@@ -1,0 +1,122 @@
+from abc import ABC, abstractmethod
+from torchvision.models import (
+    ResNet50_Weights,
+    VGG16_Weights,
+    Inception_V3_Weights,
+    resnet50,
+    vgg16,
+    inception_v3,
+)
+import torch
+from enum import Enum
+from PIL.Image import Image as ImageImage
+from PIL import Image
+from urllib.request import urlretrieve
+from ultralytics import YOLO
+
+class EmbeddingModelNames(str, Enum):
+    RESNET50 = "resnet50"
+    VGG16 = "vgg16"
+    INCEPTION_V3 = "inception_v3"
+    YOLOn = "yolon"
+    YOLOs = "yolos"
+    YOLOm = "yolom"
+
+MODELS = {
+    EmbeddingModelNames.RESNET50: {
+        'model': resnet50,
+        'weights': ResNet50_Weights.DEFAULT,
+    },
+
+    EmbeddingModelNames.VGG16: {
+        'model': vgg16,
+        'weights': VGG16_Weights.DEFAULT,
+    },
+
+    EmbeddingModelNames.INCEPTION_V3: {
+        'model': inception_v3,
+        'weights': Inception_V3_Weights.DEFAULT
+    },
+    EmbeddingModelNames.YOLOn: {
+        'model': 'yolo26n.pt',
+    },
+    EmbeddingModelNames.YOLOs: {
+        'model': 'yolo26s.pt',
+    },
+    EmbeddingModelNames.YOLOm: {
+        'model': 'yolo26m.pt',
+    },
+}
+
+class EmbeddingModel(ABC):
+    @staticmethod
+    def model_factory(name: EmbeddingModelNames) -> EmbeddingModel:
+        match name:
+            case EmbeddingModelNames.YOLOm | EmbeddingModelNames.YOLOs | EmbeddingModelNames.YOLOn:
+                return YoloEmbeddingModel(name)
+
+            case _:
+                return TorchEmbeddingModel(name)
+
+    @abstractmethod
+    def get_embedding(self, image: ImageImage) -> list[float]:
+        pass
+
+    @abstractmethod
+    def get_embedding_from_url(self, url: str, **kwargs) -> list[float]:
+        pass
+
+class TorchEmbeddingModel(EmbeddingModel):
+    def __init__(self, name: EmbeddingModelNames):
+        self.name = name
+
+        m_data = MODELS[name]
+        self.preprocessor = m_data['weights'].transforms()
+        self.model = m_data['model'](weights=m_data['weights'])
+        if hasattr(self.model, 'classifier'):
+            # Remove the final layer
+            self.model.classifier = self.model.classifier[:-1]
+        elif hasattr(self.model, 'fc'):
+            self.model.fc = torch.nn.Identity()
+        else:
+            print(f"Nothing done for model {name}")
+        self.model.eval()  # Set model to evaluation mode
+
+    def get_embedding(self, image: ImageImage) -> list[float]:
+        # Get the embedding
+        with torch.no_grad():
+            input_tensor = self.preprocessor(image).unsqueeze(0)  # Add batch dimension
+            output = self.model(input_tensor)
+
+        return output.squeeze().tolist()  # Convert to list for storage
+
+    def get_embedding_from_url(self, url: str, **kwargs):
+        file, _ = urlretrieve(url)
+        img = Image.open(file).convert("RGB")
+        return self.get_embedding(img, **kwargs)
+
+class YoloEmbeddingModel(EmbeddingModel):
+    def __init__(self, name: EmbeddingModelNames):
+        self.model = YOLO(MODELS[name]['model'])
+
+    def get_embedding(self, image: ImageImage) -> list[float]:
+        return self.model.embed(image)[0].cpu().tolist() # type: ignore
+
+    def get_embedding_from_url(self, url: str, **kwargs) -> list[float]:
+        return self.model.embed(url, **kwargs)[0].cpu().tolist()
+
+memo = {}
+def get_model(name: EmbeddingModelNames) -> EmbeddingModel:
+    if name not in memo:
+        memo[name] = EmbeddingModel.model_factory(name)
+
+    return memo[name]
+
+if __name__ == "__main__":
+    model = get_model(EmbeddingModelNames.YOLOm)
+    embedding = model.get_embedding_from_url(
+            "https://www.sqlalchemy.org/img/symbols-bg5.gif")
+
+    print(embedding)
+    
+
