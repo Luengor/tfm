@@ -28,12 +28,20 @@ class Configuration:
 
         return similar_images
 
-    def cluster_images(self, **kwargs) -> list[int]:
+    def cluster_images(self, **kwargs) -> list[list[ImageData]]:
         # Get all images from storage
         images = self.storage.get_all_images()
 
         # Cluster the images
-        clusters = self.clustering.cluster(images, **kwargs)
+        cluster_index = self.clustering.cluster(images, **kwargs)
+        n_clusters = max(cluster_index) + 1
+
+        clusters = [[] for _ in range(n_clusters)]
+        for i, cluster in enumerate(cluster_index):
+            if cluster == -1:
+                clusters.append([images[i]])
+            else:
+                clusters[cluster].append(images[i])
 
         return clusters
 
@@ -45,19 +53,30 @@ if __name__ == "__main__":
     from sys import argv
     from tqdm import tqdm
 
+    print("Creating configuration...")
     config = Configuration(
             SQLiteStorage("test.db"),
             get_model(EmbeddingModelNames.YOLOn),
             KMeansClusterer()
     )
 
+    print("Adding images...")
     for filename in tqdm(argv[1:]):
         try:
             config.save_image(filename)
         except Exception as e:
             print(f"Error processing {filename}: {e}")
 
-    clusters = config.cluster_images(n_clusters=3)
-    print(clusters)
-    print([image.filename for image in config.get_by_distance(argv[1])])
+    print("Clustering images...")
+    clusters = config.cluster_images(n_clusters=20)
+    for cluster in clusters:
+        print(f"Cluster with {len(cluster)} images:")
+        for image in cluster[:5]:  # Print first 5 images in the cluster
+            print(f"  - {image.filename}")
+
+    if len(argv) <= 1:
+        exit(0) 
+    
+    print("\nFinding similar images...")
+    print('\n'.join(image.filename for image in config.get_by_distance(argv[1])[:10]))
 

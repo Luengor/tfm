@@ -8,5 +8,5 @@ class KMeansClusterer(ClusteringBase):
         n_clusters = kwargs.get("n_clusters", 5)
         embeddings = np.array([img.embedding for img in images])
         kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(embeddings)
-        return list(kmeans.labels_) # type: ignore
+        return list(kmeans.labels_.tolist()) # type: ignore
 
