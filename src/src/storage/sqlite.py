@@ -1,6 +1,6 @@
 from src.abstractions import StorageBase, ImageData 
 from PIL import Image as PILImage
-from functools import lru_cache
+import numpy as np
 import struct
 import sqlite3
 
@@ -54,15 +54,18 @@ class SQLiteStorage(StorageBase):
         return images
 
     @staticmethod
-    def distance(emb1: list[float], emb2: list[float], squared:bool = True) -> float:
-        distance = sum((a - b) ** 2 for a, b in zip(emb1, emb2))
-        return distance if squared else distance ** 0.5
+    def distance(emb1: list[float], emb2: list[float], cos_distance: bool) -> float:
+        if cos_distance:
+            return 1 - np.dot(emb1, emb2) / (np.linalg.norm(emb1) * np.linalg.norm(emb2))
+        else:
+            # Euclidean distance
+            return float(np.linalg.norm(np.array(emb1) - np.array(emb2)))
 
-    def get_by_distance(self, embedding: list[float]) -> list[ImageData]:
+    def get_by_distance(self, embedding: list[float], cos_distance: bool = True) -> list[ImageData]:
         # Get all images first and calculate distance in Python (not efficient
         # but we can't do much more in sqlite)
         all_images = self.get_all_images()
-        sorted_images = sorted(all_images, key=lambda img: self.distance(img.embedding, embedding))
+        sorted_images = sorted(all_images, key=lambda img: self.distance(img.embedding, embedding, cos_distance))
         return sorted_images
 
 if __name__ == "__main__":

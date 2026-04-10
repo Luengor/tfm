@@ -21,7 +21,7 @@ class StorageBase(ABC):
         ...
 
     @abstractmethod
-    def get_by_distance(self, embedding: list[float]) -> list[ImageData]:
+    def get_by_distance(self, embedding: list[float], cos_distance: bool = True) -> list[ImageData]:
         ...
 
 class EmbeddingBase(ABC):

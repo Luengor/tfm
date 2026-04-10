@@ -1,5 +1,6 @@
 from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData
 from PIL import Image as PILImage
+import numpy as np
 
 class Configuration:
     def __init__(self, storage: StorageBase, embedding: EmbeddingBase,
@@ -19,12 +20,12 @@ class Configuration:
 
         return data
 
-    def get_by_distance(self, filename: str) -> list[ImageData]:
+    def get_by_distance(self, filename: str, cos_distance: bool = True) -> list[ImageData]:
         # Load the target image
         target_data = self.storage.load(filename)
 
         # Get similar images by distance
-        similar_images = self.storage.get_by_distance(target_data.embedding)
+        similar_images = self.storage.get_by_distance(target_data.embedding, cos_distance=cos_distance)
 
         return similar_images
 
@@ -45,6 +46,16 @@ class Configuration:
 
         return clusters
 
+    def get_distance(self, filename1: str, filename2: str, cos_distance: bool = True) -> float:
+        data1 = self.storage.load(filename1)
+        data2 = self.storage.load(filename2)
+
+        if cos_distance:
+            return 1 - np.dot(data1.embedding, data2.embedding) / (np.linalg.norm(data1.embedding) * np.linalg.norm(data2.embedding))
+        else:
+            # Euclidean distance
+            return float(np.linalg.norm(np.array(data1.embedding) - np.array(data2.embedding)))
+
 
 if __name__ == "__main__":
     from src.storage.sqlite import SQLiteStorage
@@ -56,7 +67,7 @@ if __name__ == "__main__":
     print("Creating configuration...")
     config = Configuration(
             SQLiteStorage("test.db"),
-            get_model(EmbeddingModelNames.YOLOn),
+            get_model(EmbeddingModelNames.YOLOs),
             KMeansClusterer()
     )
 
