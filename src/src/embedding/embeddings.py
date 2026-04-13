@@ -24,25 +24,31 @@ MODELS = {
     EmbeddingModelNames.RESNET50: {
         'model': resnet50,
         'weights': ResNet50_Weights.DEFAULT,
+        'embedding_size': 2048,
     },
 
     EmbeddingModelNames.VGG16: {
         'model': vgg16,
         'weights': VGG16_Weights.DEFAULT,
+        'embedding_size': 4096,
     },
 
     EmbeddingModelNames.INCEPTION_V3: {
         'model': inception_v3,
-        'weights': Inception_V3_Weights.DEFAULT
+        'weights': Inception_V3_Weights.DEFAULT,
+        'embedding_size': 2048,
     },
     EmbeddingModelNames.YOLOn: {
         'model': 'yolo26n.pt',
+        'embedding_size': 256,
     },
     EmbeddingModelNames.YOLOs: {
         'model': 'yolo26s.pt',
+        'embedding_size': 512,
     },
     EmbeddingModelNames.YOLOm: {
         'model': 'yolo26m.pt',
+        'embedding_size': 512,
     },
 }
 
@@ -53,13 +59,16 @@ class TorchEmbeddingModel(EmbeddingBase):
         m_data = MODELS[name]
         self.preprocessor = m_data['weights'].transforms()
         self.model = m_data['model'](weights=m_data['weights'])
-        if hasattr(self.model, 'classifier'):
-            # Remove the final layer
-            self.model.classifier = self.model.classifier[:-1]
-        elif hasattr(self.model, 'fc'):
-            self.model.fc = torch.nn.Identity()
-        else:
-            print(f"Nothing done for model {name}")
+
+        # Remove final layer
+        match name:
+            case EmbeddingModelNames.RESNET50:
+                self.model.fc = torch.nn.Identity()
+            case EmbeddingModelNames.VGG16:
+                self.model.classifier[6] = torch.nn.Identity()
+            case EmbeddingModelNames.INCEPTION_V3:
+                self.model.fc = torch.nn.Identity()
+
         self.model.eval()  # Set model to evaluation mode
 
     def gen_embedding(self, image: ImageImage) -> list[float]:
@@ -70,12 +79,21 @@ class TorchEmbeddingModel(EmbeddingBase):
 
         return output.squeeze().tolist()  # Convert to list for storage
 
+    @property
+    def embedding_size(self) -> int:
+        return MODELS[self.name]['embedding_size']
+
 class YoloEmbeddingModel(EmbeddingBase):
     def __init__(self, name: EmbeddingModelNames):
+        self.name = name
         self.model = YOLO(MODELS[name]['model'])
 
     def gen_embedding(self, image: ImageImage) -> list[float]:
         return self.model.embed(image)[0].cpu().tolist() # type: ignore
+
+    @property
+    def embedding_size(self) -> int:
+        return MODELS[self.name]['embedding_size']
 
 def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
     match name:
@@ -85,3 +103,8 @@ def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
         case _:
             return TorchEmbeddingModel(name)
 
+
+if __name__ == "__main__":
+    for name in EmbeddingModelNames:
+        model = get_model(name)
+        print(name, model.embedding_size)

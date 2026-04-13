@@ -1,18 +1,22 @@
-from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData
+from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData, ClusterCombo, SiameseBase
 from PIL import Image as PILImage
 import numpy as np
+from enum import Enum
+
+class DistanceMethod(str, Enum):
+    COSINE = "cosine"
+    EUCLIDEAN = "euclidean"
+    SIAMSE = "siamese"
 
 class Configuration:
-    def __init__(self, storage: StorageBase, embedding: EmbeddingBase,
-                 clustering: ClusteringBase):
+    def __init__(self, storage: StorageBase, nn: ClusterCombo | SiameseBase):
         self.storage = storage
-        self.embedding = embedding
-        self.clustering = clustering
+        self.nn = nn
 
     def save_image(self, filename: str) -> ImageData:
         # Get the image embedding
         image = PILImage.open(filename).convert("RGB")
-        emb = self.embedding.gen_embedding(image)
+        emb = self.nn.gen_embedding(image) 
 
         # Save the image data
         data = ImageData(filename=filename, embedding=emb)
@@ -30,11 +34,13 @@ class Configuration:
         return similar_images
 
     def cluster_images(self, **kwargs) -> list[list[ImageData]]:
+        assert isinstance(self.nn, ClusterCombo)
+
         # Get all images from storage
         images = self.storage.get_all_images()
 
         # Cluster the images
-        cluster_index = self.clustering.cluster(images, **kwargs)
+        cluster_index = self.nn.cluster(images, **kwargs)
         n_clusters = max(cluster_index) + 1
 
         clusters = [[] for _ in range(n_clusters)]
@@ -46,16 +52,19 @@ class Configuration:
 
         return clusters
 
-    def get_distance(self, filename1: str, filename2: str, cos_distance: bool = True) -> float:
+    def get_distance(self, filename1: str, filename2: str, distance_method: DistanceMethod = DistanceMethod.COSINE) -> float:
         data1 = self.storage.load(filename1)
         data2 = self.storage.load(filename2)
 
-        if cos_distance:
+
+        if distance_method == DistanceMethod.COSINE:
             return 1 - np.dot(data1.embedding, data2.embedding) / (np.linalg.norm(data1.embedding) * np.linalg.norm(data2.embedding))
-        else:
+        elif distance_method == DistanceMethod.EUCLIDEAN:
             # Euclidean distance
             return float(np.linalg.norm(np.array(data1.embedding) - np.array(data2.embedding)))
 
+        assert isinstance(self.nn, SiameseBase) 
+        return self.nn.distance(data1, data2)
 
 if __name__ == "__main__":
     from src.storage.sqlite import SQLiteStorage
@@ -67,8 +76,7 @@ if __name__ == "__main__":
     print("Creating configuration...")
     config = Configuration(
             SQLiteStorage("test.db"),
-            get_model(EmbeddingModelNames.YOLOs),
-            KMeansClusterer()
+            ClusterCombo(get_model(EmbeddingModelNames.INCEPTION_V3), KMeansClusterer())
     )
 
     print("Adding images...")
@@ -86,8 +94,8 @@ if __name__ == "__main__":
             print(f"  - {image.filename}")
 
     if len(argv) <= 1:
-        exit(0) 
-    
+        exit(0)
+
     print("\nFinding similar images...")
     print('\n'.join(image.filename for image in config.get_by_distance(argv[1])[:10]))
 
