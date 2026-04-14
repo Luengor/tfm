@@ -16,7 +16,7 @@ class TripletDataset(Dataset):
         self.clusters = clusters
         self.images_path = images_path
         self.len = sum(len(cluster) for cluster in self.clusters)
-        self.first_noise = self.len 
+        self.first_noise = len(self.clusters)
         self.transforms = transforms
         for ci, cluster in enumerate(self.clusters):
             if len(cluster) == 1:
@@ -72,7 +72,7 @@ class CustomTrainer:
         self.optimizer = optim.Adam(self.model.parameters(), lr=1e-4)
 
     # Perform one epoch of training
-    def train(self):
+    def train(self) -> float:
         self.model.train()
 
         criterion = nn.TripletMarginLoss(margin=1.0, p=2)
@@ -86,7 +86,10 @@ class CustomTrainer:
             self.optimizer.step()
 
         # Print last loss for monitoring
-        print(f"Last loss: {loss.item():.6f}")
+        return float(loss.item()) # type: ignore
+
+    def save_model(self, path: str):
+        torch.save(self.model.model.state_dict(), path)
 
 if __name__ == "__main__":
     from sys import argv
@@ -99,5 +102,17 @@ if __name__ == "__main__":
 
     custom_resnet = TorchEmbeddingModel(EmbeddingModelNames.RESNET50)
     trainer = CustomTrainer(custom_resnet, argv[1], argv[2], device) 
-    trainer.train()
+
+    try:
+        for epoch in range(10):
+            loss = trainer.train()
+            print(f"Epoch {epoch + 1}, Loss: {loss:.4f}")
+            if loss < 0.1:
+                break
+    except KeyboardInterrupt:
+        print("Training interrupted. Saving model...")
+    
+    trainer.save_model(argv[3])
+
+
 

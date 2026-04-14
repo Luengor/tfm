@@ -63,6 +63,7 @@ class Configuration:
 if __name__ == "__main__":
     from src.storage.sqlite import SQLiteStorage
     from src.embedding.embeddings import get_model, EmbeddingModelNames
+    from src.embedding.custom import CustomEmbeddingModel
     from src.cluster.cluster import KMeansClusterer
     from sys import argv
     from tqdm import tqdm
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     print("Creating configuration...")
     config = Configuration(
             SQLiteStorage("test.db"),
-            get_model(EmbeddingModelNames.INCEPTION_V3),
+            CustomEmbeddingModel(EmbeddingModelNames.RESNET50, "locresnet.pt"),
             KMeansClusterer()
     )
 
