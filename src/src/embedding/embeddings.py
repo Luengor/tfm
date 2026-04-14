@@ -7,6 +7,7 @@ from torchvision.models import (
     inception_v3,
 )
 import torch
+import torch.nn as nn
 from enum import Enum
 from PIL.Image import Image as ImageImage
 from ultralytics import YOLO # pyright: ignore
@@ -52,8 +53,9 @@ MODELS = {
     },
 }
 
-class TorchEmbeddingModel(EmbeddingBase):
+class TorchEmbeddingModel(nn.Module, EmbeddingBase):
     def __init__(self, name: EmbeddingModelNames):
+        super().__init__()
         self.name = name
 
         m_data = MODELS[name]
@@ -69,15 +71,19 @@ class TorchEmbeddingModel(EmbeddingBase):
             case EmbeddingModelNames.INCEPTION_V3:
                 self.model.fc = torch.nn.Identity()
 
-        self.model.eval()  # Set model to evaluation mode
-
     def gen_embedding(self, image: ImageImage) -> list[float]:
+        # Ensure model is in evaluation mode
+        self.model.eval()
+
         # Get the embedding
         with torch.no_grad():
             input_tensor = self.preprocessor(image).unsqueeze(0)  # Add batch dimension
             output = self.model(input_tensor)
 
         return output.squeeze().tolist()  # Convert to list for storage
+
+    def forward(self, x):
+        return self.model(x)
 
     @property
     def embedding_size(self) -> int:
@@ -108,3 +114,4 @@ if __name__ == "__main__":
     for name in EmbeddingModelNames:
         model = get_model(name)
         print(name, model.embedding_size)
+

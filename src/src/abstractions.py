@@ -39,32 +39,3 @@ class ClusteringBase(ABC):
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
         ...
 
-class ClusterCombo(EmbeddingBase, ClusteringBase):
-    def __init__(self, embedding: EmbeddingBase, clustering: ClusteringBase):
-        self.embedding = embedding
-        self.clustering = clustering
-
-    def gen_embedding(self, image: PILImage) -> list[float]:
-        return self.embedding.gen_embedding(image)
-
-    @property
-    def embedding_size(self) -> int:
-        return self.embedding.embedding_size
-
-    def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
-        return self.clustering.cluster(images, **kwargs)
-
-class SiameseBase(EmbeddingBase):
-    @abstractmethod
-    def gen_embedding(self, image: PILImage) -> list[float]:
-        ...
-
-    @property
-    @abstractmethod
-    def embedding_size(self) -> int:
-        ...
-
-    @abstractmethod
-    def distance(self, image1: ImageData, image2: ImageData) -> float:
-        ...
-
