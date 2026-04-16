@@ -66,15 +66,18 @@ class Configuration:
 
 if __name__ == "__main__":
     from src.storage.sqlite import SQLiteStorage
+    from src.storage.postgresql import PostgreSQLStorage
     from src.embedding.embeddings import get_model, EmbeddingModelNames
     from src.embedding.custom import CustomEmbeddingModel
     from src.cluster.cluster import KMeansClusterer
     from sys import argv
     from tqdm import tqdm
 
+    storage = PostgreSQLStorage("postgresql://postgres:changethis@localhost:54321/postgres")
+
     print("Creating configuration...")
     config = Configuration(
-            SQLiteStorage("test.db"),
+            storage,
             CustomEmbeddingModel(EmbeddingModelNames.RESNET50, "locresnet.pt"),
             KMeansClusterer()
     )
