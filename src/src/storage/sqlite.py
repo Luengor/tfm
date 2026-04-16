@@ -35,6 +35,10 @@ class SQLiteStorage(StorageBase):
         embedding = list(struct.unpack(f"{len(embedding_bytes) // 4}f", embedding_bytes))
         return ImageData(filename=row[0], embedding=embedding)
 
+    def has(self, filename: str) -> bool:
+        self.cur.execute("SELECT 1 FROM images WHERE filename = ?;", (filename,))
+        return self.cur.fetchone() is not None
+
     def load(self, filename:str) -> ImageData:
         self.cur.execute("SELECT filename, embedding FROM images WHERE filename = ?;", (filename,))
         result = self.cur.fetchone()

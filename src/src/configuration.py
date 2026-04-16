@@ -14,6 +14,10 @@ class Configuration:
         self.clustering = clustering
 
     def save_image(self, filename: str) -> ImageData:
+        # Check if the image is already in storage
+        if self.storage.has(filename):
+            return self.storage.load(filename)
+
         # Get the image embedding
         image = PILImage.open(filename).convert("RGB")
         emb = self.embedding.gen_embedding(image)

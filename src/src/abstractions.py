@@ -17,6 +17,10 @@ class StorageBase(ABC):
         ...
 
     @abstractmethod
+    def has(self, filename: str) -> bool:
+        ...
+
+    @abstractmethod
     def get_all_images(self) -> list[ImageData]:
         ...
 
