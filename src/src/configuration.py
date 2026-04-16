@@ -65,11 +65,10 @@ class Configuration:
             return float(np.linalg.norm(np.array(data1.embedding) - np.array(data2.embedding)))
 
 if __name__ == "__main__":
-    from src.storage.sqlite import SQLiteStorage
     from src.storage.postgresql import PostgreSQLStorage
-    from src.embedding.embeddings import get_model, EmbeddingModelNames
+    from src.embedding.embeddings import EmbeddingModelNames, get_model
     from src.embedding.custom import CustomEmbeddingModel
-    from src.cluster.cluster import KMeansClusterer
+    from src.cluster.cluster import OPTICSClusterer 
     from sys import argv
     from tqdm import tqdm
 
@@ -78,8 +77,8 @@ if __name__ == "__main__":
     print("Creating configuration...")
     config = Configuration(
             storage,
-            CustomEmbeddingModel(EmbeddingModelNames.RESNET50, "locresnet.pt"),
-            KMeansClusterer()
+            get_model(EmbeddingModelNames.YOLOm),
+            OPTICSClusterer()
     )
 
     print("Adding images...")
@@ -90,7 +89,7 @@ if __name__ == "__main__":
             print(f"Error processing {filename}: {e}")
 
     print("Clustering images...")
-    clusters = config.cluster_images(n_clusters=20)
+    clusters = config.cluster_images(metric="cosine", min_samples=2)
     for cluster in clusters:
         print(f"Cluster with {len(cluster)} images:")
         for image in cluster[:5]:  # Print first 5 images in the cluster
