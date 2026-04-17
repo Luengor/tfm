@@ -27,6 +27,8 @@ class TripletDataset(Dataset):
         return self.len 
 
     def __getitem__(self, index: int):
+        random.seed(index)  # Ensure reproducibility for the same index
+
         anchor_class = random.randint(0, self.first_noise - 1)
         first_index = random.randint(0, len(self.clusters[anchor_class]) - 1)
         second_index = first_index
@@ -113,6 +115,4 @@ if __name__ == "__main__":
         print("Training interrupted. Saving model...")
     
     trainer.save_model(argv[3])
-
-
 

@@ -64,12 +64,24 @@ class Configuration:
             # Euclidean distance
             return float(np.linalg.norm(np.array(data1.embedding) - np.array(data2.embedding)))
 
+def save_folder(folder: str, config: Configuration):
+    for filename in tqdm(os.listdir(folder), desc=f"Processing {folder}"):
+        full_path = os.path.join(folder, filename)
+        try:
+            if os.path.isfile(full_path):
+                config.save_image(full_path)
+            else:
+                save_folder(full_path, config)
+        except Exception as e:
+            print(f"Error processing {full_path}: {e}")
+
 if __name__ == "__main__":
     from src.storage.postgresql import PostgreSQLStorage
     from src.embedding.embeddings import EmbeddingModelNames, get_model
     from src.embedding.custom import CustomEmbeddingModel
     from src.cluster.cluster import OPTICSClusterer 
     from sys import argv
+    import os
     from tqdm import tqdm
 
     storage = PostgreSQLStorage("postgresql://postgres:changethis@localhost:54321/postgres")
@@ -77,27 +89,31 @@ if __name__ == "__main__":
     print("Creating configuration...")
     config = Configuration(
             storage,
-            get_model(EmbeddingModelNames.YOLOm),
+            get_model(EmbeddingModelNames.YOLOs),
             OPTICSClusterer()
     )
 
-    print("Adding images...")
+    if len(argv) < 2:
+        print("Clustering images...")
+        clusters = config.cluster_images(metric="cosine", min_samples=2)
+        for cluster in clusters:
+            print(f"Cluster with {len(cluster)} images:")
+            for image in cluster[:5]:  # Print first 5 images in the cluster
+                print(f"  - {image.filename}")
+
+    # Check if the argv[1] is a folder or file 
+    if os.path.isdir(argv[1]):
+        print("Adding images...")
+        save_folder(argv[1], config)
+
+    else:
+        print("\nFinding similar images...")
+        print('\n'.join(image.filename for image in config.get_by_distance(argv[1])[:10]))
+
     for filename in tqdm(argv[1:]):
         try:
             config.save_image(filename)
         except Exception as e:
             print(f"Error processing {filename}: {e}")
 
-    print("Clustering images...")
-    clusters = config.cluster_images(metric="cosine", min_samples=2)
-    for cluster in clusters:
-        print(f"Cluster with {len(cluster)} images:")
-        for image in cluster[:5]:  # Print first 5 images in the cluster
-            print(f"  - {image.filename}")
-
-    if len(argv) <= 1:
-        exit(0)
-
-    print("\nFinding similar images...")
-    print('\n'.join(image.filename for image in config.get_by_distance(argv[1])[:10]))
 
