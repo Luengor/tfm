@@ -1,0 +1,93 @@
+from dataclasses import dataclass, field
+from typing import Any
+
+
+@dataclass(slots=True)
+class ComponentSpec:
+    type: str
+    params: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(slots=True)
+class DistanceQuerySpec:
+    enabled: bool = False
+    target_index: int = 0
+    cos_distance: bool = True
+    top_k: int = 10
+
+
+@dataclass(slots=True)
+class BenchmarkRunSpec:
+    name: str
+    storage: ComponentSpec
+    embedding: ComponentSpec
+    clustering: ComponentSpec
+    distance_query: DistanceQuerySpec = field(default_factory=DistanceQuerySpec)
+    clear_storage: bool = True
+    run_id: str = ""
+
+
+@dataclass(slots=True)
+class StageMetrics:
+    wall_time_s: float
+    cpu_time_s: float
+    cpu_percent_estimated: float
+    rss_start_mb: float
+    rss_end_mb: float
+    rss_delta_mb: float
+    peak_rss_mb: float | None
+
+    def to_flat_dict(self, prefix: str) -> dict[str, float | None]:
+        return {
+            f"{prefix}_wall_time_s": self.wall_time_s,
+            f"{prefix}_cpu_time_s": self.cpu_time_s,
+            f"{prefix}_cpu_percent_estimated": self.cpu_percent_estimated,
+            f"{prefix}_rss_start_mb": self.rss_start_mb,
+            f"{prefix}_rss_end_mb": self.rss_end_mb,
+            f"{prefix}_rss_delta_mb": self.rss_delta_mb,
+            f"{prefix}_peak_rss_mb": self.peak_rss_mb,
+        }
+
+
+@dataclass(slots=True)
+class BenchmarkResult:
+    run_name: str
+    run_id: str
+    status: str
+    started_at: str
+    finished_at: str
+    image_count: int
+    cluster_count: int | None
+    storage_type: str
+    embedding_type: str
+    clustering_type: str
+    error: str | None = None
+    setup: StageMetrics | None = None
+    clear_storage: StageMetrics | None = None
+    ingest: StageMetrics | None = None
+    distance_query: StageMetrics | None = None
+    clustering: StageMetrics | None = None
+    total: StageMetrics | None = None
+
+    def to_record(self) -> dict[str, Any]:
+        record: dict[str, Any] = {
+            "run_name": self.run_name,
+            "run_id": self.run_id,
+            "status": self.status,
+            "started_at": self.started_at,
+            "finished_at": self.finished_at,
+            "image_count": self.image_count,
+            "cluster_count": self.cluster_count,
+            "storage_type": self.storage_type,
+            "embedding_type": self.embedding_type,
+            "clustering_type": self.clustering_type,
+            "error": self.error,
+        }
+
+        for stage_name in ("setup", "clear_storage", "ingest", "distance_query", "clustering", "total"):
+            stage = getattr(self, stage_name)
+            if stage is None:
+                continue
+            record.update(stage.to_flat_dict(stage_name))
+
+        return record

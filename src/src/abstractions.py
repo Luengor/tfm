@@ -28,6 +28,9 @@ class StorageBase(ABC):
     def get_by_distance(self, embedding: list[float], cos_distance: bool = True) -> list[ImageData]:
         ...
 
+    def clear(self) -> None:
+        raise NotImplementedError("Storage backend does not implement clear().")
+
 class EmbeddingBase(ABC):
     @abstractmethod
     def gen_embedding(self, image: PILImage) -> list[float]:

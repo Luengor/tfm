@@ -1,0 +1,49 @@
+{
+  "runs": [
+    {
+      "name": "sqlite_resnet_kmeans",
+      "storage": {
+        "type": "sqlite"
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 5
+        }
+      },
+      "distance_query": {
+        "enabled": true,
+        "target_index": 0,
+        "cos_distance": true,
+        "top_k": 10
+      },
+      "clear_storage": true
+    },
+    {
+      "name": "sqlite_yolos_optics",
+      "storage": {
+        "type": "sqlite"
+      },
+      "embedding": {
+        "type": "yolos"
+      },
+      "clustering": {
+        "type": "optics",
+        "params": {
+          "min_samples": 5,
+          "metric": "cosine"
+        }
+      },
+      "distance_query": {
+        "enabled": true,
+        "target_index": 0,
+        "cos_distance": true,
+        "top_k": 10
+      },
+      "clear_storage": true
+    }
+  ]
+}

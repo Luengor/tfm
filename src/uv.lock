@@ -1239,7 +1239,7 @@ wheels = [
 [[package]]
 name = "src"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "exifread" },
     { name = "ipykernel" },
@@ -1248,6 +1248,7 @@ dependencies = [
     { name = "pandas" },
     { name = "pgvector" },
     { name = "pip" },
+    { name = "psutil" },
     { name = "psycopg2-binary" },
     { name = "scikit-learn" },
     { name = "sqlalchemy" },
@@ -1265,6 +1266,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=3.0.1" },
     { name = "pgvector", specifier = ">=0.4.2" },
     { name = "pip", specifier = ">=26.0.1" },
+    { name = "psutil", specifier = ">=6.1.1" },
     { name = "psycopg2-binary", specifier = ">=2.9.11" },
     { name = "scikit-learn", specifier = ">=1.8.0" },
     { name = "sqlalchemy", specifier = ">=2.0.49" },
