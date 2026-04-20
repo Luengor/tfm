@@ -1,4 +1,4 @@
-from src.abstractions import StorageBase, ImageData 
+from src.abstractions import StorageBase, ImageData
 from PIL import Image as PILImage
 import numpy as np
 import struct
@@ -47,7 +47,7 @@ class SQLiteStorage(StorageBase):
             raise ValueError(f"Image with filename '{filename}' not found in database.")
 
         return self._row_to_image_data(result)
-    
+
     def get_all_images(self) -> list[ImageData]:
         self.cur.execute("SELECT filename, embedding FROM images;")
         results = self.cur.fetchall()
@@ -71,6 +71,10 @@ class SQLiteStorage(StorageBase):
         all_images = self.get_all_images()
         sorted_images = sorted(all_images, key=lambda img: self.distance(img.embedding, embedding, cos_distance))
         return sorted_images
+
+    def clear(self) -> None:
+        self.cur.execute("DELETE FROM images;")
+        self.con.commit()
 
 if __name__ == "__main__":
     storage = SQLiteStorage("test.db")

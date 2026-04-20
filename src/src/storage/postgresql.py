@@ -59,7 +59,11 @@ class PostgreSQLStorage(StorageBase):
             distance_expr = ImageModel.embedding.cosine_distance(embedding).label("distance")
         else:
             distance_expr = ImageModel.embedding.l2_distance(embedding).label("distance")
-        
+
         query = self.session.query(ImageModel, distance_expr).order_by(distance_expr)
         return [self._2imagedata(image) for image, _ in query.all()]
+
+    def clear(self) -> None:
+        self.session.query(ImageModel).delete()
+        self.session.commit()
 
