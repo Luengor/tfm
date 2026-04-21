@@ -7,6 +7,8 @@ requires-python = ">=3.14"
 dependencies = [
     "exifread>=3.5.1",
     "ipykernel>=7.2.0",
+    "jupyterlab>=4.5.6",
+    "jupyterlab-vim>=4.1.4",
     "matplotlib>=3.10.8",
     "numpy>=2.4.3",
     "pandas>=3.0.1",
