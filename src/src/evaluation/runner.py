@@ -71,6 +71,8 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
     ingest_metrics = None
     reduction_metrics = None
     query_metrics = None
+    similarity_metrics = None
+    avg_neighbor_distance = None
     clustering_metrics = None
     clustering_quality = None
 
@@ -119,6 +121,32 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
                     )
                     _ = nearest[: run_spec.distance_query.top_k]
                 query_metrics = query_stage.metrics
+
+            if run_spec.similarity_search.enabled:
+                with profile_stage() as similarity_stage:
+                    all_images = config.storage.get_all_images()
+                    distances = []
+                    for img in all_images:
+                        nearest = config.storage.get_by_distance(
+                            img.embedding,
+                            max_images=run_spec.similarity_search.top_k + 1,
+                            cos_distance=run_spec.similarity_search.cos_distance,
+                        )
+                        # Exclude self
+                        neighbors = [n for n in nearest if n.filename != img.filename]
+                        neighbors = neighbors[: run_spec.similarity_search.top_k]
+
+                        for n in neighbors:
+                            d = _calculate_distance(
+                                img.embedding,
+                                n.embedding,
+                                run_spec.similarity_search.cos_distance,
+                            )
+                            distances.append(d)
+
+                    if distances:
+                        avg_neighbor_distance = float(np.mean(distances))
+                similarity_metrics = similarity_stage.metrics
 
             with profile_stage() as cluster_stage:
                 all_images = config.storage.get_all_images()
@@ -170,6 +198,8 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
         ingest=ingest_metrics,
         reduction=reduction_metrics,
         distance_query=query_metrics,
+        similarity_search=similarity_metrics,
+        avg_neighbor_distance=avg_neighbor_distance,
         clustering=clustering_metrics,
         clustering_quality=clustering_quality,
         total=total_stage.metrics,
@@ -306,3 +336,18 @@ def _build_csv_columns(records: list[dict[str, Any]]) -> list[str]:
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _calculate_distance(emb1: list[float], emb2: list[float], cos_distance: bool) -> float:
+    e1 = np.array(emb1)
+    e2 = np.array(emb2)
+    if cos_distance:
+        norm1 = np.linalg.norm(e1)
+        norm2 = np.linalg.norm(e2)
+        if norm1 == 0 or norm2 == 0:
+            return 1.0
+        # Clip to avoid numerical precision issues resulting in values slightly outside [0, 2]
+        dot = np.dot(e1, e2) / (norm1 * norm2)
+        return float(1.0 - np.clip(dot, -1.0, 1.0))
+
+    return float(np.linalg.norm(e1 - e2))

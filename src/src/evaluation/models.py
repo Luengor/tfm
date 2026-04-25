@@ -17,6 +17,13 @@ class DistanceQuerySpec:
 
 
 @dataclass(slots=True)
+class SimilaritySearchSpec:
+    enabled: bool = False
+    top_k: int = 3
+    cos_distance: bool = True
+
+
+@dataclass(slots=True)
 class BenchmarkRunSpec:
     name: str
     storage: ComponentSpec
@@ -24,6 +31,7 @@ class BenchmarkRunSpec:
     clustering: ComponentSpec
     reduction: ComponentSpec | None = None
     distance_query: DistanceQuerySpec = field(default_factory=DistanceQuerySpec)
+    similarity_search: SimilaritySearchSpec = field(default_factory=SimilaritySearchSpec)
     clear_storage: bool = True
     limit: int | None = None
     run_id: str = ""
@@ -82,6 +90,8 @@ class BenchmarkResult:
     ingest: StageMetrics | None = None
     reduction: StageMetrics | None = None
     distance_query: StageMetrics | None = None
+    similarity_search: StageMetrics | None = None
+    avg_neighbor_distance: float | None = None
     clustering: StageMetrics | None = None
     clustering_quality: ClusteringQualityMetrics | None = None
     total: StageMetrics | None = None
@@ -99,10 +109,11 @@ class BenchmarkResult:
             "embedding_type": self.embedding_type,
             "clustering_type": self.clustering_type,
             "reduction_type": self.reduction_type,
+            "avg_neighbor_distance": self.avg_neighbor_distance,
             "error": self.error,
         }
 
-        for stage_name in ("setup", "clear_storage", "ingest", "reduction", "distance_query", "clustering", "total"):
+        for stage_name in ("setup", "clear_storage", "ingest", "reduction", "distance_query", "similarity_search", "clustering", "total"):
             stage = getattr(self, stage_name)
             if stage is None:
                 continue

@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from src.evaluation.models import BenchmarkRunSpec, ComponentSpec, DistanceQuerySpec
+from src.evaluation.models import BenchmarkRunSpec, ComponentSpec, DistanceQuerySpec, SimilaritySearchSpec
 
 
 class WhitelistError(ValueError):
@@ -39,6 +39,7 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
              reduction_spec = _parse_component(raw.get("reduction"), "reduction", index)
 
         distance_query = _parse_distance_query(raw.get("distance_query"), index)
+        similarity_search = _parse_similarity_search(raw.get("similarity_search"), index)
 
         clear_storage = raw.get("clear_storage", True)
         if not isinstance(clear_storage, bool):
@@ -56,6 +57,7 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
             clustering=clustering_spec,
             reduction=reduction_spec,
             distance_query=distance_query,
+            similarity_search=similarity_search,
             clear_storage=clear_storage,
             limit=limit,
         )
@@ -108,6 +110,30 @@ def _parse_distance_query(raw: Any, run_index: int) -> DistanceQuerySpec:
     )
 
 
+def _parse_similarity_search(raw: Any, run_index: int) -> SimilaritySearchSpec:
+    if raw is None:
+        return SimilaritySearchSpec()
+    if not isinstance(raw, dict):
+        raise WhitelistError(f"Run index {run_index}: similarity_search must be an object.")
+
+    enabled = raw.get("enabled", False)
+    top_k = raw.get("top_k", 3)
+    cos_distance = raw.get("cos_distance", True)
+
+    if not isinstance(enabled, bool):
+        raise WhitelistError(f"Run index {run_index}: similarity_search.enabled must be a boolean.")
+    if not isinstance(top_k, int) or top_k <= 0:
+        raise WhitelistError(f"Run index {run_index}: similarity_search.top_k must be a positive integer.")
+    if not isinstance(cos_distance, bool):
+        raise WhitelistError(f"Run index {run_index}: similarity_search.cos_distance must be a boolean.")
+
+    return SimilaritySearchSpec(
+        enabled=enabled,
+        top_k=top_k,
+        cos_distance=cos_distance,
+    )
+
+
 def _require_str(payload: dict[str, Any], key: str, run_index: int) -> str:
     value = payload.get(key)
     if not isinstance(value, str) or not value.strip():
@@ -127,6 +153,11 @@ def _make_run_id(spec: BenchmarkRunSpec) -> str:
             "target_index": spec.distance_query.target_index,
             "cos_distance": spec.distance_query.cos_distance,
             "top_k": spec.distance_query.top_k,
+        },
+        "similarity_search": {
+            "enabled": spec.similarity_search.enabled,
+            "top_k": spec.similarity_search.top_k,
+            "cos_distance": spec.similarity_search.cos_distance,
         },
         "clear_storage": spec.clear_storage,
         "limit": spec.limit,
