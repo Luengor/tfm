@@ -1,4 +1,5 @@
 from sklearn.cluster import KMeans, DBSCAN, HDBSCAN, OPTICS
+from sklearn.neighbors import NearestNeighbors
 import numpy as np
 
 from src.abstractions import ClusteringBase, ImageData
@@ -12,9 +13,40 @@ class KMeansClusterer(ClusteringBase):
 
 class DBSCANClusterer(ClusteringBase):
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
-        eps = kwargs.get("eps", 0.5)
+        eps = kwargs.get("eps")
         min_samples = kwargs.get("min_samples", 5)
         embeddings = np.array([img.embedding for img in images])
+
+        if eps is None:
+            if len(embeddings) <= min_samples:
+                return [-1] * len(embeddings)
+
+            # Find the optimal eps using the elbow method on k-distances
+            neigh = NearestNeighbors(n_neighbors=min_samples)
+            nbrs = neigh.fit(embeddings)
+            distances, _ = nbrs.kneighbors(embeddings)
+            
+            # Sort distances to the k-th nearest neighbor
+            k_distances = np.sort(distances[:, min_samples - 1])
+            
+            # Find the elbow point using perpendicular distance from line connecting endpoints
+            n = len(k_distances)
+            x = np.arange(n)
+            y = k_distances
+            
+            p1 = np.array([0, y[0]])
+            p2 = np.array([n - 1, y[-1]])
+            
+            line_vec = p2 - p1
+            line_vec_norm = line_vec / np.sqrt(np.sum(line_vec**2))
+            
+            p1_to_p = np.column_stack((x, y)) - p1
+            proj = np.outer(np.dot(p1_to_p, line_vec_norm), line_vec_norm)
+            dist_to_line = np.sqrt(np.sum((p1_to_p - proj)**2, axis=1))
+            
+            elbow_idx = np.argmax(dist_to_line)
+            eps = float(y[elbow_idx])
+
         dbscan = DBSCAN(eps=eps, min_samples=min_samples).fit(embeddings)
         return list(dbscan.labels_.tolist()) # type: ignore
 
