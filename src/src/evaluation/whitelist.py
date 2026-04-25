@@ -34,6 +34,10 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
         storage_spec = _parse_component(raw.get("storage"), "storage", index)
         embedding_spec = _parse_component(raw.get("embedding"), "embedding", index)
         clustering_spec = _parse_component(raw.get("clustering"), "clustering", index)
+        reduction_spec = None
+        if "reduction" in raw and raw["reduction"] is not None:
+             reduction_spec = _parse_component(raw.get("reduction"), "reduction", index)
+
         distance_query = _parse_distance_query(raw.get("distance_query"), index)
 
         clear_storage = raw.get("clear_storage", True)
@@ -45,6 +49,7 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
             storage=storage_spec,
             embedding=embedding_spec,
             clustering=clustering_spec,
+            reduction=reduction_spec,
             distance_query=distance_query,
             clear_storage=clear_storage,
         )
@@ -110,6 +115,7 @@ def _make_run_id(spec: BenchmarkRunSpec) -> str:
         "storage": {"type": spec.storage.type.lower(), "params": spec.storage.params},
         "embedding": {"type": spec.embedding.type.lower(), "params": spec.embedding.params},
         "clustering": {"type": spec.clustering.type.lower(), "params": spec.clustering.params},
+        "reduction": {"type": spec.reduction.type.lower(), "params": spec.reduction.params} if spec.reduction else None,
         "distance_query": {
             "enabled": spec.distance_query.enabled,
             "target_index": spec.distance_query.target_index,

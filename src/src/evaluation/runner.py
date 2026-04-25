@@ -8,6 +8,7 @@ from typing import Any
 
 import numpy as np
 
+from src.abstractions import ImageData
 from src.cluster.cluster import DBSCANClusterer, HDBSCANClusterer, KMeansClusterer, OPTICSClusterer
 from src.configuration import Configuration
 from src.embedding.custom import CustomEmbeddingModel
@@ -15,6 +16,7 @@ from src.embedding.embeddings import EmbeddingModelNames, get_model
 from src.evaluation.clustering_metrics import calculate_clustering_metrics
 from src.evaluation.metrics import get_runtime_info, profile_stage
 from src.evaluation.models import BenchmarkResult, BenchmarkRunSpec
+from src.reduction import IdentityReduction, PCAReduction, UMAPReduction
 from src.storage.postgresql import PostgreSQLStorage
 from src.storage.sqlite import SQLiteStorage
 
@@ -67,6 +69,7 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
     setup_metrics = None
     clear_metrics = None
     ingest_metrics = None
+    reduction_metrics = None
     query_metrics = None
     clustering_metrics = None
     clustering_quality = None
@@ -89,7 +92,8 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
                 storage = _build_storage(run_spec, output_dir)
                 embedding = _build_embedding(run_spec)
                 clustering = _build_clustering(run_spec)
-                config = Configuration(storage=storage, embedding=embedding, clustering=clustering)
+                reduction = _build_reduction(run_spec)
+                config = Configuration(storage=storage, embedding=embedding, clustering=clustering, reduction=reduction)
             setup_metrics = setup_stage.metrics
 
             if run_spec.clear_storage:
@@ -116,17 +120,24 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
             with profile_stage() as cluster_stage:
                 all_images = config.storage.get_all_images()
                 if all_images:
-                    labels = config.clustering.cluster(all_images, **run_spec.clustering.params)
+                    with profile_stage() as red_stage:
+                        embeddings = [img.embedding for img in all_images]
+                        reduced_embeddings = config.reduction.reduce(embeddings)
+                        clustering_images = [
+                            ImageData(filename=img.filename, embedding=emb) 
+                            for img, emb in zip(all_images, reduced_embeddings)
+                        ]
+                    reduction_metrics = red_stage.metrics
+                    labels = config.clustering.cluster(clustering_images, **run_spec.clustering.params)
+                        
                     labels_arr = np.array(labels)
+                    # Calculate quality metrics against ORIGINAL embeddings
                     embeddings_arr = np.array([img.embedding for img in all_images])
                     
-                    # Calculate quality metrics
                     clustering_quality = calculate_clustering_metrics(embeddings_arr, labels_arr)
                     
-                    # Reconstruct clusters to get count (similar to config.cluster_images)
                     n_clusters = int(labels_arr.max() + 1) if labels_arr.size > 0 else 0
                     cluster_count = n_clusters
-                    # Add noise points to count if they exist
                     if (labels_arr == -1).any():
                         cluster_count += int((labels_arr == -1).sum())
                 else:
@@ -149,10 +160,12 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
         storage_type=run_spec.storage.type,
         embedding_type=run_spec.embedding.type,
         clustering_type=run_spec.clustering.type,
+        reduction_type=run_spec.reduction.type if run_spec.reduction else "identity",
         error=error,
         setup=setup_metrics,
         clear_storage=clear_metrics,
         ingest=ingest_metrics,
+        reduction=reduction_metrics,
         distance_query=query_metrics,
         clustering=clustering_metrics,
         clustering_quality=clustering_quality,
@@ -237,6 +250,23 @@ def _build_clustering(run_spec: BenchmarkRunSpec):
         return OPTICSClusterer()
 
     raise ValueError(f"Run {run_spec.name}: unsupported clustering type '{run_spec.clustering.type}'.")
+
+
+def _build_reduction(run_spec: BenchmarkRunSpec):
+    if not run_spec.reduction:
+        return IdentityReduction()
+
+    name = run_spec.reduction.type.lower()
+    params = run_spec.reduction.params
+
+    if name == "pca":
+        return PCAReduction(**params)
+    if name == "umap":
+        return UMAPReduction(**params)
+    if name == "identity":
+        return IdentityReduction()
+
+    raise ValueError(f"Run {run_spec.name}: unsupported reduction type '{run_spec.reduction.type}'.")
 
 
 def _clear_storage(storage: Any) -> None:

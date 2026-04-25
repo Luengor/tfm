@@ -46,3 +46,8 @@ class ClusteringBase(ABC):
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
         ...
 
+class ReductionBase(ABC):
+    @abstractmethod
+    def reduce(self, embeddings: list[list[float]]) -> list[list[float]]:
+        ...
+

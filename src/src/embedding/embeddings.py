@@ -13,6 +13,8 @@ from PIL.Image import Image as ImageImage
 from ultralytics import YOLO # pyright: ignore
 from src.abstractions import EmbeddingBase
 
+def get_device() -> torch.device:
+    return torch.accelerator.current_accelerator() or torch.device("cpu")
 class EmbeddingModelNames(str, Enum):
     RESNET50 = "resnet50"
     VGG16 = "vgg16"
@@ -40,23 +42,25 @@ MODELS = {
         'embedding_size': 2048,
     },
     EmbeddingModelNames.YOLOn: {
-        'model': 'yolo26n.pt',
+        'model': 'yolov8n.pt',
         'embedding_size': 256,
     },
     EmbeddingModelNames.YOLOs: {
-        'model': 'yolo26s.pt',
+        'model': 'yolov8s.pt',
         'embedding_size': 512,
     },
     EmbeddingModelNames.YOLOm: {
-        'model': 'yolo26m.pt',
+        'model': 'yolov8m.pt',
         'embedding_size': 512,
     },
 }
+
 
 class TorchEmbeddingModel(nn.Module, EmbeddingBase):
     def __init__(self, name: EmbeddingModelNames):
         super().__init__()
         self.name = name
+        self.device = get_device()
 
         m_data = MODELS[name]
         self.preprocessor = m_data['weights'].transforms()
@@ -71,16 +75,18 @@ class TorchEmbeddingModel(nn.Module, EmbeddingBase):
             case EmbeddingModelNames.INCEPTION_V3:
                 self.model.fc = torch.nn.Identity()
 
+        self.model.to(self.device)
+
     def gen_embedding(self, image: ImageImage) -> list[float]:
         # Ensure model is in evaluation mode
         self.model.eval()
 
         # Get the embedding
         with torch.no_grad():
-            input_tensor = self.preprocessor(image).unsqueeze(0)  # Add batch dimension
+            input_tensor = self.preprocessor(image).unsqueeze(0).to(self.device)  # Add batch dimension and move to device
             output = self.model(input_tensor)
 
-        return output.squeeze().tolist()  # Convert to list for storage
+        return output.squeeze().cpu().tolist()  # Convert to list for storage, moving back to CPU
 
     def forward(self, x):
         return self.model(x)
@@ -92,7 +98,9 @@ class TorchEmbeddingModel(nn.Module, EmbeddingBase):
 class YoloEmbeddingModel(EmbeddingBase):
     def __init__(self, name: EmbeddingModelNames):
         self.name = name
+        self.device = get_device()
         self.model = YOLO(MODELS[name]['model'])
+        self.model.to(self.device)
 
     def gen_embedding(self, image: ImageImage) -> list[float]:
         return self.model.embed(image)[0].cpu().tolist() # type: ignore

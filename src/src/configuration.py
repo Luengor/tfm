@@ -1,4 +1,4 @@
-from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData
+from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData, ReductionBase
 from PIL import Image as PILImage
 import numpy as np
 from enum import Enum
@@ -8,10 +8,11 @@ class DistanceMethod(str, Enum):
     EUCLIDEAN = "euclidean"
 
 class Configuration:
-    def __init__(self, storage: StorageBase, embedding: EmbeddingBase, clustering: ClusteringBase):
+    def __init__(self, storage: StorageBase, embedding: EmbeddingBase, clustering: ClusteringBase, reduction: ReductionBase):
         self.storage = storage
         self.embedding = embedding
         self.clustering = clustering
+        self.reduction = reduction
 
     def save_image(self, filename: str) -> ImageData:
         # Check if the image is already in storage
@@ -40,10 +41,21 @@ class Configuration:
     def cluster_images(self, **kwargs) -> list[list[ImageData]]:
         # Get all images from storage
         images = self.storage.get_all_images()
+        
+        if not images:
+            return []
+
+        embeddings = [img.embedding for img in images]
+        reduced_embeddings = self.reduction.reduce(embeddings)
+        # Create temporary ImageData with reduced embeddings for clustering
+        clustering_images = [
+            ImageData(filename=img.filename, embedding=emb) 
+            for img, emb in zip(images, reduced_embeddings)
+        ]
 
         # Cluster the images
-        cluster_index = self.clustering.cluster(images, **kwargs)
-        n_clusters = max(cluster_index) + 1
+        cluster_index = self.clustering.cluster(clustering_images, **kwargs)
+        n_clusters = max(cluster_index) + 1 if cluster_index else 0
 
         clusters = [[] for _ in range(n_clusters)]
         for i, cluster in enumerate(cluster_index):
@@ -84,13 +96,15 @@ if __name__ == "__main__":
     import os
     from tqdm import tqdm
 
+    from src.reduction import IdentityReduction
     storage = PostgreSQLStorage("postgresql://postgres:changethis@localhost:54321/postgres")
 
     print("Creating configuration...")
     config = Configuration(
             storage,
             get_model(EmbeddingModelNames.YOLOs),
-            OPTICSClusterer()
+            OPTICSClusterer(),
+            IdentityReduction()
     )
 
     if len(argv) < 2:

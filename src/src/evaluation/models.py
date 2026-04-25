@@ -22,6 +22,7 @@ class BenchmarkRunSpec:
     storage: ComponentSpec
     embedding: ComponentSpec
     clustering: ComponentSpec
+    reduction: ComponentSpec | None = None
     distance_query: DistanceQuerySpec = field(default_factory=DistanceQuerySpec)
     clear_storage: bool = True
     run_id: str = ""
@@ -73,10 +74,12 @@ class BenchmarkResult:
     storage_type: str
     embedding_type: str
     clustering_type: str
+    reduction_type: str | None = None
     error: str | None = None
     setup: StageMetrics | None = None
     clear_storage: StageMetrics | None = None
     ingest: StageMetrics | None = None
+    reduction: StageMetrics | None = None
     distance_query: StageMetrics | None = None
     clustering: StageMetrics | None = None
     clustering_quality: ClusteringQualityMetrics | None = None
@@ -94,10 +97,11 @@ class BenchmarkResult:
             "storage_type": self.storage_type,
             "embedding_type": self.embedding_type,
             "clustering_type": self.clustering_type,
+            "reduction_type": self.reduction_type,
             "error": self.error,
         }
 
-        for stage_name in ("setup", "clear_storage", "ingest", "distance_query", "clustering", "total"):
+        for stage_name in ("setup", "clear_storage", "ingest", "reduction", "distance_query", "clustering", "total"):
             stage = getattr(self, stage_name)
             if stage is None:
                 continue
