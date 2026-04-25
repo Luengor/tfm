@@ -25,7 +25,7 @@ class StorageBase(ABC):
         ...
 
     @abstractmethod
-    def get_by_distance(self, embedding: list[float], cos_distance: bool = True) -> list[ImageData]:
+    def get_by_distance(self, embedding: list[float], max_images:int = -1, cos_distance: bool = True) -> list[ImageData]:
         ...
 
     def clear(self) -> None:

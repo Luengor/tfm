@@ -54,13 +54,17 @@ class PostgreSQLStorage(StorageBase):
         return [self._2imagedata(image) for image in
                 self.session.query(ImageModel).all()]
 
-    def get_by_distance(self, embedding: list[float], cos_distance: bool = True) -> list[ImageData]:
+    def get_by_distance(self, embedding: list[float], max_images: int = -1, cos_distance: bool = True) -> list[ImageData]:
         if cos_distance:
             distance_expr = ImageModel.embedding.cosine_distance(embedding).label("distance")
         else:
             distance_expr = ImageModel.embedding.l2_distance(embedding).label("distance")
 
         query = self.session.query(ImageModel, distance_expr).order_by(distance_expr)
+
+        if max_images > 0:
+            query = query.limit(max_images)
+
         return [self._2imagedata(image) for image, _ in query.all()]
 
     def clear(self) -> None:

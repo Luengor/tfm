@@ -65,11 +65,15 @@ class SQLiteStorage(StorageBase):
             # Euclidean distance
             return float(np.linalg.norm(np.array(emb1) - np.array(emb2)))
 
-    def get_by_distance(self, embedding: list[float], cos_distance: bool = True) -> list[ImageData]:
+    def get_by_distance(self, embedding: list[float], max_images: int = -1, cos_distance: bool = True) -> list[ImageData]:
         # Get all images first and calculate distance in Python (not efficient
         # but we can't do much more in sqlite)
         all_images = self.get_all_images()
         sorted_images = sorted(all_images, key=lambda img: self.distance(img.embedding, embedding, cos_distance))
+
+        if max_images > 0:
+            sorted_images = sorted_images[:max_images]
+
         return sorted_images
 
     def clear(self) -> None:

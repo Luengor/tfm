@@ -29,12 +29,12 @@ class Configuration:
 
         return data
 
-    def get_by_distance(self, filename: str, cos_distance: bool = True) -> list[ImageData]:
+    def get_by_distance(self, filename: str, max_images: int = 10, cos_distance: bool = True) -> list[ImageData]:
         # Load the target image
         target_data = self.storage.load(filename)
 
         # Get similar images by distance
-        similar_images = self.storage.get_by_distance(target_data.embedding, cos_distance=cos_distance)
+        similar_images = self.storage.get_by_distance(target_data.embedding, max_images=max_images, cos_distance=cos_distance)
 
         return similar_images
 
