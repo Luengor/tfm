@@ -94,7 +94,6 @@ class BenchmarkResult:
     avg_neighbor_distance: float | None = None
     clustering: StageMetrics | None = None
     clustering_quality: ClusteringQualityMetrics | None = None
-    total: StageMetrics | None = None
 
     def to_record(self) -> dict[str, Any]:
         record: dict[str, Any] = {
@@ -113,7 +112,7 @@ class BenchmarkResult:
             "error": self.error,
         }
 
-        for stage_name in ("setup", "clear_storage", "ingest", "reduction", "distance_query", "similarity_search", "clustering", "total"):
+        for stage_name in ("setup", "clear_storage", "ingest", "reduction", "distance_query", "similarity_search", "clustering"):
             stage = getattr(self, stage_name)
             if stage is None:
                 continue

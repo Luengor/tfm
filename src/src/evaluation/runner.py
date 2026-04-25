@@ -83,100 +83,99 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
 
     effective_limit = global_limit if global_limit is not None else run_spec.limit
 
-    with profile_stage() as total_stage:
-        try:
-            image_paths = _list_images(
-                dataset_root=dataset_root,
-                limit=effective_limit,
-            )
-            if not image_paths:
-                raise ValueError(f"Run {run_spec.name}: no images found in {dataset_root}")
-            image_count = len(image_paths)
+    try:
+        image_paths = _list_images(
+            dataset_root=dataset_root,
+            limit=effective_limit,
+        )
+        if not image_paths:
+            raise ValueError(f"Run {run_spec.name}: no images found in {dataset_root}")
+        image_count = len(image_paths)
 
-            with profile_stage() as setup_stage:
-                storage = _build_storage(run_spec, output_dir)
-                embedding = _build_embedding(run_spec)
-                clustering = _build_clustering(run_spec)
-                reduction = _build_reduction(run_spec)
-                config = Configuration(storage=storage, embedding=embedding, clustering=clustering, reduction=reduction)
-            setup_metrics = setup_stage.metrics
+        with profile_stage() as setup_stage:
+            storage = _build_storage(run_spec, output_dir)
+            embedding = _build_embedding(run_spec)
+            clustering = _build_clustering(run_spec)
+            reduction = _build_reduction(run_spec)
+            config = Configuration(storage=storage, embedding=embedding, clustering=clustering, reduction=reduction)
+        setup_metrics = setup_stage.metrics
 
-            if run_spec.clear_storage:
-                with profile_stage() as clear_stage:
-                    _clear_storage(storage)
-                clear_metrics = clear_stage.metrics
+        if run_spec.clear_storage:
+            with profile_stage() as clear_stage:
+                _clear_storage(storage)
+            clear_metrics = clear_stage.metrics
 
-            with profile_stage() as ingest_stage:
-                for image_path in image_paths:
-                    config.save_image(image_path)
-            ingest_metrics = ingest_stage.metrics
+        with profile_stage() as ingest_stage:
+            for image_path in image_paths:
+                config.save_image(image_path)
+        ingest_metrics = ingest_stage.metrics
 
-            if run_spec.distance_query.enabled:
-                target_index = min(run_spec.distance_query.target_index, image_count - 1)
-                target_path = image_paths[target_index]
-                with profile_stage() as query_stage:
-                    nearest = config.get_by_distance(
-                        target_path,
-                        cos_distance=run_spec.distance_query.cos_distance,
-                    )
-                    _ = nearest[: run_spec.distance_query.top_k]
-                query_metrics = query_stage.metrics
+        if run_spec.distance_query.enabled:
+            target_index = min(run_spec.distance_query.target_index, image_count - 1)
+            target_path = image_paths[target_index]
+            with profile_stage() as query_stage:
+                nearest = config.get_by_distance(
+                    target_path,
+                    cos_distance=run_spec.distance_query.cos_distance,
+                )
+                _ = nearest[: run_spec.distance_query.top_k]
+            query_metrics = query_stage.metrics
 
-            if run_spec.similarity_search.enabled:
-                with profile_stage() as similarity_stage:
-                    all_images = config.storage.get_all_images()
-                    distances = []
-                    for img in all_images:
-                        nearest = config.storage.get_by_distance(
-                            img.embedding,
-                            max_images=run_spec.similarity_search.top_k + 1,
-                            cos_distance=run_spec.similarity_search.cos_distance,
-                        )
-                        # Exclude self
-                        neighbors = [n for n in nearest if n.filename != img.filename]
-                        neighbors = neighbors[: run_spec.similarity_search.top_k]
-
-                        for n in neighbors:
-                            d = _calculate_distance(
-                                img.embedding,
-                                n.embedding,
-                                run_spec.similarity_search.cos_distance,
-                            )
-                            distances.append(d)
-
-                    if distances:
-                        avg_neighbor_distance = float(np.mean(distances))
-                similarity_metrics = similarity_stage.metrics
-
-            with profile_stage() as cluster_stage:
+        if run_spec.similarity_search.enabled:
+            with profile_stage() as similarity_stage:
                 all_images = config.storage.get_all_images()
-                if all_images:
-                    with profile_stage() as red_stage:
-                        embeddings = [img.embedding for img in all_images]
-                        reduced_embeddings = config.reduction.reduce(embeddings)
-                        clustering_images = [
-                            ImageData(filename=img.filename, embedding=emb) 
-                            for img, emb in zip(all_images, reduced_embeddings)
-                        ]
-                    reduction_metrics = red_stage.metrics
-                    labels = config.clustering.cluster(clustering_images, **run_spec.clustering.params)
-                        
-                    labels_arr = np.array(labels)
-                    # Calculate quality metrics against ORIGINAL embeddings
-                    embeddings_arr = np.array([img.embedding for img in all_images])
+                distances = []
+                for img in all_images:
+                    nearest = config.storage.get_by_distance(
+                        img.embedding,
+                        max_images=run_spec.similarity_search.top_k + 1,
+                        cos_distance=run_spec.similarity_search.cos_distance,
+                    )
+                    # Exclude self
+                    neighbors = [n for n in nearest if n.filename != img.filename]
+                    neighbors = neighbors[: run_spec.similarity_search.top_k]
+
+                    for n in neighbors:
+                        d = _calculate_distance(
+                            img.embedding,
+                            n.embedding,
+                            run_spec.similarity_search.cos_distance,
+                        )
+                        distances.append(d)
+
+                if distances:
+                    avg_neighbor_distance = float(np.mean(distances))
+            similarity_metrics = similarity_stage.metrics
+
+        with profile_stage() as cluster_stage:
+            all_images = config.storage.get_all_images()
+            if all_images:
+                with profile_stage() as red_stage:
+                    embeddings = [img.embedding for img in all_images]
+                    reduced_embeddings = config.reduction.reduce(embeddings)
+                    clustering_images = [
+                        ImageData(filename=img.filename, embedding=emb) 
+                        for img, emb in zip(all_images, reduced_embeddings)
+                    ]
+                reduction_metrics = red_stage.metrics
+                labels = config.clustering.cluster(clustering_images, **run_spec.clustering.params)
                     
-                    clustering_quality = calculate_clustering_metrics(embeddings_arr, labels_arr)
-                    
-                    n_clusters = int(labels_arr.max() + 1) if labels_arr.size > 0 else 0
-                    cluster_count = n_clusters
-                    if (labels_arr == -1).any():
-                        cluster_count += int((labels_arr == -1).sum())
-                else:
-                    cluster_count = 0
-            clustering_metrics = cluster_stage.metrics
-        except Exception as exc:  # noqa: BLE001
-            status = "failed"
-            error = str(exc)
+                labels_arr = np.array(labels)
+                # Calculate quality metrics against ORIGINAL embeddings
+                embeddings_arr = np.array([img.embedding for img in all_images])
+                
+                clustering_quality = calculate_clustering_metrics(embeddings_arr, labels_arr)
+                
+                n_clusters = int(labels_arr.max() + 1) if labels_arr.size > 0 else 0
+                cluster_count = n_clusters
+                if (labels_arr == -1).any():
+                    cluster_count += int((labels_arr == -1).sum())
+            else:
+                cluster_count = 0
+        clustering_metrics = cluster_stage.metrics
+    except Exception as exc:  # noqa: BLE001
+        status = "failed"
+        error = str(exc)
 
     finished_at = _utc_now()
 
@@ -202,7 +201,6 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
         avg_neighbor_distance=avg_neighbor_distance,
         clustering=clustering_metrics,
         clustering_quality=clustering_quality,
-        total=total_stage.metrics,
     )
 
 
