@@ -44,6 +44,11 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
         if not isinstance(clear_storage, bool):
             raise WhitelistError(f"Run {run_name}: clear_storage must be a boolean.")
 
+        limit = raw.get("limit")
+        if limit is not None:
+            if not isinstance(limit, int) or limit <= 0:
+                raise WhitelistError(f"Run {run_name}: limit must be a positive integer.")
+
         run_spec = BenchmarkRunSpec(
             name=run_name,
             storage=storage_spec,
@@ -52,6 +57,7 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
             reduction=reduction_spec,
             distance_query=distance_query,
             clear_storage=clear_storage,
+            limit=limit,
         )
         run_spec.run_id = _make_run_id(run_spec)
         run_specs.append(run_spec)
@@ -123,6 +129,7 @@ def _make_run_id(spec: BenchmarkRunSpec) -> str:
             "top_k": spec.distance_query.top_k,
         },
         "clear_storage": spec.clear_storage,
+        "limit": spec.limit,
     }
     digest = hashlib.sha256(json.dumps(normalized, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
     return digest[:12]

@@ -28,6 +28,12 @@ def build_parser() -> argparse.ArgumentParser:
         default="benchmark",
         help="Output filename prefix.",
     )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Optional limit on the number of images to process per run.",
+    )
     return parser
 
 
@@ -49,7 +55,12 @@ def main() -> int:
         if not run_specs:
             parser.error("None of the provided --run values matched whitelist run names or run IDs.")
 
-    results = run_benchmarks(run_specs=run_specs, dataset_path=str(dataset_path), output_dir=args.output_dir)
+    results = run_benchmarks(
+        run_specs=run_specs,
+        dataset_path=str(dataset_path),
+        output_dir=args.output_dir,
+        limit=args.limit,
+    )
     csv_path, json_path = write_results(results=results, output_dir=args.output_dir, prefix=args.prefix)
 
     success = sum(1 for result in results if result.status == "success")

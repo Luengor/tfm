@@ -25,6 +25,7 @@ class BenchmarkRunSpec:
     reduction: ComponentSpec | None = None
     distance_query: DistanceQuerySpec = field(default_factory=DistanceQuerySpec)
     clear_storage: bool = True
+    limit: int | None = None
     run_id: str = ""
 
 

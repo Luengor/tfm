@@ -22,7 +22,7 @@ from src.storage.sqlite import SQLiteStorage
 
 DEFAULT_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tiff"}
 
-def run_benchmarks(run_specs: list[BenchmarkRunSpec], dataset_path: str, output_dir: str) -> list[BenchmarkResult]:
+def run_benchmarks(run_specs: list[BenchmarkRunSpec], dataset_path: str, output_dir: str, limit: int | None = None) -> list[BenchmarkResult]:
     dataset_root = Path(dataset_path)
     if not dataset_root.exists() or not dataset_root.is_dir():
         raise ValueError(f"Dataset path must be a directory: {dataset_path}")
@@ -33,7 +33,7 @@ def run_benchmarks(run_specs: list[BenchmarkRunSpec], dataset_path: str, output_
     print(f"Starting benchmarks: {len(run_specs)} runs to execute.")
     for run_spec in run_specs:
         print(f"Running benchmark: {run_spec.name} (ID: {run_spec.run_id})")
-        result = _run_single(run_spec=run_spec, dataset_root=dataset_root, output_dir=Path(output_dir))
+        result = _run_single(run_spec=run_spec, dataset_root=dataset_root, output_dir=Path(output_dir), global_limit=limit)
         results.append(result)
         print(f"Completed run: {run_spec.name} with status {result.status}.")
 
@@ -63,7 +63,7 @@ def write_results(results: list[BenchmarkResult], output_dir: str, prefix: str =
     return str(csv_path), str(json_path)
 
 
-def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path) -> BenchmarkResult:
+def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path, global_limit: int | None = None) -> BenchmarkResult:
     started_at = _utc_now()
 
     setup_metrics = None
@@ -79,10 +79,13 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
     status = "success"
     error = None
 
+    effective_limit = global_limit if global_limit is not None else run_spec.limit
+
     with profile_stage() as total_stage:
         try:
             image_paths = _list_images(
                 dataset_root=dataset_root,
+                limit=effective_limit,
             )
             if not image_paths:
                 raise ValueError(f"Run {run_spec.name}: no images found in {dataset_root}")
@@ -175,6 +178,7 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
 
 def _list_images(
     dataset_root: Path,
+    limit: int | None = None,
 ) -> list[str]:
     allowed = DEFAULT_IMAGE_EXTENSIONS
     image_paths: list[str] = []
@@ -186,6 +190,8 @@ def _list_images(
         if path.suffix.lower() not in allowed:
             continue
         image_paths.append(str(path))
+        if limit is not None and len(image_paths) >= limit:
+            break
 
     return image_paths
 
