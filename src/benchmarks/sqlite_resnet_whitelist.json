@@ -1,0 +1,335 @@
+{
+  "runs": [
+    {
+      "name": "resnet_kmeans_identity",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 5
+        }
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "limit": 100,
+      "clear_storage": true
+    },
+    {
+      "name": "resnet_dbscan_pca",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "eps": 0.5,
+          "min_samples": 5
+        }
+      },
+      "reduction": {
+        "type": "pca",
+        "params": {
+          "n_components": 50
+        }
+      },
+      "limit": 100,
+      "clear_storage": false
+    },
+    {
+      "name": "resnet_hdbscan_umap",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15
+        }
+      },
+      "limit": 100,
+      "clear_storage": false
+    },
+    {
+      "name": "resnet_optics_identity",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "optics",
+        "params": {
+          "min_samples": 5,
+          "metric": "cosine"
+        }
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "limit": 100,
+      "clear_storage": false
+    },
+    {
+      "name": "resnet_kmeans_pca",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 5
+        }
+      },
+      "reduction": {
+        "type": "pca",
+        "params": {
+          "n_components": 50
+        }
+      },
+      "limit": 100,
+      "clear_storage": false
+    },
+    {
+      "name": "resnet_dbscan_identity",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "eps": 0.5,
+          "min_samples": 5
+        }
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "limit": 100,
+      "clear_storage": false
+    },
+    {
+      "name": "resnet_hdbscan_pca",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "reduction": {
+        "type": "pca",
+        "params": {
+          "n_components": 50
+        }
+      },
+      "limit": 100,
+      "clear_storage": false
+    },
+    {
+      "name": "resnet_optics_umap",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "optics",
+        "params": {
+          "min_samples": 5,
+          "metric": "cosine"
+        }
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15
+        }
+      },
+      "limit": 100,
+      "clear_storage": false
+    },
+    {
+      "name": "resnet_kmeans_umap",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 5
+        }
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15
+        }
+      },
+      "limit": 100,
+      "clear_storage": false
+    },
+    {
+      "name": "resnet_kmeans_identity_k10",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 10
+        }
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "limit": 100,
+      "clear_storage": false
+    },
+    {
+      "name": "resnet_elbow_dbscan_identity",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "min_samples": 5
+        }
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "limit": 100,
+      "clear_storage": false
+    },
+    {
+      "name": "resnet_elbow_dbscan_pca",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "min_samples": 5
+        }
+      },
+      "reduction": {
+        "type": "pca",
+        "params": {
+          "n_components": 50
+        }
+      },
+      "limit": 100,
+      "clear_storage": false
+    },
+    {
+      "name": "resnet_elbow_dbscan_umap",
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "benchmark_results/shared.sqlite"
+        }
+      },
+      "embedding": {
+        "type": "resnet50"
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "min_samples": 5
+        }
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15
+        }
+      },
+      "limit": 100,
+      "clear_storage": false
+    }
+  ]
+}
