@@ -6,10 +6,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from src.cluster.cluster import DBSCANClusterer, HDBSCANClusterer, KMeansClusterer, OPTICSClusterer
 from src.configuration import Configuration
 from src.embedding.custom import CustomEmbeddingModel
 from src.embedding.embeddings import EmbeddingModelNames, get_model
+from src.evaluation.clustering_metrics import calculate_clustering_metrics
 from src.evaluation.metrics import get_runtime_info, profile_stage
 from src.evaluation.models import BenchmarkResult, BenchmarkRunSpec
 from src.storage.postgresql import PostgreSQLStorage
@@ -66,6 +69,7 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
     ingest_metrics = None
     query_metrics = None
     clustering_metrics = None
+    clustering_quality = None
 
     image_count = 0
     cluster_count = None
@@ -110,8 +114,23 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
                 query_metrics = query_stage.metrics
 
             with profile_stage() as cluster_stage:
-                clusters = config.cluster_images(**run_spec.clustering.params)
-                cluster_count = len(clusters)
+                all_images = config.storage.get_all_images()
+                if all_images:
+                    labels = config.clustering.cluster(all_images, **run_spec.clustering.params)
+                    labels_arr = np.array(labels)
+                    embeddings_arr = np.array([img.embedding for img in all_images])
+                    
+                    # Calculate quality metrics
+                    clustering_quality = calculate_clustering_metrics(embeddings_arr, labels_arr)
+                    
+                    # Reconstruct clusters to get count (similar to config.cluster_images)
+                    n_clusters = int(labels_arr.max() + 1) if labels_arr.size > 0 else 0
+                    cluster_count = n_clusters
+                    # Add noise points to count if they exist
+                    if (labels_arr == -1).any():
+                        cluster_count += int((labels_arr == -1).sum())
+                else:
+                    cluster_count = 0
             clustering_metrics = cluster_stage.metrics
         except Exception as exc:  # noqa: BLE001
             status = "failed"
@@ -136,6 +155,7 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
         ingest=ingest_metrics,
         distance_query=query_metrics,
         clustering=clustering_metrics,
+        clustering_quality=clustering_quality,
         total=total_stage.metrics,
     )
 

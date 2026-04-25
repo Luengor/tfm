@@ -50,6 +50,18 @@ class StageMetrics:
 
 
 @dataclass(slots=True)
+class ClusteringQualityMetrics:
+    silhouette_score: float | None
+    calinski_harabasz_score: float | None
+
+    def to_flat_dict(self, prefix: str = "clustering_quality") -> dict[str, float | None]:
+        return {
+            f"{prefix}_silhouette": self.silhouette_score,
+            f"{prefix}_calinski_harabasz": self.calinski_harabasz_score,
+        }
+
+
+@dataclass(slots=True)
 class BenchmarkResult:
     run_name: str
     run_id: str
@@ -67,6 +79,7 @@ class BenchmarkResult:
     ingest: StageMetrics | None = None
     distance_query: StageMetrics | None = None
     clustering: StageMetrics | None = None
+    clustering_quality: ClusteringQualityMetrics | None = None
     total: StageMetrics | None = None
 
     def to_record(self) -> dict[str, Any]:
@@ -89,5 +102,8 @@ class BenchmarkResult:
             if stage is None:
                 continue
             record.update(stage.to_flat_dict(stage_name))
+
+        if self.clustering_quality:
+            record.update(self.clustering_quality.to_flat_dict())
 
         return record
