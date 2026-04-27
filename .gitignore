@@ -1,2 +1,4 @@
 *.egg-info
 /src/build/lib
+/src/benchmark_results
+/src/plots
