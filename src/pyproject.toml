@@ -26,11 +26,14 @@ dependencies = [
 ]
 
 [project.scripts]
-pipeline-benchmark = "evaluation.benchmark:main"
-pipeline-plot = "evaluation.plot_metrics:main"
+pipeline-benchmark = "src.evaluation.benchmark:main"
+pipeline-plot = "src.evaluation.plot_metrics:main"
 
 [tool.uv]
 package = true
+
+[tool.setuptools]
+packages = ["src"]
 
 [build-system]
 requires = ["setuptools>=61.0"]
