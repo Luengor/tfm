@@ -28,7 +28,23 @@ def load_data(input_paths: List[str]) -> pd.DataFrame:
     if not all_results:
         raise ValueError("No valid results found in the provided input files.")
         
-    return pd.DataFrame(all_results)
+    df = pd.DataFrame(all_results)
+
+    # Expand JSON string columns for easier filtering
+    json_cols = ["storage_params", "embedding_params", "clustering_params", "reduction_params"]
+    for col in json_cols:
+        if col in df.columns:
+            try:
+                # Parse JSON strings and handle possible None values
+                expanded = df[col].apply(lambda x: json.loads(x) if isinstance(x, str) else (x if x is not None else {}))
+                # Convert to DataFrame and join
+                expanded_df = pd.json_normalize(expanded.tolist()).add_prefix(f"{col}.")
+                # Reset index to ensure proper alignment during concat
+                df = pd.concat([df.reset_index(drop=True), expanded_df.reset_index(drop=True)], axis=1)
+            except Exception as e:
+                print(f"Warning: Could not expand JSON column {col}: {e}")
+
+    return df
 
 
 def main():
@@ -71,7 +87,9 @@ def main():
         nargs="+",
         help=(
             "Filter expressions to apply to the data (e.g., 'image_count > 100' "
-            "or 'storage_type == \"sqlite\"'). Uses pandas.query() syntax."
+            "or 'storage_type == \"sqlite\"'). Uses pandas.query() syntax. "
+            "JSON parameters are expanded (e.g., '`clustering_params.n_clusters` == 5'). "
+            "Note: Use backticks for columns with dots."
         ),
     )
 
@@ -113,7 +131,10 @@ def main():
         
         # Create combined column
         plot_x_axis = " + ".join(x_axis_cols)
-        df[plot_x_axis] = df[x_axis_cols].astype(str).agg(" | ".join, axis=1)
+        # We use a lambda to ensure strings and handle NaNs gracefully
+        df[plot_x_axis] = df[x_axis_cols].apply(
+            lambda row: " | ".join(row.fillna("N/A").astype(str)), axis=1
+        )
         print(f"Combined x-axis variables: {x_axis_cols} -> {plot_x_axis}")
     elif args.x_axis not in df.columns:
         print(f"Error: X-axis column '{args.x_axis}' not found in data.")
