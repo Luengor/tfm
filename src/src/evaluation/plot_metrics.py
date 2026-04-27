@@ -100,6 +100,25 @@ def main():
         print("Error: No data left after filtering.")
         return
 
+    # Handle multi-variable x-axis
+    x_axis_cols = [c.strip() for c in args.x_axis.split(",")]
+    plot_x_axis = args.x_axis
+    
+    if len(x_axis_cols) > 1:
+        # Check if all columns exist
+        missing_cols = [c for c in x_axis_cols if c not in df.columns]
+        if missing_cols:
+            print(f"Error: X-axis columns {missing_cols} not found in data.")
+            return
+        
+        # Create combined column
+        plot_x_axis = " + ".join(x_axis_cols)
+        df[plot_x_axis] = df[x_axis_cols].astype(str).agg(" | ".join, axis=1)
+        print(f"Combined x-axis variables: {x_axis_cols} -> {plot_x_axis}")
+    elif args.x_axis not in df.columns:
+        print(f"Error: X-axis column '{args.x_axis}' not found in data.")
+        return
+
     # Create output directory
     output_path = Path(args.output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
@@ -126,7 +145,7 @@ def main():
         if len(valid_metrics) > 1:
             # Multi-metric plot: We need to melt the dataframe to have 'metric_name' and 'value' columns
             # This allows seaborn to use 'metric_name' as hue
-            id_vars = [args.x_axis]
+            id_vars = [plot_x_axis]
             if args.hue and args.hue in df.columns:
                 id_vars.append(args.hue)
             
@@ -147,13 +166,13 @@ def main():
                 plot_df["Group"] = plot_df[args.hue].astype(str) + " (" + plot_df["Metric"] + ")"
                 hue_col = "Group"
                 
-            ax = sns.barplot(data=plot_df, x=args.x_axis, y="Value", hue=hue_col)
+            ax = sns.barplot(data=plot_df, x=plot_x_axis, y="Value", hue=hue_col)
             plt.ylabel("Value")
             title_suffix = f"({', '.join(valid_metrics)})"
         else:
             # Single metric plot
             metric = valid_metrics[0]
-            ax = sns.barplot(data=df, x=args.x_axis, y=metric, hue=args.hue)
+            ax = sns.barplot(data=df, x=plot_x_axis, y=metric, hue=args.hue)
             plt.ylabel(metric)
             title_suffix = metric
 
