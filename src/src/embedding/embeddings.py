@@ -42,15 +42,15 @@ MODELS = {
         'embedding_size': 2048,
     },
     EmbeddingModelNames.YOLOn: {
-        'model': 'yolov8n.pt',
+        'model': 'yolo26n.pt',
         'embedding_size': 256,
     },
     EmbeddingModelNames.YOLOs: {
-        'model': 'yolov8s.pt',
+        'model': 'yolo26s.pt',
         'embedding_size': 512,
     },
     EmbeddingModelNames.YOLOm: {
-        'model': 'yolov8m.pt',
+        'model': 'yolo26m.pt',
         'embedding_size': 512,
     },
 }
