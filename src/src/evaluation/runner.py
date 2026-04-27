@@ -201,6 +201,7 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
         avg_neighbor_distance=avg_neighbor_distance,
         clustering=clustering_metrics,
         clustering_quality=clustering_quality,
+        config=run_spec,
     )
 
 
@@ -323,8 +324,22 @@ def _build_csv_columns(records: list[dict[str, Any]]) -> list[str]:
         "image_count",
         "cluster_count",
         "storage_type",
+        "storage_params",
         "embedding_type",
+        "embedding_params",
         "clustering_type",
+        "clustering_params",
+        "reduction_type",
+        "reduction_params",
+        "distance_query_enabled",
+        "distance_query_target_index",
+        "distance_query_cos_distance",
+        "distance_query_top_k",
+        "similarity_search_enabled",
+        "similarity_search_top_k",
+        "similarity_search_cos_distance",
+        "clear_storage_enabled",
+        "limit_parameter",
         "error",
     ]
 

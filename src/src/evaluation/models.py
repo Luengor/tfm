@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -94,6 +95,7 @@ class BenchmarkResult:
     avg_neighbor_distance: float | None = None
     clustering: StageMetrics | None = None
     clustering_quality: ClusteringQualityMetrics | None = None
+    config: BenchmarkRunSpec | None = None
 
     def to_record(self) -> dict[str, Any]:
         record: dict[str, Any] = {
@@ -111,6 +113,23 @@ class BenchmarkResult:
             "avg_neighbor_distance": self.avg_neighbor_distance,
             "error": self.error,
         }
+
+        if self.config:
+            record.update({
+                "storage_params": json.dumps(self.config.storage.params),
+                "embedding_params": json.dumps(self.config.embedding.params),
+                "clustering_params": json.dumps(self.config.clustering.params),
+                "reduction_params": json.dumps(self.config.reduction.params) if self.config.reduction else None,
+                "distance_query_enabled": self.config.distance_query.enabled,
+                "distance_query_target_index": self.config.distance_query.target_index,
+                "distance_query_cos_distance": self.config.distance_query.cos_distance,
+                "distance_query_top_k": self.config.distance_query.top_k,
+                "similarity_search_enabled": self.config.similarity_search.enabled,
+                "similarity_search_top_k": self.config.similarity_search.top_k,
+                "similarity_search_cos_distance": self.config.similarity_search.cos_distance,
+                "clear_storage_enabled": self.config.clear_storage,
+                "limit_parameter": self.config.limit,
+            })
 
         for stage_name in ("setup", "clear_storage", "ingest", "reduction", "distance_query", "similarity_search", "clustering"):
             stage = getattr(self, stage_name)
