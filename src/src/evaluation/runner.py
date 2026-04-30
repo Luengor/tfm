@@ -81,12 +81,12 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
     status = "success"
     error = None
 
-    effective_limit = global_limit if global_limit is not None else run_spec.limit
+    run_spec.limit = global_limit if global_limit is not None else run_spec.limit
 
     try:
         image_paths = _list_images(
             dataset_root=dataset_root,
-            limit=effective_limit,
+            limit=run_spec.limit,
         )
         if not image_paths:
             raise ValueError(f"Run {run_spec.name}: no images found in {dataset_root}")
