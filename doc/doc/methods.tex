@@ -1,3 +1,77 @@
 %! TeX root: ../informe.tex
 \section{Métodos}
 \label{sec:metodos}
+En esta sección se detalla la metodología seguida para evaluar tanto el
+rendimiento como la calidad de los sistemas de extracción de características y
+algoritmos de agrupamiento para nuestro banco de imágenes de grafiti.
+
+\subsection{Arquitectura del entorno de evaluación}
+\label{subsec:arquitectura_pipeline}
+% Anotación: Describir la arquitectura modular del pipeline implementado.
+% Mencionar cómo las clases abstractas en abstractions.py permiten el desacoplamiento.
+% Explicar el flujo de datos desde la imagen en bruto hasta el resultado del clustering.
+
+\subsubsection{Diseño general del sistema}
+% Anotación: Detallar el uso de Python y herramientas como uv para la gestión
+% de dependencias.
+% Resaltar la importancia de la reproducibilidad y la automatización mediante
+% el pipeline de benchmark.
+
+\subsubsection{Descripción del conjunto de datos}
+% Anotación: Describir el dataset de imágenes de grafiti (volumen, tipos de
+% imágenes, resolución).
+% Detallar los pasos de preprocesamiento aplicados (redimensionamiento,
+% normalización, etc.).
+
+\subsection{Espacio de configuraciones del sistema}
+\label{subsec:configuraciones}
+% Anotación: Introducir que el sistema permite combinar múltiples componentes.
+
+\subsubsection{Modelos de extracción de características (Embeddings)}
+% Anotación: Listar y justificar los modelos CNN y YOLO utilizados.
+% Mencionar la arquitectura de salida de cada modelo y la dimensionalidad de
+% los vectores generados.
+
+\subsubsection{Algoritmos de agrupamiento (Clustering)}
+% Anotación: Explicar la selección de algoritmos (K-Means, DBSCAN, HDBSCAN,
+% OPTICS).
+% Discutir brevemente los hiperparámetros clave que se variarán en las pruebas.
+
+\subsubsection{Técnicas de reducción de dimensionalidad}
+% Anotación: Justificar el uso de PCA y UMAP.
+% Explicar cómo afectan a la eficiencia del clustering y a la visualización de
+% resultados.
+
+\subsubsection{Sistemas de almacenamiento y recuperación}
+% Anotación: Comparar el uso de SQLite para pruebas rápidas frente a PostgreSQL
+% con pgvector para producción/escalabilidad.
+
+\subsection{Métricas de evaluación}
+\label{subsec:metricas}
+% Anotación: Definir qué se entiende por "éxito" en este estudio, tanto en
+% calidad como en eficiencia.
+
+\subsubsection{Métricas de calidad y desempeño}
+% Anotación: Detallar métricas intrínsecas (Silueta, Davies-Bouldin).
+% Explicar cómo se evalúa la precisión de las consultas de similitud (Top-K).
+
+\subsubsection{Métricas de coste computacional}
+% Anotación: Definir las métricas de tiempo (latencia por imagen, tiempo total
+% de entrenamiento). Mencionar el consumo de recursos (CPU/GPU/Memoria) si se
+% han monitorizado.
+
+\subsection{Diseño experimental y procedimiento de pruebas}
+\label{subsec:diseno_experimental}
+
+\subsubsection{Entorno de ejecución}
+% Anotación: Especificar el hardware utilizado (procesador, tarjeta gráfica, RAM).
+% Listar versiones críticas de software (PyTorch, Scikit-learn, PostgreSQL).
+
+\subsubsection{Configuración de escenarios (Whitelists)}
+% Anotación: Explicar el funcionamiento de los archivos JSON de "whitelist"
+% para orquestar los experimentos.
+
+\subsubsection{Protocolo de pruebas}
+% Anotación: Describir los pasos exactos que sigue el pipeline en cada
+% ejecución para asegurar condiciones idénticas entre pruebas.
+
