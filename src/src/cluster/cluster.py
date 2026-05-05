@@ -1,4 +1,5 @@
-from sklearn.cluster import KMeans, DBSCAN, HDBSCAN, OPTICS
+from sklearn.cluster import KMeans, DBSCAN, HDBSCAN, OPTICS, AgglomerativeClustering, SpectralClustering, AffinityPropagation
+from sklearn.mixture import GaussianMixture
 from sklearn.neighbors import NearestNeighbors
 import numpy as np
 
@@ -66,5 +67,38 @@ class OPTICSClusterer(ClusteringBase):
         embeddings = np.array([img.embedding for img in images])
         optics = OPTICS(min_samples=min_samples, max_eps=max_eps, metric=metric).fit(embeddings)
         return list(optics.labels_.tolist()) # type: ignore
+
+class AgglomerativeClusterer(ClusteringBase):
+    def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
+        n_clusters = kwargs.get("n_clusters", 5)
+        linkage = kwargs.get("linkage", "ward")
+        embeddings = np.array([img.embedding for img in images])
+        agg = AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage).fit(embeddings)
+        return list(agg.labels_.tolist()) # type: ignore
+
+class SpectralClusterer(ClusteringBase):
+    def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
+        n_clusters = kwargs.get("n_clusters", 5)
+        affinity = kwargs.get("affinity", "nearest_neighbors")
+        embeddings = np.array([img.embedding for img in images])
+        spectral = SpectralClustering(n_clusters=n_clusters, affinity=affinity, random_state=0).fit(embeddings)
+        return list(spectral.labels_.tolist()) # type: ignore
+
+class GMMClusterer(ClusteringBase):
+    def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
+        n_components = kwargs.get("n_clusters", 5)
+        covariance_type = kwargs.get("covariance_type", "full")
+        embeddings = np.array([img.embedding for img in images])
+        gmm = GaussianMixture(n_components=n_components, covariance_type=covariance_type, random_state=0).fit(embeddings)
+        labels = gmm.predict(embeddings)
+        return list(labels.tolist())
+
+class AffinityPropagationClusterer(ClusteringBase):
+    def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
+        damping = kwargs.get("damping", 0.5)
+        preference = kwargs.get("preference", None)
+        embeddings = np.array([img.embedding for img in images])
+        af = AffinityPropagation(damping=damping, preference=preference, random_state=0).fit(embeddings)
+        return list(af.labels_.tolist()) # type: ignore
 
 

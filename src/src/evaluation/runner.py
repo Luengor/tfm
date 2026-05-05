@@ -9,7 +9,16 @@ from typing import Any
 import numpy as np
 
 from src.abstractions import ImageData
-from src.cluster.cluster import DBSCANClusterer, HDBSCANClusterer, KMeansClusterer, OPTICSClusterer
+from src.cluster.cluster import (
+    AffinityPropagationClusterer,
+    AgglomerativeClusterer,
+    DBSCANClusterer,
+    GMMClusterer,
+    HDBSCANClusterer,
+    KMeansClusterer,
+    OPTICSClusterer,
+    SpectralClusterer,
+)
 from src.configuration import Configuration
 from src.embedding.custom import CustomEmbeddingModel
 from src.embedding.embeddings import EmbeddingModelNames, get_model
@@ -300,6 +309,14 @@ def _build_clustering(run_spec: BenchmarkRunSpec):
         return HDBSCANClusterer()
     if name == "optics":
         return OPTICSClusterer()
+    if name == "agglomerative":
+        return AgglomerativeClusterer()
+    if name == "spectral":
+        return SpectralClusterer()
+    if name == "gmm":
+        return GMMClusterer()
+    if name == "affinity_propagation":
+        return AffinityPropagationClusterer()
 
     raise ValueError(f"Run {run_spec.name}: unsupported clustering type '{run_spec.clustering.type}'.")
 

@@ -4,6 +4,26 @@
     {
       "type": "dbscan",
       "params": {}
+    },
+    {
+      "type": "kmeans",
+      "params": {"n_clusters": 5}
+    },
+    {
+      "type": "agglomerative",
+      "params": {"n_clusters": 5}
+    },
+    {
+      "type": "spectral",
+      "params": {"n_clusters": 5}
+    },
+    {
+      "type": "gmm",
+      "params": {"n_clusters": 5}
+    },
+    {
+      "type": "affinity_propagation",
+      "params": {}
     }
   ],
   "storage": [
