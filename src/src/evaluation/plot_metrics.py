@@ -92,6 +92,18 @@ def main():
             "Note: Use backticks for columns with dots."
         ),
     )
+    parser.add_argument(
+        "--sort-by",
+        "-S",
+        nargs="+",
+        help="Column(s) to sort the data by before plotting. Supports expanded JSON columns."
+    )
+    parser.add_argument(
+        "--sort-order",
+        choices=["asc", "desc"],
+        default="asc",
+        help="Sort order (asc or desc). Default is asc."
+    )
 
     args = parser.parse_args()
 
@@ -113,6 +125,23 @@ def main():
             except Exception as e:
                 print(f"Error applying filter '{filter_expr}': {e}")
                 continue
+
+    # Apply sorting
+    if args.sort_by:
+        ascending = args.sort_order == "asc"
+        # Validate sort columns
+        valid_sort_cols = [c for c in args.sort_by if c in df.columns]
+        missing_sort_cols = [c for c in args.sort_by if c not in df.columns]
+        
+        if missing_sort_cols:
+            print(f"Warning: Sort columns {missing_sort_cols} not found in data. Ignoring them.")
+        
+        if valid_sort_cols:
+            try:
+                df = df.sort_values(by=valid_sort_cols, ascending=ascending)
+                print(f"Sorted data by {valid_sort_cols} ({args.sort_order}).")
+            except Exception as e:
+                print(f"Error sorting data: {e}")
 
     if df.empty:
         print("Error: No data left after filtering.")
