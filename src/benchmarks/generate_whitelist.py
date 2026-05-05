@@ -2,6 +2,7 @@ import json
 import argparse
 import itertools
 import hashlib
+import copy
 from pathlib import Path
 
 def get_storage_key(run_config):
@@ -26,7 +27,8 @@ def get_storage_key(run_config):
     
     # Stable JSON string for hashing
     key_str = json.dumps(key_data, sort_keys=True, separators=(",", ":"))
-    return hashlib.sha256(key_str.encode()).hexdigest()[:12]
+    key = hashlib.sha256(key_str.encode()).hexdigest()[:12]
+    return key
 
 def generate_name(combination, keys):
     parts = []
@@ -90,9 +92,9 @@ def main():
     seen_storage_keys = {} # key -> stable_db_path
 
     for combo in combinations:
-        run_config = static_config.copy()
+        run_config = copy.deepcopy(static_config)
         for key, val in zip(grid_keys, combo):
-            run_config[key] = val
+            run_config[key] = copy.deepcopy(val)
         
         # Generate a name if not provided in static or grid
         if "name" not in run_config:
