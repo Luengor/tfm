@@ -2,9 +2,11 @@ from torchvision.models import (
     ResNet50_Weights,
     VGG16_Weights,
     Inception_V3_Weights,
+    MobileNet_V3_Large_Weights,
     resnet50,
     vgg16,
     inception_v3,
+    mobilenet_v3_large,
 )
 import torch
 import torch.nn as nn
@@ -19,6 +21,7 @@ class EmbeddingModelNames(str, Enum):
     RESNET50 = "resnet50"
     VGG16 = "vgg16"
     INCEPTION_V3 = "inception_v3"
+    MOBILENET_V3 = "mobilenet_v3"
     YOLOn = "yolon"
     YOLOs = "yolos"
     YOLOm = "yolom"
@@ -40,6 +43,11 @@ MODELS = {
         'model': inception_v3,
         'weights': Inception_V3_Weights.DEFAULT,
         'embedding_size': 2048,
+    },
+    EmbeddingModelNames.MOBILENET_V3: {
+        'model': mobilenet_v3_large,
+        'weights': MobileNet_V3_Large_Weights.DEFAULT,
+        'embedding_size': 960,
     },
     EmbeddingModelNames.YOLOn: {
         'model': 'yolo26n.pt',
@@ -74,6 +82,8 @@ class TorchEmbeddingModel(nn.Module, EmbeddingBase):
                 self.model.classifier[6] = torch.nn.Identity()
             case EmbeddingModelNames.INCEPTION_V3:
                 self.model.fc = torch.nn.Identity()
+            case EmbeddingModelNames.MOBILENET_V3:
+                self.model.classifier[3] = torch.nn.Identity()
 
         self.model.to(self.device)
 
