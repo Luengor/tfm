@@ -1,0 +1,42 @@
+{
+  "limit": [10, 50, 100, 200, 500, 1000],
+  "clustering": [
+    {
+      "type": "dbscan",
+      "params": {}
+    }
+  ],
+  "storage": [
+    {
+      "type": "sqlite",
+      "params": {
+        "db_path": "benchmark_{run_id}.db"
+      }
+    }
+  ],
+  "embedding": [
+    {
+      "type": "resnet50",
+      "params": {}
+    }
+  ],
+  "reduction": [
+    {
+      "type": "identity",
+      "params": {}
+    },
+    {
+      "type": "pca",
+      "params": {
+        "n_components": 50
+      }
+    },
+    {
+      "type": "umap",
+      "params": {
+        "n_components": 2
+      }
+    }
+  ],
+  "clear_storage": [true]
+}
