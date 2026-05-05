@@ -64,11 +64,17 @@ class StageMetrics:
 class ClusteringQualityMetrics:
     silhouette_score: float | None
     calinski_harabasz_score: float | None
+    davies_bouldin_score: float | None
+    noise_ratio: float | None
+    cluster_size_cv: float | None
 
     def to_flat_dict(self, prefix: str = "clustering_quality") -> dict[str, float | None]:
         return {
             f"{prefix}_silhouette": self.silhouette_score,
             f"{prefix}_calinski_harabasz": self.calinski_harabasz_score,
+            f"{prefix}_davies_bouldin": self.davies_bouldin_score,
+            f"{prefix}_noise_ratio": self.noise_ratio,
+            f"{prefix}_cluster_size_cv": self.cluster_size_cv,
         }
 
 
