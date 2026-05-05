@@ -5,6 +5,7 @@ from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from tqdm import tqdm
 
 import numpy as np
 
@@ -40,7 +41,7 @@ def run_benchmarks(run_specs: list[BenchmarkRunSpec], dataset_path: str, output_
 
     results: list[BenchmarkResult] = []
     print(f"Starting benchmarks: {len(run_specs)} runs to execute.")
-    for run_spec in run_specs:
+    for run_spec in tqdm(run_specs, desc="Benchmark Runs", unit="run"):
         print(f"Running benchmark: {run_spec.name} (ID: {run_spec.run_id})")
         result = _run_single(run_spec=run_spec, dataset_root=dataset_root, output_dir=Path(output_dir), global_limit=limit)
         results.append(result)
@@ -131,6 +132,7 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
             # it means we reused the database, so we use the original metrics.
             if ingest_metrics.wall_time_s < db_metrics_dict.get("wall_time_s", 0) * 0.5:
                 # Reconstruct StageMetrics from dict
+                print(f"Run {run_spec.name}: reusing ingestion metrics from previous run.")
                 ingest_metrics = StageMetrics(**db_metrics_dict)
         elif ingest_metrics.wall_time_s > 0.5:
             # Only save if it looks like a meaningful ingestion run

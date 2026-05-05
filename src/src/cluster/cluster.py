@@ -5,11 +5,51 @@ import numpy as np
 
 from src.abstractions import ClusteringBase, ImageData
 
+def find_elbow(y: np.ndarray) -> int:
+    """
+    Finds the elbow point in a curve using the perpendicular distance method.
+    Returns the index of the elbow point.
+    """
+    n = len(y)
+    if n < 3:
+        return 0
+    x = np.arange(n)
+    
+    p1 = np.array([0, y[0]])
+    p2 = np.array([n - 1, y[-1]])
+    
+    line_vec = p2 - p1
+    norm = np.sqrt(np.sum(line_vec**2))
+    if norm == 0:
+        return 0
+        
+    line_vec_norm = line_vec / norm
+    
+    p1_to_p = np.column_stack((x, y)) - p1
+    proj = np.outer(np.dot(p1_to_p, line_vec_norm), line_vec_norm)
+    dist_to_line = np.sqrt(np.sum((p1_to_p - proj)**2, axis=1))
+    
+    return int(np.argmax(dist_to_line))
+
 class KMeansClusterer(ClusteringBase):
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
-        n_clusters = kwargs.get("n_clusters", 5)
+        n_clusters = kwargs.get("n_clusters")
         embeddings = np.array([img.embedding for img in images])
-        kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(embeddings)
+        
+        if n_clusters is None:
+            # Search for optimal k using inertia elbow
+            max_k = min(len(embeddings), kwargs.get("max_clusters", 20))
+            if max_k < 2:
+                n_clusters = 1
+            else:
+                ks = range(1, max_k + 1)
+                inertias = [
+                    KMeans(n_clusters=k, random_state=0, n_init="auto").fit(embeddings).inertia_
+                    for k in ks
+                ]
+                n_clusters = ks[find_elbow(np.array(inertias))]
+
+        kmeans = KMeans(n_clusters=n_clusters, random_state=0, n_init="auto").fit(embeddings)
         return list(kmeans.labels_.tolist()) # type: ignore
 
 class DBSCANClusterer(ClusteringBase):
@@ -29,24 +69,7 @@ class DBSCANClusterer(ClusteringBase):
             
             # Sort distances to the k-th nearest neighbor
             k_distances = np.sort(distances[:, min_samples - 1])
-            
-            # Find the elbow point using perpendicular distance from line connecting endpoints
-            n = len(k_distances)
-            x = np.arange(n)
-            y = k_distances
-            
-            p1 = np.array([0, y[0]])
-            p2 = np.array([n - 1, y[-1]])
-            
-            line_vec = p2 - p1
-            line_vec_norm = line_vec / np.sqrt(np.sum(line_vec**2))
-            
-            p1_to_p = np.column_stack((x, y)) - p1
-            proj = np.outer(np.dot(p1_to_p, line_vec_norm), line_vec_norm)
-            dist_to_line = np.sqrt(np.sum((p1_to_p - proj)**2, axis=1))
-            
-            elbow_idx = np.argmax(dist_to_line)
-            eps = float(y[elbow_idx])
+            eps = float(k_distances[find_elbow(k_distances)])
 
         dbscan = DBSCAN(eps=eps, min_samples=min_samples).fit(embeddings)
         return list(dbscan.labels_.tolist()) # type: ignore
@@ -86,9 +109,23 @@ class SpectralClusterer(ClusteringBase):
 
 class GMMClusterer(ClusteringBase):
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
-        n_components = kwargs.get("n_clusters", 5)
+        n_components = kwargs.get("n_clusters")
         covariance_type = kwargs.get("covariance_type", "full")
         embeddings = np.array([img.embedding for img in images])
+        
+        if n_components is None:
+            # Search for optimal k using BIC elbow
+            max_k = min(len(embeddings), kwargs.get("max_clusters", 20))
+            if max_k < 2:
+                n_components = 1
+            else:
+                ks = range(1, max_k + 1)
+                bics = [
+                    GaussianMixture(n_components=k, covariance_type=covariance_type, random_state=0).fit(embeddings).bic(embeddings)
+                    for k in ks
+                ]
+                n_components = ks[find_elbow(np.array(bics))]
+
         gmm = GaussianMixture(n_components=n_components, covariance_type=covariance_type, random_state=0).fit(embeddings)
         labels = gmm.predict(embeddings)
         return list(labels.tolist())
