@@ -5,6 +5,7 @@ import time
 from dataclasses import dataclass
 
 import psutil
+import torch
 
 from src.evaluation.models import StageMetrics
 
@@ -36,6 +37,10 @@ class StageProfiler:
         cpu_times = self._process.cpu_times()
         self._start_cpu = cpu_times.user + cpu_times.system
         self._start_rss_mb = self._process.memory_info().rss / (1024 * 1024)
+        
+        if torch.cuda.is_available():
+            torch.cuda.reset_peak_memory_stats()
+            
         return self
 
     def __exit__(self, exc_type, exc, exc_tb) -> None:
@@ -50,6 +55,11 @@ class StageProfiler:
         if wall_time > 0:
             cpu_percent_estimated = 100.0 * cpu_time / wall_time / self._cpu_count
 
+        vram_peak_mb = None
+        if torch.cuda.is_available():
+            # max_memory_allocated returns bytes
+            vram_peak_mb = torch.cuda.max_memory_allocated() / (1024 * 1024)
+
         self.metrics = StageMetrics(
             wall_time_s=wall_time,
             cpu_time_s=cpu_time,
@@ -58,6 +68,7 @@ class StageProfiler:
             rss_end_mb=end_rss_mb,
             rss_delta_mb=end_rss_mb - self._start_rss_mb,
             peak_rss_mb=_read_peak_rss_mb(),
+            vram_peak_mb=vram_peak_mb,
         )
 
 

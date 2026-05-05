@@ -90,7 +90,6 @@ def save_folder(folder: str, config: Configuration):
 if __name__ == "__main__":
     from src.storage.postgresql import PostgreSQLStorage
     from src.embedding.embeddings import EmbeddingModelNames, get_model
-    from src.embedding.custom import CustomEmbeddingModel
     from src.cluster.cluster import OPTICSClusterer 
     from sys import argv
     import os

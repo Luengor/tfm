@@ -3,11 +3,11 @@ import torch.nn as nn
 import torch.optim as optim
 import json
 from torch.utils.data import Dataset, DataLoader
-import os, random
+import os
+import random
 from PIL import Image as PILImage
 from tqdm import tqdm
 
-from src.embedding.custom import CustomEmbeddingModel
 from src.embedding.embeddings import EmbeddingModelNames, TorchEmbeddingModel
 
 class TripletDataset(Dataset):
