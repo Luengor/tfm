@@ -332,6 +332,10 @@ def _build_reduction(run_spec: BenchmarkRunSpec):
         return PCAReduction(**params)
     if name == "umap":
         return UMAPReduction(**params)
+    if name == "isomap":
+        return IsomapReduction(**params)
+    if name == "kernel_pca":
+        return KernelPCAReduction(**params)
     if name == "identity":
         return IdentityReduction()
 
