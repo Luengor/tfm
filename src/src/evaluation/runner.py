@@ -26,7 +26,7 @@ from src.embedding.embeddings import EmbeddingModelNames, get_model
 from src.evaluation.clustering_metrics import calculate_clustering_metrics
 from src.evaluation.metrics import get_runtime_info, profile_stage
 from src.evaluation.models import BenchmarkResult, BenchmarkRunSpec, StageMetrics
-from src.reduction import IdentityReduction, PCAReduction, UMAPReduction
+from src.reduction import IdentityReduction, PCAReduction, UMAPReduction, KernelPCAReduction, IsomapReduction
 from src.storage.postgresql import PostgreSQLStorage
 from src.storage.sqlite import SQLiteStorage
 
