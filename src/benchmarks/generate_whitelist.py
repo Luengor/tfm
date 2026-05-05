@@ -1,7 +1,32 @@
 import json
 import argparse
 import itertools
+import hashlib
 from pathlib import Path
+
+def get_storage_key(run_config):
+    # We care about storage (excluding db_path), embedding and limit
+    storage = run_config.get("storage", {})
+    embedding = run_config.get("embedding", {})
+    limit = run_config.get("limit")
+    
+    storage_type = str(storage.get("type", "")).lower()
+    storage_params = dict(storage.get("params", {}))
+    
+    # We ignore db_path for the key to group runs that COULD share a database
+    if "db_path" in storage_params:
+        del storage_params["db_path"]
+        
+    key_data = {
+        "storage_type": storage_type,
+        "storage_params": storage_params,
+        "embedding": embedding,
+        "limit": limit
+    }
+    
+    # Stable JSON string for hashing
+    key_str = json.dumps(key_data, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(key_str.encode()).hexdigest()[:12]
 
 def generate_name(combination, keys):
     parts = []
@@ -62,6 +87,8 @@ def main():
     combinations = list(itertools.product(*grid_values))
     
     runs = []
+    seen_storage_keys = {} # key -> stable_db_path
+
     for combo in combinations:
         run_config = static_config.copy()
         for key, val in zip(grid_keys, combo):
@@ -71,6 +98,51 @@ def main():
         if "name" not in run_config:
             varying_values = [combo[i] for i in varying_indices]
             run_config["name"] = generate_name(varying_values, varying_keys)
+        
+        # Database reuse logic
+        storage_key = get_storage_key(run_config)
+        storage_type = str(run_config.get("storage", {}).get("type", "")).lower()
+
+        if storage_key not in seen_storage_keys:
+            # First time seeing this combination, we must clear storage
+            run_config["clear_storage"] = True
+            
+            # For SQLite, we assign a stable path based on the storage key if none provided
+            if storage_type == "sqlite":
+                storage_params = run_config.get("storage", {}).get("params", {})
+                db_path = storage_params.get("db_path", "")
+                
+                if not db_path or "{run_id}" in db_path:
+                    # Use a stable path that doesn't depend on the run_id
+                    if not db_path:
+                        stable_path = "{output_dir}/db/storage_" + storage_key + ".sqlite"
+                    else:
+                        # Replace {run_id} with the storage_key to keep the user's naming preference but make it stable
+                        stable_path = db_path.replace("{run_id}", "storage_" + storage_key)
+                        
+                    if "storage" not in run_config:
+                        run_config["storage"] = {"type": "sqlite", "params": {}}
+                    if "params" not in run_config["storage"]:
+                        run_config["storage"]["params"] = {}
+                    run_config["storage"]["params"]["db_path"] = stable_path
+                    seen_storage_keys[storage_key] = stable_path
+                else:
+                    # User provided a stable path, we respect it but still use it for reuse
+                    seen_storage_keys[storage_key] = db_path
+            else:
+                # For Postgres or others, we just mark it as seen
+                seen_storage_keys[storage_key] = True
+        else:
+            # Reusing a previously seen storage/embedding/limit combination
+            run_config["clear_storage"] = False
+            
+            # If it's SQLite, ensure we use the same stable path
+            if storage_type == "sqlite" and isinstance(seen_storage_keys[storage_key], str):
+                if "storage" not in run_config:
+                    run_config["storage"] = {"type": "sqlite", "params": {}}
+                if "params" not in run_config["storage"]:
+                    run_config["storage"]["params"] = {}
+                run_config["storage"]["params"]["db_path"] = seen_storage_keys[storage_key]
         
         runs.append(run_config)
 

@@ -16,6 +16,10 @@ class SQLiteStorage(StorageBase):
             filename TEXT UNIQUE,
             embedding BLOB
         );""")
+        self.cur.execute("""CREATE TABLE IF NOT EXISTS metadata (
+            key TEXT PRIMARY KEY,
+            value TEXT
+        );""")
         self.con.commit()
 
     def __del__(self):
@@ -76,8 +80,18 @@ class SQLiteStorage(StorageBase):
 
         return sorted_images
 
+    def set_metadata(self, key: str, value: str) -> None:
+        self.cur.execute("INSERT OR REPLACE INTO metadata (key, value) VALUES (?, ?);", (key, value))
+        self.con.commit()
+
+    def get_metadata(self, key: str) -> str | None:
+        self.cur.execute("SELECT value FROM metadata WHERE key = ?;", (key,))
+        result = self.cur.fetchone()
+        return result[0] if result else None
+
     def clear(self) -> None:
         self.cur.execute("DELETE FROM images;")
+        self.cur.execute("DELETE FROM metadata;")
         self.con.commit()
 
 if __name__ == "__main__":

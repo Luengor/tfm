@@ -15,7 +15,7 @@ from src.embedding.custom import CustomEmbeddingModel
 from src.embedding.embeddings import EmbeddingModelNames, get_model
 from src.evaluation.clustering_metrics import calculate_clustering_metrics
 from src.evaluation.metrics import get_runtime_info, profile_stage
-from src.evaluation.models import BenchmarkResult, BenchmarkRunSpec
+from src.evaluation.models import BenchmarkResult, BenchmarkRunSpec, StageMetrics
 from src.reduction import IdentityReduction, PCAReduction, UMAPReduction
 from src.storage.postgresql import PostgreSQLStorage
 from src.storage.sqlite import SQLiteStorage
@@ -109,6 +109,23 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
             for image_path in image_paths:
                 config.save_image(image_path)
         ingest_metrics = ingest_stage.metrics
+        assert ingest_metrics is not None  # for type checker
+
+        # Persist/retrieve ingestion metrics
+        # If the database is reused, the original ingestion metrics are retrieved.
+        METADATA_INGEST_KEY = "ingest_metrics"
+        db_metrics_json = storage.get_metadata(METADATA_INGEST_KEY)
+
+        if db_metrics_json:
+            db_metrics_dict = json.loads(db_metrics_json)
+            # Heuristic: if current ingestion was significantly faster than the one in DB,
+            # it means we reused the database, so we use the original metrics.
+            if ingest_metrics.wall_time_s < db_metrics_dict.get("wall_time_s", 0) * 0.5:
+                # Reconstruct StageMetrics from dict
+                ingest_metrics = StageMetrics(**db_metrics_dict)
+        elif ingest_metrics.wall_time_s > 0.5:
+            # Only save if it looks like a meaningful ingestion run
+            storage.set_metadata(METADATA_INGEST_KEY, json.dumps(asdict(ingest_metrics)))
 
         if run_spec.distance_query.enabled:
             target_index = min(run_spec.distance_query.target_index, image_count - 1)

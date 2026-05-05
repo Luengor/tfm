@@ -13,6 +13,12 @@ class ImageModel(Base):
     filename: Mapped[str] = mapped_column(unique=True)
     embedding: Mapped[Vector] = mapped_column(Vector)
 
+class MetadataModel(Base):
+    __tablename__ = 'metadata'
+
+    key: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[str] = mapped_column()
+
 class PostgreSQLStorage(StorageBase):
     def __init__(self, db_url: str):
         self.engine = create_engine(db_url)
@@ -42,7 +48,7 @@ class PostgreSQLStorage(StorageBase):
 
     @staticmethod
     def _2imagedata(image: ImageModel) -> ImageData:
-        return ImageData(filename=image.filename, embedding=list(image.embedding))
+        return ImageData(filename=image.filename, embedding=list(image.embedding)) #type: ignore
 
     def load(self, filename:str) -> ImageData:
         result = self.session.query(ImageModel).filter_by(filename=filename).first()
@@ -67,7 +73,21 @@ class PostgreSQLStorage(StorageBase):
 
         return [self._2imagedata(image) for image, _ in query.all()]
 
+    def set_metadata(self, key: str, value: str) -> None:
+        metadata = self.session.query(MetadataModel).filter_by(key=key).first()
+        if metadata:
+            metadata.value = value
+        else:
+            metadata = MetadataModel(key=key, value=value)
+            self.session.add(metadata)
+        self.session.commit()
+
+    def get_metadata(self, key: str) -> str | None:
+        metadata = self.session.query(MetadataModel).filter_by(key=key).first()
+        return metadata.value if metadata else None
+
     def clear(self) -> None:
         self.session.query(ImageModel).delete()
+        self.session.query(MetadataModel).delete()
         self.session.commit()
 

@@ -28,6 +28,14 @@ class StorageBase(ABC):
     def get_by_distance(self, embedding: list[float], max_images:int = -1, cos_distance: bool = True) -> list[ImageData]:
         ...
 
+    @abstractmethod
+    def set_metadata(self, key: str, value: str) -> None:
+        ...
+
+    @abstractmethod
+    def get_metadata(self, key: str) -> str | None:
+        ...
+
     def clear(self) -> None:
         raise NotImplementedError("Storage backend does not implement clear().")
 
