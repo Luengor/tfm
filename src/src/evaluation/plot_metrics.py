@@ -50,12 +50,13 @@ def load_data(input_paths: List[str]) -> pd.DataFrame:
 def main():
     parser = argparse.ArgumentParser(description="Visualize benchmark metrics.")
     parser.add_argument(
-        "--inputs", "-i", nargs="+", required=True, help="Path(s) to JSON results files."
+        "--inputs", "-i", nargs="+", action="append", required=True, help="Path(s) to JSON results files."
     )
     parser.add_argument(
         "--metrics",
         "-m",
         nargs="+",
+        action="append",
         default=["ingest_wall_time_s", "clustering_wall_time_s", "clustering_quality_silhouette"],
         help=(
             "Metrics to plot. Can be individual columns or comma-separated groups "
@@ -85,6 +86,7 @@ def main():
         "--filter",
         "-f",
         nargs="+",
+        action="append",
         help=(
             "Filter expressions to apply to the data (e.g., 'image_count > 100' "
             "or 'storage_type == \"sqlite\"'). Uses pandas.query() syntax. "
@@ -96,6 +98,7 @@ def main():
         "--sort-by",
         "-S",
         nargs="+",
+        action="append",
         help="Column(s) to sort the data by before plotting. Supports expanded JSON columns."
     )
     parser.add_argument(
@@ -106,6 +109,18 @@ def main():
     )
 
     args = parser.parse_args()
+
+    # Flatten list arguments that use action="append"
+    if args.inputs:
+        args.inputs = [item for sublist in args.inputs for item in sublist]
+    if args.metrics:
+        # Default value is a list, but if provided via CLI it will be a list of lists
+        if isinstance(args.metrics[0], list):
+            args.metrics = [item for sublist in args.metrics for item in sublist]
+    if args.filter:
+        args.filter = [item for sublist in args.filter for item in sublist]
+    if args.sort_by:
+        args.sort_by = [item for sublist in args.sort_by for item in sublist]
 
     # Load data
     try:
@@ -124,6 +139,8 @@ def main():
                 print(f"Applied filter '{filter_expr}': {before_count} -> {after_count} rows.")
             except Exception as e:
                 print(f"Error applying filter '{filter_expr}': {e}")
+                if "." in filter_expr and "`" not in filter_expr:
+                    print(f"Hint: Use backticks for columns with dots, e.g., '`{filter_expr.split()[0]}`' if it contains a dot.")
                 continue
 
     # Apply sorting
