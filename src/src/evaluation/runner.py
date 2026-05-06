@@ -1,13 +1,15 @@
 import csv
+import gc
 import json
 import os
 from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
-from tqdm import tqdm
 
 import numpy as np
+import torch
+from tqdm import tqdm
 
 from src.abstractions import ImageData
 from src.cluster.cluster import (
@@ -204,6 +206,35 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
     except Exception as exc:  # noqa: BLE001
         status = "failed"
         error = str(exc)
+    finally:
+        # Explicit cleanup to prevent memory accumulation across runs
+        # We delete large objects and call GC + CUDA cache clear
+        if "config" in locals():
+            del config
+        if "storage" in locals():
+            del storage
+        if "embedding" in locals():
+            del embedding
+        if "clustering" in locals():
+            del clustering
+        if "reduction" in locals():
+            del reduction
+        if "all_images" in locals():
+            del all_images
+        if "embeddings_arr" in locals():
+            del embeddings_arr
+        if "labels_arr" in locals():
+            del labels_arr
+        if "clustering_images" in locals():
+            del clustering_images
+        if "reduced_embeddings" in locals():
+            del reduced_embeddings
+        if "image_paths" in locals():
+            del image_paths
+        
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
 
     finished_at = _utc_now()
 
