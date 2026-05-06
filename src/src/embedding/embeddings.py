@@ -13,6 +13,7 @@ from torchvision.models import (
     inception_v3,
     mobilenet_v3_large,
 )
+from torchvision import models
 import torch
 import torch.nn as nn
 import os
@@ -29,6 +30,7 @@ class EmbeddingModelNames(str, Enum):
     VGG16 = "vgg16"
     INCEPTION_V3 = "inception_v3"
     MOBILENET_V3 = "mobilenet_v3"
+    MOBILENET_V3_GRAFFITI_HEAD = "mobilenet_v3_graffiti_head"
     DINOV2_VITS14 = "dinov2_vits14"
     DINOV2_GRAFFITI_HEAD = "dinov2_graffiti_head"
     CLIP_VIT_B32 = "clip_vit_b32"
@@ -58,6 +60,10 @@ MODELS = {
         'model': mobilenet_v3_large,
         'weights': MobileNet_V3_Large_Weights.DEFAULT,
         'embedding_size': 1280,
+    },
+    EmbeddingModelNames.MOBILENET_V3_GRAFFITI_HEAD: {
+        'embedding_size': 1280,
+        'weights_path': "models/mobilenet_graffiti_head.pth"
     },
     EmbeddingModelNames.DINOV2_VITS14: {
         'embedding_size': 384,
@@ -197,45 +203,34 @@ class YoloEmbeddingModel(EmbeddingBase):
     def embedding_size(self) -> int:
         return MODELS[self.name]['embedding_size']
 
-class DinoHeadEmbeddingModel(EmbeddingBase):
-    def __init__(self, name: EmbeddingModelNames):
+class HeadEmbeddingModel(EmbeddingBase):
+    def __init__(self, name: EmbeddingModelNames, base_model, preprocessor, input_dim):
         self.name = name
         self.device = get_device()
-        self.base_model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
+        self.base_model = base_model
+        self.preprocessor = preprocessor
         
-        # Projection Head architecture must match the one in training
         self.projection_head = nn.Sequential(
-            nn.Linear(384, 512),
+            nn.Linear(input_dim, 512),
             nn.ReLU(),
-            nn.Linear(512, 384)
+            nn.Linear(512, input_dim)
         )
         
         m_data = MODELS[name]
         if os.path.exists(m_data['weights_path']):
             print(f"Loading custom weights for {name} from {m_data['weights_path']}")
-            # Load the full state dict
             state_dict = torch.load(m_data['weights_path'], map_location=self.device)
             
-            # Map keys from DINOWithHead (base_model.X, projection_head.X)
-            # to our local attributes.
             base_state_dict = {k.replace('base_model.', ''): v for k, v in state_dict.items() if k.startswith('base_model.')}
             head_state_dict = {k.replace('projection_head.', ''): v for k, v in state_dict.items() if k.startswith('projection_head.')}
             
             self.base_model.load_state_dict(base_state_dict)
             self.projection_head.load_state_dict(head_state_dict)
-        
+            
         self.base_model.to(self.device)
         self.projection_head.to(self.device)
         self.base_model.eval()
         self.projection_head.eval()
-        
-        from torchvision import transforms
-        self.preprocessor = transforms.Compose([
-            transforms.Resize(256, interpolation=transforms.InterpolationMode.BICUBIC),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
-        ])
 
     def gen_embedding(self, image: ImageImage) -> list[float]:
         with torch.no_grad():
@@ -253,11 +248,25 @@ def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
         case EmbeddingModelNames.YOLOm | EmbeddingModelNames.YOLOs | EmbeddingModelNames.YOLOn:
             return YoloEmbeddingModel(name)
         
+        case EmbeddingModelNames.MOBILENET_V3_GRAFFITI_HEAD:
+            weights = models.MobileNet_V3_Large_Weights.DEFAULT
+            base = models.mobilenet_v3_large(weights=weights)
+            base.classifier[3] = nn.Identity()
+            return HeadEmbeddingModel(name, base, weights.transforms(), input_dim=1280)
+        
         case EmbeddingModelNames.DINOV2_VITS14:
             return DinoEmbeddingModel(name)
         
         case EmbeddingModelNames.DINOV2_GRAFFITI_HEAD:
-            return DinoHeadEmbeddingModel(name)
+            base = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
+            from torchvision import transforms
+            preprocessor = transforms.Compose([
+                transforms.Resize(256, interpolation=transforms.InterpolationMode.BICUBIC),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+            ])
+            return HeadEmbeddingModel(name, base, preprocessor, input_dim=384)
             
         case EmbeddingModelNames.CLIP_VIT_B32:
             return ClipEmbeddingModel(name)

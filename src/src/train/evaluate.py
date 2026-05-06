@@ -80,7 +80,9 @@ if __name__ == "__main__":
     
     models_to_compare = [
         EmbeddingModelNames.DINOV2_VITS14,
-        EmbeddingModelNames.DINOV2_GRAFFITI_HEAD
+        EmbeddingModelNames.DINOV2_GRAFFITI_HEAD,
+        EmbeddingModelNames.MOBILENET_V3,
+        EmbeddingModelNames.MOBILENET_V3_GRAFFITI_HEAD
     ]
     
     results = {}
@@ -88,10 +90,12 @@ if __name__ == "__main__":
         results[m_name] = evaluate_model(m_name, CROPS_DIR)
         
     print("\nComparison Results:")
-    header = f"{'Metric':<20} | {'Base':<10} | {'Head':<10}"
+    header = f"{'Metric':<20} | {'DINO Base':<10} | {'DINO Head':<10} | {'MBNet Base':<10} | {'MBNet Head':<10}"
     print(header)
     print("-" * len(header))
     for metric in ["silhouette", "accuracy_1nn", "ari", "nmi"]:
-        base_val = results[EmbeddingModelNames.DINOV2_VITS14][metric]
-        head_val = results[EmbeddingModelNames.DINOV2_GRAFFITI_HEAD][metric]
-        print(f"{metric:<20} | {base_val:<10.4f} | {head_val:<10.4f}")
+        d_base = results[EmbeddingModelNames.DINOV2_VITS14][metric]
+        d_head = results[EmbeddingModelNames.DINOV2_GRAFFITI_HEAD][metric]
+        m_base = results[EmbeddingModelNames.MOBILENET_V3][metric]
+        m_head = results[EmbeddingModelNames.MOBILENET_V3_GRAFFITI_HEAD][metric]
+        print(f"{metric:<20} | {d_base:<10.4f} | {d_head:<10.4f} | {m_base:<10.4f} | {m_head:<10.4f}")
