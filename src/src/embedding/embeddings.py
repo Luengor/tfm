@@ -15,6 +15,7 @@ from torchvision.models import (
 )
 import torch
 import torch.nn as nn
+import os
 from enum import Enum
 from PIL.Image import Image as ImageImage
 from ultralytics import YOLO # pyright: ignore
@@ -29,6 +30,7 @@ class EmbeddingModelNames(str, Enum):
     INCEPTION_V3 = "inception_v3"
     MOBILENET_V3 = "mobilenet_v3"
     DINOV2_VITS14 = "dinov2_vits14"
+    DINOV2_GRAFFITI_HEAD = "dinov2_graffiti_head"
     CLIP_VIT_B32 = "clip_vit_b32"
     YOLOn = "yolon"
     YOLOs = "yolos"
@@ -59,6 +61,10 @@ MODELS = {
     },
     EmbeddingModelNames.DINOV2_VITS14: {
         'embedding_size': 384,
+    },
+    EmbeddingModelNames.DINOV2_GRAFFITI_HEAD: {
+        'embedding_size': 384,
+        'weights_path': "models/dinov2_graffiti_head.pth"
     },
     EmbeddingModelNames.CLIP_VIT_B32: {
         'embedding_size': 512,
@@ -125,6 +131,13 @@ class DinoEmbeddingModel(EmbeddingBase):
         self.device = get_device()
         # Using torch hub for DINOv2
         self.model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
+        
+        # Load custom weights if available
+        m_data = MODELS[name]
+        if 'weights_path' in m_data and os.path.exists(m_data['weights_path']):
+            print(f"Loading custom weights for {name} from {m_data['weights_path']}")
+            self.model.load_state_dict(torch.load(m_data['weights_path'], map_location=self.device))
+        
         self.model.to(self.device)
         self.model.eval()
         
@@ -184,6 +197,57 @@ class YoloEmbeddingModel(EmbeddingBase):
     def embedding_size(self) -> int:
         return MODELS[self.name]['embedding_size']
 
+class DinoHeadEmbeddingModel(EmbeddingBase):
+    def __init__(self, name: EmbeddingModelNames):
+        self.name = name
+        self.device = get_device()
+        self.base_model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
+        
+        # Projection Head architecture must match the one in training
+        self.projection_head = nn.Sequential(
+            nn.Linear(384, 512),
+            nn.ReLU(),
+            nn.Linear(512, 384)
+        )
+        
+        m_data = MODELS[name]
+        if os.path.exists(m_data['weights_path']):
+            print(f"Loading custom weights for {name} from {m_data['weights_path']}")
+            # Load the full state dict
+            state_dict = torch.load(m_data['weights_path'], map_location=self.device)
+            
+            # Map keys from DINOWithHead (base_model.X, projection_head.X)
+            # to our local attributes.
+            base_state_dict = {k.replace('base_model.', ''): v for k, v in state_dict.items() if k.startswith('base_model.')}
+            head_state_dict = {k.replace('projection_head.', ''): v for k, v in state_dict.items() if k.startswith('projection_head.')}
+            
+            self.base_model.load_state_dict(base_state_dict)
+            self.projection_head.load_state_dict(head_state_dict)
+        
+        self.base_model.to(self.device)
+        self.projection_head.to(self.device)
+        self.base_model.eval()
+        self.projection_head.eval()
+        
+        from torchvision import transforms
+        self.preprocessor = transforms.Compose([
+            transforms.Resize(256, interpolation=transforms.InterpolationMode.BICUBIC),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+        ])
+
+    def gen_embedding(self, image: ImageImage) -> list[float]:
+        with torch.no_grad():
+            input_tensor = self.preprocessor(image).unsqueeze(0).to(self.device)
+            features = self.base_model(input_tensor)
+            output = self.projection_head(features)
+        return output.squeeze().cpu().tolist()
+
+    @property
+    def embedding_size(self) -> int:
+        return MODELS[self.name]['embedding_size']
+
 def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
     match name:
         case EmbeddingModelNames.YOLOm | EmbeddingModelNames.YOLOs | EmbeddingModelNames.YOLOn:
@@ -191,6 +255,9 @@ def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
         
         case EmbeddingModelNames.DINOV2_VITS14:
             return DinoEmbeddingModel(name)
+        
+        case EmbeddingModelNames.DINOV2_GRAFFITI_HEAD:
+            return DinoHeadEmbeddingModel(name)
             
         case EmbeddingModelNames.CLIP_VIT_B32:
             return ClipEmbeddingModel(name)

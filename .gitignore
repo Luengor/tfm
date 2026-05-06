@@ -2,3 +2,5 @@
 /src/build/lib
 /src/benchmark_results
 /src/plots
+dataset
+/models
