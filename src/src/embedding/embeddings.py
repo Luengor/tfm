@@ -55,7 +55,7 @@ MODELS = {
     EmbeddingModelNames.MOBILENET_V3: {
         'model': mobilenet_v3_large,
         'weights': MobileNet_V3_Large_Weights.DEFAULT,
-        'embedding_size': 960,
+        'embedding_size': 1280,
     },
     EmbeddingModelNames.DINOV2_VITS14: {
         'embedding_size': 384,
