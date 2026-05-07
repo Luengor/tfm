@@ -55,6 +55,12 @@ def main() -> int:
         if not run_specs:
             parser.error("None of the provided --run values matched whitelist run names or run IDs.")
 
+    if args.limit is not None:
+        from src.evaluation.whitelist import make_run_id
+        for spec in run_specs:
+            spec.limit = args.limit
+            spec.run_id = make_run_id(spec)
+
     results = run_benchmarks(
         run_specs=run_specs,
         dataset_path=str(dataset_path),

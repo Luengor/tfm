@@ -30,6 +30,7 @@ class BenchmarkRunSpec:
     storage: ComponentSpec
     embedding: ComponentSpec
     clustering: ComponentSpec
+    segmenter: ComponentSpec | None = None
     reduction: ComponentSpec | None = None
     distance_query: DistanceQuerySpec = field(default_factory=DistanceQuerySpec)
     similarity_search: SimilaritySearchSpec = field(default_factory=SimilaritySearchSpec)
@@ -92,6 +93,7 @@ class BenchmarkResult:
     storage_type: str
     embedding_type: str
     clustering_type: str
+    segmenter_type: str | None = None
     reduction_type: str | None = None
     error: str | None = None
     setup: StageMetrics | None = None
@@ -117,6 +119,7 @@ class BenchmarkResult:
             "storage_type": self.storage_type,
             "embedding_type": self.embedding_type,
             "clustering_type": self.clustering_type,
+            "segmenter_type": self.segmenter_type,
             "reduction_type": self.reduction_type,
             "avg_neighbor_distance": self.avg_neighbor_distance,
             "error": self.error,
@@ -127,6 +130,7 @@ class BenchmarkResult:
                 "storage_params": json.dumps(self.config.storage.params),
                 "embedding_params": json.dumps(self.config.embedding.params),
                 "clustering_params": json.dumps(self.config.clustering.params),
+                "segmenter_params": json.dumps(self.config.segmenter.params) if self.config.segmenter else None,
                 "reduction_params": json.dumps(self.config.reduction.params) if self.config.reduction else None,
                 "distance_query_enabled": self.config.distance_query.enabled,
                 "distance_query_target_index": self.config.distance_query.target_index,

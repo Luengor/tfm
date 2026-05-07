@@ -14,6 +14,9 @@
           "n_clusters": 5
         }
       },
+      "segmenter": {
+        "type": "identity"
+      },
       "distance_query": {
         "enabled": true,
         "target_index": 0,
@@ -35,6 +38,12 @@
         "params": {
           "min_samples": 5,
           "metric": "cosine"
+        }
+      },
+      "segmenter": {
+        "type": "yolo",
+        "params": {
+          "model_path": "yolo26n.pt"
         }
       },
       "distance_query": {

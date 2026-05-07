@@ -25,6 +25,7 @@ from src.cluster.cluster import (
 from src.configuration import Configuration
 from src.embedding.custom import CustomEmbeddingModel
 from src.embedding.embeddings import EmbeddingModelNames, get_model
+from src.embedding.segmenters import YoloSegmenter, IdentitySegmenter
 from src.evaluation.clustering_metrics import calculate_clustering_metrics
 from src.evaluation.metrics import get_runtime_info, profile_stage
 from src.evaluation.models import BenchmarkResult, BenchmarkRunSpec, StageMetrics
@@ -94,6 +95,10 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
     error = None
 
     run_spec.limit = global_limit if global_limit is not None else run_spec.limit
+    
+    if global_limit is not None:
+        from src.evaluation.whitelist import make_run_id
+        run_spec.run_id = make_run_id(run_spec)
 
     try:
         image_paths = _list_images(
@@ -109,7 +114,8 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
             embedding = _build_embedding(run_spec)
             clustering = _build_clustering(run_spec)
             reduction = _build_reduction(run_spec)
-            config = Configuration(storage=storage, embedding=embedding, clustering=clustering, reduction=reduction)
+            segmenter = _build_segmenter(run_spec)
+            config = Configuration(storage=storage, embedding=embedding, clustering=clustering, reduction=reduction, segmenter=segmenter)
         setup_metrics = setup_stage.metrics
 
         if run_spec.clear_storage:
@@ -210,27 +216,29 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
         # Explicit cleanup to prevent memory accumulation across runs
         # We delete large objects and call GC + CUDA cache clear
         if "config" in locals():
-            del config
+            del config # type: ignore
         if "storage" in locals():
-            del storage
+            del storage # type: ignore
         if "embedding" in locals():
-            del embedding
+            del embedding # type: ignore
         if "clustering" in locals():
-            del clustering
+            del clustering # type: ignore
         if "reduction" in locals():
-            del reduction
+            del reduction # type: ignore
+        if "segmenter" in locals():
+            del segmenter # type: ignore
         if "all_images" in locals():
-            del all_images
+            del all_images # type: ignore
         if "embeddings_arr" in locals():
-            del embeddings_arr
+            del embeddings_arr # type: ignore
         if "labels_arr" in locals():
-            del labels_arr
+            del labels_arr # type: ignore
         if "clustering_images" in locals():
-            del clustering_images
+            del clustering_images # type: ignore
         if "reduced_embeddings" in locals():
-            del reduced_embeddings
+            del reduced_embeddings # type: ignore
         if "image_paths" in locals():
-            del image_paths
+            del image_paths # type: ignore
         
         gc.collect()
         if torch.cuda.is_available():
@@ -249,6 +257,7 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
         storage_type=run_spec.storage.type,
         embedding_type=run_spec.embedding.type,
         clustering_type=run_spec.clustering.type,
+        segmenter_type=run_spec.segmenter.type if run_spec.segmenter else "identity",
         reduction_type=run_spec.reduction.type if run_spec.reduction else "identity",
         error=error,
         setup=setup_metrics,
@@ -354,6 +363,25 @@ def _build_clustering(run_spec: BenchmarkRunSpec):
     raise ValueError(f"Run {run_spec.name}: unsupported clustering type '{run_spec.clustering.type}'.")
 
 
+def _build_segmenter(run_spec: BenchmarkRunSpec):
+    if not run_spec.segmenter:
+        return IdentitySegmenter()
+
+    name = run_spec.segmenter.type.lower()
+    params = run_spec.segmenter.params
+
+    if name == "yolo":
+        model_path = params.get("model_path")
+        if not model_path:
+            raise ValueError(f"Run {run_spec.name}: segmenter.type 'yolo' requires params.model_path.")
+        return YoloSegmenter(model_path)
+    
+    if name == "identity":
+        return IdentitySegmenter()
+
+    raise ValueError(f"Run {run_spec.name}: unsupported segmenter type '{run_spec.segmenter.type}'.")
+
+
 def _build_reduction(run_spec: BenchmarkRunSpec):
     if not run_spec.reduction:
         return IdentityReduction()
@@ -400,6 +428,8 @@ def _build_csv_columns(records: list[dict[str, Any]]) -> list[str]:
         "embedding_params",
         "clustering_type",
         "clustering_params",
+        "segmenter_type",
+        "segmenter_params",
         "reduction_type",
         "reduction_params",
         "distance_query_enabled",

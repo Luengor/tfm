@@ -1,4 +1,4 @@
-from src.abstractions import StorageBase, ImageData
+from src.abstractions import StorageBase, ImageData, BoundingBox
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, Session
@@ -12,6 +12,11 @@ class ImageModel(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     filename: Mapped[str] = mapped_column(unique=True)
     embedding: Mapped[Vector] = mapped_column(Vector)
+    bbox_x1: Mapped[float] = mapped_column(nullable=True)
+    bbox_y1: Mapped[float] = mapped_column(nullable=True)
+    bbox_x2: Mapped[float] = mapped_column(nullable=True)
+    bbox_y2: Mapped[float] = mapped_column(nullable=True)
+    bbox_conf: Mapped[float] = mapped_column(nullable=True)
 
 class MetadataModel(Base):
     __tablename__ = 'metadata'
@@ -38,7 +43,17 @@ class PostgreSQLStorage(StorageBase):
         self.engine.dispose()
 
     def save(self, data: ImageData) -> None:
-        image = ImageModel(filename=data.filename, embedding=data.embedding)
+        bbox_data = {}
+        if data.bbox:
+            bbox_data = {
+                'bbox_x1': data.bbox.x1,
+                'bbox_y1': data.bbox.y1,
+                'bbox_x2': data.bbox.x2,
+                'bbox_y2': data.bbox.y2,
+                'bbox_conf': data.bbox.confidence
+            }
+        
+        image = ImageModel(filename=data.filename, embedding=data.embedding, **bbox_data)
         self.session.add(image)
         self.session.commit()
 
@@ -48,7 +63,16 @@ class PostgreSQLStorage(StorageBase):
 
     @staticmethod
     def _2imagedata(image: ImageModel) -> ImageData:
-        return ImageData(filename=image.filename, embedding=list(image.embedding)) #type: ignore
+        bbox = None
+        if image.bbox_x1 is not None:
+            bbox = BoundingBox(
+                x1=image.bbox_x1,
+                y1=image.bbox_y1,
+                x2=image.bbox_x2,
+                y2=image.bbox_y2,
+                confidence=image.bbox_conf # type: ignore
+            )
+        return ImageData(filename=image.filename, embedding=list(image.embedding), bbox=bbox) #type: ignore
 
     def load(self, filename:str) -> ImageData:
         result = self.session.query(ImageModel).filter_by(filename=filename).first()

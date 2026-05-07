@@ -1,4 +1,4 @@
-from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData, ReductionBase
+from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData, ReductionBase, SegmenterBase
 from PIL import Image as PILImage
 import numpy as np
 from enum import Enum
@@ -8,11 +8,12 @@ class DistanceMethod(str, Enum):
     EUCLIDEAN = "euclidean"
 
 class Configuration:
-    def __init__(self, storage: StorageBase, embedding: EmbeddingBase, clustering: ClusteringBase, reduction: ReductionBase):
+    def __init__(self, storage: StorageBase, embedding: EmbeddingBase, clustering: ClusteringBase, reduction: ReductionBase, segmenter: SegmenterBase):
         self.storage = storage
         self.embedding = embedding
         self.clustering = clustering
         self.reduction = reduction
+        self.segmenter = segmenter
 
     def save_image(self, filename: str) -> ImageData:
         # Check if the image is already in storage
@@ -21,10 +22,25 @@ class Configuration:
 
         # Get the image embedding
         image = PILImage.open(filename).convert("RGB")
-        emb = self.embedding.gen_embedding(image)
+        
+        # Segment the image to find the graffiti
+        boxes = self.segmenter.segment(image)
+        
+        # For now, we take the most confident detection
+        # If no detection, we can fall back to the full image embedding 
+        # (effectively what IdentitySegmenter would do, but we handle it here for safety)
+        best_box = None
+        target_image = image
+        
+        if boxes:
+            best_box = max(boxes, key=lambda x: x.confidence)
+            # Crop to the detected bounding box
+            target_image = image.crop((best_box.x1, best_box.y1, best_box.x2, best_box.y2))
+
+        emb = self.embedding.gen_embedding(target_image)
 
         # Save the image data
-        data = ImageData(filename=filename, embedding=emb)
+        data = ImageData(filename=filename, embedding=emb, bbox=best_box)
         self.storage.save(data)
 
         return data
@@ -91,6 +107,7 @@ if __name__ == "__main__":
     from src.storage.postgresql import PostgreSQLStorage
     from src.embedding.embeddings import EmbeddingModelNames, get_model
     from src.cluster.cluster import OPTICSClusterer 
+    from src.embedding.segmenters import IdentitySegmenter
     from sys import argv
     import os
     from tqdm import tqdm
@@ -103,7 +120,8 @@ if __name__ == "__main__":
             storage,
             get_model(EmbeddingModelNames.YOLOs),
             OPTICSClusterer(),
-            IdentityReduction()
+            IdentityReduction(),
+            IdentitySegmenter()
     )
 
     if len(argv) < 2:

@@ -3,9 +3,19 @@ from dataclasses import dataclass
 from PIL.Image import Image as PILImage
 
 @dataclass
+class BoundingBox:
+    x1: float
+    y1: float
+    x2: float
+    y2: float
+    confidence: float
+
+@dataclass
 class ImageData:
     filename: str
     embedding: list[float]
+    bbox: BoundingBox | None = None
+
 
 class StorageBase(ABC):
     @abstractmethod
@@ -47,6 +57,11 @@ class EmbeddingBase(ABC):
     @property
     @abstractmethod
     def embedding_size(self) -> int:
+        ...
+
+class SegmenterBase(ABC):
+    @abstractmethod
+    def segment(self, image: PILImage, threshold: float = 0.5) -> list[BoundingBox]:
         ...
 
 class ClusteringBase(ABC):

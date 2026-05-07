@@ -34,6 +34,11 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
         storage_spec = _parse_component(raw.get("storage"), "storage", index)
         embedding_spec = _parse_component(raw.get("embedding"), "embedding", index)
         clustering_spec = _parse_component(raw.get("clustering"), "clustering", index)
+        
+        segmenter_spec = None
+        if "segmenter" in raw and raw["segmenter"] is not None:
+             segmenter_spec = _parse_component(raw.get("segmenter"), "segmenter", index)
+
         reduction_spec = None
         if "reduction" in raw and raw["reduction"] is not None:
              reduction_spec = _parse_component(raw.get("reduction"), "reduction", index)
@@ -55,13 +60,14 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
             storage=storage_spec,
             embedding=embedding_spec,
             clustering=clustering_spec,
+            segmenter=segmenter_spec,
             reduction=reduction_spec,
             distance_query=distance_query,
             similarity_search=similarity_search,
             clear_storage=clear_storage,
             limit=limit,
         )
-        run_spec.run_id = _make_run_id(run_spec)
+        run_spec.run_id = make_run_id(run_spec)
         run_specs.append(run_spec)
 
     return run_specs
@@ -141,12 +147,13 @@ def _require_str(payload: dict[str, Any], key: str, run_index: int) -> str:
     return value.strip()
 
 
-def _make_run_id(spec: BenchmarkRunSpec) -> str:
+def make_run_id(spec: BenchmarkRunSpec) -> str:
     normalized = {
         "name": spec.name,
         "storage": {"type": spec.storage.type.lower(), "params": spec.storage.params},
         "embedding": {"type": spec.embedding.type.lower(), "params": spec.embedding.params},
         "clustering": {"type": spec.clustering.type.lower(), "params": spec.clustering.params},
+        "segmenter": {"type": spec.segmenter.type.lower(), "params": spec.segmenter.params} if spec.segmenter else None,
         "reduction": {"type": spec.reduction.type.lower(), "params": spec.reduction.params} if spec.reduction else None,
         "distance_query": {
             "enabled": spec.distance_query.enabled,
