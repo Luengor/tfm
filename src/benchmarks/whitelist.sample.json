@@ -43,7 +43,7 @@
       "segmenter": {
         "type": "yolo",
         "params": {
-          "model_path": "yolo26n.pt"
+          "model_path": "models/yolo26n.pt"
         }
       },
       "distance_query": {
