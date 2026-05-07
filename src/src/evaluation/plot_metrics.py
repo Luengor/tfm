@@ -57,10 +57,10 @@ def main():
         "-m",
         nargs="+",
         action="append",
-        default=["ingest_wall_time_s", "clustering_wall_time_s", "clustering_quality_silhouette"],
         help=(
             "Metrics to plot. Can be individual columns or comma-separated groups "
-            "(e.g., 'ingest_wall_time_s,clustering_wall_time_s') to show multiple series in one plot."
+            "(e.g., 'ingest_wall_time_s,clustering_wall_time_s') to show multiple series in one plot. "
+            "Defaults to ingest_wall_time_s, clustering_wall_time_s, and clustering_quality_silhouette."
         ),
     )
     parser.add_argument(
@@ -113,10 +113,12 @@ def main():
     # Flatten list arguments that use action="append"
     if args.inputs:
         args.inputs = [item for sublist in args.inputs for item in sublist]
+
     if args.metrics:
-        # Default value is a list, but if provided via CLI it will be a list of lists
-        if isinstance(args.metrics[0], list):
-            args.metrics = [item for sublist in args.metrics for item in sublist]
+        args.metrics = [item for sublist in args.metrics for item in sublist]
+    else:
+        args.metrics = ["ingest_wall_time_s", "clustering_wall_time_s", "clustering_quality_silhouette"]
+
     if args.filter:
         args.filter = [item for sublist in args.filter for item in sublist]
     if args.sort_by:
