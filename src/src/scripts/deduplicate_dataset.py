@@ -112,15 +112,20 @@ def main():
 
     input_dir = Path(args.input)
     output_dir = Path(args.output)
-    images_dir = input_dir / "images"
+    
+    # Check if cvat style or flat style
+    has_images_dir = (input_dir / "images").exists()
+    images_dir = input_dir / "images" if has_images_dir else input_dir
     xml_path = input_dir / "annotations.xml"
 
     if not images_dir.exists():
-        print(f"Error: images/ directory not found in {args.input}")
+        print(f"Error: Directory not found at {images_dir}")
         return
 
     output_dir.mkdir(parents=True, exist_ok=True)
-    (output_dir / "images").mkdir(exist_ok=True)
+    out_images_dir = output_dir / "images" if has_images_dir else output_dir
+    if has_images_dir:
+        out_images_dir.mkdir(exist_ok=True)
 
     print(f"Loading model: {args.model}...")
     model = get_model(EmbeddingModelNames(args.model))
@@ -172,17 +177,19 @@ def main():
         # Handle group of duplicates
         print(f"\nFound duplicate group: {current_group}")
         
-        # Sort by annotation count (descending)
-        group_with_counts = []
+        # Sort by annotation count (descending), then file size (descending)
+        group_with_metrics = []
         for name in current_group:
             elem = annotations.get(name)
             count = count_annotations(elem) if elem is not None else 0
-            group_with_counts.append((name, count))
+            size = (images_dir / name).stat().st_size
+            group_with_metrics.append((name, count, size))
             
-        group_with_counts.sort(key=lambda x: x[1], reverse=True)
+        # Primary sort by count, secondary sort by size
+        group_with_metrics.sort(key=lambda x: (x[1], x[2]), reverse=True)
         
-        winner_name, winner_count = group_with_counts[0]
-        others = group_with_counts[1:]
+        winner_name, winner_count, winner_size = group_with_metrics[0]
+        others = group_with_metrics[1:]
         
         # Decision logic
         final_winner = winner_name
@@ -194,40 +201,40 @@ def main():
             print(f"Conflict: Multiple images have {winner_count} annotations.")
             
             # Paths for visualization
-            group_paths = [images_dir / name for name, _ in group_with_counts]
+            group_paths = [images_dir / name for name, _, _ in group_with_metrics]
             visualize_group(group_paths, annotations)
             
-            for idx, (name, count) in enumerate(group_with_counts):
-                print(f"  [{idx}] {name} ({count} annotations)")
+            for idx, (name, count, size) in enumerate(group_with_metrics):
+                print(f"  [{idx}] {name} ({count} annotations, {size/1024:.1f} KB)")
             
             while True:
-                choice = input(f"Which one to keep? [0-{len(group_with_counts)-1}, s to skip]: ").strip().lower()
+                choice = input(f"Which one to keep? [0-{len(group_with_metrics)-1}, s to skip]: ").strip().lower()
                 if choice == 's':
                     break
                 try:
                     choice_idx = int(choice)
-                    if 0 <= choice_idx < len(group_with_counts):
-                        final_winner = group_with_counts[choice_idx][0]
+                    if 0 <= choice_idx < len(group_with_metrics):
+                        final_winner = group_with_metrics[choice_idx][0]
                         break
                 except ValueError:
                     pass
             plt.close()
-        elif args.interactive and len(group_with_counts) > 1:
+        elif args.interactive and len(group_with_metrics) > 1:
             # Even if no conflict in counts, show them if interactive
             print(f"Duplicate group found. Winner by annotation count: {winner_name} ({winner_count})")
-            group_paths = [images_dir / name for name, _ in group_with_counts]
+            group_paths = [images_dir / name for name, _, _ in group_with_metrics]
             visualize_group(group_paths, annotations)
             
-            choice = input(f"Keep {winner_name}? [y/n, or index 0-{len(group_with_counts)-1}]: ").strip().lower()
+            choice = input(f"Keep {winner_name}? [y/n, or index 0-{len(group_with_metrics)-1}]: ").strip().lower()
             if choice == 'n':
                  # Prompt for which one then
-                 for idx, (name, count) in enumerate(group_with_counts):
-                    print(f"  [{idx}] {name} ({count} annotations)")
+                 for idx, (name, count, size) in enumerate(group_with_metrics):
+                    print(f"  [{idx}] {name} ({count} annotations, {size/1024:.1f} KB)")
                  choice_idx = int(input("Index to keep: "))
-                 final_winner = group_with_counts[choice_idx][0]
+                 final_winner = group_with_metrics[choice_idx][0]
             elif choice != 'y' and choice != '':
                 try:
-                    final_winner = group_with_counts[int(choice)][0]
+                    final_winner = group_with_metrics[int(choice)][0]
                 except (ValueError, IndexError):
                     pass
             plt.close()
@@ -235,7 +242,7 @@ def main():
             print(f"Tie detected for {winner_name} and {potential_conflicts[0][0]}. Keeping {winner_name} by default.")
 
         to_keep.add(final_winner)
-        for name, _ in group_with_counts:
+        for name, _, _ in group_with_metrics:
             if name != final_winner:
                 to_remove.add(name)
 
@@ -271,7 +278,7 @@ def main():
     # Copy images
     for name in tqdm(to_keep, desc="Copying images"):
         src = images_dir / name
-        dst = output_dir / "images" / name
+        dst = out_images_dir / name
         shutil.copy2(src, dst)
 
     print(f"Cleaned dataset saved to: {args.output}")
