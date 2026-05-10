@@ -1,6 +1,5 @@
-from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData, ReductionBase, SegmenterBase
+from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData, ReductionBase, SegmenterBase, BoundingBox
 from PIL import Image as PILImage
-import numpy as np
 from enum import Enum
 
 class DistanceMethod(str, Enum):
@@ -15,7 +14,7 @@ class Configuration:
         self.reduction = reduction
         self.segmenter = segmenter
 
-    def save_image(self, filename: str) -> ImageData:
+    def save_image(self, filename: str) -> list[ImageData]:
         # Check if the image is already in storage
         if self.storage.has(filename):
             return self.storage.load(filename)
@@ -26,31 +25,32 @@ class Configuration:
         # Segment the image to find the graffiti
         boxes = self.segmenter.segment(image)
         
-        # For now, we take the most confident detection
-        # If no detection, we can fall back to the full image embedding 
-        # (effectively what IdentitySegmenter would do, but we handle it here for safety)
-        best_box = None
-        target_image = image
-        
-        if boxes:
-            best_box = max(boxes, key=lambda x: x.confidence)
-            # Crop to the detected bounding box
-            target_image = image.crop((best_box.x1, best_box.y1, best_box.x2, best_box.y2))
+        # If no boxes are detected, use the full image
+        if not boxes:
+            boxes = [BoundingBox(x1=0, y1=0, x2=image.width, y2=image.height, confidence=1.0)]
 
-        emb = self.embedding.gen_embedding(target_image)
+        # Generate embeddings for each box and save them
+        images = []
+        for box in boxes:
+            crop = image.crop((box.x1, box.y1, box.x2, box.y2))
+            emb = self.embedding.gen_embedding(crop)
 
-        # Save the image data
-        data = ImageData(filename=filename, embedding=emb, bbox=best_box)
-        self.storage.save(data)
+            data = ImageData(filename=filename, bbox=box, embedding=emb)
+            self.storage.save(data)
+            images.append(data)
 
-        return data
+        return images 
 
-    def get_by_distance(self, filename: str, max_images: int = 10, cos_distance: bool = True) -> list[ImageData]:
-        # Load the target image
-        target_data = self.storage.load(filename)
+    def get_by_distance(self, image: ImageData|str, max_images: int = 10, cos_distance: bool = True) -> list[ImageData]:
+        # If the image is given as a filename, load it and take the first embedding 
+        if isinstance(image, str):
+            images = self.storage.load(image)
+            image_data = images[0]
+        else:
+            image_data = image
 
         # Get similar images by distance
-        similar_images = self.storage.get_by_distance(target_data.embedding, max_images=max_images, cos_distance=cos_distance)
+        similar_images = self.storage.get_by_distance(image_data.embedding, max_images=max_images, cos_distance=cos_distance)
 
         return similar_images
 
@@ -81,16 +81,6 @@ class Configuration:
                 clusters[cluster].append(images[i])
 
         return clusters
-
-    def get_distance(self, filename1: str, filename2: str, distance_method: DistanceMethod = DistanceMethod.COSINE) -> float:
-        data1 = self.storage.load(filename1)
-        data2 = self.storage.load(filename2)
-
-        if distance_method == DistanceMethod.COSINE:
-            return 1 - np.dot(data1.embedding, data2.embedding) / (np.linalg.norm(data1.embedding) * np.linalg.norm(data2.embedding))
-        elif distance_method == DistanceMethod.EUCLIDEAN:
-            # Euclidean distance
-            return float(np.linalg.norm(np.array(data1.embedding) - np.array(data2.embedding)))
 
 def save_folder(folder: str, config: Configuration):
     for filename in tqdm(os.listdir(folder), desc=f"Processing {folder}"):
@@ -136,10 +126,6 @@ if __name__ == "__main__":
     if os.path.isdir(argv[1]):
         print("Adding images...")
         save_folder(argv[1], config)
-
-    else:
-        print("\nFinding similar images...")
-        print('\n'.join(image.filename for image in config.get_by_distance(argv[1])[:10]))
 
     for filename in tqdm(argv[1:]):
         try:

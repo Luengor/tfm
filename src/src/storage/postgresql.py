@@ -10,13 +10,13 @@ class ImageModel(Base):
     __tablename__ = 'images'
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    filename: Mapped[str] = mapped_column(unique=True)
+    filename: Mapped[str] = mapped_column()
     embedding: Mapped[Vector] = mapped_column(Vector)
-    bbox_x1: Mapped[float] = mapped_column(nullable=True)
-    bbox_y1: Mapped[float] = mapped_column(nullable=True)
-    bbox_x2: Mapped[float] = mapped_column(nullable=True)
-    bbox_y2: Mapped[float] = mapped_column(nullable=True)
-    bbox_conf: Mapped[float] = mapped_column(nullable=True)
+    bbox_x1: Mapped[float] = mapped_column()
+    bbox_y1: Mapped[float] = mapped_column()
+    bbox_x2: Mapped[float] = mapped_column()
+    bbox_y2: Mapped[float] = mapped_column()
+    bbox_conf: Mapped[float] = mapped_column()
 
 class MetadataModel(Base):
     __tablename__ = 'metadata'
@@ -43,17 +43,15 @@ class PostgreSQLStorage(StorageBase):
         self.engine.dispose()
 
     def save(self, data: ImageData) -> None:
-        bbox_data = {}
-        if data.bbox:
-            bbox_data = {
-                'bbox_x1': data.bbox.x1,
-                'bbox_y1': data.bbox.y1,
-                'bbox_x2': data.bbox.x2,
-                'bbox_y2': data.bbox.y2,
-                'bbox_conf': data.bbox.confidence
-            }
-        
-        image = ImageModel(filename=data.filename, embedding=data.embedding, **bbox_data)
+        image = ImageModel(
+            filename=data.filename,
+            embedding=data.embedding,
+            bbox_x1=data.bbox.x1,
+            bbox_y1=data.bbox.y1,
+            bbox_x2=data.bbox.x2,
+            bbox_y2=data.bbox.y2,
+            bbox_conf=data.bbox.confidence
+        )
         self.session.add(image)
         self.session.commit()
 
@@ -74,11 +72,11 @@ class PostgreSQLStorage(StorageBase):
             )
         return ImageData(filename=image.filename, embedding=list(image.embedding), bbox=bbox) #type: ignore
 
-    def load(self, filename:str) -> ImageData:
-        result = self.session.query(ImageModel).filter_by(filename=filename).first()
+    def load(self, filename:str) -> list[ImageData]:
+        result = self.session.query(ImageModel).filter_by(filename=filename).all()
         if result is None:
             raise ValueError(f"Image with filename '{filename}' not found in database.")
-        return self._2imagedata(result)
+        return [self._2imagedata(image) for image in result]
 
     def get_all_images(self) -> list[ImageData]:
         return [self._2imagedata(image) for image in

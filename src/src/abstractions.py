@@ -1,20 +1,20 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from PIL.Image import Image as PILImage
 
 @dataclass
 class BoundingBox:
-    x1: float
-    y1: float
-    x2: float
-    y2: float
-    confidence: float
+    x1: float = 0
+    y1: float = 0
+    x2: float = 1
+    y2: float = 1
+    confidence: float = 1
 
 @dataclass
 class ImageData:
     filename: str
     embedding: list[float]
-    bbox: BoundingBox | None = None
+    bbox: BoundingBox = field(default_factory=BoundingBox)
 
 
 class StorageBase(ABC):
@@ -23,7 +23,7 @@ class StorageBase(ABC):
         ...
 
     @abstractmethod
-    def load(self, filename:str) -> ImageData:
+    def load(self, filename:str) -> list[ImageData]:
         ...
 
     @abstractmethod
