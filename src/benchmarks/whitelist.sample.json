@@ -37,7 +37,10 @@
       "segmenter": {
         "type": "yolo",
         "params": {
-          "model_path": "models/yolo26n.pt"
+          "model_path": "models/yolo26n.pt",
+          "threshold": 0.5,
+          "merge_threshold": 0.8,
+          "padding": 0.1
         }
       },
       "clear_storage": true
