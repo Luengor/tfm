@@ -3,10 +3,15 @@ from src.abstractions import SegmenterBase, BoundingBox
 from PIL.Image import Image as PILImage
 
 class YoloSegmenter(SegmenterBase):
-    def __init__(self, model_path: str, threshold: float = 0.5, merge_threshold: float = 0.8):
+    def __init__(self, model_path: str, threshold: float = 0.5, merge_threshold: float = 0.8, padding: float = 0.0):
         self.model = YOLO(model_path)
         self.threshold = threshold
         self.merge_threshold = merge_threshold
+        self._padding = padding
+
+    @property
+    def padding(self) -> float:
+        return self._padding
 
     def segment(self, image: PILImage) -> list[BoundingBox]:
         width, height = image.size
@@ -28,7 +33,21 @@ class YoloSegmenter(SegmenterBase):
         if self.merge_threshold < 1.0:
             boxes = self._merge_boxes(boxes)
 
+        if self._padding > 0:
+            boxes = [self._apply_padding(box) for box in boxes]
+
         return boxes
+
+    def _apply_padding(self, box: BoundingBox) -> BoundingBox:
+        w = box.x2 - box.x1
+        h = box.y2 - box.y1
+        return BoundingBox(
+            x1=max(0.0, box.x1 - w * self._padding),
+            y1=max(0.0, box.y1 - h * self._padding),
+            x2=min(1.0, box.x2 + w * self._padding),
+            y2=min(1.0, box.y2 + h * self._padding),
+            confidence=box.confidence
+        )
 
     def _merge_boxes(self, boxes: list[BoundingBox]) -> list[BoundingBox]:
         if not boxes:
@@ -84,6 +103,13 @@ class YoloSegmenter(SegmenterBase):
         return (intersection_area / area1 > self.merge_threshold) or (intersection_area / area2 > self.merge_threshold)
 
 class IdentitySegmenter(SegmenterBase):
+    def __init__(self, padding: float = 0.0):
+        self._padding = padding
+
+    @property
+    def padding(self) -> float:
+        return self._padding
+
     def segment(self, image: PILImage) -> list[BoundingBox]:
         return [BoundingBox(
             x1=0.0,

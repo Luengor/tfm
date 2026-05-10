@@ -367,10 +367,12 @@ def _build_segmenter(run_spec: BenchmarkRunSpec):
             raise ValueError(f"Run {run_spec.name}: segmenter.type 'yolo' requires params.model_path.")
         threshold = params.get("threshold", 0.5)
         merge_threshold = params.get("merge_threshold", 0.8)
-        return YoloSegmenter(model_path, threshold=threshold, merge_threshold=merge_threshold)
+        padding = params.get("padding", 0.0)
+        return YoloSegmenter(model_path, threshold=threshold, merge_threshold=merge_threshold, padding=padding)
     
     if name == "identity":
-        return IdentitySegmenter()
+        padding = params.get("padding", 0.0)
+        return IdentitySegmenter(padding=padding)
 
     raise ValueError(f"Run {run_spec.name}: unsupported segmenter type '{run_spec.segmenter.type}'.")
 

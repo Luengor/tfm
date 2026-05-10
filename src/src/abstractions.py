@@ -60,6 +60,11 @@ class EmbeddingBase(ABC):
         ...
 
 class SegmenterBase(ABC):
+    @property
+    @abstractmethod
+    def padding(self) -> float:
+        ...
+
     @abstractmethod
     def segment(self, image: PILImage) -> list[BoundingBox]:
         ...

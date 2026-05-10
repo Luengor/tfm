@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 from PIL import Image
 from tqdm import tqdm
 
-def crop_images(annotations_path, images_dir, output_dir):
+def crop_images(annotations_path, images_dir, output_dir, padding=0.0):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -24,12 +24,21 @@ def crop_images(annotations_path, images_dir, output_dir):
 
         try:
             with Image.open(image_path) as img:
+                width, height = img.size
                 for i, box in enumerate(boxes):
                     label = box.get('label')
                     xtl = float(box.get('xtl'))
                     ytl = float(box.get('ytl'))
                     xbr = float(box.get('xbr'))
                     ybr = float(box.get('ybr'))
+
+                    if padding > 0:
+                        box_w = xbr - xtl
+                        box_h = ybr - ytl
+                        xtl = max(0, xtl - box_w * padding)
+                        ytl = max(0, ytl - box_h * padding)
+                        xbr = min(width, xbr + box_w * padding)
+                        ybr = min(height, ybr + box_h * padding)
 
                     # Create label directory
                     label_dir = os.path.join(output_dir, label)
@@ -52,5 +61,6 @@ if __name__ == "__main__":
     ANNOTATIONS_PATH = os.path.join("dataset", "annotations.xml")
     IMAGES_DIR = os.path.join("dataset", "images")
     OUTPUT_DIR = os.path.join("dataset", "crops")
+    PADDING = 0.1 # 10% padding
     
-    crop_images(ANNOTATIONS_PATH, IMAGES_DIR, OUTPUT_DIR)
+    crop_images(ANNOTATIONS_PATH, IMAGES_DIR, OUTPUT_DIR, padding=PADDING)
