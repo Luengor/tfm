@@ -235,13 +235,13 @@ def main():
                 plot_df["Group"] = plot_df[args.hue].astype(str) + " (" + plot_df["Metric"] + ")"
                 hue_col = "Group"
                 
-            ax = sns.barplot(data=plot_df, x=plot_x_axis, y="Value", hue=hue_col)
+            sns.barplot(data=plot_df, x=plot_x_axis, y="Value", hue=hue_col)
             plt.ylabel("Value")
             title_suffix = f"({', '.join(valid_metrics)})"
         else:
             # Single metric plot
             metric = valid_metrics[0]
-            ax = sns.barplot(data=df, x=plot_x_axis, y=metric, hue=args.hue)
+            sns.barplot(data=df, x=plot_x_axis, y=metric, hue=args.hue)
             plt.ylabel(metric)
             title_suffix = metric
 

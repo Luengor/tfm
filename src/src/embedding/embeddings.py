@@ -3,6 +3,7 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="torch.hub")
 warnings.filterwarnings("ignore", category=UserWarning, module="open_clip")
 
+# ruff: noqa: E402
 from torchvision.models import (
     ResNet50_Weights,
     VGG16_Weights,

@@ -5,7 +5,6 @@ from PIL import Image
 from sklearn.metrics import silhouette_score, adjusted_rand_score, normalized_mutual_info_score
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import LeaveOneOut
-from tqdm import tqdm
 import torch.nn.functional as F
 
 from src.embedding.embeddings import get_model, EmbeddingModelNames

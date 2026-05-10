@@ -32,7 +32,7 @@ class StageProfiler:
         self._start_rss_mb = 0.0
         self.metrics: StageMetrics | None = None
 
-    def __enter__(self) -> StageProfiler:
+    def __enter__(self) -> "StageProfiler":
         self._start_wall = time.perf_counter()
         cpu_times = self._process.cpu_times()
         self._start_cpu = cpu_times.user + cpu_times.system

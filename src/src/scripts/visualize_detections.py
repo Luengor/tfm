@@ -10,6 +10,7 @@ project_root = script_dir.parents[2]
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
+# ruff: noqa: E402
 from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
 from src.storage.sqlite import SQLiteStorage

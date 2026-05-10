@@ -1,12 +1,10 @@
 import argparse
-import os
 import shutil
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Set
 
 import numpy as np
-import torch
 from PIL import Image
 from tqdm import tqdm
 
@@ -18,6 +16,7 @@ project_root = script_dir.parents[2]
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
+# ruff: noqa: E402
 from src.embedding.embeddings import EmbeddingModelNames, get_model
 
 def get_image_fingerprint(image_path: Path, model) -> np.ndarray:
@@ -58,7 +57,7 @@ def count_annotations(image_element: ET.Element) -> int:
     return count
 
 import matplotlib.pyplot as plt
-from PIL import Image, ImageDraw
+from PIL import ImageDraw
 
 def draw_annotations(image: Image.Image, image_element: ET.Element) -> Image.Image:
     """Draw CVAT annotations on a copy of the image."""
@@ -246,7 +245,7 @@ def main():
             if name != final_winner:
                 to_remove.add(name)
 
-    print(f"\nSummary:")
+    print("\nSummary:")
     print(f"  Total images: {len(image_paths)}")
     print(f"  To keep:      {len(to_keep)}")
     print(f"  To remove:    {len(to_remove)}")
