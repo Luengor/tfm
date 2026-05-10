@@ -61,7 +61,7 @@ class EmbeddingBase(ABC):
 
 class SegmenterBase(ABC):
     @abstractmethod
-    def segment(self, image: PILImage, threshold: float = 0.5) -> list[BoundingBox]:
+    def segment(self, image: PILImage) -> list[BoundingBox]:
         ...
 
 class ClusteringBase(ABC):

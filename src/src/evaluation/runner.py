@@ -365,7 +365,9 @@ def _build_segmenter(run_spec: BenchmarkRunSpec):
         model_path = params.get("model_path")
         if not model_path:
             raise ValueError(f"Run {run_spec.name}: segmenter.type 'yolo' requires params.model_path.")
-        return YoloSegmenter(model_path)
+        threshold = params.get("threshold", 0.5)
+        merge_threshold = params.get("merge_threshold", 0.8)
+        return YoloSegmenter(model_path, threshold=threshold, merge_threshold=merge_threshold)
     
     if name == "identity":
         return IdentitySegmenter()

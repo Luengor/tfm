@@ -27,12 +27,18 @@ class Configuration:
         
         # If no boxes are detected, use the full image
         if not boxes:
-            boxes = [BoundingBox(x1=0, y1=0, x2=image.width, y2=image.height, confidence=1.0)]
+            boxes = [BoundingBox(x1=0.0, y1=0.0, x2=1.0, y2=1.0, confidence=1.0)]
 
         # Generate embeddings for each box and save them
         images = []
         for box in boxes:
-            crop = image.crop((box.x1, box.y1, box.x2, box.y2))
+            # Scale normalized coordinates back to image dimensions for cropping
+            left = box.x1 * image.width
+            top = box.y1 * image.height
+            right = box.x2 * image.width
+            bottom = box.y2 * image.height
+            
+            crop = image.crop((left, top, right, bottom))
             emb = self.embedding.gen_embedding(crop)
 
             data = ImageData(filename=filename, bbox=box, embedding=emb)
