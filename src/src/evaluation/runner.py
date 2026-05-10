@@ -149,17 +149,6 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
             # Only save if it looks like a meaningful ingestion run
             storage.set_metadata(METADATA_INGEST_KEY, json.dumps(asdict(ingest_metrics)))
 
-        if run_spec.distance_query.enabled:
-            target_index = min(run_spec.distance_query.target_index, image_count - 1)
-            target_path = image_paths[target_index]
-            with profile_stage() as query_stage:
-                nearest = config.get_by_distance(
-                    target_path,
-                    cos_distance=run_spec.distance_query.cos_distance,
-                )
-                _ = nearest[: run_spec.distance_query.top_k]
-            query_metrics = query_stage.metrics
-
         if run_spec.similarity_search.enabled:
             with profile_stage() as similarity_stage:
                 all_images = config.storage.get_all_images()
@@ -267,7 +256,6 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
         clear_storage=clear_metrics,
         ingest=ingest_metrics,
         reduction=reduction_metrics,
-        distance_query=query_metrics,
         similarity_search=similarity_metrics,
         avg_neighbor_distance=avg_neighbor_distance,
         clustering=clustering_metrics,
@@ -435,16 +423,11 @@ def _build_csv_columns(records: list[dict[str, Any]]) -> list[str]:
         "segmenter_params",
         "reduction_type",
         "reduction_params",
-        "distance_query_enabled",
-        "distance_query_target_index",
-        "distance_query_cos_distance",
-        "distance_query_top_k",
         "similarity_search_enabled",
         "similarity_search_top_k",
         "similarity_search_cos_distance",
         "clear_storage_enabled",
         "limit_parameter",
-        "error",
     ]
 
     dynamic = sorted({key for record in records for key in record.keys() if key not in preferred})

@@ -10,14 +10,6 @@ class ComponentSpec:
 
 
 @dataclass(slots=True)
-class DistanceQuerySpec:
-    enabled: bool = False
-    target_index: int = 0
-    cos_distance: bool = True
-    top_k: int = 10
-
-
-@dataclass(slots=True)
 class SimilaritySearchSpec:
     enabled: bool = False
     top_k: int = 3
@@ -32,7 +24,6 @@ class BenchmarkRunSpec:
     clustering: ComponentSpec
     segmenter: ComponentSpec | None = None
     reduction: ComponentSpec | None = None
-    distance_query: DistanceQuerySpec = field(default_factory=DistanceQuerySpec)
     similarity_search: SimilaritySearchSpec = field(default_factory=SimilaritySearchSpec)
     clear_storage: bool = True
     limit: int | None = None
@@ -100,7 +91,6 @@ class BenchmarkResult:
     clear_storage: StageMetrics | None = None
     ingest: StageMetrics | None = None
     reduction: StageMetrics | None = None
-    distance_query: StageMetrics | None = None
     similarity_search: StageMetrics | None = None
     avg_neighbor_distance: float | None = None
     clustering: StageMetrics | None = None
@@ -132,10 +122,6 @@ class BenchmarkResult:
                 "clustering_params": json.dumps(self.config.clustering.params),
                 "segmenter_params": json.dumps(self.config.segmenter.params) if self.config.segmenter else None,
                 "reduction_params": json.dumps(self.config.reduction.params) if self.config.reduction else None,
-                "distance_query_enabled": self.config.distance_query.enabled,
-                "distance_query_target_index": self.config.distance_query.target_index,
-                "distance_query_cos_distance": self.config.distance_query.cos_distance,
-                "distance_query_top_k": self.config.distance_query.top_k,
                 "similarity_search_enabled": self.config.similarity_search.enabled,
                 "similarity_search_top_k": self.config.similarity_search.top_k,
                 "similarity_search_cos_distance": self.config.similarity_search.cos_distance,
@@ -143,7 +129,7 @@ class BenchmarkResult:
                 "limit_parameter": self.config.limit,
             })
 
-        for stage_name in ("setup", "clear_storage", "ingest", "reduction", "distance_query", "similarity_search", "clustering"):
+        for stage_name in ("setup", "clear_storage", "ingest", "reduction", "similarity_search", "clustering"):
             stage = getattr(self, stage_name)
             if stage is None:
                 continue

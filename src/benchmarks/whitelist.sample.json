@@ -17,12 +17,6 @@
       "segmenter": {
         "type": "identity"
       },
-      "distance_query": {
-        "enabled": true,
-        "target_index": 0,
-        "cos_distance": true,
-        "top_k": 10
-      },
       "clear_storage": true
     },
     {
@@ -45,12 +39,6 @@
         "params": {
           "model_path": "models/yolo26n.pt"
         }
-      },
-      "distance_query": {
-        "enabled": true,
-        "target_index": 0,
-        "cos_distance": true,
-        "top_k": 10
       },
       "clear_storage": true
     }

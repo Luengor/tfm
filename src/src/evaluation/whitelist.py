@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from src.evaluation.models import BenchmarkRunSpec, ComponentSpec, DistanceQuerySpec, SimilaritySearchSpec
+from src.evaluation.models import BenchmarkRunSpec, ComponentSpec, SimilaritySearchSpec
 
 
 class WhitelistError(ValueError):
@@ -43,7 +43,6 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
         if "reduction" in raw and raw["reduction"] is not None:
              reduction_spec = _parse_component(raw.get("reduction"), "reduction", index)
 
-        distance_query = _parse_distance_query(raw.get("distance_query"), index)
         similarity_search = _parse_similarity_search(raw.get("similarity_search"), index)
 
         clear_storage = raw.get("clear_storage", True)
@@ -62,7 +61,6 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
             clustering=clustering_spec,
             segmenter=segmenter_spec,
             reduction=reduction_spec,
-            distance_query=distance_query,
             similarity_search=similarity_search,
             clear_storage=clear_storage,
             limit=limit,
@@ -86,34 +84,6 @@ def _parse_component(raw: Any, component_name: str, run_index: int) -> Component
         raise WhitelistError(f"Run index {run_index}: {component_name}.params must be an object.")
 
     return ComponentSpec(type=c_type.strip(), params=params)
-
-
-def _parse_distance_query(raw: Any, run_index: int) -> DistanceQuerySpec:
-    if raw is None:
-        return DistanceQuerySpec()
-    if not isinstance(raw, dict):
-        raise WhitelistError(f"Run index {run_index}: distance_query must be an object.")
-
-    enabled = raw.get("enabled", False)
-    target_index = raw.get("target_index", 0)
-    cos_distance = raw.get("cos_distance", True)
-    top_k = raw.get("top_k", 10)
-
-    if not isinstance(enabled, bool):
-        raise WhitelistError(f"Run index {run_index}: distance_query.enabled must be a boolean.")
-    if not isinstance(target_index, int) or target_index < 0:
-        raise WhitelistError(f"Run index {run_index}: distance_query.target_index must be >= 0.")
-    if not isinstance(cos_distance, bool):
-        raise WhitelistError(f"Run index {run_index}: distance_query.cos_distance must be a boolean.")
-    if not isinstance(top_k, int) or top_k <= 0:
-        raise WhitelistError(f"Run index {run_index}: distance_query.top_k must be a positive integer.")
-
-    return DistanceQuerySpec(
-        enabled=enabled,
-        target_index=target_index,
-        cos_distance=cos_distance,
-        top_k=top_k,
-    )
 
 
 def _parse_similarity_search(raw: Any, run_index: int) -> SimilaritySearchSpec:
@@ -155,12 +125,6 @@ def make_run_id(spec: BenchmarkRunSpec) -> str:
         "clustering": {"type": spec.clustering.type.lower(), "params": spec.clustering.params},
         "segmenter": {"type": spec.segmenter.type.lower(), "params": spec.segmenter.params} if spec.segmenter else None,
         "reduction": {"type": spec.reduction.type.lower(), "params": spec.reduction.params} if spec.reduction else None,
-        "distance_query": {
-            "enabled": spec.distance_query.enabled,
-            "target_index": spec.distance_query.target_index,
-            "cos_distance": spec.distance_query.cos_distance,
-            "top_k": spec.distance_query.top_k,
-        },
         "similarity_search": {
             "enabled": spec.similarity_search.enabled,
             "top_k": spec.similarity_search.top_k,
