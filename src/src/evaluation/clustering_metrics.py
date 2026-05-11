@@ -31,9 +31,11 @@ def calculate_clustering_metrics(embeddings: np.ndarray, labels: np.ndarray) -> 
             s_score = None
             
     ch_score = None
-    if len(unique_labels) > 1:
+    if n_clusters > 1:
         try:
-            ch_score = float(calinski_harabasz_score(embeddings, labels))
+            mask = labels != -1
+            if mask.sum() > n_clusters:
+                ch_score = float(calinski_harabasz_score(embeddings[mask], labels[mask]))
         except Exception:
             ch_score = None
 
