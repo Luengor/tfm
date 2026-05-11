@@ -208,6 +208,8 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
         if "storage" in locals():
             storage.close() # type: ignore
             del storage # type: ignore
+        if "config" in locals():
+            del config # type: ignore
         if "embedding" in locals():
             del embedding # type: ignore
         if "clustering" in locals():
