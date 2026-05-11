@@ -5,8 +5,11 @@ import struct
 import sqlite3
 
 class SQLiteStorage(StorageBase):
+    _COMMIT_BATCH = 50
+
     def __init__(self, db_path: str):
         self.db_path = db_path
+        self._pending = 0
 
         # Init db
         self.con = sqlite3.connect(self.db_path)
@@ -40,13 +43,15 @@ class SQLiteStorage(StorageBase):
             pass
 
     def save(self, data: ImageData) -> None:
-        # Convert the embedding to bytes and save it in the database
         embedding_bytes = struct.pack(f"{len(data.embedding)}f", *data.embedding)
-        self.cur.execute("""INSERT INTO images 
-            (filename, embedding, bbox_x1, bbox_y1, bbox_x2, bbox_y2, bbox_conf) 
+        self.cur.execute("""INSERT INTO images
+            (filename, embedding, bbox_x1, bbox_y1, bbox_x2, bbox_y2, bbox_conf)
             VALUES (?, ?, ?, ?, ?, ?, ?);""",
             (data.filename, embedding_bytes, data.bbox.x1, data.bbox.y1, data.bbox.x2, data.bbox.y2, data.bbox.confidence))
-        self.con.commit()
+        self._pending += 1
+        if self._pending >= self._COMMIT_BATCH:
+            self.con.commit()
+            self._pending = 0
 
     def _row_to_image_data(self, row) -> ImageData:
         filename, embedding_bytes, x1, y1, x2, y2, conf = row

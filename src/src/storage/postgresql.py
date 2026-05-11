@@ -25,8 +25,11 @@ class MetadataModel(Base):
     value: Mapped[str] = mapped_column()
 
 class PostgreSQLStorage(StorageBase):
+    _COMMIT_BATCH = 50
+
     def __init__(self, db_url: str):
         self.engine = create_engine(db_url)
+        self._pending = 0
 
         # Init db
         self.connection = self.engine.connect()
@@ -60,7 +63,10 @@ class PostgreSQLStorage(StorageBase):
             bbox_conf=data.bbox.confidence
         )
         self.session.add(image)
-        self.session.commit()
+        self._pending += 1
+        if self._pending >= self._COMMIT_BATCH:
+            self.session.commit()
+            self._pending = 0
 
     def has(self, filename: str) -> bool:
         query = self.session.query(ImageModel).filter_by(filename=filename)
