@@ -114,7 +114,7 @@ class GMMClusterer(ClusteringBase):
         embeddings = np.array([img.embedding for img in images])
         
         if n_components is None:
-            # Search for optimal k using BIC elbow
+            # Search for optimal k by minimizing BIC
             max_k = min(len(embeddings), kwargs.get("max_clusters", 20))
             if max_k < 2:
                 n_components = 1
@@ -124,7 +124,7 @@ class GMMClusterer(ClusteringBase):
                     GaussianMixture(n_components=k, covariance_type=covariance_type, random_state=0).fit(embeddings).bic(embeddings)
                     for k in ks
                 ]
-                n_components = ks[find_elbow(np.array(bics))]
+                n_components = ks[int(np.argmin(bics))]
 
         gmm = GaussianMixture(n_components=n_components, covariance_type=covariance_type, random_state=0).fit(embeddings)
         labels = gmm.predict(embeddings)
