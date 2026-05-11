@@ -1,17 +1,18 @@
 {
   "runs": [
     {
-      "name": "sqlite_resnet_kmeans",
+      "name": "sqlite_mobilenet_identity",
       "storage": {
         "type": "sqlite"
       },
       "embedding": {
-        "type": "resnet50"
+        "type": "mobilenet_v3"
       },
       "clustering": {
-        "type": "kmeans",
+        "type": "HDBSCAN",
         "params": {
-          "n_clusters": 5
+          "min_cluster_size": 3,
+          "max_cluster_size": 30
         }
       },
       "segmenter": {
@@ -20,30 +21,74 @@
       "clear_storage": true
     },
     {
-      "name": "sqlite_yolos_optics",
+      "name": "sqlite_mobilenet_umap",
       "storage": {
         "type": "sqlite"
       },
       "embedding": {
-        "type": "yolos"
+        "type": "mobilenet_v3"
       },
       "clustering": {
-        "type": "optics",
+        "type": "HDBSCAN",
         "params": {
-          "min_samples": 5,
-          "metric": "cosine"
+          "min_cluster_size": 3,
+          "max_cluster_size": 30
         }
+      },
+      "reduction": {
+          "type": "umap",
+          "params": {
+              "n_components": 100
+          }
       },
       "segmenter": {
-        "type": "yolo",
-        "params": {
-          "model_path": "models/yolo26n.pt",
-          "threshold": 0.5,
-          "merge_threshold": 0.8,
-          "padding": 0.1
-        }
+        "type": "identity"
       },
-      "clear_storage": true
+      "clear_storage": true 
+    },
+    {
+      "name": "sqlite_mobilenet_gmm",
+      "storage": {
+        "type": "sqlite"
+      },
+      "embedding": {
+        "type": "mobilenet_v3"
+      },
+      "clustering": {
+        "type": "gmm"
+      },
+      "reduction": {
+          "type": "umap",
+          "params": {
+              "n_components": 100
+          }
+      },
+      "segmenter": {
+        "type": "identity"
+      },
+      "clear_storage": false 
+    },
+    {
+      "name": "sqlite_mobilenet_gmm_again",
+      "storage": {
+        "type": "sqlite"
+      },
+      "embedding": {
+        "type": "mobilenet_v3"
+      },
+      "clustering": {
+        "type": "gmm"
+      },
+      "reduction": {
+          "type": "umap",
+          "params": {
+              "n_components": 100
+          }
+      },
+      "segmenter": {
+        "type": "identity"
+      },
+      "clear_storage": false 
     }
   ]
 }
