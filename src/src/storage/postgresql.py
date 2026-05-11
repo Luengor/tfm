@@ -87,7 +87,7 @@ class PostgreSQLStorage(StorageBase):
 
     def load(self, filename:str) -> list[ImageData]:
         result = self.session.query(ImageModel).filter_by(filename=filename).all()
-        if result is None:
+        if not result:
             raise ValueError(f"Image with filename '{filename}' not found in database.")
         return [self._2imagedata(image) for image in result]
 

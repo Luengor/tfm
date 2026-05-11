@@ -1,6 +1,8 @@
 from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData, ReductionBase, SegmenterBase, BoundingBox
 from PIL import Image as PILImage
 from enum import Enum
+import os
+from tqdm import tqdm
 
 class DistanceMethod(str, Enum):
     COSINE = "cosine"
@@ -127,8 +129,9 @@ if __name__ == "__main__":
             print(f"Cluster with {len(cluster)} images:")
             for image in cluster[:5]:  # Print first 5 images in the cluster
                 print(f"  - {image.filename}")
+        sys.exit(0)
 
-    # Check if the argv[1] is a folder or file 
+    # Check if the argv[1] is a folder or file
     if os.path.isdir(argv[1]):
         print("Adding images...")
         save_folder(argv[1], config)

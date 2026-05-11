@@ -78,6 +78,7 @@ class CustomTrainer:
         self.model.train()
 
         criterion = nn.TripletMarginLoss(margin=1.0, p=2)
+        loss = torch.tensor(0.0)
 
         for anchors, positives, negatives in tqdm(self.dataloader):
             anchors, positives, negatives = anchors.to(self.device), positives.to(self.device), negatives.to(self.device)

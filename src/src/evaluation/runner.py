@@ -161,7 +161,7 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
                         cos_distance=run_spec.similarity_search.cos_distance,
                     )
                     # Exclude self
-                    neighbors = [n for n in nearest if n.filename != img.filename]
+                    neighbors = [n for n in nearest if (n.filename, n.bbox) != (img.filename, img.bbox)]
                     neighbors = neighbors[: run_spec.similarity_search.top_k]
 
                     for n in neighbors:

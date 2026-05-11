@@ -68,7 +68,7 @@ class SQLiteStorage(StorageBase):
         self.cur.execute("SELECT filename, embedding, bbox_x1, bbox_y1, bbox_x2, bbox_y2, bbox_conf FROM images WHERE filename = ?;", (filename,))
         result = self.cur.fetchall()
 
-        if result is None:
+        if not result:
             raise ValueError(f"Image with filename '{filename}' not found in database.")
 
         return [self._row_to_image_data(row) for row in result]

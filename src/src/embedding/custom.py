@@ -6,6 +6,6 @@ class CustomEmbeddingModel(TorchEmbeddingModel):
         super().__init__(name)
 
         # Load custom weights
-        self.model.load_state_dict(torch.load(weight_path))
+        self.model.load_state_dict(torch.load(weight_path, map_location=self.device))
 
 
