@@ -238,6 +238,7 @@ class HeadEmbeddingModel(EmbeddingBase):
             input_tensor = self.preprocessor(image).unsqueeze(0).to(self.device)
             features = self.base_model(input_tensor)
             output = self.projection_head(features)
+            output = torch.nn.functional.normalize(output, p=2, dim=-1)
         return output.squeeze().cpu().tolist()
 
     @property
