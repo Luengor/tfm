@@ -1,0 +1,25 @@
+{
+  "limit": 1000,
+  "storage": [
+    {"type": "sqlite", "params": {}}
+  ],
+  "segmenter": [
+    {"type": "identity", "params": {}}
+  ],
+  "embedding": [
+    {"type": "dinov2_graffiti_head", "params": {}},
+    {"type": "mobilenet_v3", "params": {}}
+  ],
+  "reduction": [
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.1, "metric": "euclidean"}},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.1, "metric": "manhattan"}}
+  ],
+  "clustering": [
+    {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+    {"type": "kmeans", "params": {"max_clusters": 30}},
+    {"type": "optics", "params": {"min_samples": 5, "metric": "cosine"}},
+    {"type": "optics", "params": {"min_samples": 5, "metric": "euclidean"}},
+    {"type": "optics", "params": {"min_samples": 5, "metric": "manhattan"}}
+  ]
+}

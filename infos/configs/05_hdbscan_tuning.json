@@ -1,0 +1,23 @@
+{
+  "limit": 1000,
+  "storage": [
+    {"type": "sqlite", "params": {}}
+  ],
+  "segmenter": [
+    {"type": "identity", "params": {}}
+  ],
+  "embedding": [
+    {"type": "dinov2_graffiti_head", "params": {}}
+  ],
+  "reduction": [
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}}
+  ],
+  "clustering": [
+    {"type": "hdbscan", "params": {"min_cluster_size": 3}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 10}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 15}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 20}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 30}}
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "limit": 1000,
+  "storage": [
+    {"type": "sqlite", "params": {}}
+  ],
+  "segmenter": [
+    {"type": "identity", "params": {}}
+  ],
+  "reduction": [
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}}
+  ],
+  "clustering": [
+    {"type": "hdbscan", "params": {"min_cluster_size": 5}}
+  ],
+  "embedding": [
+    {"type": "resnet50", "params": {}},
+    {"type": "vgg16", "params": {}},
+    {"type": "inception_v3", "params": {}},
+    {"type": "mobilenet_v3", "params": {}},
+    {"type": "dinov2_vits14", "params": {}},
+    {"type": "clip_vit_b32", "params": {}},
+    {"type": "yolon", "params": {}},
+    {"type": "yolos", "params": {}},
+    {"type": "yolom", "params": {}},
+    {"type": "mobilenet_v3_graffiti_head", "params": {}},
+    {"type": "dinov2_graffiti_head", "params": {}}
+  ]
+}
