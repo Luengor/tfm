@@ -49,6 +49,9 @@ class StorageBase(ABC):
     def clear(self) -> None:
         raise NotImplementedError("Storage backend does not implement clear().")
 
+    def close(self) -> None:
+        pass
+
 class EmbeddingBase(ABC):
     @abstractmethod
     def gen_embedding(self, image: PILImage) -> list[float]:

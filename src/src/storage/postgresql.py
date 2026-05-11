@@ -37,10 +37,17 @@ class PostgreSQLStorage(StorageBase):
 
         Base.metadata.create_all(self.engine)
 
-    def __del__(self):
+    def close(self) -> None:
+        self.session.commit()
         self.session.close()
         self.connection.close()
         self.engine.dispose()
+
+    def __del__(self):
+        try:
+            self.close()
+        except Exception:
+            pass
 
     def save(self, data: ImageData) -> None:
         image = ImageModel(

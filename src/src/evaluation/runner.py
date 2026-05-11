@@ -205,9 +205,8 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
     finally:
         # Explicit cleanup to prevent memory accumulation across runs
         # We delete large objects and call GC + CUDA cache clear
-        if "config" in locals():
-            del config # type: ignore
         if "storage" in locals():
+            storage.close() # type: ignore
             del storage # type: ignore
         if "embedding" in locals():
             del embedding # type: ignore

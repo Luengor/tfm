@@ -28,9 +28,16 @@ class SQLiteStorage(StorageBase):
         );""")
         self.con.commit()
 
-    def __del__(self):
+    def close(self) -> None:
+        self.con.commit()
         self.cur.close()
         self.con.close()
+
+    def __del__(self):
+        try:
+            self.close()
+        except Exception:
+            pass
 
     def save(self, data: ImageData) -> None:
         # Convert the embedding to bytes and save it in the database
