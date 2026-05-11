@@ -12,7 +12,7 @@ algoritmos de agrupamiento para nuestro banco de imágenes de grafiti.
 % Explicar el flujo de datos desde la imagen en bruto hasta el resultado del clustering.
 Para la evaluación de cada uno de los sistemas, se ha implementado un
 \textit{pipeline} modular en Python, que permite la integración de diferentes
-componentes de almacenamiento, extracción de características, reducción de
+componentes de segmentación, almacenamiento, extracción de características, reducción de
 dimensionalidad y agrupamiento a través de un archivo de configuración JSON,
 así como parámetros adicionales que permiten personalizar cada una de las
 etapas del proceso. Los módulos que componen el sistema se han diseñado como
@@ -23,10 +23,13 @@ dos etapas principales: la fase de extracción de características y la fase de
 agrupamiento y evaluación.
 
 En la primera etapa, el sistema comienza con la ingesta de imágenes en bruto.
-Durante esta fase, el sistema aplica el modelo de extracción de características
-seleccionado para generar vectores de características (\textit{embeddings}) a
-partir de las imágenes. Estos vectores luego se almacenan en el entorno de
-almacenamiento configurado.
+Durante esta fase, el segmentador detecta las regiones de grafiti presentes en
+cada imagen y recorta las áreas correspondientes. Este es un paso adicional a
+la generación de vectores de características, pero se ha incluido debido a la
+naturaleza de nuestro banco de imágenes. A continuación, el sistema aplica el
+modelo de extracción de características seleccionado para generar vectores de
+características (\textit{embeddings}) a partir de cada región detectada. Estos
+vectores luego se almacenan en el entorno de almacenamiento configurado.
 
 Durante la segunda etapa, el sistema recupera los vectores de características
 almacenados y aplica la técnica de reducción de dimensionalidad seleccionada
@@ -48,32 +51,6 @@ configuraciones probadas.
 % Anotación: Detallar el uso de Python y herramientas como uv para la gestión de dependencias.
 % Resaltar la importancia de la reproducibilidad y la automatización mediante el pipeline de benchmark.
 
-\subsubsection{Descripción del conjunto de datos}
-% Anotación: Describir el dataset de imágenes de grafiti (volumen, tipos de imágenes, resolución).
-% Detallar los pasos de preprocesamiento aplicados (redimensionamiento, normalización, etc.).
-
-\subsection{Espacio de configuraciones del sistema}
-\label{subsec:configuraciones}
-A continuación se describen los componentes clave del sistema que se han creado
-para la evaluación, así como las opciones de configuración más relevantes para
-cada uno de ellos.
-
-\subsubsection{Modelos de extracción de características (Embeddings)}
-% Anotación: Listar y justificar los modelos CNN y YOLO utilizados.
-% Mencionar la arquitectura de salida de cada modelo y la dimensionalidad de los vectores generados.
-
-\subsubsection{Algoritmos de agrupamiento (Clustering)}
-% Anotación: Explicar la selección de algoritmos (K-Means, DBSCAN, HDBSCAN, OPTICS).
-% Discutir brevemente los hiperparámetros clave que se variarán en las pruebas.
-
-\subsubsection{Técnicas de reducción de dimensionalidad}
-% Anotación: Justificar el uso de PCA y UMAP.
-% Explicar cómo afectan a la eficiencia del clustering y a la visualización de resultados.
-
-\subsubsection{Sistemas de almacenamiento y recuperación}
-% Anotación: Comparar el uso de SQLite para pruebas rápidas frente a PostgreSQL
-% con pgvector para producción/escalabilidad.
-
 \subsection{Métricas de evaluación}
 \label{subsec:metricas}
 % Anotación: Definir qué se entiende por "éxito" en este estudio, tanto en
@@ -91,10 +68,6 @@ cada uno de ellos.
 \subsection{Diseño experimental y procedimiento de pruebas}
 \label{subsec:diseno_experimental}
 
-\subsubsection{Entorno de ejecución}
-% Anotación: Especificar el hardware utilizado (procesador, tarjeta gráfica, RAM).
-% Listar versiones críticas de software (PyTorch, Scikit-learn, PostgreSQL).
-
 \subsubsection{Configuración de escenarios (Whitelists)}
 % Anotación: Explicar el funcionamiento de los archivos JSON de "whitelist"
 % para orquestar los experimentos.
@@ -102,4 +75,3 @@ cada uno de ellos.
 \subsubsection{Protocolo de pruebas}
 % Anotación: Describir los pasos exactos que sigue el pipeline en cada
 % ejecución para asegurar condiciones idénticas entre pruebas.
-

@@ -1,0 +1,37 @@
+%! TeX root: ../informe.tex
+\section{Materiales y métodos}
+\label{sec:materiales}
+
+\subsection{Descripción del conjunto de datos}
+% Anotación: Describir el dataset de imágenes de grafiti (volumen, tipos de imágenes, resolución).
+% Detallar los pasos de preprocesamiento aplicados (redimensionamiento, normalización, etc.).
+
+\subsection{Espacio de configuraciones del sistema}
+\label{subsec:configuraciones}
+A continuación se describen los componentes clave del sistema que se han creado
+para la evaluación, así como las opciones de configuración más relevantes para
+cada uno de ellos.
+
+\subsubsection{Segmentador de imágenes}
+% Anotación: Describir los segmentadores disponibles (YoloSegmenter, IdentitySegmenter).
+% Explicar el proceso de detección de regiones de grafiti, fusión de bounding boxes y padding.
+
+\subsubsection{Modelos de extracción de características (Embeddings)}
+% Anotación: Listar y justificar los modelos CNN y YOLO utilizados.
+% Mencionar la arquitectura de salida de cada modelo y la dimensionalidad de los vectores generados.
+
+\subsubsection{Algoritmos de agrupamiento (Clustering)}
+% Anotación: Explicar la selección de algoritmos (K-Means, DBSCAN, HDBSCAN, OPTICS).
+% Discutir brevemente los hiperparámetros clave que se variarán en las pruebas.
+
+\subsubsection{Técnicas de reducción de dimensionalidad}
+% Anotación: Justificar el uso de PCA y UMAP.
+% Explicar cómo afectan a la eficiencia del clustering y a la visualización de resultados.
+
+\subsubsection{Sistemas de almacenamiento y recuperación}
+% Anotación: Comparar el uso de SQLite para pruebas rápidas frente a PostgreSQL
+% con pgvector para producción/escalabilidad.
+
+\subsection{Entorno de ejecución}
+% Anotación: Especificar el hardware utilizado (procesador, tarjeta gráfica, RAM).
+% Listar versiones críticas de software (PyTorch, Scikit-learn, PostgreSQL).
