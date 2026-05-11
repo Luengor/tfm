@@ -42,7 +42,7 @@ class KMeansClusterer(ClusteringBase):
             if max_k < 2:
                 n_clusters = 1
             else:
-                ks = range(1, max_k + 1)
+                ks = range(2, max_k + 1)
                 inertias = [
                     KMeans(n_clusters=k, random_state=0, n_init="auto").fit(embeddings).inertia_
                     for k in ks
