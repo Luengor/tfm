@@ -27,6 +27,42 @@ another axis is:
   (tune up/down depending on dataset size and how patient you are; held constant
   across runs so timing comparisons are fair).
 
+## Computational performance as primary metric
+
+The benchmark runner profiles each pipeline stage and records wall time, CPU
+time, and memory (RSS delta, VRAM peak) for:
+
+| Stage | Captures |
+|---|---|
+| `setup` | Model loading / storage connection |
+| `ingest` | Segment → embed → store, repeated per image |
+| `reduction` | Dimensionality reduction over all stored embeddings |
+| `clustering` | Full clustering pass (wraps reduction timing) |
+| `similarity_search` | k-NN lookup for every stored image |
+
+`ingest_throughput_ips` (images/s) and `clustering_throughput_ips` are derived
+automatically. These timing columns are available alongside quality scores in
+every result CSV and JSON.
+
+**Treat timing as co-primary.** A configuration that clusters well but ingests
+10× slower represents a different trade-off than one that is fast but produces
+poor clusters. Where the two objectives conflict, document both.
+
+**Variability.** Each configuration runs once; wall time on a single run is
+noisy. Differences smaller than ~15 % between configurations should be treated
+as within measurement noise. For the scalability experiment (#9), the trend
+across n values is more meaningful than any individual data point.
+
+**Dataset size.** The current dataset contains approximately 240 images. Configs
+with `limit=1000` are effectively capped at the full dataset size; the actual
+n in every result is stored in the `image_count` column.
+
+**Memory.** Every stage captures `peak_rss_mb` and `vram_peak_mb`. Embedding
+models dominate VRAM; reduction and clustering dominate RAM at large n. Large
+reduction algorithms (Isomap, KernelPCA) also build O(n²) distance matrices —
+their RAM consumption scales quadratically and can become the binding constraint
+before CPU time does.
+
 ## Running an experiment
 
 Each grid file is consumed by `generate_whitelist.py` to produce a whitelist,
@@ -269,20 +305,69 @@ recommendation.
 ### 8. Storage backend performance
 
 **Question.** What is the throughput difference between SQLite (linear scan)
-and PostgreSQL + pgvector (indexed) for ingest and similarity search?
+and PostgreSQL + pgvector (indexed ANN) for ingest and similarity search across
+multiple dataset sizes?
 
-**Varies.** Storage type only.
+**Varies.** Storage type (`sqlite`, `postgresql`) × `limit` ∈ {100, 150, 200,
+240}. Similarity search is **enabled** (`top_k=5`) — this is the key axis where
+the two backends differ (SQLite: O(n) Python scan; PostgreSQL: O(log n) index).
 
 **Fixed.** Baseline embedding, reduction, clustering, segmenter.
 
 **Why it matters.** Clustering quality is unaffected by storage choice; this
-experiment isolates infrastructure cost. The result should inform the
-deployment recommendation in the thesis. PostgreSQL requires the dev container
-from the `mnt/` PostgreSQL setup at `localhost:54321`.
+experiment isolates infrastructure cost. Testing at four dataset sizes reveals
+whether the PostgreSQL index advantage is detectable even at the current dataset
+scale (~240 images) or only emerges at larger n. The result informs the
+deployment recommendation in the thesis.
 
-**Cost.** 2 runs, 2 ingests.
+**Prerequisites.** PostgreSQL requires the dev container from the `mnt/`
+PostgreSQL setup at `localhost:54321`.
+
+**Cost.** 8 runs, 8 ingests (every storage × limit combination requires a
+separate DB).
 
 **Config.** [`configs/08_storage_comparison.json`](configs/08_storage_comparison.json)
+
+### 9. Scalability sweep
+
+**Question.** How does wall time for each pipeline stage scale with dataset
+size n, and do the O() complexity differences between clustering algorithms
+manifest empirically within the available dataset range?
+
+**Varies.** `limit` ∈ {50, 100, 150, 200, 240} (full dataset) × clustering
+algorithm ∈ {HDBSCAN, KMeans, Agglomerative, Spectral}.
+
+**Fixed.** Baseline embedding (DINOv2 graffiti head), UMAP reduction (10d,
+cosine), SQLite, identity segmenter.
+
+**Why it matters.** This is the primary performance characterisation experiment.
+Expected complexity classes:
+
+| Stage | Algorithm | Expected scaling |
+|---|---|---|
+| Ingest | Any embedding | O(n) — model inference per image |
+| Reduction | UMAP | ~O(n^1.14) empirically |
+| Clustering | HDBSCAN | O(n log n) amortized |
+| Clustering | KMeans | O(n · k · iterations) ≈ O(n) |
+| Clustering | Agglomerative | O(n² log n) |
+| Clustering | Spectral | O(n²)–O(n³) |
+
+Even within the current 240-image dataset the 4.8× range from n=50 to n=240
+should make the quadratic algorithms measurably slower than the linear ones. If
+differences are within noise (~15 %), that is itself a result: it confirms that
+all algorithms are computationally equivalent at this scale and the bottleneck
+is per-image embedding throughput.
+
+**Note on dataset ceiling.** The current dataset has ≈240 images; all five limit
+values fit entirely within it. Running the same grid against a larger dataset
+(n = 500–5000) would show O(n²) algorithms breaking down more dramatically. This
+sweep provides the baseline trend; the pattern can be extrapolated or re-run if
+the dataset grows.
+
+**Cost.** 20 runs, 5 ingests (the embedding DB is reused across the 4 clusterers
+within each limit group).
+
+**Config.** [`configs/09_scalability_sweep.json`](configs/09_scalability_sweep.json)
 
 ## Suggested order
 
@@ -295,4 +380,6 @@ from the `mnt/` PostgreSQL setup at `localhost:54321`.
    whether swapping the metric from cosine to L2/L1 changes anything.
 5. **#6 Segmenter** once the rest of the pipeline is settled — it is the most
    expensive and benefits from comparison against an already-strong baseline.
-6. **#8 Storage** independently — affects timing only, not quality.
+6. **#9 Scalability sweep** and **#8 Storage** independently — both are
+   performance-only and can run in any order or in parallel with the quality
+   experiments once the baseline pipeline is fixed.
