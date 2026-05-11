@@ -113,12 +113,9 @@ class TorchEmbeddingModel(nn.Module, EmbeddingBase):
                 self.model.classifier[3] = torch.nn.Identity()
 
         self.model.to(self.device)
-
-    def gen_embedding(self, image: ImageImage) -> list[float]:
-        # Ensure model is in evaluation mode
         self.model.eval()
 
-        # Get the embedding
+    def gen_embedding(self, image: ImageImage) -> list[float]:
         with torch.no_grad():
             input_tensor = self.preprocessor(image).unsqueeze(0).to(self.device)  # Add batch dimension and move to device
             output = self.model(input_tensor)
