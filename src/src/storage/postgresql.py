@@ -1,3 +1,5 @@
+from urllib.parse import urlparse, urlunparse
+
 from src.abstractions import StorageBase, ImageData, BoundingBox
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import create_engine, text
@@ -28,6 +30,8 @@ class PostgreSQLStorage(StorageBase):
     _COMMIT_BATCH = 50
 
     def __init__(self, db_url: str):
+        self._ensure_database(db_url)
+
         self.engine = create_engine(db_url)
         self._pending = 0
 
@@ -39,6 +43,26 @@ class PostgreSQLStorage(StorageBase):
         self.session.commit()
 
         Base.metadata.create_all(self.engine)
+
+    @staticmethod
+    def _ensure_database(db_url: str) -> None:
+        parsed = urlparse(db_url)
+        db_name = parsed.path.lstrip("/")
+        if not db_name or db_name == "postgres":
+            return
+
+        bootstrap_url = urlunparse(parsed._replace(path="/postgres"))
+        engine = create_engine(bootstrap_url, isolation_level="AUTOCOMMIT")
+        try:
+            with engine.connect() as conn:
+                exists = conn.execute(
+                    text("SELECT 1 FROM pg_database WHERE datname = :name"),
+                    {"name": db_name},
+                ).fetchone()
+                if not exists:
+                    conn.execute(text(f'CREATE DATABASE "{db_name}"'))
+        finally:
+            engine.dispose()
 
     def close(self) -> None:
         self.session.commit()

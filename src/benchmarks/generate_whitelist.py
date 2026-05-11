@@ -4,6 +4,7 @@ import itertools
 import hashlib
 import copy
 from pathlib import Path
+from urllib.parse import urlparse, urlunparse
 
 def get_storage_key(run_config):
     # We care about storage (excluding db_path), embedding and limit
@@ -14,9 +15,14 @@ def get_storage_key(run_config):
     storage_type = str(storage.get("type", "")).lower()
     storage_params = dict(storage.get("params", {}))
     
-    # We ignore db_path for the key to group runs that COULD share a database
+    # We ignore db_path / db_url database name so runs that COULD share a database are grouped
     if "db_path" in storage_params:
         del storage_params["db_path"]
+
+    # For PostgreSQL, strip the database name from db_url (only the host/user/port matter)
+    if storage_type in {"postgres", "postgresql"} and "db_url" in storage_params:
+        parsed = urlparse(storage_params["db_url"])
+        storage_params["db_url"] = urlunparse(parsed._replace(path="/"))
         
     key_data = {
         "storage_type": storage_type,
@@ -108,12 +114,12 @@ def main():
         if storage_key not in seen_storage_keys:
             # First time seeing this combination, we must clear storage
             run_config["clear_storage"] = True
-            
+
             # For SQLite, we assign a stable path based on the storage key if none provided
             if storage_type == "sqlite":
                 storage_params = run_config.get("storage", {}).get("params", {})
                 db_path = storage_params.get("db_path", "")
-                
+
                 if not db_path or "{run_id}" in db_path:
                     # Use a stable path that doesn't depend on the run_id
                     if not db_path:
@@ -121,7 +127,7 @@ def main():
                     else:
                         # Replace {run_id} with the storage_key to keep the user's naming preference but make it stable
                         stable_path = db_path.replace("{run_id}", "storage_" + storage_key)
-                        
+
                     if "storage" not in run_config:
                         run_config["storage"] = {"type": "sqlite", "params": {}}
                     if "params" not in run_config["storage"]:
@@ -131,20 +137,41 @@ def main():
                 else:
                     # User provided a stable path, we respect it but still use it for reuse
                     seen_storage_keys[storage_key] = db_path
+            elif storage_type in {"postgres", "postgresql"}:
+                storage_params = run_config.get("storage", {}).get("params", {})
+                db_url = storage_params.get("db_url", "")
+
+                if db_url:
+                    parsed = urlparse(db_url)
+                    stable_url = urlunparse(parsed._replace(path="/storage_" + storage_key))
+                    if "storage" not in run_config:
+                        run_config["storage"] = {"type": storage_type, "params": {}}
+                    if "params" not in run_config["storage"]:
+                        run_config["storage"]["params"] = {}
+                    run_config["storage"]["params"]["db_url"] = stable_url
+                    seen_storage_keys[storage_key] = stable_url
+                else:
+                    seen_storage_keys[storage_key] = True
             else:
-                # For Postgres or others, we just mark it as seen
+                # For others, we just mark it as seen
                 seen_storage_keys[storage_key] = True
         else:
             # Reusing a previously seen storage/embedding/limit combination
             run_config["clear_storage"] = False
-            
-            # If it's SQLite, ensure we use the same stable path
+
+            # Ensure we use the same stable path/url as the first run
             if storage_type == "sqlite" and isinstance(seen_storage_keys[storage_key], str):
                 if "storage" not in run_config:
                     run_config["storage"] = {"type": "sqlite", "params": {}}
                 if "params" not in run_config["storage"]:
                     run_config["storage"]["params"] = {}
                 run_config["storage"]["params"]["db_path"] = seen_storage_keys[storage_key]
+            elif storage_type in {"postgres", "postgresql"} and isinstance(seen_storage_keys[storage_key], str):
+                if "storage" not in run_config:
+                    run_config["storage"] = {"type": storage_type, "params": {}}
+                if "params" not in run_config["storage"]:
+                    run_config["storage"]["params"] = {}
+                run_config["storage"]["params"]["db_url"] = seen_storage_keys[storage_key]
         
         runs.append(run_config)
 
