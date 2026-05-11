@@ -30,13 +30,18 @@ class UMAPReduction(ReductionBase):
     def reduce(self, embeddings: list[list[float]]) -> list[list[float]]:
         if not embeddings:
             return []
-        
+
         data = np.array(embeddings)
-        # UMAP needs enough samples
         n_samples = data.shape[0]
         if n_samples <= self.n_neighbors:
-             # Adjust n_neighbors if too few samples
-             self.reducer.n_neighbors = max(2, n_samples - 1)
-        
-        reduced_data = self.reducer.fit_transform(data)
+            reducer = umap.UMAP(
+                n_components=self.n_components,
+                n_neighbors=max(2, n_samples - 1),
+                min_dist=self.min_dist,
+                metric=self.metric,
+            )
+        else:
+            reducer = self.reducer
+
+        reduced_data = reducer.fit_transform(data)
         return reduced_data.tolist()
