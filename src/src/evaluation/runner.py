@@ -149,9 +149,10 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
             # Only save if it looks like a meaningful ingestion run
             storage.set_metadata(METADATA_INGEST_KEY, json.dumps(asdict(ingest_metrics)))
 
+        all_images = config.storage.get_all_images()
+
         if run_spec.similarity_search.enabled:
             with profile_stage() as similarity_stage:
-                all_images = config.storage.get_all_images()
                 distances = []
                 for img in all_images:
                     nearest = config.storage.get_by_distance(
@@ -176,7 +177,6 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
             similarity_metrics = similarity_stage.metrics
 
         with profile_stage() as cluster_stage:
-            all_images = config.storage.get_all_images()
             if all_images:
                 with profile_stage() as red_stage:
                     embeddings = [img.embedding for img in all_images]
