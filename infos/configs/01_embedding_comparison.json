@@ -7,7 +7,7 @@
     {"type": "identity", "params": {}}
   ],
   "reduction": [
-    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}}
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}}
   ],
   "clustering": [
     {"type": "hdbscan", "params": {"min_cluster_size": 5}}

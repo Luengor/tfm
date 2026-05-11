@@ -13,15 +13,15 @@
     {"type": "hdbscan", "params": {"min_cluster_size": 5}}
   ],
   "reduction": [
-    {"type": "umap", "params": {"n_components": 2,  "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}},
-    {"type": "umap", "params": {"n_components": 5,  "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}},
-    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}},
-    {"type": "umap", "params": {"n_components": 20, "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}},
-    {"type": "umap", "params": {"n_components": 50, "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}},
-    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 5,  "min_dist": 0.1, "metric": "cosine"}},
-    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 30, "min_dist": 0.1, "metric": "cosine"}},
-    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 50, "min_dist": 0.1, "metric": "cosine"}},
+    {"type": "umap", "params": {"n_components": 2,  "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+    {"type": "umap", "params": {"n_components": 5,  "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
     {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+    {"type": "umap", "params": {"n_components": 20, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+    {"type": "umap", "params": {"n_components": 50, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 5,  "min_dist": 0.0, "metric": "cosine"}},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 30, "min_dist": 0.0, "metric": "cosine"}},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 50, "min_dist": 0.0, "metric": "cosine"}},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}},
     {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.5, "metric": "cosine"}}
   ]
 }

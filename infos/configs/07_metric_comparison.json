@@ -11,9 +11,9 @@
     {"type": "mobilenet_v3", "params": {}}
   ],
   "reduction": [
-    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}},
-    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.1, "metric": "euclidean"}},
-    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.1, "metric": "manhattan"}}
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "euclidean"}},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "manhattan"}}
   ],
   "clustering": [
     {"type": "hdbscan", "params": {"min_cluster_size": 5}},

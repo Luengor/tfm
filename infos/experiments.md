@@ -11,10 +11,11 @@ another axis is:
 - **Embedding:** `dinov2_graffiti_head` (DINOv2 ViT-S/14 backbone with the
   graffiti-fine-tuned projection head — self-supervised features tuned for the
   domain).
-- **Reduction:** UMAP, `n_components=10`, `metric="cosine"`
+- **Reduction:** UMAP, `n_components=10`, `metric="cosine"`, `min_dist=0.0`
   (the canonical pre-clustering reduction; cosine matches the L2-normalised
-  output of DINOv2/CLIP-style encoders).
 - **Clustering:** HDBSCAN, `min_cluster_size=5`
+  output of DINOv2/CLIP-style encoders; `min_dist=0` keeps projected points as
+  tightly packed as possible, which maximises density contrast for HDBSCAN).
   (density-aware, auto-detects k, isolates noise — the strongest recommendation
   in [`best_cluster.md`](best_cluster.md)).
 - **Segmenter:** `identity`
