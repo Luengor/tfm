@@ -49,6 +49,8 @@ def run_benchmarks(run_specs: list[BenchmarkRunSpec], dataset_path: str, output_
         result = _run_single(run_spec=run_spec, dataset_root=dataset_root, output_dir=Path(output_dir), global_limit=limit)
         results.append(result)
         print(f"Completed run: {run_spec.name} with status {result.status}.")
+        if result.error:
+            print(f"Error details: {result.error}")
 
     return results
 
