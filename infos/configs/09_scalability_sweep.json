@@ -12,10 +12,10 @@
     {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}}
   ],
   "clustering": [
-    {"type": "hdbscan",      "params": {"min_cluster_size": 5}},
-    {"type": "kmeans",       "params": {"max_clusters": 30}},
-    {"type": "agglomerative","params": {"n_clusters": 10, "linkage": "average"}},
-    {"type": "spectral",     "params": {"n_clusters": 10, "affinity": "nearest_neighbors"}}
+    {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+    {"type": "kmeans", "params": {"max_clusters": 30}},
+    {"type": "agglomerative", "params": {"n_clusters": 10, "linkage": "average"}},
+    {"type": "spectral", "params": {"n_clusters": 10, "affinity": "nearest_neighbors"}}
   ],
   "limit": [50, 100, 150, 200, 240]
 }
