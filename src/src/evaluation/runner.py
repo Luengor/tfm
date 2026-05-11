@@ -196,8 +196,6 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
                 
                 n_clusters = int(labels_arr.max() + 1) if labels_arr.size > 0 else 0
                 cluster_count = n_clusters
-                if (labels_arr == -1).any():
-                    cluster_count += int((labels_arr == -1).sum())
             else:
                 cluster_count = 0
         clustering_metrics = cluster_stage.metrics
