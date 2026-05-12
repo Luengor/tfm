@@ -53,9 +53,13 @@ noisy. Differences smaller than ~15 % between configurations should be treated
 as within measurement noise. For the scalability experiment (#9), the trend
 across n values is more meaningful than any individual data point.
 
-**Dataset size.** The current dataset contains approximately 240 images. Configs
-with `limit=1000` are effectively capped at the full dataset size; the actual
-n in every result is stored in the `image_count` column.
+**Dataset size.** The working dataset contains approximately 5000 images (a
+second, larger dataset acquired after the initial 240-image collection).
+Per-experiment `limit` values are set explicitly per config — the headline
+quality experiments use the full 5000, while the embedding (#1) and segmenter
+(#6) sweeps cap at 2000 to keep wall-clock costs manageable since they require
+a fresh ingest per run. The actual n in every result is stored in the
+`image_count` column.
 
 **Memory.** Every stage captures `peak_rss_mb` and `vram_peak_mb`. Embedding
 models dominate VRAM; reduction and clustering dominate RAM at large n. Large
@@ -224,7 +228,8 @@ recovers clusters.
 
 **Question.** What is the smallest meaningful cluster size for this dataset?
 
-**Varies.** `min_cluster_size` ∈ {3, 5, 10, 15, 20, 30}.
+**Varies.** `min_cluster_size` ∈ {10, 25, 50, 100, 200, 500} — sized as
+fractions of a 5000-image dataset (0.2% to 10%) rather than absolute counts.
 
 **Fixed.** Baseline embedding and UMAP.
 
@@ -308,9 +313,11 @@ recommendation.
 and PostgreSQL + pgvector (indexed ANN) for ingest and similarity search across
 multiple dataset sizes?
 
-**Varies.** Storage type (`sqlite`, `postgresql`) × `limit` ∈ {100, 150, 200,
-240}. Similarity search is **enabled** (`top_k=5`) — this is the key axis where
-the two backends differ (SQLite: O(n) Python scan; PostgreSQL: O(log n) index).
+**Varies.** Storage type (`sqlite`, `postgresql`) × `limit` ∈ {500, 1000, 2500,
+5000}. Similarity search is **enabled** (`top_k=5`) — this is the key axis
+where the two backends differ (SQLite: O(n) Python scan; PostgreSQL: O(log n)
+index). The 10× range is wide enough that the index advantage should be
+empirically visible rather than buried in per-call overhead.
 
 **Fixed.** Baseline embedding, reduction, clustering, segmenter.
 
@@ -334,8 +341,8 @@ separate DB).
 size n, and do the O() complexity differences between clustering algorithms
 manifest empirically within the available dataset range?
 
-**Varies.** `limit` ∈ {50, 100, 150, 200, 240} (full dataset) × clustering
-algorithm ∈ {HDBSCAN, KMeans, Agglomerative, Spectral}.
+**Varies.** `limit` ∈ {250, 500, 1000, 2000, 5000} (geometric, spanning 20×) ×
+clustering algorithm ∈ {HDBSCAN, KMeans, Agglomerative, Spectral}.
 
 **Fixed.** Baseline embedding (DINOv2 graffiti head), UMAP reduction (10d,
 cosine), SQLite, identity segmenter.
@@ -352,17 +359,11 @@ Expected complexity classes:
 | Clustering | Agglomerative | O(n² log n) |
 | Clustering | Spectral | O(n²)–O(n³) |
 
-Even within the current 240-image dataset the 4.8× range from n=50 to n=240
-should make the quadratic algorithms measurably slower than the linear ones. If
-differences are within noise (~15 %), that is itself a result: it confirms that
-all algorithms are computationally equivalent at this scale and the bottleneck
-is per-image embedding throughput.
-
-**Note on dataset ceiling.** The current dataset has ≈240 images; all five limit
-values fit entirely within it. Running the same grid against a larger dataset
-(n = 500–5000) would show O(n²) algorithms breaking down more dramatically. This
-sweep provides the baseline trend; the pattern can be extrapolated or re-run if
-the dataset grows.
+With the 5000-image dataset, the 20× range from n=250 to n=5000 gives O(n²) and
+O(n² log n) algorithms (Agglomerative, Spectral) enough room to visibly break
+down against the near-linear ones (HDBSCAN, KMeans). On a log-log plot the
+slope of wall time vs. n should be ~1 for the linear pair and ~2 for the
+quadratic pair — that's the headline figure for the performance chapter.
 
 **Cost.** 20 runs, 5 ingests (the embedding DB is reused across the 4 clusterers
 within each limit group).

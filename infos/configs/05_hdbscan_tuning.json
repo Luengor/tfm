@@ -1,5 +1,5 @@
 {
-  "limit": 1000,
+  "limit": 5000,
   "storage": [
     {"type": "sqlite", "params": {}}
   ],
@@ -13,11 +13,11 @@
     {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}}
   ],
   "clustering": [
-    {"type": "hdbscan", "params": {"min_cluster_size": 3}},
-    {"type": "hdbscan", "params": {"min_cluster_size": 5}},
     {"type": "hdbscan", "params": {"min_cluster_size": 10}},
-    {"type": "hdbscan", "params": {"min_cluster_size": 15}},
-    {"type": "hdbscan", "params": {"min_cluster_size": 20}},
-    {"type": "hdbscan", "params": {"min_cluster_size": 30}}
+    {"type": "hdbscan", "params": {"min_cluster_size": 25}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 50}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 100}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 200}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 500}}
   ]
 }

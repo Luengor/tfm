@@ -16,5 +16,5 @@
     {"type": "sqlite", "params": {}},
     {"type": "postgresql", "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/postgres"}}
   ],
-  "limit": [100, 150, 200, 240]
+  "limit": [500, 1000, 2500, 5000]
 }

@@ -17,5 +17,5 @@
     {"type": "agglomerative", "params": {"n_clusters": 10, "linkage": "average"}},
     {"type": "spectral", "params": {"n_clusters": 10, "affinity": "nearest_neighbors"}}
   ],
-  "limit": [50, 100, 150, 200, 240]
+  "limit": [250, 500, 1000, 2000, 5000]
 }
