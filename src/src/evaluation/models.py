@@ -73,6 +73,26 @@ class ClusteringQualityMetrics:
 
 
 @dataclass(slots=True)
+class ExtrinsicMetrics:
+    ari: float | None
+    nmi: float | None
+    pairwise_f1: float | None
+    n_matched: int = 0
+    n_classes: int = 0
+    coverage: float | None = None
+
+    def to_flat_dict(self, prefix: str = "extrinsic") -> dict[str, float | int | None]:
+        return {
+            f"{prefix}_ari": self.ari,
+            f"{prefix}_nmi": self.nmi,
+            f"{prefix}_pairwise_f1": self.pairwise_f1,
+            f"{prefix}_n_matched": self.n_matched,
+            f"{prefix}_n_classes": self.n_classes,
+            f"{prefix}_coverage": self.coverage,
+        }
+
+
+@dataclass(slots=True)
 class BenchmarkResult:
     run_name: str
     run_id: str
@@ -95,6 +115,7 @@ class BenchmarkResult:
     avg_neighbor_distance: float | None = None
     clustering: StageMetrics | None = None
     clustering_quality: ClusteringQualityMetrics | None = None
+    clustering_extrinsic: ExtrinsicMetrics | None = None
     config: BenchmarkRunSpec | None = None
 
     def to_record(self) -> dict[str, Any]:
@@ -145,5 +166,8 @@ class BenchmarkResult:
 
         if self.clustering_quality:
             record.update(self.clustering_quality.to_flat_dict())
+
+        if self.clustering_extrinsic:
+            record.update(self.clustering_extrinsic.to_flat_dict())
 
         return record

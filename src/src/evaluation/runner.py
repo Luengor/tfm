@@ -26,16 +26,58 @@ from src.configuration import Configuration
 from src.embedding.custom import CustomEmbeddingModel
 from src.embedding.embeddings import EmbeddingModelNames, get_model
 from src.embedding.segmenters import YoloSegmenter, IdentitySegmenter
-from src.evaluation.clustering_metrics import calculate_clustering_metrics
+from src.evaluation.clustering_metrics import (
+    calculate_clustering_metrics,
+    calculate_extrinsic_metrics,
+)
 from src.evaluation.metrics import get_runtime_info, profile_stage
-from src.evaluation.models import BenchmarkResult, BenchmarkRunSpec, StageMetrics
+from src.evaluation.models import (
+    BenchmarkResult,
+    BenchmarkRunSpec,
+    ExtrinsicMetrics,
+    StageMetrics,
+)
 from src.reduction import IdentityReduction, PCAReduction, UMAPReduction, KernelPCAReduction, IsomapReduction
 from src.storage.postgresql import PostgreSQLStorage
 from src.storage.sqlite import SQLiteStorage
 
 DEFAULT_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tiff"}
 
-def run_benchmarks(run_specs: list[BenchmarkRunSpec], dataset_path: str, output_dir: str, limit: int | None = None) -> list[BenchmarkResult]:
+
+def load_ground_truth(csv_path: str | Path) -> dict[str, str]:
+    """Load a ground-truth CSV mapping basename -> style.
+
+    Required columns: ``filename`` and ``style``. Extra columns (e.g. ``surface``)
+    are ignored. Rows with empty ``filename`` or ``style`` are skipped.
+    """
+    path = Path(csv_path)
+    if not path.is_file():
+        raise ValueError(f"Ground-truth CSV not found: {path}")
+
+    mapping: dict[str, str] = {}
+    with path.open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        fieldnames = reader.fieldnames or []
+        if "filename" not in fieldnames or "style" not in fieldnames:
+            raise ValueError(
+                f"Ground-truth CSV must have 'filename' and 'style' columns. "
+                f"Got: {fieldnames}"
+            )
+        for row in reader:
+            fname = (row.get("filename") or "").strip()
+            style = (row.get("style") or "").strip()
+            if fname and style:
+                mapping[fname] = style
+    return mapping
+
+
+def run_benchmarks(
+    run_specs: list[BenchmarkRunSpec],
+    dataset_path: str,
+    output_dir: str,
+    limit: int | None = None,
+    ground_truth: dict[str, str] | None = None,
+) -> list[BenchmarkResult]:
     dataset_root = Path(dataset_path)
     if not dataset_root.exists() or not dataset_root.is_dir():
         raise ValueError(f"Dataset path must be a directory: {dataset_path}")
@@ -44,9 +86,17 @@ def run_benchmarks(run_specs: list[BenchmarkRunSpec], dataset_path: str, output_
 
     results: list[BenchmarkResult] = []
     print(f"Starting benchmarks: {len(run_specs)} runs to execute.")
+    if ground_truth is not None:
+        print(f"Ground truth loaded: {len(ground_truth)} labeled entries.")
     for run_spec in tqdm(run_specs, desc="Benchmark Runs", unit="run"):
         print(f"Running benchmark: {run_spec.name} (ID: {run_spec.run_id})")
-        result = _run_single(run_spec=run_spec, dataset_root=dataset_root, output_dir=Path(output_dir), global_limit=limit)
+        result = _run_single(
+            run_spec=run_spec,
+            dataset_root=dataset_root,
+            output_dir=Path(output_dir),
+            global_limit=limit,
+            ground_truth=ground_truth,
+        )
         results.append(result)
         print(f"Completed run: {run_spec.name} with status {result.status}.")
         if result.error:
@@ -78,7 +128,13 @@ def write_results(results: list[BenchmarkResult], output_dir: str, prefix: str =
     return str(csv_path), str(json_path)
 
 
-def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path, global_limit: int | None = None) -> BenchmarkResult:
+def _run_single(
+    run_spec: BenchmarkRunSpec,
+    dataset_root: Path,
+    output_dir: Path,
+    global_limit: int | None = None,
+    ground_truth: dict[str, str] | None = None,
+) -> BenchmarkResult:
     started_at = _utc_now()
 
     setup_metrics = None
@@ -90,6 +146,7 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
     avg_neighbor_distance = None
     clustering_metrics = None
     clustering_quality = None
+    clustering_extrinsic = None
 
     image_count = 0
     cluster_count = None
@@ -195,7 +252,18 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
                 embeddings_arr = np.array([img.embedding for img in all_images])
                 
                 clustering_quality = calculate_clustering_metrics(embeddings_arr, labels_arr)
-                
+
+                segmenter_type_eff = (
+                    run_spec.segmenter.type.lower() if run_spec.segmenter else "identity"
+                )
+                if ground_truth is not None and segmenter_type_eff == "identity":
+                    clustering_extrinsic = _compute_extrinsic(all_images, labels_arr, ground_truth)
+                elif ground_truth is not None:
+                    print(
+                        f"Run {run_spec.name}: ground truth provided but segmenter is "
+                        f"'{segmenter_type_eff}' (not identity); skipping extrinsic metrics."
+                    )
+
                 n_clusters = int(labels_arr.max() + 1) if labels_arr.size > 0 else 0
                 cluster_count = n_clusters
             else:
@@ -261,6 +329,7 @@ def _run_single(run_spec: BenchmarkRunSpec, dataset_root: Path, output_dir: Path
         avg_neighbor_distance=avg_neighbor_distance,
         clustering=clustering_metrics,
         clustering_quality=clustering_quality,
+        clustering_extrinsic=clustering_extrinsic,
         config=run_spec,
     )
 
@@ -441,6 +510,44 @@ def _build_csv_columns(records: list[dict[str, Any]]) -> list[str]:
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _compute_extrinsic(
+    all_images: list[ImageData],
+    labels_arr: np.ndarray,
+    ground_truth: dict[str, str],
+) -> ExtrinsicMetrics:
+    matched_indices: list[int] = []
+    matched_styles: list[str] = []
+    for i, img in enumerate(all_images):
+        basename = Path(img.filename).name
+        style = ground_truth.get(basename)
+        if style is not None:
+            matched_indices.append(i)
+            matched_styles.append(style)
+
+    n_total = len(all_images)
+    n_matched = len(matched_indices)
+    coverage = (n_matched / n_total) if n_total > 0 else None
+
+    if n_matched < 2:
+        return ExtrinsicMetrics(
+            ari=None,
+            nmi=None,
+            pairwise_f1=None,
+            n_matched=n_matched,
+            n_classes=len(set(matched_styles)),
+            coverage=coverage,
+        )
+
+    unique_styles = sorted(set(matched_styles))
+    style_to_id = {s: idx for idx, s in enumerate(unique_styles)}
+    labels_true = np.array([style_to_id[s] for s in matched_styles])
+    labels_pred = labels_arr[np.array(matched_indices)]
+
+    metrics = calculate_extrinsic_metrics(labels_pred, labels_true)
+    metrics.coverage = coverage
+    return metrics
 
 
 def _calculate_distance(emb1: list[float], emb2: list[float], cos_distance: bool) -> float:

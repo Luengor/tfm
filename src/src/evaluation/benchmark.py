@@ -34,6 +34,16 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Optional limit on the number of images to process per run.",
     )
+    parser.add_argument(
+        "--ground-truth",
+        default=None,
+        help=(
+            "Optional path to a ground-truth CSV with at least 'filename' and "
+            "'style' columns. When provided, the runner computes extrinsic "
+            "metrics (ARI, NMI, pairwise F1) for runs that use the identity "
+            "segmenter. Filenames are matched by basename."
+        ),
+    )
     return parser
 
 
@@ -41,13 +51,15 @@ def main() -> int:
     parser = build_parser()
     args = parser.parse_args()
 
-    from src.evaluation.runner import run_benchmarks, write_results
+    from src.evaluation.runner import load_ground_truth, run_benchmarks, write_results
     from src.evaluation.whitelist import load_whitelist
 
     whitelist_path = Path(args.whitelist)
     dataset_path = Path(args.dataset)
 
     run_specs = load_whitelist(str(whitelist_path))
+
+    ground_truth = load_ground_truth(args.ground_truth) if args.ground_truth else None
 
     if args.run:
         selected = set(args.run)
@@ -66,6 +78,7 @@ def main() -> int:
         dataset_path=str(dataset_path),
         output_dir=args.output_dir,
         limit=args.limit,
+        ground_truth=ground_truth,
     )
     csv_path, json_path = write_results(results=results, output_dir=args.output_dir, prefix=args.prefix)
 

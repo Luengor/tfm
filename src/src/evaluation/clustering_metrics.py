@@ -1,7 +1,14 @@
 import numpy as np
-from sklearn.metrics import calinski_harabasz_score, davies_bouldin_score, silhouette_score
+from sklearn.metrics import (
+    adjusted_rand_score,
+    calinski_harabasz_score,
+    davies_bouldin_score,
+    normalized_mutual_info_score,
+    silhouette_score,
+)
+from sklearn.metrics.cluster import pair_confusion_matrix
 
-from src.evaluation.models import ClusteringQualityMetrics
+from src.evaluation.models import ClusteringQualityMetrics, ExtrinsicMetrics
 
 
 def calculate_clustering_metrics(embeddings: np.ndarray, labels: np.ndarray) -> ClusteringQualityMetrics:
@@ -69,4 +76,41 @@ def calculate_clustering_metrics(embeddings: np.ndarray, labels: np.ndarray) -> 
         davies_bouldin_score=db_score,
         noise_ratio=noise_ratio,
         cluster_size_cv=cluster_size_cv
+    )
+
+
+def calculate_extrinsic_metrics(
+    labels_pred: np.ndarray,
+    labels_true: np.ndarray,
+) -> ExtrinsicMetrics:
+    """
+    Calculates supervised (extrinsic) clustering metrics against ground-truth labels.
+
+    Includes ARI, NMI, and pairwise F1 (precision/recall over same-cluster vs
+    same-class pairs). Noise points (label == -1) are treated as their own cluster.
+    """
+    n = len(labels_pred)
+    if n == 0 or n != len(labels_true):
+        return ExtrinsicMetrics(ari=None, nmi=None, pairwise_f1=None, n_matched=n)
+
+    ari = float(adjusted_rand_score(labels_true, labels_pred))
+    nmi = float(normalized_mutual_info_score(labels_true, labels_pred))
+
+    pcm = pair_confusion_matrix(labels_true, labels_pred)
+    fp = float(pcm[0, 1])
+    fn = float(pcm[1, 0])
+    tp = float(pcm[1, 1])
+    if tp + fp == 0 or tp + fn == 0:
+        pairwise_f1: float | None = None
+    else:
+        precision = tp / (tp + fp)
+        recall = tp / (tp + fn)
+        pairwise_f1 = float(2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0.0
+
+    return ExtrinsicMetrics(
+        ari=ari,
+        nmi=nmi,
+        pairwise_f1=pairwise_f1,
+        n_matched=n,
+        n_classes=int(len(np.unique(labels_true))),
     )
