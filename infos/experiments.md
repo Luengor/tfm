@@ -370,6 +370,142 @@ within each limit group).
 
 **Config.** [`configs/09_scalability_sweep.json`](configs/09_scalability_sweep.json)
 
+### 10. Supervised validation on labeled crops
+
+**Question.** When ground-truth style labels exist, which pipeline best recovers
+those classes? Specifically: (a) does fine-tuning a graffiti-specific projection
+head improve cluster–label agreement over the pretrained backbone, and (b) is
+the improvement consistent across backbone families (DINOv2 self-supervised vs.
+MobileNet/ResNet ImageNet-supervised vs. CLIP image–text)?
+
+**Dataset.** [`sample_crop/`](../sample_crop/) — 273 manually labeled crops
+across 4 styles: `tag` (116), `piece` (69), `throw-up` (69), `character` (19).
+Labels live in [`sample_crop/labels.csv`](../sample_crop/labels.csv) in the
+`filename,style` schema consumed by `pipeline-benchmark --ground-truth`. The
+crops are already segmented, so the `identity` segmenter is the correct choice
+(this is also a runner requirement — extrinsic metrics are only computed when
+`segmenter == "identity"`, see `runner.py:266`).
+
+**Metrics.** The runner computes the unsupervised triad (silhouette, CH, DB) as
+usual, plus the supervised triad whenever ground truth is provided:
+
+| Metric | Range | What it measures |
+|---|---|---|
+| Adjusted Rand Index (ARI) | [−1, 1] | Pair agreement, chance-corrected. 0 = random labelling, 1 = perfect. |
+| Normalised Mutual Information (NMI) | [0, 1] | Shared information between predicted and true partitions; insensitive to cluster count. |
+| Pairwise F1 | [0, 1] | Harmonic mean of pairwise precision/recall over same-cluster vs. same-class pairs; treats noise (label −1) as its own cluster. |
+
+ARI is the headline metric (chance-corrected, comparable across runs with
+different k); NMI is reported alongside to flag the "many tiny clusters
+inflating NMI" failure mode; pairwise F1 is the most interpretable for the
+write-up. All three live under `clustering_quality.extrinsic` in the result
+JSON.
+
+**Varies.**
+
+- **Embedding (6).** Two fine-tuning pairs (`dinov2_vits14` ↔
+  `dinov2_graffiti_head` and `mobilenet_v3` ↔ `mobilenet_v3_graffiti_head`) plus
+  two strong baselines (`clip_vit_b32` self-supervised image–text, `resnet50`
+  ImageNet-supervised CNN). The pairs isolate the fine-tuning effect within a
+  fixed backbone; the baselines anchor where each pair sits relative to
+  off-the-shelf encoders.
+- **Reduction (2).** UMAP `n_components=2` (matches the 2-D scatter plots used
+  for visualisation in the thesis) and UMAP `n_components=10` (the canonical
+  pre-clustering reduction from the other experiments). Comparing the two
+  isolates whether aggressive dimensionality reduction degrades the supervised
+  metric — important context for any figure that uses the 2-D projection as
+  evidence of cluster structure.
+- **Clustering (3).** `kmeans` with `n_clusters=4` (forced to the ground-truth
+  k — measures recovery quality given oracle k), `agglomerative` with
+  `n_clusters=4` + `linkage="average"` (hierarchical alternative under oracle
+  k), and `hdbscan` with `min_cluster_size=5` (density-based, auto-detects k —
+  measures whether the true class count emerges naturally).
+
+**Fixed.** SQLite storage, identity segmenter, `limit=1000` (sample_crop has
+~273 images, so the limit only matters as an upper bound).
+
+**Hypotheses.**
+
+1. The fine-tuned heads should outperform their base models on ARI/NMI/F1 —
+   **but** the heads were trained on `sample_crop`'s style-organised folders
+   via triplet loss (see `src/train/dataset.py:1`), so this is a *training-set*
+   evaluation, not held-out generalisation. The result establishes a ceiling
+   ("the head learned the training distribution") rather than out-of-sample
+   transfer. State this caveat explicitly in any figure caption.
+2. CLIP should be competitive with DINOv2 base; ResNet50 should be the weakest
+   off-the-shelf encoder for stylistic clustering, consistent with the broader
+   embedding comparison (#1).
+3. KMeans-4 should achieve the highest extrinsic scores on the fine-tuned
+   heads because k matches ground truth and the heads were trained to make
+   classes linearly separable; HDBSCAN should auto-discover a number of
+   clusters near 4 on the fine-tuned heads and noticeably different on the
+   baselines.
+4. UMAP-2 should slightly underperform UMAP-10 on the extrinsic metrics
+   (information loss at the projection step) but the gap should be small for
+   fine-tuned embeddings (the head has already concentrated discriminative
+   information) and larger for raw ImageNet features. If UMAP-2 *matches*
+   UMAP-10 even on the unfine-tuned models, the 2-D visualisations in the
+   thesis are honest representations of the cluster structure rather than
+   artefacts of compression.
+
+**Why it matters.** Every other experiment in this catalogue uses unsupervised
+proxies (silhouette, CH, DB) as the quality signal — these reward
+within-cluster density and between-cluster separation regardless of whether the
+clusters correspond to anything semantically meaningful. The supervised
+validation is the single experiment where "good clustering" is defined against
+human-labelled categories. Two derived analyses follow naturally:
+
+- **Internal–external correlation.** Plot ARI vs. silhouette over the 36 runs.
+  A strong positive correlation means the unsupervised metrics are a defensible
+  proxy on this dataset and we can trust them in the experiments without
+  ground truth; a weak or zero correlation means the unsupervised optima do
+  not coincide with semantic optima, and the thesis must hedge its
+  recommendations accordingly.
+- **k-recovery for HDBSCAN.** Whether HDBSCAN's auto-detected cluster count
+  lands near 4 on the fine-tuned heads is the cleanest evidence for/against
+  the "density-based clustering discovers the true number of styles" claim.
+  The `n_clusters` field is already in every result row.
+
+**Cost.** 36 runs (6 embeddings × 2 reductions × 3 clusterers), 6 ingests (one
+per embedding; reduction and clustering re-use the cached DB within an
+embedding group thanks to `generate_whitelist.py`'s storage-key hashing).
+
+**Caveat on the fine-tuned heads.** `dinov2_graffiti_head` and
+`mobilenet_v3_graffiti_head` were trained via triplet loss on
+`sample_crop/{character,piece,tag,throw-up}` — exactly this dataset's
+directory layout (`src/train/dataset.py:6`). Their supervised scores here are
+therefore training-set performance, not generalisation. A genuinely fair
+comparison would require a held-out labeled split that does not exist yet;
+collecting one (even 50–100 additional crops with style labels) is the
+single biggest improvement that could be made to this experiment.
+
+**Running.**
+
+```bash
+cd src
+
+# 1. Expand the grid (36 runs)
+uv run python benchmarks/generate_whitelist.py \
+  -i ../infos/configs/10_supervised_validation.json \
+  -o benchmarks/supervised_validation.whitelist.json
+
+# 2. Run, pointing at sample_crop and passing the labels for extrinsic metrics
+uv run pipeline-benchmark \
+  --whitelist benchmarks/supervised_validation.whitelist.json \
+  --dataset ../sample_crop \
+  --ground-truth ../sample_crop/labels.csv \
+  --cluster-plot
+
+# 3. Plot — the extrinsic columns (ari, nmi, pairwise_f1) are auto-detected
+uv run pipeline-plot -i benchmark_results/benchmark_*.json -o plots/
+```
+
+`--cluster-plot` writes a 2-D UMAP scatter per run alongside the metrics —
+useful here precisely because ground-truth labels can be overlaid for visual
+sanity-checking.
+
+**Config.** [`configs/10_supervised_validation.json`](configs/10_supervised_validation.json)
+
 ## Suggested order
 
 1. **#1 Embedding comparison** first — fixes the strongest variable so later
@@ -384,3 +520,8 @@ within each limit group).
 6. **#9 Scalability sweep** and **#8 Storage** independently — both are
    performance-only and can run in any order or in parallel with the quality
    experiments once the baseline pipeline is fixed.
+7. **#10 Supervised validation** at any point after #1 — provides the
+   ground-truth anchor for the unsupervised metrics used throughout the
+   other experiments. Running it early (right after #1) lets later
+   experiments cite the internal–external correlation when defending the
+   silhouette/CH/DB scores as proxies for semantic quality.
