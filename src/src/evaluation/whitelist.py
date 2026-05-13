@@ -10,7 +10,19 @@ class WhitelistError(ValueError):
     pass
 
 
+DEFAULT_CLUSTER_PLOT_OPTIONS: dict[str, Any] = {
+    "enabled": False,
+    "show_noise": True,
+}
+
+
 def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
+    return load_whitelist_with_options(path)[0]
+
+
+def load_whitelist_with_options(
+    path: str,
+) -> tuple[list[BenchmarkRunSpec], dict[str, Any]]:
     source = Path(path)
     if not source.exists():
         raise WhitelistError(f"Whitelist file not found: {path}")
@@ -24,6 +36,8 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
     raw_runs = payload.get("runs")
     if not isinstance(raw_runs, list) or not raw_runs:
         raise WhitelistError("Whitelist must include a non-empty 'runs' list.")
+
+    cluster_plot_options = _parse_cluster_plot(payload.get("cluster_plot"))
 
     run_specs: list[BenchmarkRunSpec] = []
     for index, raw in enumerate(raw_runs):
@@ -68,7 +82,27 @@ def load_whitelist(path: str) -> list[BenchmarkRunSpec]:
         run_spec.run_id = make_run_id(run_spec)
         run_specs.append(run_spec)
 
-    return run_specs
+    return run_specs, cluster_plot_options
+
+
+def _parse_cluster_plot(raw: Any) -> dict[str, Any]:
+    options = dict(DEFAULT_CLUSTER_PLOT_OPTIONS)
+    if raw is None:
+        return options
+    if not isinstance(raw, dict):
+        raise WhitelistError("cluster_plot must be an object.")
+
+    if "enabled" in raw:
+        if not isinstance(raw["enabled"], bool):
+            raise WhitelistError("cluster_plot.enabled must be a boolean.")
+        options["enabled"] = raw["enabled"]
+
+    if "show_noise" in raw:
+        if not isinstance(raw["show_noise"], bool):
+            raise WhitelistError("cluster_plot.show_noise must be a boolean.")
+        options["show_noise"] = raw["show_noise"]
+
+    return options
 
 
 def _parse_component(raw: Any, component_name: str, run_index: int) -> ComponentSpec:

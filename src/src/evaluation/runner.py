@@ -77,6 +77,7 @@ def run_benchmarks(
     output_dir: str,
     limit: int | None = None,
     ground_truth: dict[str, str] | None = None,
+    cluster_plot_options: dict[str, Any] | None = None,
 ) -> list[BenchmarkResult]:
     dataset_root = Path(dataset_path)
     if not dataset_root.exists() or not dataset_root.is_dir():
@@ -84,10 +85,14 @@ def run_benchmarks(
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
+    cluster_plot_options = cluster_plot_options or {}
+
     results: list[BenchmarkResult] = []
     print(f"Starting benchmarks: {len(run_specs)} runs to execute.")
     if ground_truth is not None:
         print(f"Ground truth loaded: {len(ground_truth)} labeled entries.")
+    if cluster_plot_options.get("enabled"):
+        print("Cluster 2D plotting enabled.")
     for run_spec in tqdm(run_specs, desc="Benchmark Runs", unit="run"):
         print(f"Running benchmark: {run_spec.name} (ID: {run_spec.run_id})")
         result = _run_single(
@@ -96,6 +101,7 @@ def run_benchmarks(
             output_dir=Path(output_dir),
             global_limit=limit,
             ground_truth=ground_truth,
+            cluster_plot_options=cluster_plot_options,
         )
         results.append(result)
         print(f"Completed run: {run_spec.name} with status {result.status}.")
@@ -134,6 +140,7 @@ def _run_single(
     output_dir: Path,
     global_limit: int | None = None,
     ground_truth: dict[str, str] | None = None,
+    cluster_plot_options: dict[str, Any] | None = None,
 ) -> BenchmarkResult:
     started_at = _utc_now()
 
@@ -266,6 +273,16 @@ def _run_single(
 
                 n_clusters = int(labels_arr.max() + 1) if labels_arr.size > 0 else 0
                 cluster_count = n_clusters
+
+                if cluster_plot_options and cluster_plot_options.get("enabled"):
+                    _maybe_plot_clusters(
+                        run_spec=run_spec,
+                        output_dir=output_dir,
+                        embeddings_arr=embeddings_arr,
+                        reduced_embeddings=reduced_embeddings,
+                        labels_arr=labels_arr,
+                        options=cluster_plot_options,
+                    )
             else:
                 cluster_count = 0
         clustering_metrics = cluster_stage.metrics
@@ -548,6 +565,42 @@ def _compute_extrinsic(
     metrics = calculate_extrinsic_metrics(labels_pred, labels_true)
     metrics.coverage = coverage
     return metrics
+
+
+def _maybe_plot_clusters(
+    run_spec: BenchmarkRunSpec,
+    output_dir: Path,
+    embeddings_arr: np.ndarray,
+    reduced_embeddings: list[list[float]],
+    labels_arr: np.ndarray,
+    options: dict[str, Any],
+) -> None:
+    from src.evaluation.cluster_plot import plot_clusters_2d, project_to_2d
+
+    try:
+        reduction_is_2d = (
+            run_spec.reduction is not None
+            and run_spec.reduction.type.lower() != "identity"
+            and int(run_spec.reduction.params.get("n_components", 0)) == 2
+        )
+
+        if reduction_is_2d:
+            points_2d = np.array(reduced_embeddings)
+        else:
+            points_2d = project_to_2d(embeddings_arr)
+
+        output_path = output_dir / f"{run_spec.run_id}_cluster.png"
+        title = f"{run_spec.name} — {run_spec.embedding.type} / {run_spec.clustering.type}"
+        plot_clusters_2d(
+            points_2d=points_2d,
+            labels=labels_arr,
+            output_path=output_path,
+            title=title,
+            show_noise=bool(options.get("show_noise", True)),
+        )
+        print(f"Wrote cluster plot: {output_path}")
+    except Exception as exc:  # noqa: BLE001
+        print(f"Run {run_spec.name}: cluster plot failed: {exc}")
 
 
 def _calculate_distance(emb1: list[float], emb2: list[float], cos_distance: bool) -> float:

@@ -44,6 +44,16 @@ def build_parser() -> argparse.ArgumentParser:
             "segmenter. Filenames are matched by basename."
         ),
     )
+    parser.add_argument(
+        "--cluster-plot",
+        action="store_true",
+        default=False,
+        help=(
+            "Generate a 2D UMAP scatter plot of the final clusters per run. "
+            "Writes <output-dir>/<run_id>_cluster.png. Overrides the "
+            "'cluster_plot.enabled' field in the whitelist if set."
+        ),
+    )
     return parser
 
 
@@ -52,12 +62,14 @@ def main() -> int:
     args = parser.parse_args()
 
     from src.evaluation.runner import load_ground_truth, run_benchmarks, write_results
-    from src.evaluation.whitelist import load_whitelist
+    from src.evaluation.whitelist import load_whitelist_with_options
 
     whitelist_path = Path(args.whitelist)
     dataset_path = Path(args.dataset)
 
-    run_specs = load_whitelist(str(whitelist_path))
+    run_specs, cluster_plot_options = load_whitelist_with_options(str(whitelist_path))
+    if args.cluster_plot:
+        cluster_plot_options["enabled"] = True
 
     ground_truth = load_ground_truth(args.ground_truth) if args.ground_truth else None
 
@@ -79,6 +91,7 @@ def main() -> int:
         output_dir=args.output_dir,
         limit=args.limit,
         ground_truth=ground_truth,
+        cluster_plot_options=cluster_plot_options,
     )
     csv_path, json_path = write_results(results=results, output_dir=args.output_dir, prefix=args.prefix)
 
