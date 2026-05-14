@@ -1,77 +1,101 @@
 %! TeX root: ../informe.tex
 \section{Metodología}
 \label{sec:metodologia}
-En esta sección se detalla la metodología seguida para evaluar tanto el
-rendimiento como la calidad de los sistemas de extracción de características y
-algoritmos de agrupamiento para nuestro banco de imágenes de grafiti.
 
-\subsection{Arquitectura del entorno de evaluación}
-\label{subsec:arquitectura_pipeline}
-% Anotación: Describir la arquitectura modular del pipeline implementado.
-% Mencionar cómo las clases abstractas en abstractions.py permiten el desacoplamiento.
-% Explicar el flujo de datos desde la imagen en bruto hasta el resultado del clustering.
-Para la evaluación de cada uno de los sistemas, se ha implementado un
-\textit{pipeline} modular en Python, que permite la integración de diferentes
-componentes de segmentación, almacenamiento, extracción de características, reducción de
-dimensionalidad y agrupamiento a través de un archivo de configuración JSON,
-así como parámetros adicionales que permiten personalizar cada una de las
-etapas del proceso. Los módulos que componen el sistema se han diseñado como
-una interfaz que define los métodos necesarios para su funcionamiento.
+\subsection{Visión general del flujo de trabajo}
+\label{subsec:vision}
+% Descripción a alto nivel del proceso seguido: partir de un conjunto de
+% imágenes, generar representaciones vectoriales, almacenarlas, reducir su
+% dimensionalidad y agruparlas. Diagrama del flujo completo.
+% Justificación de tratar cada etapa como un componente intercambiable para
+% poder medir el rendimiento de combinaciones.
 
-El proceso de evaluación sigue un flujo de datos estructurado que se divide en
-dos etapas principales: la fase de extracción de características y la fase de
-agrupamiento y evaluación.
+\subsection{Arquitectura modular del sistema}
+\label{subsec:arquitectura}
+% Cómo se ha estructurado el código para soportar la evaluación
+% combinatoria.
 
-En la primera etapa, el sistema comienza con la ingesta de imágenes en bruto.
-Durante esta fase, el segmentador detecta las regiones de grafiti presentes en
-cada imagen y recorta las áreas correspondientes. Este es un paso adicional a
-la generación de vectores de características, pero se ha incluido debido a la
-naturaleza de nuestro banco de imágenes. A continuación, el sistema aplica el
-modelo de extracción de características seleccionado para generar vectores de
-características (\textit{embeddings}) a partir de cada región detectada. Estos
-vectores luego se almacenan en el entorno de almacenamiento configurado.
+\subsubsection{Clases abstractas e interfaces}
+% Las cinco interfaces sobre las que se apoya el sistema:
+% \texttt{SegmenterBase}, \texttt{EmbeddingBase}, \texttt{StorageBase},
+% \texttt{ReductionBase} y \texttt{ClusteringBase}. Contratos que cada
+% implementación debe respetar.
 
-Durante la segunda etapa, el sistema recupera los vectores de características
-almacenados y aplica la técnica de reducción de dimensionalidad seleccionada
-(en el caso de que se haya configurado, puesto que esta es opcional). Sobre los
-vectores resultantes, se ejecuta el algoritmo de agrupamiento configurado para
-generar los \textit{clusters}. Finalmente, se evalúa la calidad de los grupos
-generados utilizando las métricas definidas en la sección
-\ref{subsec:metricas}.
+\subsubsection{Ensamblado mediante \texttt{Configuration}}
+% Clase \texttt{Configuration} como punto de cableado. Separación clara
+% entre la fase de ingesta (\texttt{save\_image}) y la de agrupamiento
+% (\texttt{cluster\_images}).
 
-De forma adicional, durante la segunda etapa se pueden realizar consultas de
-similitud para evaluar la eficiencia y precisión del sistema en la recuperación
-de imágenes similares a una imagen de consulta dada.
+\subsection{Pipeline de procesamiento de imágenes}
+\label{subsec:pipeline}
+% Descripción operativa del recorrido de una imagen por el sistema,
+% suficientemente detallada para permitir replicación.
 
-Durante cada una de estas operaciones, se registran métricas de tiempo y
-consumo de recursos para su posterior análisis comparativo entre las diferentes
-configuraciones probadas.
+\subsubsection{Ingesta y generación de \textit{embeddings}}
+% Apertura de la imagen, segmentación (opcional), recorte de cada
+% \textit{bounding box}, generación del \textit{embedding} por recorte y
+% persistencia en el almacenamiento elegido.
 
-\subsubsection{Diseño general del sistema}
-% Anotación: Detallar el uso de Python y herramientas como uv para la gestión de dependencias.
-% Resaltar la importancia de la reproducibilidad y la automatización mediante el pipeline de benchmark.
+\subsubsection{Recuperación, reducción y agrupamiento}
+% Carga de todos los \textit{embeddings} desde el almacenamiento, aplicación
+% de la reducción de dimensionalidad si procede, ejecución del algoritmo
+% de \textit{clustering} y reconstrucción del mapeo clúster $\rightarrow$
+% imágenes.
 
-\subsection{Métricas de evaluación}
-\label{subsec:metricas}
-% Anotación: Definir qué se entiende por "éxito" en este estudio, tanto en
-% calidad como en eficiencia.
+\subsection{Procedimiento experimental}
+\label{subsec:experimental}
+% Núcleo metodológico del trabajo: cómo se ejecutan y miden los
+% experimentos de rendimiento.
 
-\subsubsection{Métricas de calidad y desempeño}
-% Anotación: Detallar métricas intrínsecas (Silueta, Davies-Bouldin).
-% Explicar cómo se evalúa la precisión de las consultas de similitud (Top-K).
+\subsubsection{Definición del espacio de configuraciones}
+% Ficheros de \textit{whitelist} en JSON declarando cada ejecución como
+% combinación de \texttt{storage}, \texttt{embedding}, \texttt{segmenter},
+% \texttt{reduction} y \texttt{clustering}. Generación automática por
+% producto cartesiano a partir de una rejilla.
 
-\subsubsection{Métricas de coste computacional}
-% Anotación: Definir las métricas de tiempo (latencia por imagen, tiempo total
-% de entrenamiento). Mencionar el consumo de recursos (CPU/GPU/Memoria) si se
-% han monitorizado.
+\subsubsection{Reutilización de almacenamientos}
+% Estrategia para evitar repetir la ingesta cuando varias configuraciones
+% comparten \texttt{storage + embedding + limit}: reuso de
+% \texttt{db\_path}, \texttt{clear\_storage: false} y persistencia de las
+% métricas de ingesta en la tabla \texttt{metadata}.
 
-\subsection{Diseño experimental y procedimiento de pruebas}
-\label{subsec:diseno_experimental}
+\subsubsection{Instrumentación y medición de tiempos}
+% Etapas perfiladas por el \textit{runner}: \textit{setup}, limpieza,
+% ingesta, reducción, \textit{clustering} y búsqueda por similitud.
+% Forma exacta de cronometrar cada una.
 
-\subsubsection{Configuración de escenarios (Whitelists)}
-% Anotación: Explicar el funcionamiento de los archivos JSON de "whitelist"
-% para orquestar los experimentos.
+\subsubsection{Selección automática de hiperparámetros}
+% Cuando el usuario no fija ciertos parámetros, el sistema los estima:
+% método del codo sobre la inercia (K-Means), minimización del BIC (GMM)
+% y curva de k-distancias (DBSCAN).
 
-\subsubsection{Protocolo de pruebas}
-% Anotación: Describir los pasos exactos que sigue el pipeline en cada
-% ejecución para asegurar condiciones idénticas entre pruebas.
+\subsubsection{Cálculo de métricas de calidad}
+% \textit{Silhouette} y Calinski-Harabasz calculadas sobre los
+% \textit{embeddings} originales (sin reducir) para que la distorsión de
+% la proyección no contamine la comparación entre configuraciones.
+
+\subsubsection{Salida y agregación de resultados}
+% Generación de ficheros CSV y JSON por lote de \textit{benchmark},
+% formato de los registros y posterior agregación con
+% \texttt{pipeline-plot} para producir las gráficas comparativas.
+
+\subsection{Procedimientos adicionales}
+\label{subsec:extras-metod}
+% Procesos auxiliares relacionados con las extensiones específicas del
+% dominio, separados del bucle principal de evaluación.
+
+\subsubsection{Entrenamiento del detector de grafiti}
+% Anotación de imágenes con CVAT, preparación del conjunto, entrenamiento
+% del modelo YOLO de detección y exportación de pesos.
+
+\subsubsection{Entrenamiento de las cabezas de proyección}
+% Construcción de pares de muestras, función de pérdida empleada,
+% hiperparámetros de entrenamiento y proceso de validación de las cabezas
+% sobre MobileNetV3 y DINOv2.
+
+\subsection{Reproducibilidad}
+\label{subsec:reproducibilidad}
+% Medidas para garantizar la reproducción de los resultados: fijado de
+% semillas aleatorias, versiones congeladas mediante \texttt{uv}, ejecución
+% desde el directorio \texttt{src/} y disponibilidad pública de los
+% \textit{whitelists} usados en cada experimento.

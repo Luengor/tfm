@@ -2,184 +2,85 @@
 \section{Materiales y métodos}
 \label{sec:materiales}
 
-\subsection{Descripción del conjunto de datos}
+\subsection{Conjunto de datos}
 \label{subsec:dataset}
+% Origen y procedencia de las imágenes de grafiti, número total de muestras,
+% formato, resolución y características visuales generales (variabilidad
+% cromática, escenas urbanas, condiciones de iluminación...).
+% Limitaciones a destacar: ausencia de un etiquetado fiable de similitud
+% entre imágenes (no hay verdad fundamental para validar el agrupamiento),
+% heterogeneidad fotográfica, sesgos de captura y volumen limitado.
+% Mencionar también el subconjunto recortado (\texttt{dataset\_cropped/}) y
+% para qué se utiliza.
 
-% TODO
+\subsection{Marco conceptual}
+\label{subsec:conceptos}
+% Conceptos teóricos necesarios para interpretar la evaluación.
 
-\subsection{Espacio de configuraciones del sistema}
+\subsubsection{Representación vectorial de imágenes}
+% Definición de \textit{embedding}, espacio latente, normalización L2 y
+% métricas de distancia habituales (coseno, euclidiana). Idea de que dos
+% imágenes parecidas deben quedar próximas en el espacio.
+
+\subsubsection{Agrupamiento no supervisado}
+% Paradigmas principales: basados en centroides, en densidad, jerárquicos y
+% probabilísticos. Problema de la selección del número de clústeres en
+% ausencia de etiquetas.
+
+\subsubsection{Reducción de dimensionalidad}
+% Maldición de la dimensionalidad y motivación para aplicar reducción antes
+% del agrupamiento. Diferencias entre técnicas lineales (PCA) y no lineales
+% (UMAP, Isomap).
+
+\subsubsection{Métricas de evaluación}
+% Foco principal del trabajo: métricas de rendimiento (tiempos por etapa,
+% throughput de ingesta, latencia de búsqueda, escalabilidad).
+% Secundariamente, métricas internas de calidad de los clústeres
+% (silhouette, Calinski-Harabasz) usadas como apoyo, sin verdad fundamental.
+
+\subsection{Componentes implementados}
 \label{subsec:configuraciones}
-A continuación se describen los componentes clave del sistema que se han creado
-para la evaluación, así como las opciones de configuración más relevantes para
-cada uno de ellos.
+% Catálogo de implementaciones intercambiables que cubren cada pieza del
+% sistema modular. Tabla resumen de opciones por componente.
 
-\subsubsection{Segmentador de imágenes}
+\subsubsection{Modelos de extracción de características}
+% Tabla con ResNet50, VGG16, InceptionV3, MobileNetV3, DINOv2 ViT-S/14,
+% CLIP ViT-B/32 y YOLOv26 (n/s/m). Indicar arquitectura, dimensionalidad
+% de salida y preentrenamiento. Todos los modelos se usan congelados.
 
-El sistema incluye dos implementaciones del módulo de segmentación, cuya función
-es delimitar las regiones de grafiti presentes en cada imagen antes de la
-extracción de características.
-
-El \textit{IdentitySegmenter} es el segmentador más simple: devuelve un único
-cuadro delimitador (\textit{bounding box}) que abarca la imagen completa, con
-coordenadas normalizadas $(0, 0, 1, 1)$ y confianza máxima. Se utiliza cuando
-no se requiere localización explícita del grafiti o cuando las imágenes ya
-contienen únicamente la región de interés.
-
-El \textit{YoloSegmenter} emplea un modelo YOLO entrenado específicamente para
-la detección de grafiti. Dado que un mismo grafiti puede generar múltiples
-detecciones solapadas, se aplica un proceso de fusión de cajas: las detecciones
-se ordenan por confianza de forma descendente y se fusionan aquellos pares en
-los que el área de intersección supera el umbral de fusión configurado
-(\textit{merge\_threshold}, con valor por defecto de 0,8) respecto a cualquiera
-de las dos cajas. De forma opcional, se puede aplicar un margen de expansión
-(\textit{padding}) sobre las cajas resultantes, expresado como fracción del
-ancho y alto de cada caja, para incluir contexto adicional alrededor de cada
-región detectada. Todas las coordenadas se almacenan normalizadas al rango
-$[0, 1]$ relativo a las dimensiones de la imagen.
-
-\subsubsection{Modelos de extracción de características (\textit{Embeddings})}
-
-Para la extracción de características se han implementado once modelos de
-distinta arquitectura y dimensionalidad de salida. Todos los modelos se ejecutan
-en modo de inferencia con los pesos congelados y producen un vector de
-características de longitud fija por cada región segmentada. La
-Tabla~\ref{tab:embeddings} resume los modelos disponibles.
-
-\begin{longtable}{|p{5cm}|p{3cm}|p{1.8cm}|p{4cm}|} \hline
-  \textbf{Modelo} & \textbf{Tipo} & \textbf{Dim.} & \textbf{Preentrenamiento} \\ \hline
-  ResNet50 & CNN & 2048 & ImageNet \\ \hline
-  VGG16 & CNN & 4096 & ImageNet \\ \hline
-  InceptionV3 & CNN & 2048 & ImageNet \\ \hline
-  MobileNetV3 Large & CNN ligero & 1280 & ImageNet \\ \hline
-  DINOv2 ViT-S/14 & \textit{Transformer} & 384 & LVD-142M \\ \hline
-  CLIP ViT-B/32 & \textit{Transformer} & 512 & LAION-2B \\ \hline
-  YOLOv8n & YOLO & 256 & Grafiti (dominio) \\ \hline
-  YOLOv8s & YOLO & 512 & Grafiti (dominio) \\ \hline
-  YOLOv8m & YOLO & 512 & Grafiti (dominio) \\ \hline
-  MobileNetV3 + cabeza grafiti & CNN + cabeza & 1280 & Ajuste fino \\ \hline
-  DINOv2 + cabeza grafiti & \textit{Transformer} + cabeza & 384 & Ajuste fino \\ \hline
-  \caption{Modelos de extracción de características disponibles en el sistema.}
-  \label{tab:embeddings}
-\end{longtable}
-
-Los modelos CNN estándar (ResNet50, VGG16, InceptionV3, MobileNetV3) utilizan
-pesos preentrenados con ImageNet y se adaptan para la extracción de
-características eliminando la última capa de clasificación, de forma que la
-salida corresponde al vector de activaciones de la penúltima capa. Los modelos
-basados en \textit{transformers} (DINOv2 y CLIP) generan vectores normalizados
-en longitud unitaria, lo que facilita el uso de la similitud coseno como métrica
-de distancia.
-
-Los modelos con cabeza de ajuste fino incorporan una red de proyección de dos
-capas (Linear $\rightarrow$ ReLU $\rightarrow$ Linear) entrenada sobre un
-subconjunto de imágenes de grafiti, con el objetivo de proyectar los
-\textit{embeddings} base hacia un espacio de menor variabilidad intra-clase para
-este dominio específico. La salida de estos modelos también está normalizada en
-longitud unitaria mediante normalización L2.
-
-Los modelos YOLO se emplean como extractores de características aprovechando
-las representaciones internas aprendidas durante el entrenamiento de detección.
-La extracción se realiza a través del método \texttt{embed()} de la biblioteca
-\textit{Ultralytics}, que devuelve el vector de características antes de la
-cabeza de detección.
-
-\subsubsection{Algoritmos de agrupamiento (\textit{Clustering})}
-
-Se han implementado ocho algoritmos de agrupamiento que cubren distintos
-paradigmas: basados en centroides, en densidad, jerárquicos y probabilísticos.
-Esta diversidad permite comparar tanto la calidad de los grupos resultantes como
-el coste computacional de cada enfoque bajo las mismas condiciones. La
-Tabla~\ref{tab:clustering} resume los algoritmos disponibles y sus parámetros
-más relevantes.
-
-\begin{longtable}{|p{4cm}|p{4cm}|p{5.5cm}|} \hline
-  \textbf{Algoritmo} & \textbf{Parámetros clave} & \textbf{Selección automática} \\ \hline
-  K-Means & \texttt{n\_clusters} & Método del codo sobre inercia (máx. 20) \\ \hline
-  DBSCAN & \texttt{eps}, \texttt{min\_samples}=5 & Gráfica de k-distancias \\ \hline
-  HDBSCAN & \texttt{min\_cluster\_size}=5 & No \\ \hline
-  OPTICS & \texttt{min\_samples}=5, métrica coseno & No \\ \hline
-  Agglomerative & \texttt{n\_clusters}=5, enlace Ward & No \\ \hline
-  Spectral & \texttt{n\_clusters}=5 & No \\ \hline
-  GMM & \texttt{n\_components}, covarianza completa & Minimización del BIC (máx. 20) \\ \hline
-  Affinity Propagation & \texttt{damping}=0.5 & Automática \\ \hline
-  \caption{Algoritmos de agrupamiento implementados en el sistema.}
-  \label{tab:clustering}
-\end{longtable}
-
-Tres de los algoritmos implementan mecanismos de selección automática del
-número de clústeres cuando dicho parámetro no se especifica explícitamente.
-K-Means y GMM utilizan el método del codo: se evalúan configuraciones con un
-número de clústeres de 2 a 20 y se selecciona el punto de máxima curvatura de
-la curva de inercia o del criterio de información bayesiano (BIC)
-respectivamente. DBSCAN estima el valor óptimo de \texttt{eps} a partir de la
-gráfica de k-distancias ordenadas, identificando igualmente el punto de mayor
-curvatura mediante la distancia perpendicular a la diagonal de la curva.
+\subsubsection{Algoritmos de agrupamiento}
+% Tabla con K-Means, DBSCAN, HDBSCAN, OPTICS, Agglomerative, Spectral, GMM
+% y Affinity Propagation. Indicar parámetros clave y si admiten selección
+% automática del número de clústeres.
 
 \subsubsection{Técnicas de reducción de dimensionalidad}
+% Tabla con Identity (sin reducción), PCA, UMAP, Isomap y Kernel PCA.
+% Parámetros por defecto y observaciones de uso.
 
-Dado que los vectores de características tienen dimensionalidades que oscilan
-entre 256 y 4096, la reducción de dimensionalidad previa al agrupamiento puede
-mejorar tanto la eficiencia computacional como la calidad de los clústeres al
-mitigar la denominada maldición de la dimensionalidad. Se han implementado cinco
-técnicas, incluyendo una configuración identidad que no aplica ninguna
-transformación, tal como se recoge en la Tabla~\ref{tab:reduccion}.
+\subsubsection{Sistemas de almacenamiento}
+% SQLiteStorage (búsqueda lineal en Python, sin servicio externo) y
+% PostgreSQLStorage con \textit{pgvector} (búsqueda delegada al motor de
+% base de datos). Interfaz común y persistencia de metadatos.
 
-\begin{longtable}{|p{3cm}|p{2.8cm}|p{7.5cm}|} \hline
-  \textbf{Técnica} & \textbf{Comp. por defecto} & \textbf{Observaciones} \\ \hline
-  Identity & --- & Sin reducción; devuelve los vectores originales sin modificar \\ \hline
-  PCA & 50 & Se limita al número de muestras disponibles si es inferior \\ \hline
-  UMAP & 2 & \textit{n\_neighbors}=15, \textit{min\_dist}=0.1, métrica coseno \\ \hline
-  Isomap & 2 & \textit{n\_neighbors}=5; ajuste automático si hay pocas muestras \\ \hline
-  Kernel PCA & 50 & Núcleo RBF configurable \\ \hline
-  \caption{Técnicas de reducción de dimensionalidad disponibles en el sistema.}
-  \label{tab:reduccion}
-\end{longtable}
+\subsection{Extensiones específicas para grafiti}
+\label{subsec:extras}
+% Componentes adicionales centrados en el dominio de grafiti. No forman
+% parte del núcleo de la evaluación de rendimiento, pero amplían el espacio
+% de configuraciones evaluable.
 
-Es importante destacar que, aunque la reducción de dimensionalidad se aplica
-antes del agrupamiento, las métricas de calidad descritas en la
-sección~\ref{subsec:metricas} se calculan sobre los vectores de características
-originales, sin reducir, para evitar que la distorsión introducida por la
-proyección afecte a la evaluación comparativa de los resultados.
+\subsubsection{Segmentador YOLO}
+% IdentitySegmenter (imagen completa) y YoloSegmenter (detección, fusión de
+% cajas solapadas y padding configurable). Modelo YOLO entrenado para
+% grafiti.
 
-\subsubsection{Sistemas de almacenamiento y recuperación}
-
-El sistema soporta dos \textit{backends} de almacenamiento intercambiables para
-la persistencia y recuperación de los vectores de características.
-
-\textbf{SQLiteStorage} es la opción por defecto. Los vectores se serializan como
-datos binarios en formato flotante de 32 bits y se almacenan en una base de
-datos SQLite local. La búsqueda por similitud se realiza mediante un recorrido
-lineal en Python, calculando la distancia coseno o euclidiana respecto a todos
-los vectores almacenados y devolviendo los más próximos. Esta implementación
-no requiere ningún servicio adicional y es adecuada para entornos de prueba y
-volúmenes de datos moderados.
-
-\textbf{PostgreSQLStorage} emplea la extensión \textit{pgvector} para
-PostgreSQL, que proporciona un tipo de dato nativo para vectores de alta
-dimensión y operadores de distancia optimizados. Las búsquedas de similitud se
-realizan directamente mediante consultas SQL con los operadores de distancia
-coseno y L2 de \textit{pgvector}, delegando el cómputo al motor de la base de
-datos. Esta opción resulta más adecuada para escenarios con mayores volúmenes de
-datos en los que el recorrido lineal en memoria no es viable.
-
-Ambos \textit{backends} comparten la misma interfaz abstracta y admiten la
-persistencia de metadatos en una tabla auxiliar de clave-valor, utilizada por el
-sistema de \textit{benchmark} para conservar las métricas de ingestión y evitar
-la repetición de esta fase en configuraciones que comparten el mismo conjunto de
-datos almacenado.
+\subsubsection{Cabezas de proyección ajustadas al dominio}
+% Cabezas Linear $\rightarrow$ ReLU $\rightarrow$ Linear entrenadas sobre
+% MobileNetV3 y DINOv2 para proyectar los \textit{embeddings} base a un
+% espacio más adaptado al dominio.
 
 \subsection{Entorno de ejecución}
-% TODO: Especificar el hardware utilizado (procesador, tarjeta gráfica, RAM).
-
-El proyecto está desarrollado en Python 3.14, gestionando las dependencias
-mediante \texttt{uv}. Los modelos de \textit{deep learning} se ejecutan sobre
-PyTorch 2.10, con soporte automático para la aceleración por GPU cuando está
-disponible, recurriendo a la CPU en caso contrario. Los algoritmos de
-agrupamiento y reducción de dimensionalidad están implementados sobre
-\textit{scikit-learn} 1.8, a excepción de HDBSCAN y UMAP, que utilizan las
-bibliotecas \textit{hdbscan} y \textit{umap-learn} 0.5 respectivamente. El
-acceso a modelos \textit{transformer} se realiza a través de \textit{Hugging
-Face Transformers} 5.7 y \textit{open-clip-torch} 3.3, mientras que los modelos
-YOLO emplean la biblioteca \textit{Ultralytics} 8.4. El \textit{backend} de
-almacenamiento vectorial con PostgreSQL utiliza SQLAlchemy 2.0 como ORM y
-\textit{pgvector} 0.4 como extensión vectorial.
+\label{subsec:entorno}
+% Hardware utilizado (CPU, GPU, RAM) y pila de software: Python 3.14
+% gestionado con \texttt{uv}, PyTorch 2.10, scikit-learn 1.8, hdbscan,
+% umap-learn 0.5, Hugging Face Transformers 5.7, open-clip-torch 3.3,
+% Ultralytics 8.4, SQLAlchemy 2.0 y \textit{pgvector} 0.4.
