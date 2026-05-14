@@ -275,12 +275,22 @@ def _run_single(
                 cluster_count = n_clusters
 
                 if cluster_plot_options and cluster_plot_options.get("enabled"):
+                    plot_metrics: dict[str, Any] = {
+                        "image_count": image_count,
+                        "n_clusters": n_clusters,
+                    }
+                    if clustering_quality is not None:
+                        plot_metrics.update(clustering_quality.to_flat_dict())
+                    if clustering_extrinsic is not None:
+                        plot_metrics.update(clustering_extrinsic.to_flat_dict())
                     _maybe_plot_clusters(
                         run_spec=run_spec,
                         output_dir=output_dir,
                         embeddings_arr=embeddings_arr,
                         reduced_embeddings=reduced_embeddings,
                         labels_arr=labels_arr,
+                        filenames=[img.filename for img in all_images],
+                        metrics=plot_metrics,
                         options=cluster_plot_options,
                     )
             else:
@@ -573,6 +583,8 @@ def _maybe_plot_clusters(
     embeddings_arr: np.ndarray,
     reduced_embeddings: list[list[float]],
     labels_arr: np.ndarray,
+    filenames: list[str],
+    metrics: dict[str, Any],
     options: dict[str, Any],
 ) -> None:
     from src.evaluation.cluster_plot import plot_clusters_2d, project_to_2d
@@ -589,7 +601,7 @@ def _maybe_plot_clusters(
         else:
             points_2d = project_to_2d(embeddings_arr)
 
-        output_path = output_dir / f"{run_spec.run_id}_cluster.png"
+        output_path = output_dir / f"{run_spec.run_id}_cluster.html"
         title = f"{run_spec.name} — {run_spec.embedding.type} / {run_spec.clustering.type}"
         plot_clusters_2d(
             points_2d=points_2d,
@@ -597,6 +609,9 @@ def _maybe_plot_clusters(
             output_path=output_path,
             title=title,
             show_noise=bool(options.get("show_noise", True)),
+            filenames=filenames,
+            metrics=metrics,
+            images_root=str(options.get("images_root", "")),
         )
         print(f"Wrote cluster plot: {output_path}")
     except Exception as exc:  # noqa: BLE001

@@ -49,9 +49,9 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         default=False,
         help=(
-            "Generate a 2D UMAP scatter plot of the final clusters per run. "
-            "Writes <output-dir>/<run_id>_cluster.png. Overrides the "
-            "'cluster_plot.enabled' field in the whitelist if set."
+            "Generate an interactive 2D UMAP Vega-Lite scatter of the final "
+            "clusters per run. Writes <output-dir>/<run_id>_cluster.html. "
+            "Overrides the 'cluster_plot.enabled' field in the whitelist if set."
         ),
     )
     return parser
