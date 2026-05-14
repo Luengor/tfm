@@ -261,7 +261,7 @@ def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
         case EmbeddingModelNames.DINOV2_VITS14:
             return DinoEmbeddingModel(name)
         
-        case EmbeddingModelNames.DINOV2_GRAFFITI_HEAD:
+        case EmbeddingModelNames.DINOV2_GRAFFITI_AUTHOR_HEAD | EmbeddingModelNames.DINOV2_GRAFFITI_STYLE_HEAD:
             base = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
             from torchvision import transforms
             preprocessor = transforms.Compose([
