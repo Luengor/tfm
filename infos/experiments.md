@@ -470,15 +470,6 @@ human-labelled categories. Two derived analyses follow naturally:
 per embedding; reduction and clustering re-use the cached DB within an
 embedding group thanks to `generate_whitelist.py`'s storage-key hashing).
 
-**Caveat on the fine-tuned heads.** `dinov2_graffiti_head` and
-`mobilenet_v3_graffiti_head` were trained via triplet loss on
-`sample_crop/{character,piece,tag,throw-up}` — exactly this dataset's
-directory layout (`src/train/dataset.py:6`). Their supervised scores here are
-therefore training-set performance, not generalisation. A genuinely fair
-comparison would require a held-out labeled split that does not exist yet;
-collecting one (even 50–100 additional crops with style labels) is the
-single biggest improvement that could be made to this experiment.
-
 **Running.**
 
 ```bash
