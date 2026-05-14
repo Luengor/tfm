@@ -13,9 +13,9 @@ another axis is:
   fine-tuned for graffiti style similarity).
 - **Reduction:** UMAP, `n_components=10`, `metric="cosine"`, `min_dist=0.0`
   (the canonical pre-clustering reduction; cosine matches the L2-normalised
-- **Clustering:** HDBSCAN, `min_cluster_size=5`
   output of DINOv2/CLIP-style encoders; `min_dist=0` keeps projected points as
   tightly packed as possible, which maximises density contrast for HDBSCAN).
+- **Clustering:** HDBSCAN, `min_cluster_size=5`
   (density-aware, auto-detects k, isolates noise — the strongest recommendation
   in [`best_cluster.md`](best_cluster.md)).
 - **Segmenter:** `identity`
@@ -55,11 +55,11 @@ across n values is more meaningful than any individual data point.
 
 **Dataset size.** The working dataset contains approximately 5000 images (a
 second, larger dataset acquired after the initial 240-image collection).
-Per-experiment `limit` values are set explicitly per config — the headline
-quality experiments use the full 5000, while the embedding (#1) and segmenter
-(#6) sweeps cap at 2000 to keep wall-clock costs manageable since they require
-a fresh ingest per run. The actual n in every result is stored in the
-`image_count` column.
+Per-experiment `limit` values are set explicitly per config — the HDBSCAN
+tuning (#5) and scalability sweep (#9) use the full 5000, while the embedding
+(#1) and segmenter (#6) sweeps cap at 1000 to keep wall-clock costs manageable
+since they require a fresh ingest per run. The actual n in every result is
+stored in the `image_count` column.
 
 **Memory.** Every stage captures `peak_rss_mb` and `vram_peak_mb`. Embedding
 models dominate VRAM; reduction and clustering dominate RAM at large n. Large
@@ -72,8 +72,7 @@ before CPU time does.
 Each grid file is consumed by `generate_whitelist.py` to produce a whitelist,
 which is then fed to the benchmark runner:
 
-bash
-```
+```bash
 cd src
 
 # 1. Expand the grid into a whitelist
@@ -150,9 +149,10 @@ graffiti clusters?
 `inception_v3`, `mobilenet_v3`), DINOv2, CLIP, the three YOLO backbones, and
 the two actively-used fine-tuned heads (`mobilenet_v3_graffiti_head`,
 `dinov2_graffiti_style_head`). The author-trained DINOv2 head
-(`dinov2_graffiti_author_head`) is also registered in the codebase but is
-omitted here — it targets identity recovery, not style similarity, and so is
-off-question for this experiment.
+(`dinov2_graffiti_author_head`, weights at `models/dinov2_graffiti_head.pth`)
+is registered in the codebase but is omitted here — it targets author /
+identity recovery, not style similarity, and so is off-question for this
+experiment.
 
 **Fixed.** UMAP → HDBSCAN baseline, identity segmenter, SQLite, `limit=1000`.
 
@@ -175,8 +175,11 @@ algorithm groups them best?
 
 **Varies.** `hdbscan`, `kmeans`, `gmm`, `dbscan`, `optics` (cosine and
 euclidean — the only clusterer where the metric is configurable),
-`agglomerative`, `spectral`. `affinity_propagation` is intentionally
-omitted — `best_cluster.md` rules it out as impractical.
+`agglomerative` (n_clusters ∈ {5, 10, 20}), `spectral` (n_clusters ∈ {5, 10,
+20}). `affinity_propagation` is intentionally omitted — `best_cluster.md`
+rules it out as impractical. The agglo/spectral `n_clusters` sweep removes the
+k-confound: their silhouette/CH can be compared against HDBSCAN's auto-k by
+selecting the best-k row per algorithm.
 
 **Fixed.** Baseline embedding and UMAP reduction.
 
@@ -184,7 +187,7 @@ omitted — `best_cluster.md` rules it out as impractical.
 against the actual data: HDBSCAN should win, KMeans should be the strong
 baseline, the rest provide ablation evidence.
 
-**Cost.** 8 runs, 1 ingest (the embedding is computed once and reused).
+**Cost.** 12 runs, 1 ingest (the embedding is computed once and reused).
 
 **Config.** [`configs/02_clustering_comparison.json`](configs/02_clustering_comparison.json)
 
@@ -235,7 +238,9 @@ recovers clusters.
 **Varies.** `min_cluster_size` ∈ {10, 25, 50, 100, 200, 500} — sized as
 fractions of a 5000-image dataset (0.2% to 10%) rather than absolute counts.
 
-**Fixed.** Baseline embedding and UMAP.
+**Fixed.** Baseline embedding and UMAP. Note: `limit=5000` here (not the
+catalogue baseline of 1000) so the fractions above resolve to the intended
+absolute counts.
 
 **Why it matters.** This is HDBSCAN's main knob. Too low → noisy micro-clusters;
 too high → everything labelled as noise. The right value depends on dataset
@@ -290,12 +295,15 @@ OPTICS-euclidean, OPTICS-manhattan}. Two embeddings:
 
 **Hypotheses (worth stating before running so the result is interpretable).**
 
-1. On `dinov2_graffiti_style_head`, UMAP-cosine and UMAP-euclidean should produce
-   near-identical clusters under HDBSCAN and OPTICS, because on the unit
-   sphere `‖x − y‖² = 2 − 2·cos(x, y)` makes L2 a monotonic function of
-   cosine — neighbourhood orderings (and hence density-based clustering)
-   are invariant. KMeans may diverge slightly because centroids drift off
-   the sphere during iteration.
+1. On `dinov2_graffiti_style_head`, UMAP-cosine and UMAP-euclidean should
+   produce qualitatively similar clusters under HDBSCAN and OPTICS, because on
+   the unit sphere `‖x − y‖² = 2 − 2·cos(x, y)` makes L2 a monotonic function
+   of cosine — neighbourhood orderings (and hence density-based clustering on
+   the same kNN graph) are invariant. In practice UMAP-cosine uses an angular
+   nearest-neighbour backend with different stochastic init than UMAP-euclidean,
+   so the two reductions are not byte-identical — expect small label
+   differences from optimisation noise rather than from geometry. KMeans may
+   diverge further because centroids drift off the sphere during iteration.
 2. UMAP-manhattan should diverge from both even on normalised data, because
    L1 is not monotonic in cosine on the sphere.
 3. On `mobilenet_v3`, all three metrics should produce different results;
@@ -327,9 +335,9 @@ empirically visible rather than buried in per-call overhead.
 
 **Why it matters.** Clustering quality is unaffected by storage choice; this
 experiment isolates infrastructure cost. Testing at four dataset sizes reveals
-whether the PostgreSQL index advantage is detectable even at the current dataset
-scale (~240 images) or only emerges at larger n. The result informs the
-deployment recommendation in the thesis.
+how the PostgreSQL index advantage scales with n across the available dataset
+range (up to ~5000 images). The result informs the deployment recommendation
+in the thesis.
 
 **Prerequisites.** PostgreSQL requires the dev container from the `mnt/`
 PostgreSQL setup at `localhost:54321`.
@@ -422,12 +430,14 @@ JSON.
   reduction helps the supervised metric at all and whether aggressive
   reduction degrades it — important context for any figure that uses the 2-D
   projection as evidence of cluster structure.
-- **Clustering (4).** `kmeans` with `n_clusters=4` (forced to the ground-truth
+- **Clustering (7).** `kmeans` with `n_clusters=4` (forced to the ground-truth
   k — measures recovery quality given oracle k), `agglomerative` with
   `n_clusters=4` + `linkage="average"` (hierarchical alternative under oracle
   k), `spectral` with `n_clusters=4` (graph-based alternative under oracle
-  k), and `hdbscan` with `min_cluster_size=5` (density-based, auto-detects
-  k — measures whether the true class count emerges naturally).
+  k), and `hdbscan` swept over `min_cluster_size ∈ {3, 5, 10, 20}`
+  (density-based, auto-detects k — sweep tests whether the true class count
+  emerges naturally and how stable it is across the main HDBSCAN knob, given
+  class sizes `tag=116, piece=69, throw-up=69, character=19`).
 
 **Fixed.** SQLite storage, identity segmenter, no `limit` (sample_crop has
 ~273 images so every run processes the full set).
@@ -448,9 +458,11 @@ JSON.
 3. KMeans-4 should achieve the highest extrinsic scores on the fine-tuned
    style head because k matches ground truth and the head was trained to
    make classes linearly separable; spectral and agglomerative under oracle
-   k=4 should follow closely; HDBSCAN should auto-discover a number of
-   clusters near 4 on the fine-tuned head and noticeably different on the
-   baselines.
+   k=4 should follow closely; HDBSCAN should auto-discover a count near 4 on
+   the fine-tuned head at moderate `min_cluster_size` (≈10–20, the
+   `character` class has only 19 samples so smaller values risk fragmenting
+   it and larger values risk absorbing it into noise) and noticeably
+   different counts on the baselines.
 4. The `identity` reduction should match or beat UMAP on the fine-tuned head
    (the head has already concentrated discriminative information so further
    reduction is information loss) and should underperform UMAP on the raw
@@ -476,13 +488,16 @@ human-labelled categories. Two derived analyses follow naturally:
   not coincide with semantic optima, and the thesis must hedge its
   recommendations accordingly.
 - **k-recovery for HDBSCAN.** Whether HDBSCAN's auto-detected cluster count
-  lands near 4 on the fine-tuned head is the cleanest evidence for/against
-  the "density-based clustering discovers the true number of styles" claim.
-  The `n_clusters` field is already in every result row.
+  lands near 4 on the fine-tuned head — across the `min_cluster_size`
+  sweep — is the cleanest evidence for/against the "density-based clustering
+  discovers the true number of styles" claim. The `n_clusters` field is
+  already in every result row; report it alongside the noise fraction so
+  inflated NMI from many-tiny-clusters runs is visible.
 
-**Cost.** 48 runs (4 embeddings × 3 reductions × 4 clusterers), 4 ingests (one
-per embedding; reduction and clustering re-use the cached DB within an
-embedding group thanks to `generate_whitelist.py`'s storage-key hashing).
+**Cost.** 84 runs (4 embeddings × 3 reductions × 7 clusterers — 3 fixed-k +
+4 HDBSCAN variants), 4 ingests (one per embedding; reduction and clustering
+re-use the cached DB within an embedding group thanks to
+`generate_whitelist.py`'s storage-key hashing).
 
 **Running.**
 

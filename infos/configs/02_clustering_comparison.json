@@ -19,7 +19,11 @@
     {"type": "dbscan", "params": {"min_samples": 5}},
     {"type": "optics", "params": {"min_samples": 5, "metric": "cosine"}},
     {"type": "optics", "params": {"min_samples": 5, "metric": "euclidean"}},
+    {"type": "agglomerative", "params": {"n_clusters": 5, "linkage": "average"}},
     {"type": "agglomerative", "params": {"n_clusters": 10, "linkage": "average"}},
-    {"type": "spectral", "params": {"n_clusters": 10, "affinity": "nearest_neighbors"}}
+    {"type": "agglomerative", "params": {"n_clusters": 20, "linkage": "average"}},
+    {"type": "spectral", "params": {"n_clusters": 5, "affinity": "nearest_neighbors"}},
+    {"type": "spectral", "params": {"n_clusters": 10, "affinity": "nearest_neighbors"}},
+    {"type": "spectral", "params": {"n_clusters": 20, "affinity": "nearest_neighbors"}}
   ]
 }
