@@ -7,7 +7,7 @@
     {"type": "identity", "params": {}}
   ],
   "embedding": [
-    {"type": "dinov2_graffiti_head", "params": {}}
+    {"type": "dinov2_graffiti_style_head", "params": {}}
   ],
   "reduction": [
     {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}}

@@ -8,9 +8,9 @@ what stays fixed, and the corresponding grid or whitelist file in
 The default "best-guess" baseline used as the fixed component when varying
 another axis is:
 
-- **Embedding:** `dinov2_graffiti_head` (DINOv2 ViT-S/14 backbone with the
-  graffiti-fine-tuned projection head — self-supervised features tuned for the
-  domain).
+- **Embedding:** `dinov2_graffiti_style_head` (DINOv2 ViT-S/14 backbone with
+  the style-discriminative projection head — self-supervised features
+  fine-tuned for graffiti style similarity).
 - **Reduction:** UMAP, `n_components=10`, `metric="cosine"`, `min_dist=0.0`
   (the canonical pre-clustering reduction; cosine matches the L2-normalised
 - **Clustering:** HDBSCAN, `min_cluster_size=5`
@@ -115,7 +115,7 @@ wrappers operate in L2 internally, so the only place the working metric can be
 chosen for those clusterers is in the upstream UMAP stage. Whether changing it
 matters depends on whether the embeddings live on the unit hypersphere:
 
-- **L2-normalised embeddings** (`dinov2_graffiti_head`, `clip_vit_b32`, and the
+- **L2-normalised embeddings** (`dinov2_graffiti_style_head`, `clip_vit_b32`, and the
   `*_graffiti_head` family — all explicitly normalise to unit norm). On the
   unit sphere, `‖x − y‖² = 2 − 2·cos(x, y)`: L2 distance is a strictly
   monotonic function of cosine distance. Any algorithm that depends only on
@@ -146,9 +146,13 @@ The metric experiment below uses one of each so the contrast is observable.
 **Question.** Which embedding backbone produces the most semantically meaningful
 graffiti clusters?
 
-**Varies.** All 11 supported embeddings — four ImageNet CNNs (`resnet50`,
-`vgg16`, `inception_v3`, `mobilenet_v3`), DINOv2, CLIP, the three YOLO
-backbones, and both fine-tuned heads.
+**Varies.** Eleven embeddings — four ImageNet CNNs (`resnet50`, `vgg16`,
+`inception_v3`, `mobilenet_v3`), DINOv2, CLIP, the three YOLO backbones, and
+the two actively-used fine-tuned heads (`mobilenet_v3_graffiti_head`,
+`dinov2_graffiti_style_head`). The author-trained DINOv2 head
+(`dinov2_graffiti_author_head`) is also registered in the codebase but is
+omitted here — it targets identity recovery, not style similarity, and so is
+off-question for this experiment.
 
 **Fixed.** UMAP → HDBSCAN baseline, identity segmenter, SQLite, `limit=1000`.
 
@@ -157,7 +161,7 @@ encoders (DINOv2, CLIP) usually beat ImageNet supervision on stylistic tasks;
 fine-tuned heads test whether domain adaptation helps further. This grid also
 covers the "fine-tuned vs pretrained" question directly (compare
 `mobilenet_v3` ↔ `mobilenet_v3_graffiti_head` and
-`dinov2_vits14` ↔ `dinov2_graffiti_head` in the results).
+`dinov2_vits14` ↔ `dinov2_graffiti_style_head` in the results).
 
 **Cost.** 11 runs, 11 full ingests (no DB reuse — each embedding produces a
 different vector space).
@@ -278,7 +282,7 @@ hypersphere?
 clustering ∈ {HDBSCAN (L2-locked), KMeans (L2-locked), OPTICS-cosine,
 OPTICS-euclidean, OPTICS-manhattan}. Two embeddings:
 
-- `dinov2_graffiti_head` — fine-tuned with explicit L2-normalisation,
+- `dinov2_graffiti_style_head` — fine-tuned with explicit L2-normalisation,
   output lives on the unit hypersphere.
 - `mobilenet_v3` — raw ImageNet features, not normalised.
 
@@ -286,7 +290,7 @@ OPTICS-euclidean, OPTICS-manhattan}. Two embeddings:
 
 **Hypotheses (worth stating before running so the result is interpretable).**
 
-1. On `dinov2_graffiti_head`, UMAP-cosine and UMAP-euclidean should produce
+1. On `dinov2_graffiti_style_head`, UMAP-cosine and UMAP-euclidean should produce
    near-identical clusters under HDBSCAN and OPTICS, because on the unit
    sphere `‖x − y‖² = 2 − 2·cos(x, y)` makes L2 a monotonic function of
    cosine — neighbourhood orderings (and hence density-based clustering)
@@ -403,50 +407,60 @@ JSON.
 
 **Varies.**
 
-- **Embedding (6).** Two fine-tuning pairs (`dinov2_vits14` ↔
-  `dinov2_graffiti_head` and `mobilenet_v3` ↔ `mobilenet_v3_graffiti_head`) plus
-  two strong baselines (`clip_vit_b32` self-supervised image–text, `resnet50`
-  ImageNet-supervised CNN). The pairs isolate the fine-tuning effect within a
-  fixed backbone; the baselines anchor where each pair sits relative to
-  off-the-shelf encoders.
-- **Reduction (2).** UMAP `n_components=2` (matches the 2-D scatter plots used
-  for visualisation in the thesis) and UMAP `n_components=10` (the canonical
-  pre-clustering reduction from the other experiments). Comparing the two
-  isolates whether aggressive dimensionality reduction degrades the supervised
-  metric — important context for any figure that uses the 2-D projection as
-  evidence of cluster structure.
-- **Clustering (3).** `kmeans` with `n_clusters=4` (forced to the ground-truth
+- **Embedding (4).** One fine-tuning pair (`dinov2_vits14` ↔
+  `dinov2_graffiti_style_head`) plus two strong baselines (`clip_vit_b32`
+  self-supervised image–text, `resnet50` ImageNet-supervised CNN). The pair
+  isolates the fine-tuning effect within a fixed backbone; the baselines anchor
+  where the pair sits relative to off-the-shelf encoders. The MobileNet pair is
+  omitted here — its supervised behaviour is already covered by experiment #1,
+  and the DINOv2 family is the canonical fine-tuning testbed for the thesis.
+- **Reduction (3).** `identity` (no reduction — baseline measuring whether the
+  raw embedding space already separates classes), UMAP `n_components=2`
+  (matches the 2-D scatter plots used for visualisation in the thesis), and
+  UMAP `n_components=10` (the canonical pre-clustering reduction from the
+  other experiments). Comparing the three isolates whether dimensionality
+  reduction helps the supervised metric at all and whether aggressive
+  reduction degrades it — important context for any figure that uses the 2-D
+  projection as evidence of cluster structure.
+- **Clustering (4).** `kmeans` with `n_clusters=4` (forced to the ground-truth
   k — measures recovery quality given oracle k), `agglomerative` with
   `n_clusters=4` + `linkage="average"` (hierarchical alternative under oracle
-  k), and `hdbscan` with `min_cluster_size=5` (density-based, auto-detects k —
-  measures whether the true class count emerges naturally).
+  k), `spectral` with `n_clusters=4` (graph-based alternative under oracle
+  k), and `hdbscan` with `min_cluster_size=5` (density-based, auto-detects
+  k — measures whether the true class count emerges naturally).
 
-**Fixed.** SQLite storage, identity segmenter, `limit=1000` (sample_crop has
-~273 images, so the limit only matters as an upper bound).
+**Fixed.** SQLite storage, identity segmenter, no `limit` (sample_crop has
+~273 images so every run processes the full set).
 
 **Hypotheses.**
 
-1. The fine-tuned heads should outperform their base models on ARI/NMI/F1 —
-   **but** the heads were trained on `sample_crop`'s style-organised folders
-   via triplet loss (see `src/train/dataset.py:1`), so this is a *training-set*
-   evaluation, not held-out generalisation. The result establishes a ceiling
-   ("the head learned the training distribution") rather than out-of-sample
-   transfer. State this caveat explicitly in any figure caption.
+1. The fine-tuned style head should outperform `dinov2_vits14` on ARI/NMI/F1 —
+   **but** the head was trained on `sample_crop`'s style-organised folders
+   via supervised contrastive loss (`SupConLoss`, see
+   `src/train/style_trainer.py`), so this is a *training-set* evaluation,
+   not held-out generalisation. The result
+   establishes a ceiling ("the head learned the training distribution")
+   rather than out-of-sample transfer. State this caveat explicitly in any
+   figure caption.
 2. CLIP should be competitive with DINOv2 base; ResNet50 should be the weakest
    off-the-shelf encoder for stylistic clustering, consistent with the broader
    embedding comparison (#1).
 3. KMeans-4 should achieve the highest extrinsic scores on the fine-tuned
-   heads because k matches ground truth and the heads were trained to make
-   classes linearly separable; HDBSCAN should auto-discover a number of
-   clusters near 4 on the fine-tuned heads and noticeably different on the
+   style head because k matches ground truth and the head was trained to
+   make classes linearly separable; spectral and agglomerative under oracle
+   k=4 should follow closely; HDBSCAN should auto-discover a number of
+   clusters near 4 on the fine-tuned head and noticeably different on the
    baselines.
-4. UMAP-2 should slightly underperform UMAP-10 on the extrinsic metrics
-   (information loss at the projection step) but the gap should be small for
-   fine-tuned embeddings (the head has already concentrated discriminative
-   information) and larger for raw ImageNet features. If UMAP-2 *matches*
-   UMAP-10 even on the unfine-tuned models, the 2-D visualisations in the
-   thesis are honest representations of the cluster structure rather than
-   artefacts of compression.
+4. The `identity` reduction should match or beat UMAP on the fine-tuned head
+   (the head has already concentrated discriminative information so further
+   reduction is information loss) and should underperform UMAP on the raw
+   ImageNet features (UMAP's manifold-aware projection helps when the input
+   geometry is poor). UMAP-2 should slightly underperform UMAP-10 on the
+   extrinsic metrics; the gap should be small for fine-tuned embeddings and
+   larger for raw ImageNet features. If UMAP-2 *matches* UMAP-10 even on the
+   unfine-tuned models, the 2-D visualisations in the thesis are honest
+   representations of the cluster structure rather than artefacts of
+   compression.
 
 **Why it matters.** Every other experiment in this catalogue uses unsupervised
 proxies (silhouette, CH, DB) as the quality signal — these reward
@@ -455,18 +469,18 @@ clusters correspond to anything semantically meaningful. The supervised
 validation is the single experiment where "good clustering" is defined against
 human-labelled categories. Two derived analyses follow naturally:
 
-- **Internal–external correlation.** Plot ARI vs. silhouette over the 36 runs.
+- **Internal–external correlation.** Plot ARI vs. silhouette over the 48 runs.
   A strong positive correlation means the unsupervised metrics are a defensible
   proxy on this dataset and we can trust them in the experiments without
   ground truth; a weak or zero correlation means the unsupervised optima do
   not coincide with semantic optima, and the thesis must hedge its
   recommendations accordingly.
 - **k-recovery for HDBSCAN.** Whether HDBSCAN's auto-detected cluster count
-  lands near 4 on the fine-tuned heads is the cleanest evidence for/against
+  lands near 4 on the fine-tuned head is the cleanest evidence for/against
   the "density-based clustering discovers the true number of styles" claim.
   The `n_clusters` field is already in every result row.
 
-**Cost.** 36 runs (6 embeddings × 2 reductions × 3 clusterers), 6 ingests (one
+**Cost.** 48 runs (4 embeddings × 3 reductions × 4 clusterers), 4 ingests (one
 per embedding; reduction and clustering re-use the cached DB within an
 embedding group thanks to `generate_whitelist.py`'s storage-key hashing).
 
@@ -475,7 +489,7 @@ embedding group thanks to `generate_whitelist.py`'s storage-key hashing).
 ```bash
 cd src
 
-# 1. Expand the grid (36 runs)
+# 1. Expand the grid (48 runs)
 uv run python benchmarks/generate_whitelist.py \
   -i ../infos/configs/10_supervised_validation.json \
   -o benchmarks/supervised_validation.whitelist.json
@@ -491,9 +505,14 @@ uv run pipeline-benchmark \
 uv run pipeline-plot -i benchmark_results/benchmark_*.json -o plots/
 ```
 
-`--cluster-plot` writes a 2-D UMAP scatter per run alongside the metrics —
-useful here precisely because ground-truth labels can be overlaid for visual
-sanity-checking.
+`--cluster-plot` writes an interactive 2-D UMAP scatter per run as a
+self-contained Vega-Lite HTML page (`<output-dir>/<run_id>_cluster.html`).
+The page embeds the per-run metrics table and supports pan/zoom (drag +
+wheel), shift-drag brush selection, a thumbnail grid of the selected
+points, and a click-to-enlarge lightbox with keyboard navigation. The
+image path prefix is editable inline so the page can resolve thumbnails
+without re-running the pipeline; this is useful here precisely because
+ground-truth labels can be overlaid for visual sanity-checking.
 
 **Config.** [`configs/10_supervised_validation.json`](configs/10_supervised_validation.json)
 

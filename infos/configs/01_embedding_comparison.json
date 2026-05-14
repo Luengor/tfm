@@ -23,6 +23,6 @@
     {"type": "yolos", "params": {}},
     {"type": "yolom", "params": {}},
     {"type": "mobilenet_v3_graffiti_head", "params": {}},
-    {"type": "dinov2_graffiti_head", "params": {}}
+    {"type": "dinov2_graffiti_style_head", "params": {}}
   ]
 }
