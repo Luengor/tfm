@@ -33,7 +33,8 @@ class EmbeddingModelNames(str, Enum):
     MOBILENET_V3 = "mobilenet_v3"
     MOBILENET_V3_GRAFFITI_HEAD = "mobilenet_v3_graffiti_head"
     DINOV2_VITS14 = "dinov2_vits14"
-    DINOV2_GRAFFITI_HEAD = "dinov2_graffiti_head"
+    DINOV2_GRAFFITI_AUTHOR_HEAD = "dinov2_graffiti_author_head"
+    DINOV2_GRAFFITI_STYLE_HEAD = "dinov2_graffiti_style_head"
     CLIP_VIT_B32 = "clip_vit_b32"
     YOLOn = "yolon"
     YOLOs = "yolos"
@@ -69,9 +70,13 @@ MODELS = {
     EmbeddingModelNames.DINOV2_VITS14: {
         'embedding_size': 384,
     },
-    EmbeddingModelNames.DINOV2_GRAFFITI_HEAD: {
+    EmbeddingModelNames.DINOV2_GRAFFITI_AUTHOR_HEAD: {
         'embedding_size': 384,
         'weights_path': "models/dinov2_graffiti_head.pth"
+    },
+    EmbeddingModelNames.DINOV2_GRAFFITI_STYLE_HEAD: {
+        'embedding_size': 384,
+        'weights_path': "models/dinov2_graffiti_style_head.pth"
     },
     EmbeddingModelNames.CLIP_VIT_B32: {
         'embedding_size': 512,
