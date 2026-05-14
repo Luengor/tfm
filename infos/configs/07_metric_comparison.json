@@ -8,12 +8,13 @@
   ],
   "embedding": [
     {"type": "dinov2_graffiti_style_head", "params": {}},
-    {"type": "mobilenet_v3", "params": {}}
+    {"type": "mobilenet_v3", "params": {}},
+    {"type": "mobilenet_v3_normalized", "params": {}}
   ],
   "reduction": [
-    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
-    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "euclidean"}},
-    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "manhattan"}}
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine", "random_state": 0}},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "euclidean", "random_state": 0}},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "manhattan", "random_state": 0}}
   ],
   "clustering": [
     {"type": "hdbscan", "params": {"min_cluster_size": 5}},

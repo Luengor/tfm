@@ -217,8 +217,13 @@ test whether non-cosine geometry pays off when feeding an L2-based clusterer
 **Question.** Given UMAP is the chosen reduction, what `n_components`,
 `n_neighbors`, and `min_dist` produce the cleanest cluster structure?
 
-**Varies.** A focused sweep over each UMAP parameter while holding the others
-at their defaults (one-at-a-time, not full factorial — keeps the grid small).
+**Varies.** A 1-D sweep over `n_components ∈ {2, 5, 10, 20, 50}` (with
+`n_neighbors=15`, `min_dist=0.0`) plus a 3×3 joint mini-grid over
+`n_neighbors ∈ {5, 15, 30}` × `min_dist ∈ {0.0, 0.1, 0.5}` (with
+`n_components=10`). The joint grid exposes interaction between the
+local-vs-global and cluster-tightness knobs, which a pure one-at-a-time sweep
+would miss. `random_state=0` is fixed across all rows so differences reflect
+the hyperparameter, not optimisation noise.
 
 **Fixed.** Baseline embedding and HDBSCAN.
 
@@ -227,7 +232,8 @@ at their defaults (one-at-a-time, not full factorial — keeps the grid small).
 `n_components`. The sweep identifies the regime where HDBSCAN reliably
 recovers clusters.
 
-**Cost.** 10 runs, 1 ingest.
+**Cost.** 13 runs, 1 ingest (one row, `n_components=10 / n_neighbors=15 /
+min_dist=0.0`, is shared between the two sub-sweeps).
 
 **Config.** [`configs/04_umap_tuning.json`](configs/04_umap_tuning.json)
 
@@ -285,11 +291,18 @@ hypersphere?
 
 **Varies.** UMAP `metric` ∈ {`cosine`, `euclidean`, `manhattan`} crossed with
 clustering ∈ {HDBSCAN (L2-locked), KMeans (L2-locked), OPTICS-cosine,
-OPTICS-euclidean, OPTICS-manhattan}. Two embeddings:
+OPTICS-euclidean, OPTICS-manhattan}. UMAP `random_state=0` is pinned across
+all rows so the metric is the only varying axis. Three embeddings:
 
 - `dinov2_graffiti_style_head` — fine-tuned with explicit L2-normalisation,
   output lives on the unit hypersphere.
 - `mobilenet_v3` — raw ImageNet features, not normalised.
+- `mobilenet_v3_normalized` — same backbone with a post-hoc L2-normalisation
+  wrapper (`NormalizedEmbeddingModel` in `src/src/embedding/embeddings.py`).
+  Isolates the "norm vs encoder" effect from the metric effect: any gap
+  between `mobilenet_v3` and `mobilenet_v3_normalized` under the same UMAP
+  metric is pure normalisation, while any gap *across* metrics on the
+  normalised variant is geometry on the sphere.
 
 **Fixed.** Identity segmenter, SQLite, `min_cluster_size=5` / `min_samples=5`.
 
@@ -308,6 +321,10 @@ OPTICS-euclidean, OPTICS-manhattan}. Two embeddings:
    L1 is not monotonic in cosine on the sphere.
 3. On `mobilenet_v3`, all three metrics should produce different results;
    the cosine–L2 gap is real, not a relabel.
+4. `mobilenet_v3_normalized` should behave like `dinov2_graffiti_style_head`
+   under the metric sweep (cosine ≈ euclidean, manhattan distinct) — confirming
+   that the L2-normalisation step alone, not the encoder, is what collapses
+   the cosine–L2 distinction.
 
 **Why it matters.** If hypothesis 1 holds, the cosine default for UMAP is
 already the right choice on normalised embeddings (no "geometric mismatch" to
@@ -315,7 +332,9 @@ fix). If it fails, something in the pipeline is noisier than the theory
 suggests and the choice becomes empirical. Either result tightens the thesis
 recommendation.
 
-**Cost.** 30 runs (2 embeddings × 3 UMAP metrics × 5 clusterers), 2 ingests.
+**Cost.** 45 runs (3 embeddings × 3 UMAP metrics × 5 clusterers), 3 ingests
+(`mobilenet_v3_normalized` re-uses the raw `mobilenet_v3` model under the hood
+but stores normalised vectors, so it requires its own ingest pass).
 
 **Config.** [`configs/07_metric_comparison.json`](configs/07_metric_comparison.json)
 
