@@ -36,26 +36,12 @@ sobre los espacios RGB y Lab. La aportación es relevante porque introduce el
 agrupamiento en el dominio, pero utiliza exclusivamente estadísticas cromáticas
 de la imagen y prescinde de la estructura espacial, la textura y el contenido
 semántico del grafiti.
- 
+
 No se han localizado trabajos previos que combinen descriptores visuales
 profundos con técnicas estándar de agrupamiento para esta aplicación, ni que
 evalúen sistemáticamente qué componentes funcionan mejor sobre fotografías de
 pintadas. Esta carencia en la literatura es la que delimita el espacio en el
 que se sitúa el presente trabajo y motiva su planteamiento combinatorio.
-
-% En una línea complementaria, \citea[etali]{Garcia-Garcia}{garcia_garcia_graffiti_2024}
-% presentan un colorímetro de bajo coste construido con Arduino para capturar datos
-% RGB de pintadas en pared y agrupar piezas por similitud cromática con el objetivo
-% de vincular autores y grupos. El enfoque es ortogonal al de este trabajo ---basado
-% en hardware específico y estadísticas de color frente a redes profundas--- pero
-% confirma la viabilidad de la agrupación automática de grafiti como herramienta de
-% análisis de autoría.
-
-% Más allá del ámbito urbano, \citea[etali]{Abate}{abate_hidden_2019} aplican
-% fotogrametría y teledetección para identificar grabados de grafiti sobre mármol en
-% la Basílica de San Marcos de Venecia, mostrando que la detección e identificación
-% de grafiti es un problema transversal que abarca desde el vandalismo urbano hasta
-% la documentación del patrimonio histórico.
 
 % ---------------------------------------------------------------------
 \subsection{Representación vectorial de imágenes}
@@ -98,53 +84,21 @@ existen sets etiquetados de similitud y donde los detectores específicos de
 propósito general, como las familias YOLO\cite{noauthor_ultralytics_2024},
 ofrecen además sus propios mapas de características como vectores de partida.
 
-% ---------------------------------------------------------------------
-\subsection{Reducción de dimensionalidad y agrupamiento clásico}
-\label{subsec:art-clustering}
-
-% Los \textit{embeddings} producidos por las redes profundas viven
-% habitualmente en espacios de varios cientos o miles de dimensiones, lo
-% que vuelve inestables tanto las nociones de distancia como los algoritmos
-% clásicos de agrupamiento. La técnica establecida para mitigarlo es
-% proyectar a un espacio de menor dimensión antes de agrupar, ya sea de
-% forma lineal mediante análisis de componentes principales o de forma no
-% lineal con métodos como UMAP\cite{mcinnes_umap_2020}, que preserva en
-% mayor medida la estructura local y global del manifold.
+% % ---------------------------------------------------------------------
+% \subsection{Identificación de autoría a partir de firmas y escritura}
+% \label{subsec:art-author-id}
 % 
-% Sobre el espacio reducido convergen las familias clásicas de
-% \textit{clustering}. K-Means sigue siendo la opción más
-% extendida por su simplicidad, aunque su sensibilidad a la inicialización
-% y a la geometría de los datos está bien documentada: Arthur y
-% Vassilvitskii\cite{arthur_k-means_nodate} introdujeron la inicialización
-% \textit{k-means++}, con garantías teóricas y mejoras consistentes en
-% calidad y velocidad; Sculley\cite{sculley_web-scale_2010} mostró que
-% la variante \textit{mini-batch} reduce el coste computacional varios
-% órdenes de magnitud sin pérdida significativa de calidad; y Fränti y
-% Sieranoja\cite{franti_k-means_2018} han caracterizado experimentalmente
-% las condiciones bajo las que el algoritmo deja de funcionar, identificando
-% el solapamiento entre clústeres como el factor crítico.
-% 
-% Las alternativas basadas en densidad nacen para tratar formas no
-% convexas y ruido. DBSCAN\cite{ester_density-based_1996} fija un único
-% umbral de densidad, lo que limita su aplicabilidad a datos con
-% densidades heterogéneas; OPTICS\cite{ankerst_optics_1999} resuelve esa
-% rigidez devolviendo un orden de alcanzabilidad del que pueden
-% extraerse particiones para distintos umbrales; y HDBSCAN\cite{campello_density-based_2013}
-% construye una jerarquía de densidades de la que selecciona los clústeres
-% más estables, sin requerir parámetros geométricos a priori. La
-% implementación moderna de estas tres familias está bien
-% estudiada\cite{hahsler_dbscan_2019}. Para agrupamientos jerárquicos
-% aglomerativos, los algoritmos descritos por Müllner\cite{mullner_modern_2011}
-% constituyen la referencia computacional actual.
-% 
-% La selección entre estas familias depende de hipótesis sobre los datos
-% que no se conocen \textit{a priori} en el caso del grafiti, lo que
-% refuerza la conveniencia de una evaluación empírica comparativa. La
-% calidad de las particiones obtenidas se cuantifica habitualmente
-% mediante métricas internas como el coeficiente
-% \textit{silhouette}\cite{rousseeuw_silhouettes_1987}, que mide la
-% cohesión y separación de los clústeres en ausencia de etiquetas de
-% verdad fundamental.
+% % Conectar el problema con la literatura forense de writer identification /
+% % signature verification, que es el análogo más directo a la identificación
+% % de grafiteros a partir de sus firmas (tag) tal y como plantea el enunciado.
+% % Aplicación natural de los embeddings de la sección anterior al dominio
+% % específico de la autoría.
+% % Referencias a incorporar:
+% %   - Writer identification offline (Bulacu & Schomaker, Fiel & Sablatnig).
+% %   - Signature verification basada en redes siamesas / triplet loss.
+% %   - Paralelismo con reconocimiento facial (FaceNet) como problema de
+% %     aprendizaje métrico abierto: número de clases desconocido a priori,
+% %     pocas muestras por clase, evaluación por verificación/recuperación.
 
 % ---------------------------------------------------------------------
 \subsection{Búsqueda por similitud e indexación en bancos de imágenes}
@@ -168,6 +122,49 @@ ofrecen además sus propios mapas de características como vectores de partida.
 % pipeline implementado.
 
 % ---------------------------------------------------------------------
+\subsection{Reducción de dimensionalidad y agrupamiento clásico}
+\label{subsec:art-clustering}
+
+% Los \textit{embeddings} producidos por las redes profundas viven
+% habitualmente en espacios de varios cientos o miles de dimensiones, lo
+% que vuelve inestables tanto las nociones de distancia como los algoritmos
+% clásicos de agrupamiento. La técnica establecida para mitigarlo es
+% proyectar a un espacio de menor dimensión antes de agrupar, ya sea de
+% forma lineal mediante análisis de componentes principales o de forma no
+% lineal con métodos como UMAP\cite{mcinnes_umap_2020}, que preserva en
+% mayor medida la estructura local y global del manifold.
+%
+% Sobre el espacio reducido convergen las familias clásicas de
+% \textit{clustering}. K-Means sigue siendo la opción más
+% extendida por su simplicidad, aunque su sensibilidad a la inicialización
+% y a la geometría de los datos está bien documentada: Arthur y
+% Vassilvitskii\cite{arthur_k-means_nodate} introdujeron la inicialización
+% \textit{k-means++}, con garantías teóricas y mejoras consistentes en
+% calidad y velocidad; Sculley\cite{sculley_web-scale_2010} mostró que
+% la variante \textit{mini-batch} reduce el coste computacional varios
+% órdenes de magnitud sin pérdida significativa de calidad; y Fränti y
+% Sieranoja\cite{franti_k-means_2018} han caracterizado experimentalmente
+% las condiciones bajo las que el algoritmo deja de funcionar, identificando
+% el solapamiento entre clústeres como el factor crítico.
+%
+% Las alternativas basadas en densidad nacen para tratar formas no
+% convexas y ruido. DBSCAN\cite{ester_density-based_1996} fija un único
+% umbral de densidad, lo que limita su aplicabilidad a datos con
+% densidades heterogéneas; OPTICS\cite{ankerst_optics_1999} resuelve esa
+% rigidez devolviendo un orden de alcanzabilidad del que pueden
+% extraerse particiones para distintos umbrales; y HDBSCAN\cite{campello_density-based_2013}
+% construye una jerarquía de densidades de la que selecciona los clústeres
+% más estables, sin requerir parámetros geométricos a priori. La
+% implementación moderna de estas tres familias está bien
+% estudiada\cite{hahsler_dbscan_2019}. Para agrupamientos jerárquicos
+% aglomerativos, los algoritmos descritos por Müllner\cite{mullner_modern_2011}
+% constituyen la referencia computacional actual.
+%
+% La selección entre estas familias depende de hipótesis sobre los datos
+% que no se conocen \textit{a priori} en el caso del grafiti, lo que
+% refuerza la conveniencia de una evaluación empírica comparativa.
+
+% ---------------------------------------------------------------------
 \subsection{Coste computacional y evaluación empírica}
 \label{subsec:art-cost}
 
@@ -177,14 +174,17 @@ ofrecen además sus propios mapas de características como vectores de partida.
 %     MobileNetV3 \cite{howard_mobilenets_2017}).
 %   - Complejidad asintótica y empírica de los algoritmos de clustering
 %     (mini-batch K-Means \cite{sculley_web-scale_2010}, HDBSCAN, OPTICS).
-%   - Métricas de evaluación de clustering: internas (silhouette
-%     \cite{rousseeuw_silhouettes_1987}, Calinski-Harabasz, Davies-Bouldin)
-%     y externas (ARI, NMI, F1 por pares) cuando hay etiquetas.
+%   - Métricas internas de evaluación de clustering: silhouette
+%     \cite{rousseeuw_silhouettes_1987}, Calinski-Harabasz, Davies-Bouldin.
+%   - Métricas externas cuando hay etiquetas: ARI, NMI, F1 por pares;
+%     conectar con el subconjunto etiquetado del enunciado.
 %   - Curse of dimensionality y su impacto sobre métricas de distancia
 %     (Aggarwal et al. 2001) como motivación de la reducción previa al
 %     agrupamiento.
 %   - Trabajos de benchmarking sistemático de pipelines de visión /
 %     clustering, justificando el enfoque comparativo del presente trabajo.
+%   - Caracterización empírica del coste en función del tamaño del banco
+%     de imágenes, eje explícito del enunciado.
 
 % ---------------------------------------------------------------------
 \subsection{Aprendizaje profundo de clústeres y posicionamiento de
