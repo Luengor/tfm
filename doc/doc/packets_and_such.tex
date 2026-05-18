@@ -97,4 +97,7 @@ p\'ags.\nobreakspace#2.}]}%
 \renewcommand{\tablename}{Tabla}
 \renewcommand{\listtablename}{Indice de tablas}
 
-
+% Cita chula
+\newcommand{\citea}[3][]{%
+    #2\ifx\\#1\\\else~\textit{et~al.}\fi~\cite{#3}%
+}

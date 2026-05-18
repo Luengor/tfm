@@ -1,3 +1,211 @@
 %! TeX root: ../informe.tex
-\section{Estado de la cuestion}
+\section{Estado de la cuestión}
 \label{sec:art}
+
+% ---------------------------------------------------------------------
+\subsection{Análisis automático de grafiti}
+\label{subsec:art-grafiti}
+
+La literatura específica sobre la aplicación tanto de técnicas de visión por
+computador como de agrupamiento no supervisado al análisis de grafiti es muy
+escasa, reciente y de alcance acotado. Un trabajo relevante es el de
+\citea[etali]{Fogaça}{fogaca_deep_2023}, en el que se presenta un sistema
+encargado por el Ayuntamiento de Lisboa para clasificar imágenes de calle en
+grafiti ilegal, arte urbano o ausencia de grafiti y, a continuación, localizar
+la pintada en la escena mediante un detector \textit{fine-tuned} por ellos
+mismos. En esta misma línea, \citea[etali]{Tokuda}{tokuda_quantifying_2019}
+desarrollan un sistema para cuantificar la densidad de pintadas en la ciudad de
+São Paulo, Brasil. Las imágenes se obtienen a través de la plataforma de Street
+View de Google, y el modelo de detección utilizado (Mask-RCNN) se entrena a
+partir de un conjunto de datos anotado manualmente por los autores.
+
+Estos trabajos, aunque no están alineados del todo con el planteamiento de
+este, establecen que el uso de aprendizaje profundo es viable sobre imágenes de
+grafiti captadas en condiciones no controladas.
+
+En el ámbito del agrupamiento no supervisado, aunque varios trabajos han
+abordado la categorización de grafiti por tipo o estilo (como puede ser
+el trabajo de \citea[etali]{Taylor}{taylor_twenty-first_2010}, en el que se
+categorizan pintadas de grafiti según su contenido), la gran mayoría de estos
+trabajos realizan esta categorización de forma manual, sin aplicar técnicas de
+agrupamiento automático. En esta dirección,
+\citea[etali]{Garcia-Garcia}{garcia_garcia_graffiti_2025}, de la Universidad de
+Salamanca, proponen un método de identificación y agrupamiento basado en el
+análisis de los colores dominantes de cada pintada haciendo uso de K-Means
+sobre los espacios RGB y Lab. La aportación es relevante porque introduce el
+agrupamiento en el dominio, pero utiliza exclusivamente estadísticas cromáticas
+de la imagen y prescinde de la estructura espacial, la textura y el contenido
+semántico del grafiti.
+ 
+No se han localizado trabajos previos que combinen descriptores visuales
+profundos con técnicas estándar de agrupamiento para esta aplicación, ni que
+evalúen sistemáticamente qué componentes funcionan mejor sobre fotografías de
+pintadas. Esta carencia en la literatura es la que delimita el espacio en el
+que se sitúa el presente trabajo y motiva su planteamiento combinatorio.
+
+% En una línea complementaria, \citea[etali]{Garcia-Garcia}{garcia_garcia_graffiti_2024}
+% presentan un colorímetro de bajo coste construido con Arduino para capturar datos
+% RGB de pintadas en pared y agrupar piezas por similitud cromática con el objetivo
+% de vincular autores y grupos. El enfoque es ortogonal al de este trabajo ---basado
+% en hardware específico y estadísticas de color frente a redes profundas--- pero
+% confirma la viabilidad de la agrupación automática de grafiti como herramienta de
+% análisis de autoría.
+
+% Más allá del ámbito urbano, \citea[etali]{Abate}{abate_hidden_2019} aplican
+% fotogrametría y teledetección para identificar grabados de grafiti sobre mármol en
+% la Basílica de San Marcos de Venecia, mostrando que la detección e identificación
+% de grafiti es un problema transversal que abarca desde el vandalismo urbano hasta
+% la documentación del patrimonio histórico.
+
+% ---------------------------------------------------------------------
+\subsection{Representación vectorial de imágenes}
+\label{subsec:art-embeddings}
+
+El agrupamiento automático de imágenes requiere, en primer lugar, una
+representación numérica de estas. El objetivo es que la proximidad en el
+espacio de representación refleje la similitud perceptual, de modo que las
+tareas posteriores de recuperación y agrupamiento puedan operar sobre
+distancias. Esto se ha conseguido tradicionalmente con técnicas de extracción
+de características basadas en redes profundas, que condensan la imagen en un
+vector de características de alto nivel. El paradigma moderno se estableció con
+FaceNet \cite{schroff_facenet_2015}, una red profunda entrenada con
+\textit{triplet loss}. En este y otros trabajos posteriores como el de
+\citea[etali]{Wu}{wu_sampling_2017} se matizó que la estrategia de muestreo de
+tripletes o de pares era tan o más importante que la función de perdida en la
+calidad del espacio aprendido. \citea[etali]{Khosla}{khosla_supervised_2021}
+extendieron este paradigma al régimen supervisado con la pérdida
+\textit{Supervised Contrastive} (SupCon), que utiliza las etiquetas de clase
+para juntar en el espacio de representación todos los ejemplos de una misma
+categoría y separarlos del resto, mejorando la robustez del espacio aprendido
+frente a las pérdidas basadas en tripletes.
+
+Sobre esta base se han utilizado arquitecturas de redes residuales como
+ResNet\cite{he_deep_2015}, MobileNet\cite{howard_mobilenets_2017} y, más
+recientemente, modelos basados en \textit{transformers} para
+visión\cite{dosovitskiy_image_2021} como extractores de características para
+tareas de agrupamiento. Es más, el cambio más relevante en este ámbito no ha
+sido la arquitectura, sino el método de entrenamiento. Las redes de
+clasificación clásicas se han visto superadas por modelos de fundación
+entrenados con objetivos de autosupervisión o supervisión por lenguaje natural.
+DINOv2\cite{oquab_dinov2_2024} demuestra que la primera produce características
+visuales transferibles a múltiples tareas sin la necesidad de hacer
+\textit{fine-tuning}. Por otro lado, modelos como
+CLIP\cite{radford_learning_2021} alinean un codificador visual con un
+codificador textual sobre pares imagen-texto, obteniendo un espacio en el que
+la proximidad codifica también semántica. Ambos modelos resultan candidatos
+naturales para representar grafiti, dominio para el que prácticamente no
+existen sets etiquetados de similitud y donde los detectores específicos de
+propósito general, como las familias YOLO\cite{noauthor_ultralytics_2024},
+ofrecen además sus propios mapas de características como vectores de partida.
+
+% ---------------------------------------------------------------------
+\subsection{Reducción de dimensionalidad y agrupamiento clásico}
+\label{subsec:art-clustering}
+
+% Los \textit{embeddings} producidos por las redes profundas viven
+% habitualmente en espacios de varios cientos o miles de dimensiones, lo
+% que vuelve inestables tanto las nociones de distancia como los algoritmos
+% clásicos de agrupamiento. La técnica establecida para mitigarlo es
+% proyectar a un espacio de menor dimensión antes de agrupar, ya sea de
+% forma lineal mediante análisis de componentes principales o de forma no
+% lineal con métodos como UMAP\cite{mcinnes_umap_2020}, que preserva en
+% mayor medida la estructura local y global del manifold.
+% 
+% Sobre el espacio reducido convergen las familias clásicas de
+% \textit{clustering}. K-Means sigue siendo la opción más
+% extendida por su simplicidad, aunque su sensibilidad a la inicialización
+% y a la geometría de los datos está bien documentada: Arthur y
+% Vassilvitskii\cite{arthur_k-means_nodate} introdujeron la inicialización
+% \textit{k-means++}, con garantías teóricas y mejoras consistentes en
+% calidad y velocidad; Sculley\cite{sculley_web-scale_2010} mostró que
+% la variante \textit{mini-batch} reduce el coste computacional varios
+% órdenes de magnitud sin pérdida significativa de calidad; y Fränti y
+% Sieranoja\cite{franti_k-means_2018} han caracterizado experimentalmente
+% las condiciones bajo las que el algoritmo deja de funcionar, identificando
+% el solapamiento entre clústeres como el factor crítico.
+% 
+% Las alternativas basadas en densidad nacen para tratar formas no
+% convexas y ruido. DBSCAN\cite{ester_density-based_1996} fija un único
+% umbral de densidad, lo que limita su aplicabilidad a datos con
+% densidades heterogéneas; OPTICS\cite{ankerst_optics_1999} resuelve esa
+% rigidez devolviendo un orden de alcanzabilidad del que pueden
+% extraerse particiones para distintos umbrales; y HDBSCAN\cite{campello_density-based_2013}
+% construye una jerarquía de densidades de la que selecciona los clústeres
+% más estables, sin requerir parámetros geométricos a priori. La
+% implementación moderna de estas tres familias está bien
+% estudiada\cite{hahsler_dbscan_2019}. Para agrupamientos jerárquicos
+% aglomerativos, los algoritmos descritos por Müllner\cite{mullner_modern_2011}
+% constituyen la referencia computacional actual.
+% 
+% La selección entre estas familias depende de hipótesis sobre los datos
+% que no se conocen \textit{a priori} en el caso del grafiti, lo que
+% refuerza la conveniencia de una evaluación empírica comparativa. La
+% calidad de las particiones obtenidas se cuantifica habitualmente
+% mediante métricas internas como el coeficiente
+% \textit{silhouette}\cite{rousseeuw_silhouettes_1987}, que mide la
+% cohesión y separación de los clústeres en ausencia de etiquetas de
+% verdad fundamental.
+
+% ---------------------------------------------------------------------
+\subsection{Búsqueda por similitud e indexación en bancos de imágenes}
+\label{subsec:art-similarity-search}
+
+% Cubrir la literatura de recuperación de imágenes basada en contenido (CBIR)
+% y los índices de vecinos más cercanos aproximados (ANN), eje central del
+% título del trabajo ("algoritmos de similitud en bancos de imágenes").
+% Referencias mínimas a incorporar:
+%   - FAISS \cite{johnson_billion-scale_2017} como referencia de índices
+%     vectoriales a gran escala (IVF, PQ).
+%   - HNSW \cite{malkov_efficient_2018} como grafo de proximidad jerárquico
+%     y estándar de facto en bibliotecas modernas (pgvector, qdrant, milvus).
+%   - ScaNN \cite{guo_accelerating_2020} y panorama de comparativas
+%     (ann-benchmarks) para situar trade-offs recall/latencia.
+%   - Antecedentes CBIR clásicos: Bag-of-Visual-Words, VLAD, Fisher vectors,
+%     para contextualizar la transición a descriptores profundos.
+%   - Hashing profundo y aprendizaje métrico moderno como puente entre
+%     embeddings y recuperación eficiente.
+% Conectar con la elección de pgvector / búsqueda lineal en SQLite del
+% pipeline implementado.
+
+% ---------------------------------------------------------------------
+\subsection{Coste computacional y evaluación empírica}
+\label{subsec:art-cost}
+
+% Justificar la mitad del título ("coste computacional"). Cubrir:
+%   - Comparativas de throughput y FLOPs de extractores de características
+%     (MobileNet vs ResNet vs ViT; trabajos de eficiencia como EfficientNet,
+%     MobileNetV3 \cite{howard_mobilenets_2017}).
+%   - Complejidad asintótica y empírica de los algoritmos de clustering
+%     (mini-batch K-Means \cite{sculley_web-scale_2010}, HDBSCAN, OPTICS).
+%   - Métricas de evaluación de clustering: internas (silhouette
+%     \cite{rousseeuw_silhouettes_1987}, Calinski-Harabasz, Davies-Bouldin)
+%     y externas (ARI, NMI, F1 por pares) cuando hay etiquetas.
+%   - Curse of dimensionality y su impacto sobre métricas de distancia
+%     (Aggarwal et al. 2001) como motivación de la reducción previa al
+%     agrupamiento.
+%   - Trabajos de benchmarking sistemático de pipelines de visión /
+%     clustering, justificando el enfoque comparativo del presente trabajo.
+
+% ---------------------------------------------------------------------
+\subsection{Aprendizaje profundo de clústeres y posicionamiento de
+este trabajo}
+\label{subsec:art-deep-clustering}
+
+Una línea más reciente integra la representación y el agrupamiento en un mismo
+proceso de entrenamiento. \citea[etali]{Min}{min_survey_2018} ofrecen una
+revisión exhaustiva de estas propuestas de \textit{deep clustering} por
+arquitectura subyacente. Entre las más relevantes se encuentran
+DeepCluster\cite{tian_deepcluster_2017}, que combina redes profundas con
+K-Means o mezclas gaussianas, o SCAN\cite{van_gansbeke_scan_2020}, que disocia
+el aprendizaje de características auto-supervisado de la asignación de
+clústeres con resultados muy superiores en conjuntos de evaluación estándar.
+
+Estas aproximaciones, sin embargo, presuponen volúmenes de datos y acceso a
+cómputo de los que no se dispone en el escenario de este trabajo, y resultan
+más difíciles de interpretar y de operar. Por ese motivo, el presente trabajo
+se sitúa deliberadamente en el enfoque \emph{desacoplado}: aprovechar las
+representaciones ya disponibles en modelos preentrenados, posiblemente
+ajustadas con una cabeza ligera específica de dominio, y combinarlas con
+algoritmos de \textit{clustering} maduros y bien comprendidos. La contribución
+reside en evaluar de forma sistemática qué combinaciones de extractor,
+reducción y agrupamiento se comportan mejor sobre imágenes de grafiti.
