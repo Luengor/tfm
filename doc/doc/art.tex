@@ -104,22 +104,30 @@ ofrecen además sus propios mapas de características como vectores de partida.
 \subsection{Búsqueda por similitud e indexación en bancos de imágenes}
 \label{subsec:art-similarity-search}
 
-% Cubrir la literatura de recuperación de imágenes basada en contenido (CBIR)
-% y los índices de vecinos más cercanos aproximados (ANN), eje central del
-% título del trabajo ("algoritmos de similitud en bancos de imágenes").
-% Referencias mínimas a incorporar:
-%   - FAISS \cite{johnson_billion-scale_2017} como referencia de índices
-%     vectoriales a gran escala (IVF, PQ).
-%   - HNSW \cite{malkov_efficient_2018} como grafo de proximidad jerárquico
-%     y estándar de facto en bibliotecas modernas (pgvector, qdrant, milvus).
-%   - ScaNN \cite{guo_accelerating_2020} y panorama de comparativas
-%     (ann-benchmarks) para situar trade-offs recall/latencia.
-%   - Antecedentes CBIR clásicos: Bag-of-Visual-Words, VLAD, Fisher vectors,
-%     para contextualizar la transición a descriptores profundos.
-%   - Hashing profundo y aprendizaje métrico moderno como puente entre
-%     embeddings y recuperación eficiente.
-% Conectar con la elección de pgvector / búsqueda lineal en SQLite del
-% pipeline implementado.
+Una vez obtenida la representación vectorial de cada imagen, la recuperación
+por similitud sobre el banco de imágenes se reduce a un problema de vecinos más
+cercanos en un espacio de varios cientos de dimensiones. El cálculo exacto por
+fuerza bruta tiene un coste lineal en el tamaño del banco y por imagen
+consultada, lo que resulta asumible en escalas modestas, pero deja de serlo a
+medida que el banco crece. La literatura ha respondido a esto con dos grandes
+familias de índices aproximados de vecinos más cercanos (\textit{Approximate
+Nearest Neighbor}, ANN). Por un lado, los basados en cuantificación y
+particionado del espacio ( FAISS\cite{johnson_billion-scale_2017}), que combina
+listas invertidas con cuantificación de productos para escalar la búsqueda a
+miles de millones de vectores con uso intensivo de GPU. Por otro, los basados
+en grafos de proximidad, encabezados por HNSW\cite{malkov_efficient_2018}, que
+construye una jerarquía de grafos navegables de mundo pequeño con coste de
+consulta logarítmico y que se ha convertido en el estándar de facto de las
+bases de datos vectoriales modernas (pgvector, Qdrant, Milvus).
+
+El presente trabajo no aporta novedad en este eje y se apoya en estas
+soluciones ya existentes. El pipeline implementado utiliza \texttt{pgvector}
+sobre PostgreSQL cuando el banco lo justifica, delegando la búsqueda a su
+índice HNSW, y mantiene un \textit{backend} alternativo sobre SQLite con
+búsqueda lineal en Python para escenarios de despliegue ligero y para verificar
+los resultados frente al cálculo exacto. La caracterización empírica del coste
+de búsqueda en función del tamaño del banco, planteada por el enunciado, se
+aborda en este marco sin entrar a comparar índices ANN entre sí.
 
 % ---------------------------------------------------------------------
 \subsection{Reducción de dimensionalidad y agrupamiento clásico}
