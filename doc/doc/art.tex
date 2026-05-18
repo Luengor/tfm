@@ -133,44 +133,45 @@ aborda en este marco sin entrar a comparar índices ANN entre sí.
 \subsection{Reducción de dimensionalidad y agrupamiento clásico}
 \label{subsec:art-clustering}
 
-% Los \textit{embeddings} producidos por las redes profundas viven
-% habitualmente en espacios de varios cientos o miles de dimensiones, lo
-% que vuelve inestables tanto las nociones de distancia como los algoritmos
-% clásicos de agrupamiento. La técnica establecida para mitigarlo es
-% proyectar a un espacio de menor dimensión antes de agrupar, ya sea de
-% forma lineal mediante análisis de componentes principales o de forma no
-% lineal con métodos como UMAP\cite{mcinnes_umap_2020}, que preserva en
-% mayor medida la estructura local y global del manifold.
-%
-% Sobre el espacio reducido convergen las familias clásicas de
-% \textit{clustering}. K-Means sigue siendo la opción más
-% extendida por su simplicidad, aunque su sensibilidad a la inicialización
-% y a la geometría de los datos está bien documentada: Arthur y
-% Vassilvitskii\cite{arthur_k-means_nodate} introdujeron la inicialización
-% \textit{k-means++}, con garantías teóricas y mejoras consistentes en
-% calidad y velocidad; Sculley\cite{sculley_web-scale_2010} mostró que
-% la variante \textit{mini-batch} reduce el coste computacional varios
-% órdenes de magnitud sin pérdida significativa de calidad; y Fränti y
-% Sieranoja\cite{franti_k-means_2018} han caracterizado experimentalmente
-% las condiciones bajo las que el algoritmo deja de funcionar, identificando
-% el solapamiento entre clústeres como el factor crítico.
-%
-% Las alternativas basadas en densidad nacen para tratar formas no
-% convexas y ruido. DBSCAN\cite{ester_density-based_1996} fija un único
-% umbral de densidad, lo que limita su aplicabilidad a datos con
-% densidades heterogéneas; OPTICS\cite{ankerst_optics_1999} resuelve esa
-% rigidez devolviendo un orden de alcanzabilidad del que pueden
-% extraerse particiones para distintos umbrales; y HDBSCAN\cite{campello_density-based_2013}
-% construye una jerarquía de densidades de la que selecciona los clústeres
-% más estables, sin requerir parámetros geométricos a priori. La
-% implementación moderna de estas tres familias está bien
-% estudiada\cite{hahsler_dbscan_2019}. Para agrupamientos jerárquicos
-% aglomerativos, los algoritmos descritos por Müllner\cite{mullner_modern_2011}
-% constituyen la referencia computacional actual.
-%
-% La selección entre estas familias depende de hipótesis sobre los datos
-% que no se conocen \textit{a priori} en el caso del grafiti, lo que
-% refuerza la conveniencia de una evaluación empírica comparativa.
+Los \textit{embeddings} producidos por las redes profundas viven habitualmente
+en espacios de varios cientos o miles de dimensiones, lo que vuelve inestables
+tanto las nociones de distancia como los algoritmos clásicos de agrupamiento.
+La técnica establecida para mitigarlo es proyectar a un espacio de menor
+dimensión antes de agrupar, ya sea de forma lineal mediante análisis de
+componentes principales o de forma no lineal con métodos como
+UMAP\cite{mcinnes_umap_2020}, que preserva en mayor medida la estructura local
+y global del \textit{manifold} subyacente.
+
+Sobre el espacio reducido convergen las familias clásicas de
+\textit{clustering}. K-Means sigue siendo la opción más extendida por su
+simplicidad, aunque su sensibilidad a la inicialización y a la geometría de los
+datos está bien documentada. Arthur y Vassilvitskii\cite{arthur_k-means_nodate}
+introdujeron la inicialización \textit{k-means++}, con garantías teóricas y
+mejoras consistentes en calidad y velocidad;
+Sculley\cite{sculley_web-scale_2010} mostró que la variante \textit{mini-batch}
+reduce el coste computacional varios órdenes de magnitud sin pérdida
+significativa de calidad; y Fränti y Sieranoja\cite{franti_k-means_2018} han
+caracterizado experimentalmente las condiciones bajo las que el algoritmo deja
+de funcionar, identificando el solapamiento entre clústeres como el factor
+crítico. La revisión reciente de \citea[etali]{Ahmed}{ahmed_k-means_2020}
+aporta evidencia empírica de que el rendimiento depende del conjunto de datos,
+lo que refuerza el enfoque comparativo adoptado en este trabajo.
+
+Las alternativas basadas en densidad nacen para tratar formas no convexas y
+ruido. DBSCAN\cite{ester_density-based_1996} fija un único umbral de densidad,
+lo que limita su aplicabilidad a datos con densidades heterogéneas;
+OPTICS\cite{ankerst_optics_1999} resuelve esa rigidez devolviendo un orden de
+alcanzabilidad del que pueden extraerse particiones para distintos umbrales; y
+HDBSCAN\cite{campello_density-based_2013} construye una jerarquía de densidades
+de la que selecciona los clústeres más estables, sin requerir parámetros
+geométricos a priori. La implementación moderna de estas tres familias está
+bien estudiada\cite{hahsler_dbscan_2019}. Para agrupamientos jerárquicos
+aglomerativos, los algoritmos descritos por Müllner\cite{mullner_modern_2011}
+constituyen la referencia computacional actual.
+
+La selección entre estas familias depende de hipótesis sobre los datos que no
+se conocen \textit{a priori} en el caso del grafiti, lo que refuerza la
+conveniencia de una evaluación empírica comparativa.
 
 % ---------------------------------------------------------------------
 \subsection{Coste computacional y evaluación empírica}
