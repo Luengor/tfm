@@ -16,7 +16,7 @@ def parse_args() -> argparse.Namespace:
         help="Path to dataset root with one subdirectory per author.",
     )
     parser.add_argument(
-        "--save-path", default="models/dinov2_graffiti_head.pth",
+        "--save-path", default="models/dinov2_graffiti_author_head.pth",
         help="Where to save the trained model weights.",
     )
     parser.add_argument("--epochs", type=int, default=20, help="Training epochs.")

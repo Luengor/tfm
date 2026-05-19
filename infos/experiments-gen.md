@@ -58,7 +58,7 @@
        7     {"type": "identity", "params": {}}
        8   ],
        9   "embedding": [
-      10     {"type": "dinov2_graffiti_head", "params": {}}
+      10     {"type": "dinov2_graffiti_author_head", "params": {}}
      … +19 lines (ctrl+o to expand)
 
 ● Write(infos/configs/03_reduction_comparison.json)
@@ -72,7 +72,7 @@
        7     {"type": "identity", "params": {}}
        8   ],
        9   "embedding": [
-      10     {"type": "dinov2_graffiti_head", "params": {}}
+      10     {"type": "dinov2_graffiti_author_head", "params": {}}
      … +20 lines (ctrl+o to expand)
 
 ● Write(infos/configs/04_umap_tuning.json)
@@ -86,7 +86,7 @@
        7     {"type": "identity", "params": {}}
        8   ],
        9   "embedding": [
-      10     {"type": "dinov2_graffiti_head", "params": {}}
+      10     {"type": "dinov2_graffiti_author_head", "params": {}}
      … +27 lines (ctrl+o to expand)
 
 ● Write(infos/configs/05_hdbscan_tuning.json)
@@ -100,7 +100,7 @@
        7     {"type": "identity", "params": {}}
        8   ],
        9   "embedding": [
-      10     {"type": "dinov2_graffiti_head", "params": {}}
+      10     {"type": "dinov2_graffiti_author_head", "params": {}}
      … +14 lines (ctrl+o to expand)
 
 ● Write(infos/configs/06_segmenter_comparison.whitelist.json)
@@ -110,7 +110,7 @@
        5       "limit": 1000,nter_identity",
        6       "storage": {"type": "sqlite", "params": {"db_path": "{outp
          ut_dir}/db/seg_identity.sqlite"}},
-       8       "embedding": {"type": "dinov2_graffiti_head", "params": {}
+       8       "embedding": {"type": "dinov2_graffiti_author_head", "params": {}
          },
          0, "n_neighbors": 15, "min_dist": 0.1, "metric": "cosine"}},": 1
       10       "clustering": {"type": "hdbscan", "params": {"min_cluster_
@@ -124,7 +124,7 @@
        4     {"type": "identity", "params": {}}
        5   ],
        6   "embedding": [
-       7     {"type": "dinov2_graffiti_head", "params": {}}
+       7     {"type": "dinov2_graffiti_author_head", "params": {}}
        8   ],
        9   "reduction": [
       10     {"type": "umap", "params": {"n_components": 10, "n_neighbors
@@ -215,7 +215,7 @@
 
   All grids round-trip cleanly through generate_whitelist.py (verified:
   per-config run counts and DB-reuse flags match expectations). The baseline
-  used when fixing components is dinov2_graffiti_head → UMAP(10d, cosine) →
+  used when fixing components is dinov2_graffiti_author_head → UMAP(10d, cosine) →
   HDBSCAN(min_cluster_size=5), per the recommendation in best_cluster.md.
 
 ✻ Baked for 5m 43s
@@ -257,7 +257,7 @@
        7     {"type": "identity", "params": {}}
        8   ],
        9   "embedding": [
-      10     {"type": "dinov2_graffiti_head", "params": {}},
+      10     {"type": "dinov2_graffiti_author_head", "params": {}},
      … +21 lines (ctrl+o to expand)
 
 ● Update(infos/configs/02_clustering_comparison.json)
@@ -593,7 +593,7 @@
   New experiment — infos/configs/07_metric_comparison.json (30 runs / 2
   ingests): UMAP metric ∈ {cosine, euclidean, manhattan} × clusterers {HDBSCAN,
   KMeans, OPTICS-cosine, OPTICS-euclidean, OPTICS-manhattan} × embeddings
-  {dinov2_graffiti_head L2-normalised, mobilenet_v3 unnormalised} — the second
+  {dinov2_graffiti_author_head L2-normalised, mobilenet_v3 unnormalised} — the second
   axis catches whether the metric question interacts with embedding
   normalisation.
 
@@ -658,7 +658,7 @@
 
   What that means for the experiment
 
-  For dinov2_graffiti_head and clip_vit_b32 (both L2-normalised), the
+  For dinov2_graffiti_author_head and clip_vit_b32 (both L2-normalised), the
   expectation is:
 
   - UMAP-cosine ≈ UMAP-euclidean (essentially identical clustering output,
@@ -705,9 +705,9 @@
        74 +matters depends on whether the embeddings live on the unit hyp
           +ersphere:                                                     
        75  
-       76 +- **L2-normalised embeddings** (`dinov2_graffiti_head`, `clip_
+       76 +- **L2-normalised embeddings** (`dinov2_graffiti_author_head`, `clip_
           +vit_b32`, and the                                             
-       77 +  `*_graffiti_head` family — all explicitly normalise to unit 
+       77 +  graffiti-specific heads (`*_graffiti_author_head`, `*_graffiti_style_head`) — all explicitly normalise to unit 
           +norm). On the                                                 
        78 +  unit sphere, `‖x − y‖² = 2 − 2·cos(x, y)`: L2 distance is a 
           +strictly                                                      
@@ -781,7 +781,7 @@
       239 -interacts with embedding normalisation.                       
       236 +OPTICS-euclidean, OPTICS-manhattan}. Two embeddings:          
       237  
-      238 +- `dinov2_graffiti_head` — fine-tuned with explicit L2-normali
+      238 +- `dinov2_graffiti_author_head` — fine-tuned with explicit L2-normali
           +sation,                                                       
       239 +  output lives on the unit hypersphere.                       
       240 +- `mobilenet_v3` — raw ImageNet features, not normalised.     
@@ -803,7 +803,7 @@
       244 +**Hypotheses (worth stating before running so the result is in
           +terpretable).**                                               
       245  
-      246 +1. On `dinov2_graffiti_head`, UMAP-cosine and UMAP-euclidean s
+      246 +1. On `dinov2_graffiti_author_head`, UMAP-cosine and UMAP-euclidean s
           +hould produce                                                 
       247 +   near-identical clusters under HDBSCAN and OPTICS, because o
           +n the unit                                                    
@@ -846,7 +846,7 @@
 
 ● Structure intact. Direct answer:
 
-  Yes, but mostly only for L1 — not for L2. Because dinov2_graffiti_head outputs
+  Yes, but mostly only for L1 — not for L2. Because dinov2_graffiti_author_head outputs
    onto the unit hypersphere, ‖x − y‖² = 2 − 2·cos(x, y), so L2 is a strictly
   monotonic function of cosine. Any algorithm whose result depends only on the
   ordering of pairwise distances (HDBSCAN, DBSCAN, UMAP's k-NN graph, OPTICS
@@ -865,8 +865,8 @@
   I've updated infos/experiments.md to reflect this:
 
   - The "Distance metrics" section now spells out the monotonic-equivalence on
-  the sphere, calls out which models L2-normalise (dinov2_graffiti_head,
-  clip_vit_b32, the *_graffiti_head family) vs. which don't, and notes the L1
+  the sphere, calls out which models L2-normalise (dinov2_graffiti_author_head,
+  clip_vit_b32, graffiti-specific heads (author and style)) vs. which don't, and notes the L1
   and KMeans exceptions.
   - Experiment 7's rationale is reframed as testing those three explicit
   hypotheses (cosine ≈ L2 for HDBSCAN/OPTICS on normalised; L1 differs even on

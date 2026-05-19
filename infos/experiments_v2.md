@@ -102,14 +102,14 @@ graffiti clusters under a fixed downstream pipeline?
 **Varies.** Eleven embeddings: four ImageNet CNNs (`resnet50`, `vgg16`,
 `inception_v3`, `mobilenet_v3`), DINOv2 ViT-S/14, CLIP ViT-B/32, three YOLO
 backbones (`yolon`, `yolos`, `yolom`), and the two fine-tuned heads
-(`mobilenet_v3_graffiti_head`, `dinov2_graffiti_style_head`). The author /
+(`mobilenet_v3_graffiti_author_head`, `dinov2_graffiti_style_head`). The author /
 identity-recovery head (`dinov2_graffiti_author_head`) is omitted — its
 training objective targets a different question.
 
 **Fixed.** Baseline UMAP → HDBSCAN, identity segmenter, SQLite, `limit=1000`.
 
 **Why it matters.** This is the single most consequential choice in the
-pipeline. Pairs `mobilenet_v3` ↔ `mobilenet_v3_graffiti_head` and
+pipeline. Pairs `mobilenet_v3` ↔ `mobilenet_v3_graffiti_author_head` and
 `dinov2_vits14` ↔ `dinov2_graffiti_style_head` answer the fine-tuning vs.
 pretraining question directly.
 

@@ -83,24 +83,24 @@ Graffiti-specific YOLO models. The backbone is used directly as a feature extrac
 These wrap a frozen pretrained backbone with a two-layer projection head
 (`Linear → ReLU → Linear`) trained for graffiti similarity. Output is L2-normalized.
 
-### MobileNetV3 Graffiti Head
+### MobileNetV3 Graffiti Author Head
 
-**Type string:** `mobilenet_v3_graffiti_head`  
+**Type string:** `mobilenet_v3_graffiti_author_head`  
 **Embedding size:** 1280  
-**Model file:** `models/mobilenet_graffiti_head.pth`
+**Model file:** `models/mobilenet_graffiti_author_head.pth`
 
 ```json
-{ "type": "mobilenet_v3_graffiti_head", "params": {} }
+{ "type": "mobilenet_v3_graffiti_author_head", "params": {} }
 ```
 
-### DINOv2 Graffiti Head
+### DINOv2 Graffiti Author Head
 
-**Type string:** `dinov2_graffiti_head`  
+**Type string:** `dinov2_graffiti_author_head`  
 **Embedding size:** 384  
-**Model file:** `models/dinov2_graffiti_head.pth`
+**Model file:** `models/dinov2_graffiti_author_head.pth`
 
 ```json
-{ "type": "dinov2_graffiti_head", "params": {} }
+{ "type": "dinov2_graffiti_author_head", "params": {} }
 ```
 
 ---

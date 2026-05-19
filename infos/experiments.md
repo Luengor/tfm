@@ -115,7 +115,7 @@ chosen for those clusterers is in the upstream UMAP stage. Whether changing it
 matters depends on whether the embeddings live on the unit hypersphere:
 
 - **L2-normalised embeddings** (`dinov2_graffiti_style_head`, `clip_vit_b32`, and the
-  `*_graffiti_head` family — all explicitly normalise to unit norm). On the
+  graffiti-specific heads — all explicitly normalise to unit norm). On the
   unit sphere, `‖x − y‖² = 2 − 2·cos(x, y)`: L2 distance is a strictly
   monotonic function of cosine distance. Any algorithm that depends only on
   the *ordering* of pairwise distances (k-NN graphs, mutual-reachability,
@@ -147,9 +147,9 @@ graffiti clusters?
 
 **Varies.** Eleven embeddings — four ImageNet CNNs (`resnet50`, `vgg16`,
 `inception_v3`, `mobilenet_v3`), DINOv2, CLIP, the three YOLO backbones, and
-the two actively-used fine-tuned heads (`mobilenet_v3_graffiti_head`,
+the two actively-used fine-tuned heads (`mobilenet_v3_graffiti_author_head`,
 `dinov2_graffiti_style_head`). The author-trained DINOv2 head
-(`dinov2_graffiti_author_head`, weights at `models/dinov2_graffiti_head.pth`)
+(`dinov2_graffiti_author_head`, weights at `models/dinov2_graffiti_author_head.pth`)
 is registered in the codebase but is omitted here — it targets author /
 identity recovery, not style similarity, and so is off-question for this
 experiment.
@@ -160,7 +160,7 @@ experiment.
 encoders (DINOv2, CLIP) usually beat ImageNet supervision on stylistic tasks;
 fine-tuned heads test whether domain adaptation helps further. This grid also
 covers the "fine-tuned vs pretrained" question directly (compare
-`mobilenet_v3` ↔ `mobilenet_v3_graffiti_head` and
+`mobilenet_v3` ↔ `mobilenet_v3_graffiti_author_head` and
 `dinov2_vits14` ↔ `dinov2_graffiti_style_head` in the results).
 
 **Cost.** 11 runs, 11 full ingests (no DB reuse — each embedding produces a

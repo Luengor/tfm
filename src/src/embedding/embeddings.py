@@ -32,7 +32,7 @@ class EmbeddingModelNames(str, Enum):
     INCEPTION_V3 = "inception_v3"
     MOBILENET_V3 = "mobilenet_v3"
     MOBILENET_V3_NORMALIZED = "mobilenet_v3_normalized"
-    MOBILENET_V3_GRAFFITI_HEAD = "mobilenet_v3_graffiti_head"
+    MOBILENET_V3_GRAFFITI_AUTHOR_HEAD = "mobilenet_v3_graffiti_author_head"
     DINOV2_VITS14 = "dinov2_vits14"
     DINOV2_GRAFFITI_AUTHOR_HEAD = "dinov2_graffiti_author_head"
     DINOV2_GRAFFITI_STYLE_HEAD = "dinov2_graffiti_style_head"
@@ -64,16 +64,16 @@ MODELS = {
         'weights': MobileNet_V3_Large_Weights.DEFAULT,
         'embedding_size': 1280,
     },
-    EmbeddingModelNames.MOBILENET_V3_GRAFFITI_HEAD: {
+    EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD: {
         'embedding_size': 1280,
-        'weights_path': "models/mobilenet_graffiti_head.pth"
+        'weights_path': "models/mobilenet_graffiti_author_head.pth"
     },
     EmbeddingModelNames.DINOV2_VITS14: {
         'embedding_size': 384,
     },
     EmbeddingModelNames.DINOV2_GRAFFITI_AUTHOR_HEAD: {
         'embedding_size': 384,
-        'weights_path': "models/dinov2_graffiti_head.pth"
+        'weights_path': "models/dinov2_graffiti_author_head.pth"
     },
     EmbeddingModelNames.DINOV2_GRAFFITI_STYLE_HEAD: {
         'embedding_size': 384,
@@ -270,7 +270,7 @@ def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
         case EmbeddingModelNames.MOBILENET_V3_NORMALIZED:
             return NormalizedEmbeddingModel(TorchEmbeddingModel(EmbeddingModelNames.MOBILENET_V3))
         
-        case EmbeddingModelNames.MOBILENET_V3_GRAFFITI_HEAD:
+        case EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD:
             weights = models.MobileNet_V3_Large_Weights.DEFAULT
             base = models.mobilenet_v3_large(weights=weights)
             base.classifier[3] = nn.Identity()

@@ -546,8 +546,8 @@
   distribution (or just the histogram) is a richer characterization than a
   single scalar.
 
-  11. Fine-tuning data hygiene. The fine-tuned heads (mobilenet_graffiti_head,
-  dinov2_graffiti_head) were presumably trained on graffiti. If any of the
+  11. Fine-tuning data hygiene. The fine-tuned heads (mobilenet_graffiti_author_head,
+  dinov2_graffiti_author_head) were presumably trained on graffiti. If any of the
   evaluation images overlap with the training set, that's a leak that inflates
   the fine-tuned models' apparent quality. Worth verifying explicitly in the
   thesis.
@@ -607,7 +607,7 @@
   - dataset/crops/ has those crops sorted into per-tag folders: 3–15 crops per
   named artist (≈67 total) plus 523 in other.
   - The 5000-image dataset has no annotations.
-  - The fine-tuned heads (dinov2_graffiti_head, mobilenet_graffiti_head) were
+  - The fine-tuned heads (dinov2_graffiti_author_head, mobilenet_graffiti_author_head) were
   trained on these crops with the artist labels.
 
   That gives clear answers to your two questions.
@@ -618,8 +618,8 @@
 
   Partially, but with two hard restrictions:
 
-  1. You cannot evaluate the fine-tuned heads (dinov2_graffiti_head, 
-  mobilenet_graffiti_head) on these labels. That's the exact data + label set
+  1. You cannot evaluate the fine-tuned heads (dinov2_graffiti_author_head, 
+  mobilenet_graffiti_author_head) on these labels. That's the exact data + label set
   they were trained on — they'd trivially win, and the win wouldn't generalise.
   Reporting it would be a data-leak error a reviewer will catch immediately.
   2. You can evaluate the non-fine-tuned models (DINOv2 base, CLIP, ResNet50, 
