@@ -93,6 +93,30 @@ class ExtrinsicMetrics:
 
 
 @dataclass(slots=True)
+class SimilaritySearchExtrinsicMetrics:
+    precision_at_k: float | None
+    recall_at_k: float | None
+    map_at_k: float | None
+    mrr: float | None
+    k_effective: int = 0
+    n_matched: int = 0
+    n_classes: int = 0
+    coverage: float | None = None
+
+    def to_flat_dict(self, prefix: str = "similarity_extrinsic") -> dict[str, float | int | None]:
+        return {
+            f"{prefix}_precision_at_k": self.precision_at_k,
+            f"{prefix}_recall_at_k": self.recall_at_k,
+            f"{prefix}_map_at_k": self.map_at_k,
+            f"{prefix}_mrr": self.mrr,
+            f"{prefix}_k_effective": self.k_effective,
+            f"{prefix}_n_matched": self.n_matched,
+            f"{prefix}_n_classes": self.n_classes,
+            f"{prefix}_coverage": self.coverage,
+        }
+
+
+@dataclass(slots=True)
 class BenchmarkResult:
     run_name: str
     run_id: str
@@ -113,6 +137,7 @@ class BenchmarkResult:
     reduction: StageMetrics | None = None
     similarity_search: StageMetrics | None = None
     avg_neighbor_distance: float | None = None
+    similarity_extrinsic: SimilaritySearchExtrinsicMetrics | None = None
     clustering: StageMetrics | None = None
     clustering_quality: ClusteringQualityMetrics | None = None
     clustering_extrinsic: ExtrinsicMetrics | None = None
@@ -169,5 +194,8 @@ class BenchmarkResult:
 
         if self.clustering_extrinsic:
             record.update(self.clustering_extrinsic.to_flat_dict())
+
+        if self.similarity_extrinsic:
+            record.update(self.similarity_extrinsic.to_flat_dict())
 
         return record

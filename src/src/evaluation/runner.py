@@ -29,12 +29,14 @@ from src.embedding.segmenters import YoloSegmenter, IdentitySegmenter
 from src.evaluation.clustering_metrics import (
     calculate_clustering_metrics,
     calculate_extrinsic_metrics,
+    calculate_similarity_search_extrinsic,
 )
 from src.evaluation.metrics import get_runtime_info, profile_stage
 from src.evaluation.models import (
     BenchmarkResult,
     BenchmarkRunSpec,
     ExtrinsicMetrics,
+    SimilaritySearchExtrinsicMetrics,
     StageMetrics,
 )
 from src.reduction import IdentityReduction, PCAReduction, UMAPReduction, KernelPCAReduction, IsomapReduction
@@ -151,6 +153,7 @@ def _run_single(
     query_metrics = None
     similarity_metrics = None
     avg_neighbor_distance = None
+    similarity_extrinsic = None
     clustering_metrics = None
     clustering_quality = None
     clustering_extrinsic = None
@@ -241,6 +244,22 @@ def _run_single(
                 if distances:
                     avg_neighbor_distance = float(np.mean(distances))
             similarity_metrics = similarity_stage.metrics
+
+            segmenter_type_eff = (
+                run_spec.segmenter.type.lower() if run_spec.segmenter else "identity"
+            )
+            if ground_truth is not None and segmenter_type_eff == "identity":
+                similarity_extrinsic = _compute_similarity_extrinsic(
+                    all_images,
+                    ground_truth,
+                    run_spec.similarity_search.top_k,
+                    run_spec.similarity_search.cos_distance,
+                )
+            elif ground_truth is not None:
+                print(
+                    f"Run {run_spec.name}: ground truth provided but segmenter is "
+                    f"'{segmenter_type_eff}' (not identity); skipping similarity-search extrinsic metrics."
+                )
 
         with profile_stage() as cluster_stage:
             if all_images:
@@ -354,6 +373,7 @@ def _run_single(
         reduction=reduction_metrics,
         similarity_search=similarity_metrics,
         avg_neighbor_distance=avg_neighbor_distance,
+        similarity_extrinsic=similarity_extrinsic,
         clustering=clustering_metrics,
         clustering_quality=clustering_quality,
         clustering_extrinsic=clustering_extrinsic,
@@ -573,6 +593,52 @@ def _compute_extrinsic(
     labels_pred = labels_arr[np.array(matched_indices)]
 
     metrics = calculate_extrinsic_metrics(labels_pred, labels_true)
+    metrics.coverage = coverage
+    return metrics
+
+
+def _compute_similarity_extrinsic(
+    all_images: list[ImageData],
+    ground_truth: dict[str, str],
+    top_k: int,
+    cos_distance: bool,
+) -> SimilaritySearchExtrinsicMetrics:
+    matched_indices: list[int] = []
+    matched_styles: list[str] = []
+    for i, img in enumerate(all_images):
+        basename = Path(img.filename).name
+        style = ground_truth.get(basename)
+        if style is not None:
+            matched_indices.append(i)
+            matched_styles.append(style)
+
+    n_total = len(all_images)
+    n_matched = len(matched_indices)
+    coverage = (n_matched / n_total) if n_total > 0 else None
+
+    if n_matched < 2:
+        return SimilaritySearchExtrinsicMetrics(
+            precision_at_k=None,
+            recall_at_k=None,
+            map_at_k=None,
+            mrr=None,
+            k_effective=0,
+            n_matched=n_matched,
+            n_classes=len(set(matched_styles)),
+            coverage=coverage,
+        )
+
+    unique_styles = sorted(set(matched_styles))
+    style_to_id = {s: idx for idx, s in enumerate(unique_styles)}
+    labels_true = np.array([style_to_id[s] for s in matched_styles])
+    embeddings = np.array([all_images[i].embedding for i in matched_indices])
+
+    metrics = calculate_similarity_search_extrinsic(
+        embeddings=embeddings,
+        labels_true=labels_true,
+        top_k=top_k,
+        cos_distance=cos_distance,
+    )
     metrics.coverage = coverage
     return metrics
 

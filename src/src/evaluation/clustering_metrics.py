@@ -8,7 +8,11 @@ from sklearn.metrics import (
 )
 from sklearn.metrics.cluster import pair_confusion_matrix
 
-from src.evaluation.models import ClusteringQualityMetrics, ExtrinsicMetrics
+from src.evaluation.models import (
+    ClusteringQualityMetrics,
+    ExtrinsicMetrics,
+    SimilaritySearchExtrinsicMetrics,
+)
 
 
 def calculate_clustering_metrics(embeddings: np.ndarray, labels: np.ndarray) -> ClusteringQualityMetrics:
@@ -113,4 +117,101 @@ def calculate_extrinsic_metrics(
         pairwise_f1=pairwise_f1,
         n_matched=n,
         n_classes=int(len(np.unique(labels_true))),
+    )
+
+
+def calculate_similarity_search_extrinsic(
+    embeddings: np.ndarray,
+    labels_true: np.ndarray,
+    top_k: int,
+    cos_distance: bool,
+) -> SimilaritySearchExtrinsicMetrics:
+    """
+    Supervised similarity-search metrics computed via brute-force kNN over the
+    provided (labeled-only) embedding subset. A neighbor is considered relevant
+    when it shares the query's class.
+
+    Returns Precision@k, Recall@k (denominator clipped to min(k, class_size-1)),
+    mAP@k and MRR. k is clipped to (n-1) to allow self-exclusion.
+    """
+    n = len(embeddings)
+    n_classes = int(len(np.unique(labels_true)))
+    if n < 2 or top_k < 1:
+        return SimilaritySearchExtrinsicMetrics(
+            precision_at_k=None,
+            recall_at_k=None,
+            map_at_k=None,
+            mrr=None,
+            k_effective=0,
+            n_matched=n,
+            n_classes=n_classes,
+        )
+
+    k = min(top_k, n - 1)
+
+    if cos_distance:
+        norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+        normed = embeddings / np.clip(norms, 1e-12, None)
+        sim = normed @ normed.T
+        dist = 1.0 - sim
+    else:
+        # squared euclidean preserves ordering, cheaper
+        sq = np.sum(embeddings ** 2, axis=1)
+        dist = sq[:, None] + sq[None, :] - 2.0 * (embeddings @ embeddings.T)
+
+    np.fill_diagonal(dist, np.inf)
+
+    # Partial sort: top-k smallest distances per row
+    nn_idx = np.argpartition(dist, kth=k - 1, axis=1)[:, :k]
+    row_idx = np.arange(n)[:, None]
+    nn_sorted_order = np.argsort(dist[row_idx, nn_idx], axis=1)
+    nn_idx = nn_idx[row_idx, nn_sorted_order]
+
+    neighbor_labels = labels_true[nn_idx]
+    relevance = (neighbor_labels == labels_true[:, None]).astype(np.int32)  # (n, k)
+
+    # Precision@k per-query then averaged
+    precision_at_k = float(relevance.mean())
+
+    # mAP@k
+    positions = np.arange(1, k + 1)
+    cum_hits = np.cumsum(relevance, axis=1)
+    precision_at_i = cum_hits / positions
+    relevant_counts = relevance.sum(axis=1)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        ap_per_query = np.where(
+            relevant_counts > 0,
+            (precision_at_i * relevance).sum(axis=1) / np.clip(relevant_counts, 1, None),
+            0.0,
+        )
+    map_at_k = float(ap_per_query.mean())
+
+    # MRR
+    first_hit_idx = np.argmax(relevance, axis=1)
+    has_hit = relevance.max(axis=1) > 0
+    rr = np.where(has_hit, 1.0 / (first_hit_idx + 1), 0.0)
+    mrr = float(rr.mean())
+
+    # Recall@k with denominator min(k, class_size - 1)
+    _, class_counts = np.unique(labels_true, return_counts=True)
+    label_to_count = dict(zip(np.unique(labels_true).tolist(), class_counts.tolist()))
+    relevant_totals = np.array(
+        [min(k, label_to_count[label] - 1) for label in labels_true.tolist()]
+    )
+    valid = relevant_totals > 0
+    if valid.any():
+        recall_at_k = float(
+            (relevance.sum(axis=1)[valid] / relevant_totals[valid]).mean()
+        )
+    else:
+        recall_at_k = None
+
+    return SimilaritySearchExtrinsicMetrics(
+        precision_at_k=precision_at_k,
+        recall_at_k=recall_at_k,
+        map_at_k=map_at_k,
+        mrr=mrr,
+        k_effective=k,
+        n_matched=n,
+        n_classes=n_classes,
     )
