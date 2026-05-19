@@ -4,14 +4,25 @@
 
 \subsection{Conjunto de datos}
 \label{subsec:dataset}
-% Origen y procedencia de las imágenes de grafiti, número total de muestras,
-% formato, resolución y características visuales generales (variabilidad
-% cromática, escenas urbanas, condiciones de iluminación...).
-% Limitaciones a destacar: ausencia de un etiquetado fiable de similitud
-% entre imágenes (no hay verdad fundamental para validar el agrupamiento),
-% heterogeneidad fotográfica, sesgos de captura y volumen limitado.
-% Mencionar también el subconjunto recortado (\texttt{dataset\_cropped/}) y
-% para qué se utiliza.
+El banco de imágenes de grafiti utilizado en este trabajo se compone de
+$6681$ fotografías capturadas en condiciones reales en la ciudad de
+Salamanca. Las imágenes presentan una alta variabilidad cromática y de escenas
+urbanas, con condiciones de iluminación diversas. Tampoco existe un lienzo por
+defecto para los grafitis, sino que aparecen en muros, puertas, vallas y
+mobiliario urbano en general. En muchas ocasiones, y debido a la alta densidad
+de pintadas en ciertas zonas, una misma imagen puede contener varias pintadas
+distintas, lo que añade complejidad a cualquier labor de clasificación o
+agrupamiento.
+
+Las fotografías fueron tomadas entre los años $2022$ y $2023$ con un
+dispositivo móvil Samsung, presentando en su mayoría una resolución de
+$4032 \times 2268$ píxeles. No se ha aplicado ningún tipo de filtrado ni
+postprocesado sobre las imágenes originales, de modo que la evaluación opera
+directamente sobre el material en bruto.
+
+El conjunto de datos carece de cualquier tipo de etiquetado, lo que implica que
+no existe una verdad fundamental para validar la calidad de los clústeres
+resultantes.
 
 \subsection{Marco conceptual}
 \label{subsec:conceptos}
