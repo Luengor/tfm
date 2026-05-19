@@ -34,7 +34,7 @@ comparisons are clean:
 - **Limit:** `1000` images for quality experiments, `5000` for cost-focused
   experiments and for HDBSCAN tuning where density matters.
 
-The working dataset contains roughly 5000 images. The 273 labelled crops in
+The working dataset contains roughly 6000 images. The 273 labelled crops in
 [`sample_crop/`](../sample_crop/) are a subset of the full image bank and are
 *not* deduplicated out for the unsupervised experiments — at 5 % of the corpus
 they do not perturb aggregate statistics, and segregating them would
