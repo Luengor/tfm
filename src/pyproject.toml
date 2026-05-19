@@ -31,6 +31,7 @@ dependencies = [
 [project.scripts]
 pipeline-benchmark = "src.evaluation.benchmark:main"
 pipeline-plot = "src.evaluation.plot_metrics:main"
+pipeline-table = "src.evaluation.table:main"
 
 [tool.uv]
 package = true
