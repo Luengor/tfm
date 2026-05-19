@@ -19,34 +19,140 @@ dispositivo móvil Samsung, presentando en su mayoría una resolución de $4032
 postprocesado sobre las imágenes originales, de modo que la evaluación opera
 directamente sobre el material en bruto.
 
-El conjunto de datos carece de cualquier tipo de etiquetado, lo que implica que
-no existe una verdad fundamental para validar la calidad de los clústeres
-resultantes.
+El banco principal de $6681$ fotografías carece de cualquier tipo de
+etiquetado, por lo que no existe una verdad fundamental sobre la que validar de
+forma directa la calidad de los clústeres resultantes. Para mitigar esta
+limitación se ha anotado manualmente un subconjunto separado de $250$
+fotografías, disjunto del banco principal y excluido de la mayoría de los pases
+de \textit{benchmark}. Esta separación es necesaria porque varios de los
+modelos evaluados se ajustan a partir de las anotaciones (véase
+\ref{subsec:extras}), de modo que utilizar imágenes vistas durante el
+entrenamiento para evaluar el sistema introduciría un sesgo optimista en las
+métricas.
+
+Sobre las $250$ fotografías de este subconjunto se han producido tres capas
+de anotación. En primer lugar, cada fotografía se ha segmentado manualmente
+delimitando con cajas las pintadas presentes; este proceso de segmentación
+da lugar a un total de $452$ recortes, que constituyen la unidad de trabajo
+sobre la que se aplican el resto de etiquetados. En segundo lugar, cada
+recorte se ha clasificado por estilo en una de cuatro categorías
+(\textit{tag}, \textit{throw-up}, \textit{piece} y \textit{character}),
+correspondientes a la tipología de uso habitual en el dominio del grafiti.
+Por último, los recortes que parecen permanecer al mismo autor (que son
+firmados por el mismo nombre) son asignados con un identificador común.
+
+Las anotaciones de cajas se emplean para el ajuste fino del detector descrito
+en \ref{subsubsec:segmentador}, las etiquetas de estilo para la cabeza de
+proyección estilística y las de autoría para las cabezas de proyección de autor
+descritas en \ref{subsubsec:cabezas}. Los recortes anotados por estilo se
+reservan además, en su porción de evaluación, como verdad fundamental para el
+cálculo de métricas extrínsecas (\ref{subsubsec:metricas}) cuando la
+configuración prescinde del segmentador.
 
 \subsection{Marco conceptual}
 \label{subsec:conceptos}
 % Conceptos teóricos necesarios para interpretar la evaluación.
 
 \subsubsection{Representación vectorial de imágenes}
-% Definición de \textit{embedding}, espacio latente, normalización L2 y
-% métricas de distancia habituales (coseno, euclidiana). Idea de que dos
-% imágenes parecidas deben quedar próximas en el espacio.
+Un \textit{embedding} es una proyección de una imagen en un vector de un
+espacio vectorial de dimensión fija, en el que las relaciones de similitud
+entre imágenes se traducen en relaciones geométricas entre vectores. La
+proximidad en el espacio latente debe reflejar la similitud perceptual: dos
+fotografías de la misma pintada, de pintadas estilísticamente próximas o del
+mismo autor por ejemplo, deben quedar a menor distancia que dos imágenes no
+relacionadas, paradigma ejemplificado por
+FaceNet\cite{schroff_facenet_2015}. El cálculo directo de distancias sobre
+los píxeles de la imagen no captura esta noción de similitud, ya que
+pequeñas transformaciones espaciales o de iluminación producen variaciones
+grandes en el espacio de píxeles\cite{wang_euclidean_2005}, y por ello se
+recurre a representaciones aprendidas mediante redes profundas (véase
+\ref{subsec:art-embeddings}).
+
+Las métricas de distancia utilizadas habitualmente en este contexto son la
+distancia euclidiana y la distancia coseno. Esta última depende exclusivamente
+de la dirección de los vectores y resulta equivalente a la distancia euclidiana
+cuando los \textit{embeddings} están normalizados a norma unitaria
+(normalización $L_2$), práctica frecuente para evitar que la magnitud del
+vector domine la comparación. En el presente trabajo se considera la
+normalización como un parámetro más del modelo de extracción de
+características.
 
 \subsubsection{Agrupamiento no supervisado}
-% Paradigmas principales: basados en centroides, en densidad, jerárquicos y
-% probabilísticos. Problema de la selección del número de clústeres en
-% ausencia de etiquetas.
+El agrupamiento (\textit{clustering}) consiste en particionar un conjunto de
+observaciones en grupos de forma que los elementos dentro de cada grupo sean
+más similares entre sí que con los del resto, sin disponer de etiquetas
+previas. Los principales algoritmos de agrupamiento se diferencian por la
+hipótesis estructural que asumen sobre los datos. Los métodos basados en
+centroides, como K-Means, modelan cada clúster por su media y buscan minimizar
+la varianza intracluster, siendo eficientes pero sensibles a la forma y al
+solapamiento de los grupos. Los basados en densidad, como DBSCAN, OPTICS y
+HDBSCAN, definen un clúster como una región conectada de alta densidad y
+permiten descartar puntos como ruido. Los métodos jerárquicos construyen un
+dendrograma de fusiones o divisiones sucesivas del que pueden extraerse
+particiones a distintos niveles de granularidad. Por último, los enfoques
+probabilísticos (mezclas gaussianas resueltas con el algoritmo
+EM\cite{dempster_maximum_1977}) modelan los datos como una superposición de
+distribuciones y asignan cada punto al componente más probable.
+
+La principal dificultad operativa en un escenario sin etiquetas es la selección
+del número de clústeres. K-Means y los modelos de mezcla requieren fijarlo a
+priori, y se recurre a heurísticas como el método del codo sobre la inercia o
+el criterio bayesiano de información (BIC). Los algoritmos basados en densidad
+y los jerárquicos lo evitan en su formulación, pero a cambio introducen otros
+hiperparámetros (umbrales de densidad, criterios de corte) cuyo ajuste también
+carece de un óptimo evidente sin verdad fundamental.
 
 \subsubsection{Reducción de dimensionalidad}
-% Maldición de la dimensionalidad y motivación para aplicar reducción antes
-% del agrupamiento. Diferencias entre técnicas lineales (PCA) y no lineales
-% (UMAP, Isomap).
+Los \textit{embeddings} producidos por las redes utilizadas en este trabajo
+contienen entre $256$ y $4096$ dimensiones. A medida que la dimensionalidad
+crece, las distancias entre puntos tienden a normalizarse y a perder su poder
+discriminativo, fenómeno conocido como maldición de la
+dimensionalidad\footnote{\url{https://en.wikipedia.org/wiki/Curse_of_dimensionality}}.
+Esto degrada el comportamiento de los algoritmos de agrupamiento que dependen
+de distancias, en particular los basados en densidad, y motiva aplicar una
+etapa previa de reducción que proyecte los vectores a un espacio de menor
+dimensión preservando la estructura relevante.
+
+Las técnicas se dividen en lineales y no lineales. Las primeras, como el
+análisis de componentes principales (PCA), proyectan sobre ejes de máxima
+varianza y suponen que la estructura relevante es lineal, lo que limita su
+capacidad cuando los datos viven en una variedad curva. Las técnicas no
+lineales relajan esta hipótesis preservando relaciones de vecindad, distancias
+geodésicas o estructura topológica. Las opciones concretas integradas en el
+sistema y las referencias canónicas se recogen en la
+sección~\ref{subsec:art-clustering} y en la tabla~\ref{tab:reduction}.
 
 \subsubsection{Métricas de evaluación}
-% Foco principal del trabajo: métricas de rendimiento (tiempos por etapa,
-% throughput de ingesta, latencia de búsqueda, escalabilidad).
-% Secundariamente, métricas internas de calidad de los clústeres
-% (silhouette, Calinski-Harabasz) usadas como apoyo, sin verdad fundamental.
+\label{subsubsec:metricas}
+La evaluación en este trabajo se articula en dos ejes. El primero, y principal,
+es el rendimiento computacional, cuantificado mediante los tiempos absolutos de
+cada etapa del \textit{pipeline} (preparación, ingesta, reducción, agrupamiento
+y búsqueda por similitud), el \textit{throughput} de ingesta en imágenes por
+segundo, la latencia de búsqueda por consulta y la escalabilidad de estas
+magnitudes con el tamaño del banco. Estas métricas son objetivas, no dependen
+de la existencia de etiquetas y son las que verdaderamente vertebran la
+comparación entre configuraciones.
+
+El segundo eje, secundario, es la calidad de los clústeres resultantes. Sobre
+el banco principal sin etiquetar se recurre a métricas internas, que
+cuantifican la cohesión intracluster y la separación intercluster directamente
+sobre los \textit{embeddings}. Se emplean el coeficiente de
+silueta\cite{rousseeuw_silhouettes_1987}, que combina para cada punto la
+distancia media a los miembros de su propio clúster con la distancia media al
+clúster más cercano, y el índice de
+Calinski-Harabász\cite{calinski_dendrite_1974}, que mide el cociente entre la
+dispersión intercluster e intracluster. Se complementan con dos indicadores
+estructurales: la proporción de puntos clasificados como ruido y el coeficiente
+de variación del tamaño de los clústeres.
+
+Adicionalmente, sobre el subconjunto anotado de $250$ fotografías descrito en
+\ref{subsec:dataset} se calculan métricas extrínsecas que sí utilizan la verdad
+fundamental disponible: el índice de Rand ajustado (ARI), la información mutua
+normalizada (NMI) y la F1 por pares. Estas métricas se reportan únicamente para
+las configuraciones que prescinden del segmentador, donde la correspondencia
+entre fotografía anotada y \textit{embedding} resultante es unívoca, y
+constituyen el complemento más sólido a las métricas internas en el plano de
+calidad.
 
 \subsection{Componentes implementados}
 \label{subsec:configuraciones}
@@ -54,23 +160,86 @@ resultantes.
 % sistema modular. Tabla resumen de opciones por componente.
 
 \subsubsection{Modelos de extracción de características}
-% Tabla con ResNet50, VGG16, InceptionV3, MobileNetV3, DINOv2 ViT-S/14,
-% CLIP ViT-B/32 y YOLOv26 (n/s/m). Indicar arquitectura, dimensionalidad
-% de salida y preentrenamiento. Todos los modelos se usan congelados.
+Se han integrado siete familias de modelos de extracción de características,
+cubriendo redes convolucionales clásicas, modelos de fundación basados en
+\textit{transformers} y detectores específicos reutilizados como extractores.
+Todos los modelos se utilizan congelados, sin reentrenar sus pesos: la salida
+de la última capa intermedia (eliminando la cabeza de clasificación cuando
+procede) constituye el \textit{embedding} de la imagen. La
+tabla~\ref{tab:embedding-models} resume las opciones disponibles, indicando
+arquitectura, dimensionalidad de salida y preentrenamiento.
+
+\begin{longtable}{|p{3.2cm}|p{3.8cm}|c|p{4.2cm}|} \hline
+  \textbf{Modelo} & \textbf{Arquitectura} & \textbf{Dim.} & \textbf{Preentrenamiento} \\ \hline
+  ResNet50\cite{he_deep_2015} & CNN residual & $2048$ & ImageNet \\ \hline
+  VGG16\cite{simonyan_very_2015} & CNN profunda & $4096$ & ImageNet \\ \hline
+  InceptionV3\cite{szegedy_rethinking_2015} & CNN multi-rama & $2048$ & ImageNet \\ \hline
+  MobileNetV3\cite{howard_searching_2019} & CNN ligera & $1280$ & ImageNet \\ \hline
+  DINOv2 ViT-S/14\cite{oquab_dinov2_2024} & \textit{Transformer}\cite{dosovitskiy_image_2021} & $384$ & Autosupervisado (LVD-142M) \\ \hline
+  CLIP ViT-B/32\cite{radford_learning_2021} & \textit{Transformer} & $512$ & Imagen-texto (WIT) \\ \hline
+  YOLOv26 (n/s/m)\cite{noauthor_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO + grafiti \\ \hline
+  \caption{Modelos de extracción de características integrados.}
+  \label{tab:embedding-models}
+\end{longtable}
 
 \subsubsection{Algoritmos de agrupamiento}
-% Tabla con K-Means, DBSCAN, HDBSCAN, OPTICS, Agglomerative, Spectral, GMM
-% y Affinity Propagation. Indicar parámetros clave y si admiten selección
-% automática del número de clústeres.
+El sistema cubre los principales paradigmas de agrupamiento descritos en la
+sección~\ref{subsec:conceptos}. Todas las implementaciones exponen una interfaz
+común y se configuran por hiperparámetros declarados en el \textit{whitelist}
+del \textit{benchmark}. Tres de los algoritmos (K-Means, DBSCAN y mezclas
+gaussianas) admiten la selección automática del hiperparámetro principal cuando
+este no se especifica: K-Means y GMM estiman el número de clústeres mediante el
+método del codo y el BIC, respectivamente, y DBSCAN ajusta el radio $\epsilon$
+a partir de la curva de $k$-distancias. La tabla~\ref{tab:clustering-algos}
+recoge las opciones implementadas con sus hiperparámetros clave.
+
+\begin{longtable}{|l|l|c|} \hline
+  \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
+  K-Means\cite{arthur_k-means_nodate} & $n\_clusters$ & sí \\ \hline
+  DBSCAN\cite{ester_density-based_1996} & $\epsilon$, $min\_samples$ & sí ($\epsilon$) \\ \hline
+  HDBSCAN\cite{campello_density-based_2013} & $min\_cluster\_size$, $min\_samples$ & no requiere \\ \hline
+  OPTICS\cite{ankerst_optics_1999} & $min\_samples$, $xi$ & no requiere \\ \hline
+  Aglomerativo\cite{mullner_modern_2011} & $n\_clusters$, $linkage$ & no \\ \hline
+  Espectral\cite{ng_spectral_nodate,huang_ultra-scalable_2020} & $n\_clusters$, afinidad & no \\ \hline
+  GMM\cite{dempster_maximum_1977} & $n\_components$, covarianza & sí \\ \hline
+  \textit{Affinity Propagation}\cite{frey_clustering_2007} & $damping$, $preference$ & no requiere \\ \hline
+  \caption{Algoritmos de agrupamiento implementados.}
+  \label{tab:clustering-algos}
+\end{longtable}
 
 \subsubsection{Técnicas de reducción de dimensionalidad}
-% Tabla con Identity (sin reducción), PCA, UMAP, Isomap y Kernel PCA.
-% Parámetros por defecto y observaciones de uso.
+La etapa de reducción es opcional y se controla a través del componente
+\texttt{ReductionBase}. La implementación por defecto, \texttt{Identity},
+desactiva la reducción y permite comparar de manera limpia el efecto de
+introducir esta etapa. Las técnicas no lineales se aplican sobre el mismo
+espacio de \textit{embeddings} que las lineales, lo que facilita aislar el
+factor de la transformación. La tabla~\ref{tab:reduction} resume las opciones
+disponibles.
+
+\begin{longtable}{|l|l|l|} \hline
+  \textbf{Técnica} & \textbf{Tipo} & \textbf{Parámetros principales} \\ \hline
+  Identity & --- & --- \\ \hline
+  PCA\cite{jolliffe_principal_2002} & Lineal & $n\_components$ \\ \hline
+  Kernel PCA\cite{scholkopf_nonlinear_1998} & No lineal & $n\_components$, \textit{kernel} \\ \hline
+  Isomap\cite{tenenbaum_global_2000} & No lineal & $n\_components$, $n\_neighbors$ \\ \hline
+  UMAP\cite{mcinnes_umap_2020} & No lineal & $n\_components$, $n\_neighbors$, $min\_dist$ \\ \hline
+  \caption{Técnicas de reducción de dimensionalidad implementadas.}
+  \label{tab:reduction}
+\end{longtable}
 
 \subsubsection{Sistemas de almacenamiento}
-% SQLiteStorage (búsqueda lineal en Python, sin servicio externo) y
-% PostgreSQLStorage con \textit{pgvector} (búsqueda delegada al motor de
-% base de datos). Interfaz común y persistencia de metadatos.
+La persistencia de los \textit{embeddings} y los metadatos asociados se abstrae
+en la interfaz \texttt{StorageBase}, de la que se han implementado dos
+\textit{backends} con características operativas distintas.
+\texttt{SQLiteStorage} no requiere servicios externos y realiza la búsqueda por
+similitud mediante un recorrido lineal en Python; resulta apropiado para
+despliegues ligeros y como referencia de cálculo exacto frente a alternativas
+aproximadas. \texttt{PostgreSQLStorage} se apoya en la extensión
+\textit{pgvector} de PostgreSQL y delega la búsqueda al motor de la base de
+datos, que utiliza un índice HNSW\cite{malkov_efficient_2018} sobre los
+vectores. Ambos \textit{backends} comparten el esquema lógico y la persistencia
+de metadatos, lo que permite cambiar de uno a otro sin modificar el resto del
+\textit{pipeline}.
 
 \subsection{Extensiones específicas para grafiti}
 \label{subsec:extras}
@@ -79,17 +248,63 @@ resultantes.
 % de configuraciones evaluable.
 
 \subsubsection{Segmentador YOLO}
-% IdentitySegmenter (imagen completa) y YoloSegmenter (detección, fusión de
-% cajas solapadas y padding configurable). Modelo YOLO entrenado para
-% grafiti.
+\label{subsubsec:segmentador}
+La etapa de segmentación localiza las pintadas dentro de la fotografía para que
+el extractor de características opere sobre los recortes correspondientes en
+lugar de la escena completa. Se han implementado dos variantes.
+\texttt{IdentitySegmenter} devuelve la imagen completa como única región de
+interés y se utiliza como referencia para evaluar el impacto de la
+segmentación. \texttt{YoloSegmenter} ejecuta un modelo
+YOLO\cite{noauthor_ultralytics_2024} ajustado sobre el conjunto de grafiti,
+fusiona las cajas de detección solapadas para evitar duplicados y aplica un
+margen (\textit{padding}) configurable alrededor de cada caja antes del
+recorte. El resultado es un conjunto de sub-imágenes que se procesan de forma
+independiente y que pueden producir varios \textit{embeddings} por fotografía
+original.
+
+El detector se ha ajustado sobre las $250$ fotografías del subconjunto anotado
+descrito en \ref{subsec:dataset}, partiendo de los pesos preentrenados sobre
+COCO. Las cajas se anotaron manualmente sobre las $452$ pintadas presentes en
+estas fotografías, lo que constituye el total de ejemplos positivos disponibles
+para el ajuste fino. La disjunción de este subconjunto respecto al banco de
+evaluación es condición necesaria para que las métricas reportadas sobre las
+configuraciones que utilizan el segmentador no estén sesgadas por el
+solapamiento entre entrenamiento y evaluación.
 
 \subsubsection{Cabezas de proyección ajustadas al dominio}
-% Cabezas Linear $\rightarrow$ ReLU $\rightarrow$ Linear entrenadas sobre
-% MobileNetV3 y DINOv2 para proyectar los \textit{embeddings} base a un
-% espacio más adaptado al dominio.
+\label{subsubsec:cabezas}
+Los modelos de fundación generalistas producen representaciones transferibles,
+pero no necesariamente óptimas para el dominio del grafiti. Para acortar esa
+distancia se ha optado por un esquema de \textit{transfer
+learning}\cite{pan_survey_2010} en el que la representación base se mantiene
+congelada y solo se entrena una cabeza ligera, siguiendo la metodología de
+\textit{fine-tuning} de ULMFiT\cite{howard_universal_2018}. La cabeza consiste
+en una secuencia Lineal $\rightarrow$ ReLU $\rightarrow$ Lineal que proyecta
+los \textit{embeddings} base a un espacio adaptado al dominio.
+
+Se han entrenado dos tipos de cabezas sobre dos arquitecturas base (MobileNetV3
+y DINOv2), utilizando exclusivamente los recortes del subconjunto anotado
+descrito en \ref{subsec:dataset}. Las cabezas de autoría se entrenan con
+\textit{triplet loss} y una estrategia de muestreo de tripletes basada en
+distancia\cite{wu_sampling_2017} sobre las anotaciones de autoría, que agrupan
+los recortes pertenecientes a una misma firma o autor bajo un identificador
+común; el objetivo es acercar pintadas del mismo autor y separar las de autores
+distintos. Las cabezas de estilo se entrenan con la pérdida \textit{Supervised
+Contrastive}\cite{khosla_supervised_2021} sobre las anotaciones estilísticas en
+cuatro categorías (\textit{tag}, \textit{throw-up}, \textit{piece} y
+\textit{character}). Las cuatro cabezas resultantes se integran como modelos de
+\textit{embedding} adicionales en el catálogo de la
+tabla~\ref{tab:embedding-models}, conservando la dimensionalidad del modelo
+base.
+
+Dado que estas cabezas se ajustan sobre el subconjunto anotado, su evaluación
+se realiza siempre sobre el banco principal disjunto, de modo que ninguna
+fotografía vista durante el entrenamiento aparece en los pases de
+\textit{benchmark}.
 
 \subsection{Entorno de ejecución}
 \label{subsec:entorno}
+% DO NOT FILL THIS SECTION
 % Hardware utilizado (CPU, GPU, RAM) y pila de software: Python 3.14
 % gestionado con \texttt{uv}, PyTorch 2.10, scikit-learn 1.8, hdbscan,
 % umap-learn 0.5, Hugging Face Transformers 5.7, open-clip-torch 3.3,
