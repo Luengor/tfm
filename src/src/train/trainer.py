@@ -4,7 +4,6 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
-from torchvision import transforms
 from tqdm import tqdm
 from src.train.dataset import GraffitiTripletDataset
 
@@ -19,20 +18,24 @@ class TripletLoss(nn.Module):
         losses = F.relu(distance_positive - distance_negative + self.margin)
         return losses.mean()
 
-def run_training(model, save_path, num_epochs=20, batch_size=8, learning_rate=1e-4, margin=1.0):
+def run_training(
+    model,
+    save_path,
+    dataset_dir: str = os.path.join("dataset", "crops"),
+    num_epochs: int = 20,
+    batch_size: int = 8,
+    learning_rate: float = 1e-4,
+    margin: float = 1.0,
+    hard_negative_prob: float = 0.5,
+):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.RandomHorizontalFlip(),
-        transforms.RandomRotation(10),
-        transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ])
-
-    dataset = GraffitiTripletDataset(root_dir=os.path.join("dataset", "crops"), transform=transform)
+    dataset = GraffitiTripletDataset(root_dir=dataset_dir, hard_negative_prob=hard_negative_prob)
+    print(
+        f"Dataset: {len(dataset)} anchor images across {len(dataset.anchor_classes)} classes, "
+        f"{len(dataset.singleton_classes)} singleton hard-negative classes"
+    )
     dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
     model.to(device)
