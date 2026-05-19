@@ -16,7 +16,7 @@ Example:
         --output ../dataset/sample_500_crops
 
     uv run pipeline-benchmark \\
-        --whitelist benchmarks/style_eval.json \\
+        --configuration benchmarks/style_eval.json \\
         --dataset ../dataset/sample_500_crops \\
         --ground-truth ../dataset/sample_500_crops/labels.csv
 """

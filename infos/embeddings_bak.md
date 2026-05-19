@@ -1,7 +1,7 @@
 # Embedding models
 
 Embedding models convert an image (or cropped bounding box) into a fixed-length float vector.
-The `embedding` key in a whitelist run selects the model.
+The `embedding` key in a configuration run selects the model.
 
 All models auto-select GPU via `torch.accelerator.current_accelerator()` and fall back to CPU.
 Model weights are resolved relative to the `src/` working directory.

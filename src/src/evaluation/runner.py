@@ -166,7 +166,7 @@ def _run_single(
     run_spec.limit = global_limit if global_limit is not None else run_spec.limit
     
     if global_limit is not None:
-        from src.evaluation.whitelist import make_run_id
+        from src.evaluation.configuration import make_run_id
         run_spec.run_id = make_run_id(run_spec)
 
     try:

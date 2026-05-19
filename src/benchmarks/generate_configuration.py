@@ -11,10 +11,10 @@ def get_storage_key(run_config):
     storage = run_config.get("storage", {})
     embedding = run_config.get("embedding", {})
     limit = run_config.get("limit")
-    
+
     storage_type = str(storage.get("type", "")).lower()
     storage_params = dict(storage.get("params", {}))
-    
+
     # We ignore db_path / db_url database name so runs that COULD share a database are grouped
     if "db_path" in storage_params:
         del storage_params["db_path"]
@@ -23,14 +23,14 @@ def get_storage_key(run_config):
     if storage_type in {"postgres", "postgresql"} and "db_url" in storage_params:
         parsed = urlparse(storage_params["db_url"])
         storage_params["db_url"] = urlunparse(parsed._replace(path="/"))
-        
+
     key_data = {
         "storage_type": storage_type,
         "storage_params": storage_params,
         "embedding": embedding,
         "limit": limit
     }
-    
+
     # Stable JSON string for hashing
     key_str = json.dumps(key_data, sort_keys=True, separators=(",", ":"))
     key = hashlib.sha256(key_str.encode()).hexdigest()[:12]
@@ -62,9 +62,9 @@ def generate_name(combination, keys):
     return "-".join(parts)
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate benchmark whitelist from a grid of options.")
+    parser = argparse.ArgumentParser(description="Generate benchmark configuration from a grid of options.")
     parser.add_argument("--input", "-i", type=str, required=True, help="Path to input JSON grid file.")
-    parser.add_argument("--output", "-o", type=str, required=True, help="Path to output JSON whitelist file.")
+    parser.add_argument("--output", "-o", type=str, required=True, help="Path to output JSON configuration file.")
     args = parser.parse_args()
 
     input_path = Path(args.input)
@@ -93,7 +93,7 @@ def main():
 
     # Generate all combinations
     combinations = list(itertools.product(*grid_values))
-    
+
     runs = []
     seen_storage_keys = {} # key -> stable_db_path
 
@@ -101,12 +101,12 @@ def main():
         run_config = copy.deepcopy(static_config)
         for key, val in zip(grid_keys, combo):
             run_config[key] = copy.deepcopy(val)
-        
+
         # Generate a name if not provided in static or grid
         if "name" not in run_config:
             varying_values = [combo[i] for i in varying_indices]
             run_config["name"] = generate_name(varying_values, varying_keys)
-        
+
         # Database reuse logic
         storage_key = get_storage_key(run_config)
         storage_type = str(run_config.get("storage", {}).get("type", "")).lower()
@@ -172,17 +172,17 @@ def main():
                 if "params" not in run_config["storage"]:
                     run_config["storage"]["params"] = {}
                 run_config["storage"]["params"]["db_url"] = seen_storage_keys[storage_key]
-        
+
         runs.append(run_config)
 
     output_data = {"runs": runs}
-    
+
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     with open(output_path, "w") as f:
         json.dump(output_data, f, indent=2)
-    
+
     print(f"Successfully generated {len(runs)} runs and saved to {args.output}")
 
 if __name__ == "__main__":

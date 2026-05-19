@@ -11,7 +11,7 @@
 ❯ Create a list of the configurations that could be interesting to evaluate for 
    the project. Use the information available for each pipeline component in    
   the `infos` folder. Write this list to a Markdown file in the same folder.    
-  Also create whitelist/grid configurations for them.                           
+  Also create configuration/grid configurations for them.                           
 
   Read 9 files, listed 3 directories (ctrl+o to expand)
 
@@ -27,7 +27,7 @@
         i clustering
       4 pipeline. Each entry states the question the experiment answers, 
         what varies,
-      6 [`configs/`](configs/).he corresponding grid or whitelist file in
+      6 [`configs/`](configs/).he corresponding grid or configuration file in
       7 
       8 The default "best-guess" baseline used as the fixed component whe
         n varying
@@ -103,8 +103,8 @@
       10     {"type": "dinov2_graffiti_author_head", "params": {}}
      … +14 lines (ctrl+o to expand)
 
-● Write(infos/configs/06_segmenter_comparison.whitelist.json)
-  ⎿  Wrote 94 lines to infos/configs/06_segmenter_comparison.whitelist.json
+● Write(infos/configs/06_segmenter_comparison.configuration.json)
+  ⎿  Wrote 94 lines to infos/configs/06_segmenter_comparison.configuration.json
        2   "runs": [
        3     {
        5       "limit": 1000,nter_identity",
@@ -140,22 +140,22 @@
      OK infos/configs/03_reduction_comparison.json
      … +4 lines (ctrl+o to expand)
 
-● Bash(cd src && uv run python benchmarks/generate_whitelist.py -i
+● Bash(cd src && uv run python benchmarks/generate_configuration.py -i
       ../infos/configs/02_clustering_comparison.json -o
-      /tmp/claude/test_clustering.whitelist.json 2>&1 |…)
+      /tmp/claude/test_clustering.configuration.json 2>&1 |…)
   ⎿  error: Could not acquire lock
        Caused by: Could not create temporary file
        Caused by: Read-only file system (os error 30) at path "/home/tino/.
      cache/uv/.tmpJmasuo"
 
-● Bash(cd src && python benchmarks/generate_whitelist.py -i
+● Bash(cd src && python benchmarks/generate_configuration.py -i
       ../infos/configs/02_clustering_comparison.json -o
-      /tmp/claude/test_clustering.whitelist.json 2>&1 | tail -5)
+      /tmp/claude/test_clustering.configuration.json 2>&1 | tail -5)
   ⎿  python: can't open file '/home/tino/Desktop/uni/S10/tfm/src/src/benchm
-     arks/generate_whitelist.py': [Errno 2] No such file or directory
+     arks/generate_configuration.py': [Errno 2] No such file or directory
 
 ● Bash(cd /home/tino/Desktop/uni/S10/tfm/src && python
-      benchmarks/generate_whitelist.py -i
+      benchmarks/generate_configuration.py -i
       ../infos/configs/02_clustering_comparison.json -o
       /tmp/claude/test_clusterin…)
   ⎿      ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -163,33 +163,33 @@
          os.mkdir(self, mode)
      … +2 lines (ctrl+o to expand)
 
-● Bash(python benchmarks/generate_whitelist.py -i
+● Bash(python benchmarks/generate_configuration.py -i
       ../infos/configs/02_clustering_comparison.json -o
-      "$TMPDIR/test_clustering.whitelist.json" 2>&1 | tail -3 && python -…)
+      "$TMPDIR/test_clustering.configuration.json" 2>&1 | tail -3 && python -…)
   ⎿  Successfully generated 7 runs and saved to /tmp/claude-1000/test_clust
-     ering.whitelist.json
+     ering.configuration.json
      runs: 7
      … +7 lines (ctrl+o to expand)
 
-● Bash(python benchmarks/generate_whitelist.py -i
+● Bash(python benchmarks/generate_configuration.py -i
       ../infos/configs/01_embedding_comparison.json -o
-      "$TMPDIR/test_embedding.whitelist.json" 2>&1 | tail -2 && python -c…)
+      "$TMPDIR/test_embedding.configuration.json" 2>&1 | tail -2 && python -c…)
   ⎿  Successfully generated 11 runs and saved to /tmp/claude-1000/test_embe
-     dding.whitelist.json
+     dding.configuration.json
      runs: 11
      … +16 lines (ctrl+o to expand)
 
-● Bash(python benchmarks/generate_whitelist.py -i
+● Bash(python benchmarks/generate_configuration.py -i
       ../infos/configs/07_storage_comparison.json -o
-      "$TMPDIR/test_storage.whitelist.json" 2>&1 | tail -2 && python -c "imp…)
+      "$TMPDIR/test_storage.configuration.json" 2>&1 | tail -2 && python -c "imp…)
   ⎿  Successfully generated 2 runs and saved to /tmp/claude-1000/test_stora
-     ge.whitelist.json
+     ge.configuration.json
      runs: 2
      … +2 lines (ctrl+o to expand)
 
 ● Bash(for f in 03 04 05; do echo "=== $f ==="; python
-      benchmarks/generate_whitelist.py -i ../infos/configs/${f}_*.json -o
-      "$TMPDIR/test_$f.whitelist.json" 2>&1 | tail…)
+      benchmarks/generate_configuration.py -i ../infos/configs/${f}_*.json -o
+      "$TMPDIR/test_$f.configuration.json" 2>&1 | tail…)
   ⎿  === 03 ===
      Successfully generated 8 runs and saved to /tmp/claude-1000/test_03.wh
      itelist.json
@@ -208,12 +208,12 @@
   3. 03_reduction_comparison.json — 8 reduction techniques (1 ingest)
   4. 04_umap_tuning.json — 10 UMAP parameter combinations (1 ingest)
   5. 05_hdbscan_tuning.json — 6 min_cluster_size values (1 ingest)
-  6. 06_segmenter_comparison.whitelist.json — 9 segmenter variants (whitelist,
+  6. 06_segmenter_comparison.configuration.json — 9 segmenter variants (configuration,
   not grid, because the generator's hash ignores segmenter and would incorrectly
    reuse DBs)
   7. 07_storage_comparison.json — SQLite vs PostgreSQL (2 ingests)
 
-  All grids round-trip cleanly through generate_whitelist.py (verified:
+  All grids round-trip cleanly through generate_configuration.py (verified:
   per-config run counts and DB-reuse flags match expectations). The baseline
   used when fixing components is dinov2_graffiti_author_head → UMAP(10d, cosine) →
   HDBSCAN(min_cluster_size=5), per the recommendation in best_cluster.md.
@@ -302,7 +302,7 @@
 
 ● Update(infos/experiments.md)
   ⎿  Added 24 lines
-      51  The segmenter experiment is already a whitelist (no grid expans
+      51  The segmenter experiment is already a configuration (no grid expans
           ion needed);
       52  skip step 1 for it.
       53  
@@ -433,8 +433,8 @@
 
 ● Update(infos/experiments.md)
   ⎿  Added 28 lines, removed 1 line
-      202  (feed directly to `pipeline-benchmark --whitelist`; no `genera
-           te_whitelist.py`
+      202  (feed directly to `pipeline-benchmark --configuration`; no `genera
+           te_configuration.py`
       203  step).
       204  
       205 -### 7. Storage backend performance                            
@@ -559,17 +559,17 @@
      … +5 lines (ctrl+o to expand)
 
 ● Bash(cd /home/tino/Desktop/uni/S10/tfm/src && python
-      benchmarks/generate_whitelist.py -i
+      benchmarks/generate_configuration.py -i
       ../infos/configs/07_metric_comparison.json -o
-      "$TMPDIR/test_07.whitelist.jso…)
+      "$TMPDIR/test_07.configuration.jso…)
   ⎿  Successfully generated 30 runs and saved to /tmp/claude-1000/test_07.w
      hitelist.json
      runs: 30
      … +23 lines (ctrl+o to expand)
 
 ● Bash(for f in 02 03 08; do echo "=== $f ==="; python
-      benchmarks/generate_whitelist.py -i ../infos/configs/${f}_*.json -o
-      "$TMPDIR/test_$f.whitelist.json" 2>&1 | tail…)
+      benchmarks/generate_configuration.py -i ../infos/configs/${f}_*.json -o
+      "$TMPDIR/test_$f.configuration.json" 2>&1 | tail…)
   ⎿  === 02 ===
      Successfully generated 8 runs and saved to /tmp/claude-1000/test_02.wh
      itelist.json
@@ -615,7 +615,7 @@
   - File 7/8 renumbered so quality experiments precede the orthogonal storage
   benchmark.
 
-  All grids round-trip through generate_whitelist.py (verified: 30 / 8 / 11 / 2
+  All grids round-trip through generate_configuration.py (verified: 30 / 8 / 11 / 2
   runs for 07 / 02 / 03 / 08 respectively).
 
 ✻ Churned for 4m 49s

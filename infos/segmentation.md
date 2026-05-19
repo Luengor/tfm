@@ -2,7 +2,7 @@
 
 Segmenters detect graffiti regions in each image and return bounding boxes. The pipeline crops
 each detected region and generates an independent embedding per crop. The `segmenter` key in a
-whitelist run selects the backend; omitting it is equivalent to using `"identity"`.
+configuration run selects the backend; omitting it is equivalent to using `"identity"`.
 
 ---
 

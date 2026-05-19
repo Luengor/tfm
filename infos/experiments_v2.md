@@ -71,14 +71,14 @@ coverage counts.
 ```bash
 cd src
 
-# 1. Expand the grid into a whitelist (skip for §5 which is already a whitelist)
-uv run python benchmarks/generate_whitelist.py \
+# 1. Expand the grid into a configuration (skip for §5 which is already a configuration)
+uv run python benchmarks/generate_configuration.py \
   -i ../infos/configs/v2/01_embedding.json \
-  -o benchmarks/v2_01_embedding.whitelist.json
+  -o benchmarks/v2_01_embedding.configuration.json
 
 # 2. Run the benchmark
 uv run pipeline-benchmark \
-  --whitelist benchmarks/v2_01_embedding.whitelist.json \
+  --configuration benchmarks/v2_01_embedding.configuration.json \
   --dataset ../dataset/images
 
 # 3. Plot
@@ -87,7 +87,7 @@ uv run pipeline-plot -i benchmark_results/benchmark_*.json -o plots/
 
 For §8 (supervised) add `--ground-truth ../sample_crop/labels.csv` and point
 `--dataset` at `../sample_crop`. For §5 (segmenter) skip step 1 — the file is
-already a whitelist (segmenter changes invalidate cached crops, so explicit
+already a configuration (segmenter changes invalidate cached crops, so explicit
 `db_path` + `clear_storage: true` per row is required).
 
 ---
@@ -214,17 +214,17 @@ detection errors and changes the unit of analysis (image vs. crop). The
 thesis question is whether the trade-off is worth it; the per-run timing
 captures the cost side directly.
 
-**Format.** Whitelist (not a grid). `generate_whitelist.py` hashes
+**Format.** Configuration (not a grid). `generate_configuration.py` hashes
 `storage + embedding + limit` to decide DB reuse and does *not* include the
 segmenter, so a grid would incorrectly reuse ingests across segmenter
-variants. The whitelist therefore sets explicit `db_path` and
+variants. The configuration therefore sets explicit `db_path` and
 `clear_storage: true` for every row.
 
 **Cost.** 8 runs, 8 full ingests — the most expensive quality experiment.
 
 **Config.**
-[`configs/v2/05_segmenter.whitelist.json`](configs/v2/05_segmenter.whitelist.json)
-(feed directly to `pipeline-benchmark --whitelist`; no `generate_whitelist.py`
+[`configs/v2/05_segmenter.configuration.json`](configs/v2/05_segmenter.configuration.json)
+(feed directly to `pipeline-benchmark --configuration`; no `generate_configuration.py`
 step).
 
 ## §6. Storage backend cost
@@ -375,19 +375,19 @@ enough that every run processes the full 273).
 
 **Cost.** 72 runs (4 embeddings × 3 reductions × 6 clusterers), 4 ingests
 (one per embedding; reduction and clustering re-use the cached DB within an
-embedding group thanks to storage-key hashing in `generate_whitelist.py`).
+embedding group thanks to storage-key hashing in `generate_configuration.py`).
 
 **Running.**
 
 ```bash
 cd src
 
-uv run python benchmarks/generate_whitelist.py \
+uv run python benchmarks/generate_configuration.py \
   -i ../infos/configs/v2/08_supervised.json \
-  -o benchmarks/v2_08_supervised.whitelist.json
+  -o benchmarks/v2_08_supervised.configuration.json
 
 uv run pipeline-benchmark \
-  --whitelist benchmarks/v2_08_supervised.whitelist.json \
+  --configuration benchmarks/v2_08_supervised.configuration.json \
   --dataset ../sample_crop \
   --ground-truth ../sample_crop/labels.csv \
   --cluster-plot

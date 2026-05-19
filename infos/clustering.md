@@ -1,11 +1,11 @@
 # Clustering algorithms
 
 Clustering algorithms group image embeddings into clusters after optional dimensionality
-reduction. The `clustering` key in a whitelist run selects the algorithm.
+reduction. The `clustering` key in a configuration run selects the algorithm.
 
 > **Note on parameters.** Unlike storage, embedding, and reduction, clustering parameters are
 > **not** passed into the constructor. They are forwarded as `**kwargs` at cluster time
-> (`ClusteringBase.cluster(images, **params)`). Specify them under `"params"` in the whitelist
+> (`ClusteringBase.cluster(images, **params)`). Specify them under `"params"` in the configuration
 > run exactly as shown in each example.
 
 ---

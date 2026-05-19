@@ -1,7 +1,7 @@
 # Storage backends
 
 Storage backends persist image embeddings and bounding boxes, and expose similarity search.
-The `storage` key in a whitelist run specifies the backend.
+The `storage` key in a configuration run specifies the backend.
 
 ---
 

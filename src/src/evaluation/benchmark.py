@@ -10,7 +10,7 @@ def build_parser() -> argparse.ArgumentParser:
             "export computational cost metrics."
         ),
     )
-    parser.add_argument("--whitelist", required=True, help="Path to whitelist JSON file.")
+    parser.add_argument("--configuration", required=True, help="Path to configuration JSON file.")
     parser.add_argument("--dataset", required=True, help="Path to dataset folder with images.")
     parser.add_argument(
         "--output-dir",
@@ -21,7 +21,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--run",
         nargs="+",
         default=None,
-        help="Optional run names or run IDs to execute from the whitelist.",
+        help="Optional run names or run IDs to execute from the configuration.",
     )
     parser.add_argument(
         "--prefix",
@@ -51,7 +51,7 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "Generate an interactive 2D UMAP Vega-Lite scatter of the final "
             "clusters per run. Writes <output-dir>/<run_id>_cluster.html. "
-            "Overrides the 'cluster_plot.enabled' field in the whitelist if set."
+            "Overrides the 'cluster_plot.enabled' field in the configuration if set."
         ),
     )
     return parser
@@ -62,12 +62,12 @@ def main() -> int:
     args = parser.parse_args()
 
     from src.evaluation.runner import load_ground_truth, run_benchmarks, write_results
-    from src.evaluation.whitelist import load_whitelist_with_options
+    from src.evaluation.configuration import load_configuration_with_options
 
-    whitelist_path = Path(args.whitelist)
+    configuration_path = Path(args.configuration)
     dataset_path = Path(args.dataset)
 
-    run_specs, cluster_plot_options = load_whitelist_with_options(str(whitelist_path))
+    run_specs, cluster_plot_options = load_configuration_with_options(str(configuration_path))
     if args.cluster_plot:
         cluster_plot_options["enabled"] = True
 
@@ -77,10 +77,10 @@ def main() -> int:
         selected = set(args.run)
         run_specs = [spec for spec in run_specs if spec.name in selected or spec.run_id in selected]
         if not run_specs:
-            parser.error("None of the provided --run values matched whitelist run names or run IDs.")
+            parser.error("None of the provided --run values matched configuration run names or run IDs.")
 
     if args.limit is not None:
-        from src.evaluation.whitelist import make_run_id
+        from src.evaluation.configuration import make_run_id
         for spec in run_specs:
             spec.limit = args.limit
             spec.run_id = make_run_id(spec)

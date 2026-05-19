@@ -2,7 +2,7 @@
 
 A curated list of configurations worth evaluating for the graffiti clustering
 pipeline. Each entry states the question the experiment answers, what varies,
-what stays fixed, and the corresponding grid or whitelist file in
+what stays fixed, and the corresponding grid or configuration file in
 [`configs/`](configs/).
 
 The default "best-guess" baseline used as the fixed component when varying
@@ -19,7 +19,7 @@ another axis is:
   (density-aware, auto-detects k, isolates noise — the strongest recommendation
   in [`best_cluster.md`](best_cluster.md)).
 - **Segmenter:** `identity`
-  (matches the current `whitelist.sample.json`; the segmenter experiment isolates
+  (matches the current `configuration.sample.json`; the segmenter experiment isolates
   whether YOLO cropping helps).
 - **Storage:** SQLite (single-file, no service dependency; PostgreSQL is
   benchmarked separately).
@@ -69,27 +69,27 @@ before CPU time does.
 
 ## Running an experiment
 
-Each grid file is consumed by `generate_whitelist.py` to produce a whitelist,
+Each grid file is consumed by `generate_configuration.py` to produce a configuration,
 which is then fed to the benchmark runner:
 
 ```bash
 cd src
 
-# 1. Expand the grid into a whitelist
-uv run python benchmarks/generate_whitelist.py \
+# 1. Expand the grid into a configuration
+uv run python benchmarks/generate_configuration.py \
   -i ../infos/configs/01_embedding_comparison.json \
-  -o benchmarks/embedding_comparison.whitelist.json
+  -o benchmarks/embedding_comparison.configuration.json
 
 # 2. Run the benchmark
 uv run pipeline-benchmark \
-  --whitelist benchmarks/embedding_comparison.whitelist.json \
+  --configuration benchmarks/embedding_comparison.configuration.json \
   --dataset ../dataset/images
 
 # 3. Plot the results
 uv run pipeline-plot -i benchmark_results/benchmark_*.json -o plots/
 ```
 
-The segmenter experiment is already a whitelist (no grid expansion needed);
+The segmenter experiment is already a configuration (no grid expansion needed);
 skip step 1 for it.
 
 ## Distance metrics: what is actually configurable
@@ -273,13 +273,13 @@ detection errors. The thesis question is whether the trade-off is worth it.
 **Cost.** 9 runs, 9 full ingests (each segmenter produces different crops).
 This is the most expensive experiment.
 
-**Format.** Whitelist (not grid). The generator hashes `storage+embedding+limit`
+**Format.** Configuration (not grid). The generator hashes `storage+embedding+limit`
 to decide DB reuse and does not include the segmenter, so a grid would
-incorrectly reuse ingests across segmenter variants. The whitelist sets
+incorrectly reuse ingests across segmenter variants. The configuration sets
 explicit `db_path` and `clear_storage: true` for every run.
 
-**Config.** [`configs/06_segmenter_comparison.whitelist.json`](configs/06_segmenter_comparison.whitelist.json)
-(feed directly to `pipeline-benchmark --whitelist`; no `generate_whitelist.py`
+**Config.** [`configs/06_segmenter_comparison.configuration.json`](configs/06_segmenter_comparison.configuration.json)
+(feed directly to `pipeline-benchmark --configuration`; no `generate_configuration.py`
 step).
 
 ### 7. Distance metric impact
@@ -516,7 +516,7 @@ human-labelled categories. Two derived analyses follow naturally:
 **Cost.** 84 runs (4 embeddings × 3 reductions × 7 clusterers — 3 fixed-k +
 4 HDBSCAN variants), 4 ingests (one per embedding; reduction and clustering
 re-use the cached DB within an embedding group thanks to
-`generate_whitelist.py`'s storage-key hashing).
+`generate_configuration.py`'s storage-key hashing).
 
 **Running.**
 
@@ -524,13 +524,13 @@ re-use the cached DB within an embedding group thanks to
 cd src
 
 # 1. Expand the grid (48 runs)
-uv run python benchmarks/generate_whitelist.py \
+uv run python benchmarks/generate_configuration.py \
   -i ../infos/configs/10_supervised_validation.json \
-  -o benchmarks/supervised_validation.whitelist.json
+  -o benchmarks/supervised_validation.configuration.json
 
 # 2. Run, pointing at sample_crop and passing the labels for extrinsic metrics
 uv run pipeline-benchmark \
-  --whitelist benchmarks/supervised_validation.whitelist.json \
+  --configuration benchmarks/supervised_validation.configuration.json \
   --dataset ../sample_crop \
   --ground-truth ../sample_crop/labels.csv \
   --cluster-plot

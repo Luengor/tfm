@@ -58,7 +58,7 @@
 
     sweep
   Cost (runs / ingests): 9 / 9
-  Config: 06_segmenter_comparison.whitelist.json
+  Config: 06_segmenter_comparison.configuration.json
   ────────────────────────────────────────
   #: 7
   Experiment: Distance metric impact
@@ -212,7 +212,7 @@
 
   - Ingest cost dominates. At 5k, embedding-only experiments (those that re-use
   the DB via clear_storage: false) cost roughly the same as before in clustering
-   time but ingest 20× more. The whitelist generator's DB-reuse logic
+   time but ingest 20× more. The configuration generator's DB-reuse logic
   (storage+embedding+limit hash) is now your friend — make sure dependent
   experiments share limit so they share the ingest.
   - Wall-clock budget. Rough back-of-envelope: if DINOv2 does ~10 img/s, 5k
