@@ -75,8 +75,13 @@ def crop_from_cvat(
                 for box_idx, box in enumerate(image_elem.findall("box")):
                     label = box.get("label", "")
                     if label in skip_labels:
-                        skipped += 1
-                        continue
+                        text_attr = box.find("attribute[@name='text']")
+                        text_val = (text_attr.text or "").strip().lower() if text_attr is not None else ""
+                        if text_val:
+                            label = text_val
+                        else:
+                            skipped += 1
+                            continue
 
                     try:
                         xtl = float(box.get("xtl", "0"))
