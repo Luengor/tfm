@@ -1,3 +1,4 @@
+import gc
 import os
 import platform
 import sys
@@ -28,6 +29,7 @@ class StageProfiler:
         self._start_wall = 0.0
         self._start_cpu = 0.0
         self._start_rss_mb = 0.0
+        self._start_rss_bytes = 0
         self._peak_rss_bytes = 0
         self._stop_event = threading.Event()
         self._monitor_thread: threading.Thread | None = None
@@ -43,10 +45,17 @@ class StageProfiler:
                 break
 
     def __enter__(self) -> "StageProfiler":
+        # Collect garbage so baseline RSS does not carry prior-stage detritus,
+        # which would deflate the stage's net peak.
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
         self._start_wall = time.perf_counter()
         cpu_times = self._process.cpu_times()
         self._start_cpu = cpu_times.user + cpu_times.system
         start_rss = self._process.memory_info().rss
+        self._start_rss_bytes = start_rss
         self._start_rss_mb = start_rss / (1024 * 1024)
         self._peak_rss_bytes = start_rss
 
@@ -84,6 +93,12 @@ class StageProfiler:
         if torch.cuda.is_available():
             vram_peak_mb = torch.cuda.max_memory_allocated() / (1024 * 1024)
 
+        # Net stage peak: how much RSS grew above the stage's own baseline.
+        # Absolute peak RSS is process-wide and monotonic (Python rarely
+        # returns pages to the OS), so attributing it to a single stage is
+        # misleading. Subtracting the baseline gives a stage-local figure.
+        peak_rss_delta_bytes = max(self._peak_rss_bytes - self._start_rss_bytes, 0)
+
         self.metrics = StageMetrics(
             wall_time_s=wall_time,
             cpu_time_s=cpu_time,
@@ -91,7 +106,7 @@ class StageProfiler:
             rss_start_mb=self._start_rss_mb,
             rss_end_mb=end_rss_mb,
             rss_delta_mb=end_rss_mb - self._start_rss_mb,
-            peak_rss_mb=self._peak_rss_bytes / (1024 * 1024),
+            peak_rss_delta_mb=peak_rss_delta_bytes / (1024 * 1024),
             vram_peak_mb=vram_peak_mb,
         )
 

@@ -38,7 +38,7 @@ class StageMetrics:
     rss_start_mb: float
     rss_end_mb: float
     rss_delta_mb: float
-    peak_rss_mb: float | None
+    peak_rss_delta_mb: float | None
     vram_peak_mb: float | None = None
 
     def to_flat_dict(self, prefix: str) -> dict[str, float | None]:
@@ -49,7 +49,7 @@ class StageMetrics:
             f"{prefix}_rss_start_mb": self.rss_start_mb,
             f"{prefix}_rss_end_mb": self.rss_end_mb,
             f"{prefix}_rss_delta_mb": self.rss_delta_mb,
-            f"{prefix}_peak_rss_mb": self.peak_rss_mb,
+            f"{prefix}_peak_rss_delta_mb": self.peak_rss_delta_mb,
             f"{prefix}_vram_peak_mb": self.vram_peak_mb,
         }
 
