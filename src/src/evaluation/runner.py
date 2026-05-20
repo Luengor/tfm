@@ -1,6 +1,6 @@
 import csv
-import gc
 import json
+import multiprocessing
 import os
 from dataclasses import asdict
 from datetime import datetime, timezone
@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import torch
 from tqdm import tqdm
 
 from src.abstractions import ImageData
@@ -73,6 +72,26 @@ def load_ground_truth(csv_path: str | Path) -> dict[str, str]:
     return mapping
 
 
+def _run_single_subprocess(
+    run_spec: BenchmarkRunSpec,
+    dataset_root: Path,
+    output_dir: Path,
+    global_limit: int | None,
+    ground_truth: dict[str, str] | None,
+    cluster_plot_options: dict[str, Any] | None,
+    result_queue: "multiprocessing.Queue[BenchmarkResult]",
+) -> None:
+    result = _run_single(
+        run_spec=run_spec,
+        dataset_root=dataset_root,
+        output_dir=output_dir,
+        global_limit=global_limit,
+        ground_truth=ground_truth,
+        cluster_plot_options=cluster_plot_options,
+    )
+    result_queue.put(result)
+
+
 def run_benchmarks(
     run_specs: list[BenchmarkRunSpec],
     dataset_path: str,
@@ -88,6 +107,7 @@ def run_benchmarks(
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
     cluster_plot_options = cluster_plot_options or {}
+    ctx = multiprocessing.get_context("spawn")
 
     results: list[BenchmarkResult] = []
     print(f"Starting benchmarks: {len(run_specs)} runs to execute.")
@@ -97,14 +117,34 @@ def run_benchmarks(
         print("Cluster 2D plotting enabled.")
     for run_spec in tqdm(run_specs, desc="Benchmark Runs", unit="run"):
         print(f"Running benchmark: {run_spec.name} (ID: {run_spec.run_id})")
-        result = _run_single(
-            run_spec=run_spec,
-            dataset_root=dataset_root,
-            output_dir=Path(output_dir),
-            global_limit=limit,
-            ground_truth=ground_truth,
-            cluster_plot_options=cluster_plot_options,
+        result_queue: multiprocessing.Queue[BenchmarkResult] = ctx.Queue()
+        p = ctx.Process(
+            target=_run_single_subprocess,
+            args=(run_spec, dataset_root, Path(output_dir), limit, ground_truth, cluster_plot_options, result_queue),
         )
+        p.start()
+        p.join()
+
+        if not result_queue.empty():
+            result = result_queue.get()
+        else:
+            result = BenchmarkResult(
+                run_name=run_spec.name,
+                run_id=run_spec.run_id,
+                status="failed",
+                started_at=_utc_now(),
+                finished_at=_utc_now(),
+                image_count=0,
+                cluster_count=None,
+                storage_type=run_spec.storage.type,
+                embedding_type=run_spec.embedding.type,
+                clustering_type=run_spec.clustering.type,
+                segmenter_type=run_spec.segmenter.type if run_spec.segmenter else "identity",
+                reduction_type=run_spec.reduction.type if run_spec.reduction else "identity",
+                error=f"Subprocess exited with code {p.exitcode} without returning a result.",
+                config=run_spec,
+            )
+
         results.append(result)
         print(f"Completed run: {run_spec.name} with status {result.status}.")
         if result.error:
@@ -290,66 +330,37 @@ def _run_single(
                         f"'{segmenter_type_eff}' (not identity); skipping extrinsic metrics."
                     )
 
-                n_clusters = int(labels_arr.max() + 1) if labels_arr.size > 0 else 0
+                n_clusters = int(np.sum(np.unique(labels_arr) >= 0)) if labels_arr.size > 0 else 0
                 cluster_count = n_clusters
-
-                if cluster_plot_options and cluster_plot_options.get("enabled"):
-                    plot_metrics: dict[str, Any] = {
-                        "image_count": image_count,
-                        "n_clusters": n_clusters,
-                    }
-                    if clustering_quality is not None:
-                        plot_metrics.update(clustering_quality.to_flat_dict())
-                    if clustering_extrinsic is not None:
-                        plot_metrics.update(clustering_extrinsic.to_flat_dict())
-                    _maybe_plot_clusters(
-                        run_spec=run_spec,
-                        output_dir=output_dir,
-                        embeddings_arr=embeddings_arr,
-                        reduced_embeddings=reduced_embeddings,
-                        labels_arr=labels_arr,
-                        filenames=[img.filename for img in all_images],
-                        metrics=plot_metrics,
-                        options=cluster_plot_options,
-                    )
             else:
                 cluster_count = 0
         clustering_metrics = cluster_stage.metrics
+
+        if all_images and cluster_plot_options and cluster_plot_options.get("enabled"):
+            plot_metrics: dict[str, Any] = {
+                "image_count": image_count,
+                "n_clusters": cluster_count,
+            }
+            if clustering_quality is not None:
+                plot_metrics.update(clustering_quality.to_flat_dict())
+            if clustering_extrinsic is not None:
+                plot_metrics.update(clustering_extrinsic.to_flat_dict())
+            _maybe_plot_clusters(
+                run_spec=run_spec,
+                output_dir=output_dir,
+                embeddings_arr=embeddings_arr,
+                reduced_embeddings=reduced_embeddings,
+                labels_arr=labels_arr,
+                filenames=[img.filename for img in all_images],
+                metrics=plot_metrics,
+                options=cluster_plot_options,
+            )
     except Exception as exc:  # noqa: BLE001
         status = "failed"
         error = str(exc)
     finally:
-        # Explicit cleanup to prevent memory accumulation across runs
-        # We delete large objects and call GC + CUDA cache clear
         if "storage" in locals():
-            storage.close() # type: ignore
-            del storage # type: ignore
-        if "config" in locals():
-            del config # type: ignore
-        if "embedding" in locals():
-            del embedding # type: ignore
-        if "clustering" in locals():
-            del clustering # type: ignore
-        if "reduction" in locals():
-            del reduction # type: ignore
-        if "segmenter" in locals():
-            del segmenter # type: ignore
-        if "all_images" in locals():
-            del all_images # type: ignore
-        if "embeddings_arr" in locals():
-            del embeddings_arr # type: ignore
-        if "labels_arr" in locals():
-            del labels_arr # type: ignore
-        if "clustering_images" in locals():
-            del clustering_images # type: ignore
-        if "reduced_embeddings" in locals():
-            del reduced_embeddings # type: ignore
-        if "image_paths" in locals():
-            del image_paths # type: ignore
-        
-        gc.collect()
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
+            storage.close()  # type: ignore
 
     finished_at = _utc_now()
 
