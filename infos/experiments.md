@@ -10,7 +10,7 @@ Redesigned around the three pillars of the TFM21 brief
    Davies–Bouldin against the same baseline pipeline, while varying one axis at
    a time.
 3. **Supervised validation on the labelled subset** — ARI / NMI / pairwise F1
-   on `sample_crop/` (273 hand-labelled crops over 4 styles), the only
+   on `data/style/eval_crop/` (274 hand-labelled crops over 4 styles), the only
    experiment with ground truth.
 
 The eight experiments below are ordered to support the thesis narrative: the
@@ -34,11 +34,13 @@ comparisons are clean:
 - **Limit:** `1000` images for quality experiments, `5000` for cost-focused
   experiments and for HDBSCAN tuning where density matters.
 
-The working dataset contains roughly 6000 images. The 273 labelled crops in
-[`sample_crop/`](../sample_crop/) are a subset of the full image bank and are
-*not* deduplicated out for the unsupervised experiments — at 5 % of the corpus
-they do not perturb aggregate statistics, and segregating them would
-artificially shrink the cost-sweep dataset.
+The working dataset contains roughly 6000 images. The 274 labelled eval
+crops in [`data/style/eval_crop/`](../data/style/eval_crop/) (and the 178
+train crops in [`data/style/train_crop/`](../data/style/train_crop/)) are
+derived from the full image bank and are *not* deduplicated out for the
+unsupervised experiments — at <10 % of the corpus they do not perturb
+aggregate statistics, and segregating them would artificially shrink the
+cost-sweep dataset.
 
 ## Metrics
 
@@ -85,8 +87,9 @@ uv run pipeline-benchmark \
 uv run pipeline-plot -i benchmark_results/benchmark_*.json -o plots/
 ```
 
-For §8 (supervised) add `--ground-truth ../sample_crop/labels.csv` and point
-`--dataset` at `../sample_crop`. For §5 (segmenter) skip step 1 — the file is
+For §8 (supervised) add `--ground-truth ../data/style/eval_crop/labels.csv`
+and point `--dataset` at `../data/style/eval_crop`. For §5 (segmenter) skip
+step 1 — the file is
 already a configuration (segmenter changes invalidate cached crops, so explicit
 `db_path` + `clear_storage: true` per row is required).
 
@@ -306,10 +309,15 @@ recovers them? Specifically: (a) does fine-tuning a graffiti-specific
 projection head improve cluster–label agreement over the pretrained backbone,
 and (b) is the improvement consistent across backbone families?
 
-**Dataset.** [`sample_crop/`](../sample_crop/) — 273 manually labelled crops
-across 4 styles: `tag` (116), `piece` (69), `throw-up` (69), `character` (19).
-Labels in [`sample_crop/labels.csv`](../sample_crop/labels.csv) follow the
-`filename,style` schema consumed by `--ground-truth`. The crops are already
+**Dataset.** [`data/style/eval_crop/`](../data/style/eval_crop/) — 274 manually
+labelled crops across 4 styles: `tag` (117), `piece` (69), `throw-up` (69),
+`character` (19). Labels in
+[`data/style/eval_crop/labels.csv`](../data/style/eval_crop/labels.csv) follow the
+`filename,style` schema consumed by `--ground-truth`. This is the held-out
+split — the fine-tuned style head was trained on the disjoint
+[`data/style/train_crop/`](../data/style/train_crop/) (178 crops:
+`tag` 54, `piece` 50, `throw-up` 55, `character` 19), so §8 measures
+generalisation, not train-set memorisation. The crops are already
 segmented, so `identity` is the correct (and required, per the
 segmenter check in `src/src/evaluation/runner.py`) segmenter for extrinsic metrics.
 
@@ -338,18 +346,18 @@ failure mode; pairwise F1 is the most interpretable for write-up.
   `n_clusters=4` (oracle k); `hdbscan` swept over
   `min_cluster_size ∈ {5, 10, 20}` (density-based auto-k — tests whether
   the true k=4 emerges and how sensitive that is to the main knob given
-  class sizes `tag=116, piece=69, throw-up=69, character=19`).
+  class sizes `tag=117, piece=69, throw-up=69, character=19`).
 
-**Fixed.** SQLite, identity segmenter, no `limit` (sample_crop is small
-enough that every run processes the full 273).
+**Fixed.** SQLite, identity segmenter, no `limit` (`eval_crop` is small
+enough that every run processes the full 274 crops).
 
 **Hypotheses.**
 
-1. The fine-tuned style head outperforms `dinov2_vits14` on ARI / NMI / F1
-   — *but* the head was trained on `sample_crop`'s style folders via
-   supervised contrastive loss (see `src/train/style_trainer.py`), so this is
-   a *training-set* evaluation, not held-out generalisation. State the
-   caveat explicitly in every caption.
+1. The fine-tuned style head outperforms `dinov2_vits14` on ARI / NMI / F1.
+   The head is trained with supervised contrastive loss on `data/style/train_crop/`
+   (see `src/train/style_trainer.py`); §8 evaluates on the disjoint
+   `data/style/eval_crop/`, so the comparison is held-out and a head win is
+   genuine transfer rather than memorisation.
 2. CLIP is competitive with DINOv2 base; ResNet50 is the weakest off-the-shelf
    encoder for stylistic clustering, consistent with §1.
 3. KMeans-4 (oracle k) wins on the fine-tuned head because the head was
@@ -388,8 +396,8 @@ uv run python benchmarks/generate_configuration.py \
 
 uv run pipeline-benchmark \
   --configuration benchmarks/08_supervised.configuration.json \
-  --dataset ../sample_crop \
-  --ground-truth ../sample_crop/labels.csv \
+  --dataset ../data/style/eval_crop \
+  --ground-truth ../data/style/eval_crop/labels.csv \
   --cluster-plot
 
 uv run pipeline-plot -i benchmark_results/benchmark_*.json -o plots/
