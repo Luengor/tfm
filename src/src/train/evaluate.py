@@ -84,6 +84,10 @@ def main():
     models_to_compare = [
         EmbeddingModelNames.DINOV2_VITS14,
         EmbeddingModelNames.DINOV2_GRAFFITI_AUTHOR_HEAD,
+        EmbeddingModelNames.DINOV2_GRAFFITI_STYLE_HEAD,
+        EmbeddingModelNames.MOBILENET_V3,
+        EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD,
+        EmbeddingModelNames.MOBILENET_V3_GRAFFITI_STYLE_HEAD,
     ]
 
     results = {}
@@ -91,14 +95,16 @@ def main():
         print(f"\nEvaluating {m_name.value}...")
         results[m_name] = evaluate_model(m_name, args.dataset, min_samples=args.min_samples)
 
+    col_w = 22
+    metrics = ["silhouette", "accuracy_1nn", "ari", "nmi"]
+    col_names = [m.value for m in models_to_compare]
+    header = f"{'Metric':<20} | " + " | ".join(f"{n:<{col_w}}" for n in col_names)
     print("\nResults:")
-    header = f"{'Metric':<20} | {'DINO Base':<12} | {'DINO Author Head':<16}"
     print(header)
     print("-" * len(header))
-    for metric in ["silhouette", "accuracy_1nn", "ari", "nmi"]:
-        d_base = results[EmbeddingModelNames.DINOV2_VITS14][metric]
-        d_head = results[EmbeddingModelNames.DINOV2_GRAFFITI_AUTHOR_HEAD][metric]
-        print(f"{metric:<20} | {d_base:<12.4f} | {d_head:<16.4f}")
+    for metric in metrics:
+        row = f"{metric:<20} | " + " | ".join(f"{results[m][metric]:<{col_w}.4f}" for m in models_to_compare)
+        print(row)
 
 
 if __name__ == "__main__":

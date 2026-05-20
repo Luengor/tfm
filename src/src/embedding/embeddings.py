@@ -33,6 +33,7 @@ class EmbeddingModelNames(str, Enum):
     MOBILENET_V3 = "mobilenet_v3"
     MOBILENET_V3_NORMALIZED = "mobilenet_v3_normalized"
     MOBILENET_V3_GRAFFITI_AUTHOR_HEAD = "mobilenet_v3_graffiti_author_head"
+    MOBILENET_V3_GRAFFITI_STYLE_HEAD = "mobilenet_v3_graffiti_style_head"
     DINOV2_VITS14 = "dinov2_vits14"
     DINOV2_GRAFFITI_AUTHOR_HEAD = "dinov2_graffiti_author_head"
     DINOV2_GRAFFITI_STYLE_HEAD = "dinov2_graffiti_style_head"
@@ -67,6 +68,10 @@ MODELS = {
     EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD: {
         'embedding_size': 1280,
         'weights_path': "models/mobilenet_graffiti_author_head.pth"
+    },
+    EmbeddingModelNames.MOBILENET_V3_GRAFFITI_STYLE_HEAD: {
+        'embedding_size': 1280,
+        'weights_path': "models/mobilenet_graffiti_style_head.pth"
     },
     EmbeddingModelNames.DINOV2_VITS14: {
         'embedding_size': 384,
@@ -142,9 +147,10 @@ class DinoEmbeddingModel(EmbeddingBase):
         # Using torch hub for DINOv2
         self.model = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
         
-        # Load custom weights if available
         m_data = MODELS[name]
-        if 'weights_path' in m_data and os.path.exists(m_data['weights_path']):
+        if 'weights_path' in m_data:
+            if not os.path.exists(m_data['weights_path']):
+                raise FileNotFoundError(f"Weights file not found for {name}: {m_data['weights_path']}")
             print(f"Loading custom weights for {name} from {m_data['weights_path']}")
             self.model.load_state_dict(torch.load(m_data['weights_path'], map_location=self.device))
         
@@ -221,15 +227,16 @@ class HeadEmbeddingModel(EmbeddingBase):
         )
         
         m_data = MODELS[name]
-        if os.path.exists(m_data['weights_path']):
-            print(f"Loading custom weights for {name} from {m_data['weights_path']}")
-            state_dict = torch.load(m_data['weights_path'], map_location=self.device)
-            
-            base_state_dict = {k.replace('base_model.', ''): v for k, v in state_dict.items() if k.startswith('base_model.')}
-            head_state_dict = {k.replace('projection_head.', ''): v for k, v in state_dict.items() if k.startswith('projection_head.')}
-            
-            self.base_model.load_state_dict(base_state_dict)
-            self.projection_head.load_state_dict(head_state_dict)
+        if not os.path.exists(m_data['weights_path']):
+            raise FileNotFoundError(f"Weights file not found for {name}: {m_data['weights_path']}")
+        print(f"Loading custom weights for {name} from {m_data['weights_path']}")
+        state_dict = torch.load(m_data['weights_path'], map_location=self.device)
+
+        base_state_dict = {k.replace('base_model.', ''): v for k, v in state_dict.items() if k.startswith('base_model.')}
+        head_state_dict = {k.replace('projection_head.', ''): v for k, v in state_dict.items() if k.startswith('projection_head.')}
+
+        self.base_model.load_state_dict(base_state_dict)
+        self.projection_head.load_state_dict(head_state_dict)
             
         self.base_model.to(self.device)
         self.projection_head.to(self.device)
@@ -270,7 +277,7 @@ def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
         case EmbeddingModelNames.MOBILENET_V3_NORMALIZED:
             return NormalizedEmbeddingModel(TorchEmbeddingModel(EmbeddingModelNames.MOBILENET_V3))
         
-        case EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD:
+        case EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD | EmbeddingModelNames.MOBILENET_V3_GRAFFITI_STYLE_HEAD:
             weights = models.MobileNet_V3_Large_Weights.DEFAULT
             base = models.mobilenet_v3_large(weights=weights)
             base.classifier[3] = nn.Identity()
