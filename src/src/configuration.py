@@ -1,6 +1,8 @@
 from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData, ReductionBase, SegmenterBase, BoundingBox
-from PIL import Image as PILImage
+from PIL import Image as PILImage, ImageFile
 from enum import Enum
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 import os
 from tqdm import tqdm
 
