@@ -304,8 +304,37 @@ fotografía vista durante el entrenamiento aparece en los pases de
 
 \subsection{Entorno de ejecución}
 \label{subsec:entorno}
-% DO NOT FILL THIS SECTION
-% Hardware utilizado (CPU, GPU, RAM) y pila de software: Python 3.14
-% gestionado con \texttt{uv}, PyTorch 2.10, scikit-learn 1.8, hdbscan,
-% umap-learn 0.5, Hugging Face Transformers 5.7, open-clip-torch 3.3,
-% Ultralytics 8.4, SQLAlchemy 2.0 y \textit{pgvector} 0.4.
+% TODO: Ensure this stays true. If at any moment another environment is used,
+% update this section accordingly.
+El entorno de ejecución de los experimnetos es el ordenador personal del autor,
+con las siguientes características:
+\begin{itemize}
+    \item CPU: AMD Ryzen 7 5800H (8 núcleos, 16 hilos, 3.2 GHz base, 4.4 GHz turbo).
+    \item GPU: NVIDIA GeForce GTX 1650 Mobile / Max-Q 
+    \item RAM: 16 GB DDR4.
+\end{itemize}
+
+Los experimentos se ejecutan en un entorno virtual de Python 3.14 gestionado
+con \texttt{uv}, con las siguientes dependencias principales:
+\begin{itemize}
+    \item PyTorch 2.10
+    \item open-clip-torch 3.3.0
+    \item Ultralytics 8.4.26
+    \item scikit-learn 1.8
+    \item umap-learn 0.5.12
+    \item SQLAlchemy 2.0.49
+    \item pgvector 0.4.2
+\end{itemize}
+
+Se intenta siempre ejecutar cada configuración de manera aislada, limpiando el
+almacenamiento entre pases para evitar que la caché de resultados contamine las
+métricas de tiempo. En las configuraciones que comparten tanto almacenamiento
+como modelo de extracción de características y límite de ingesta, se reutiliza
+el almacenamiento sin limpiarlo, extrayendo los tiempos de ingesta del primer
+pase y así evitar repetir todo el proceso de extracción de características, que
+acostumbra a ser de los más costosos.
+
+También se procura ejecutar los experimentos con un sistema tranquilo, sin
+otros procesos de fondo que puedan interferir con las mediciones, y se fijan
+las semillas aleatorias para garantizar la reproducibilidad de los resultados.
+
