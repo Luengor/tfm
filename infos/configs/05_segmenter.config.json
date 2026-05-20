@@ -1,0 +1,54 @@
+{
+  "runs": [
+    {
+      "name": "segmenter_identity",
+      "limit": 1000,
+      "storage": {"type": "sqlite", "params": {"db_path": "{output_dir}/db/v2_seg_identity.sqlite"}},
+      "segmenter": {"type": "identity", "params": {}},
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "clear_storage": true
+    },
+    {
+      "name": "segmenter_yolo11n",
+      "limit": 1000,
+      "storage": {"type": "sqlite", "params": {"db_path": "{output_dir}/db/v2_seg_yolo11n.sqlite"}},
+      "segmenter": {"type": "yolo", "params": {"model_path": "models/yolo11n.pt", "threshold": 0.5, "merge_threshold": 0.8, "padding": 0.05}},
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "clear_storage": true
+    },
+    {
+      "name": "segmenter_yolo11s",
+      "limit": 1000,
+      "storage": {"type": "sqlite", "params": {"db_path": "{output_dir}/db/v2_seg_yolo11s.sqlite"}},
+      "segmenter": {"type": "yolo", "params": {"model_path": "models/yolo11s.pt", "threshold": 0.5, "merge_threshold": 0.8, "padding": 0.05}},
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "clear_storage": true
+    },
+    {
+      "name": "segmenter_yolo11m",
+      "limit": 1000,
+      "storage": {"type": "sqlite", "params": {"db_path": "{output_dir}/db/v2_seg_yolo11m.sqlite"}},
+      "segmenter": {"type": "yolo", "params": {"model_path": "models/yolo11m.pt", "threshold": 0.5, "merge_threshold": 0.8, "padding": 0.05}},
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "clear_storage": true
+    },
+    {
+      "name": "segmenter_yolo11m_finetuned",
+      "limit": 1000,
+      "storage": {"type": "sqlite", "params": {"db_path": "{output_dir}/db/v2_seg_yolo11m_ft.sqlite"}},
+      "segmenter": {"type": "yolo", "params": {"model_path": "models/yolo11m-train-10.pt", "threshold": 0.5, "merge_threshold": 0.8, "padding": 0.05}},
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "clear_storage": true
+    }
+  ]
+}

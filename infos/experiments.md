@@ -1,571 +1,433 @@
 # Experiment Catalogue
 
-A curated list of configurations worth evaluating for the graffiti clustering
-pipeline. Each entry states the question the experiment answers, what varies,
-what stays fixed, and the corresponding grid or configuration file in
-[`configs/`](configs/).
+Redesigned around the three pillars of the TFM21 brief
+([`doc/enunciado.md`](../doc/enunciado.md)):
 
-The default "best-guess" baseline used as the fixed component when varying
-another axis is:
+1. **Computational cost as a function of dataset size** — the *headline*
+   contribution of the thesis. Characterised experimentally across the full
+   pipeline (ingest, reduction, clustering, similarity search).
+2. **Unsupervised study of cluster quality** — silhouette / Calinski–Harabasz /
+   Davies–Bouldin against the same baseline pipeline, while varying one axis at
+   a time.
+3. **Supervised validation on the labelled subset** — ARI / NMI / pairwise F1
+   on `sample_crop/` (273 hand-labelled crops over 4 styles), the only
+   experiment with ground truth.
 
-- **Embedding:** `dinov2_graffiti_style_head` (DINOv2 ViT-S/14 backbone with
-  the style-discriminative projection head — self-supervised features
-  fine-tuned for graffiti style similarity).
-- **Reduction:** UMAP, `n_components=10`, `metric="cosine"`, `min_dist=0.0`
-  (the canonical pre-clustering reduction; cosine matches the L2-normalised
-  output of DINOv2/CLIP-style encoders; `min_dist=0` keeps projected points as
-  tightly packed as possible, which maximises density contrast for HDBSCAN).
-- **Clustering:** HDBSCAN, `min_cluster_size=5`
-  (density-aware, auto-detects k, isolates noise — the strongest recommendation
-  in [`best_cluster.md`](best_cluster.md)).
-- **Segmenter:** `identity`
-  (matches the current `configuration.sample.json`; the segmenter experiment isolates
-  whether YOLO cropping helps).
-- **Storage:** SQLite (single-file, no service dependency; PostgreSQL is
-  benchmarked separately).
-- **Limit:** `1000` images
-  (tune up/down depending on dataset size and how patient you are; held constant
-  across runs so timing comparisons are fair).
+The eight experiments below are ordered to support the thesis narrative: the
+quality sweeps (§§1–5) fix the pipeline, the cost sweeps (§§6–7) measure it,
+and the supervised study (§8) anchors the unsupervised metrics used everywhere
+else.
 
-## Computational performance as primary metric
+## Baseline pipeline
 
-The benchmark runner profiles each pipeline stage and records wall time, CPU
-time, and memory (RSS delta, VRAM peak) for:
+Every experiment varies one axis around the same "best-guess" baseline so the
+comparisons are clean:
 
-| Stage | Captures |
-|---|---|
-| `setup` | Model loading / storage connection |
-| `ingest` | Segment → embed → store, repeated per image |
-| `reduction` | Dimensionality reduction over all stored embeddings |
-| `clustering` | Full clustering pass (wraps reduction timing) |
-| `similarity_search` | k-NN lookup for every stored image |
+- **Embedding:** `dinov2_graffiti_style_head` (DINOv2 ViT-S/14 + style-discriminative
+  projection head, L2-normalised output).
+- **Reduction:** UMAP, `n_components=10`, `n_neighbors=15`, `min_dist=0.0`,
+  `metric="cosine"`.
+- **Clustering:** HDBSCAN, `min_cluster_size=5`.
+- **Segmenter:** `identity` (whole image — isolates the segmenter question to
+  experiment §5).
+- **Storage:** SQLite.
+- **Limit:** `1000` images for quality experiments, `5000` for cost-focused
+  experiments and for HDBSCAN tuning where density matters.
 
-`ingest_throughput_ips` (images/s) and `clustering_throughput_ips` are derived
-automatically. These timing columns are available alongside quality scores in
-every result CSV and JSON.
+The working dataset contains roughly 6000 images. The 273 labelled crops in
+[`sample_crop/`](../sample_crop/) are a subset of the full image bank and are
+*not* deduplicated out for the unsupervised experiments — at 5 % of the corpus
+they do not perturb aggregate statistics, and segregating them would
+artificially shrink the cost-sweep dataset.
 
-**Treat timing as co-primary.** A configuration that clusters well but ingests
-10× slower represents a different trade-off than one that is fast but produces
-poor clusters. Where the two objectives conflict, document both.
+## Metrics
 
-**Variability.** Each configuration runs once; wall time on a single run is
-noisy. Differences smaller than ~15 % between configurations should be treated
-as within measurement noise. For the scalability experiment (#9), the trend
-across n values is more meaningful than any individual data point.
+**Computational cost (per stage).** Wall time, CPU time, stage-net peak RSS (`peak_rss_delta_mb`, peak above the stage's own baseline), peak VRAM.
+Stages: `setup`, `ingest`, `reduction`, `clustering`, `similarity_search`.
+Throughput columns (`ingest_throughput_ips`, `clustering_throughput_ips`) are
+derived automatically. Each configuration runs once; differences smaller than
+~15 % should be read as within-noise. For the scalability sweep (§7) the trend
+across `n` is the headline figure, not any single point.
 
-**Dataset size.** The working dataset contains approximately 5000 images (a
-second, larger dataset acquired after the initial 240-image collection).
-Per-experiment `limit` values are set explicitly per config — the HDBSCAN
-tuning (#5) and scalability sweep (#9) use the full 5000, while the embedding
-(#1) and segmenter (#6) sweeps cap at 1000 to keep wall-clock costs manageable
-since they require a fresh ingest per run. The actual n in every result is
-stored in the `image_count` column.
+**Unsupervised cluster quality.**
 
-**Memory.** Every stage captures `peak_rss_mb` and `vram_peak_mb`. Embedding
-models dominate VRAM; reduction and clustering dominate RAM at large n. Large
-reduction algorithms (Isomap, KernelPCA) also build O(n²) distance matrices —
-their RAM consumption scales quadratically and can become the binding constraint
-before CPU time does.
+| Metric | Range | Interpretation |
+|---|---|---|
+| Silhouette | [−1, 1] | Cohesion vs. separation, per-point average. |
+| Calinski–Harabasz | [0, ∞) | Between-cluster vs. within-cluster dispersion. |
+| Davies–Bouldin | [0, ∞) | Average max-similarity between clusters; lower is better. |
+| Noise ratio | [0, 1] | Fraction labelled −1 (HDBSCAN / DBSCAN / OPTICS only). |
+| Cluster-size CV | [0, ∞) | Balance — standard deviation of cluster sizes ÷ mean. |
 
-## Running an experiment
+All five are computed against the **original unreduced** embeddings so the
+reduction stage is not graded by its own loss.
 
-Each grid file is consumed by `generate_configuration.py` to produce a configuration,
-which is then fed to the benchmark runner:
+**Supervised cluster quality** (only when `--ground-truth` is supplied and
+`segmenter == "identity"`): ARI, NMI, pairwise F1, plus the matched / class /
+coverage counts.
+
+## How to run an experiment
 
 ```bash
 cd src
 
-# 1. Expand the grid into a configuration
+# 1. Expand the grid into a configuration (skip for §5 which is already a configuration)
 uv run python benchmarks/generate_configuration.py \
-  -i ../infos/configs/01_embedding_comparison.json \
-  -o benchmarks/embedding_comparison.configuration.json
+  -i ../infos/configs/01_embedding.json \
+  -o benchmarks/01_embedding.configuration.json
 
 # 2. Run the benchmark
 uv run pipeline-benchmark \
-  --configuration benchmarks/embedding_comparison.configuration.json \
+  --configuration benchmarks/01_embedding.configuration.json \
   --dataset ../dataset/images
 
-# 3. Plot the results
+# 3. Plot
 uv run pipeline-plot -i benchmark_results/benchmark_*.json -o plots/
 ```
 
-The segmenter experiment is already a configuration (no grid expansion needed);
-skip step 1 for it.
+For §8 (supervised) add `--ground-truth ../sample_crop/labels.csv` and point
+`--dataset` at `../sample_crop`. For §5 (segmenter) skip step 1 — the file is
+already a configuration (segmenter changes invalidate cached crops, so explicit
+`db_path` + `clear_storage: true` per row is required).
 
-## Distance metrics: what is actually configurable
+---
 
-The cosine default is convenient but not always the right choice — many of the
-clustering algorithms internally assume Euclidean (L2) distance. The current
-wrappers expose a metric parameter only on a subset of components:
+## §1. Embedding model comparison
 
-| Component | Metric / kernel knob | Default | Other supported values |
-|---|---|---|---|
-| UMAP reduction | `metric` | `"cosine"` | `"euclidean"` (L2), `"manhattan"` (L1), `"chebyshev"`, `"minkowski"`, `"correlation"`, … (any `umap-learn` metric) |
-| KernelPCA reduction | `kernel` | `"rbf"` | `"linear"`, `"poly"`, `"sigmoid"`, `"cosine"` (RBF and poly are L2-based; cosine and linear are inner-product based) |
-| OPTICS clustering | `metric` | `"cosine"` | `"euclidean"`, `"manhattan"` / `"l1"`, `"chebyshev"`, … (any sklearn pairwise metric) |
-| Isomap reduction | — | L2 (sklearn default) | wrapper does not expose `metric` |
-| KMeans, GMM | — | L2 (algorithmic requirement) | not changeable |
-| HDBSCAN, DBSCAN | — | L2 (sklearn default) | wrapper does not forward `metric` to sklearn |
-| Agglomerative | — | L2 (sklearn default) | wrapper does not forward `metric`; only `linkage` is configurable |
-| Spectral | `affinity` | `"nearest_neighbors"` | `"rbf"` (different concept than a metric) |
+**Pillar.** Unsupervised quality (2).
 
-**Practical consequence.** The HDBSCAN / DBSCAN / KMeans / Agglomerative
-wrappers operate in L2 internally, so the only place the working metric can be
-chosen for those clusterers is in the upstream UMAP stage. Whether changing it
-matters depends on whether the embeddings live on the unit hypersphere:
+**Question.** Which embedding backbone produces the most semantically coherent
+graffiti clusters under a fixed downstream pipeline?
 
-- **L2-normalised embeddings** (`dinov2_graffiti_style_head`, `clip_vit_b32`, and the
-  graffiti-specific heads — all explicitly normalise to unit norm). On the
-  unit sphere, `‖x − y‖² = 2 − 2·cos(x, y)`: L2 distance is a strictly
-  monotonic function of cosine distance. Any algorithm that depends only on
-  the *ordering* of pairwise distances (k-NN graphs, mutual-reachability,
-  single/complete/average linkage merges) returns identical clusters under
-  cosine and under L2. UMAP-cosine and UMAP-euclidean should produce
-  near-identical reductions for these embeddings; HDBSCAN on either is
-  effectively the same algorithm.
+**Varies.** Eleven embeddings: four ImageNet CNNs (`resnet50`, `vgg16`,
+`inception_v3`, `mobilenet_v3`), DINOv2 ViT-S/14, CLIP ViT-B/32, three YOLO
+backbones (`yolon`, `yolos`, `yolom`), and the two fine-tuned heads
+(`mobilenet_v3_graffiti_author_head`, `dinov2_graffiti_style_head`). The author /
+identity-recovery head (`dinov2_graffiti_author_head`) is omitted — its
+training objective targets a different question.
 
-  **L1 / Manhattan is not** monotonic in cosine on the sphere — it can reorder
-  neighbours and so genuinely change the result.
+**Fixed.** Baseline UMAP → HDBSCAN, identity segmenter, SQLite, `limit=1000`.
 
-  KMeans is a partial exception: centroids are vector means and drift inside
-  the sphere as iterations proceed, so cosine-nearest and L2-nearest
-  assignments can diverge slightly even on normalised data.
+**Why it matters.** This is the single most consequential choice in the
+pipeline. Pairs `mobilenet_v3` ↔ `mobilenet_v3_graffiti_author_head` and
+`dinov2_vits14` ↔ `dinov2_graffiti_style_head` answer the fine-tuning vs.
+pretraining question directly.
 
-- **Unnormalised embeddings** (`resnet50`, `vgg16`, `inception_v3`,
-  `mobilenet_v3`, the raw YOLO backbones). Cosine and L2 differ both in
-  ordering and in magnitude, so the metric choice has measurable end-to-end
-  impact.
+**Cost.** 11 runs, 11 full ingests (each embedding lives in a different vector
+space, no DB reuse).
 
-The metric experiment below uses one of each so the contrast is observable.
+**Config.** [`configs/01_embedding.json`](configs/01_embedding.json)
 
-## Experiments
+## §2. Reduction technique comparison
 
-### 1. Embedding model comparison
+**Pillar.** Unsupervised quality (2).
 
-**Question.** Which embedding backbone produces the most semantically meaningful
-graffiti clusters?
-
-**Varies.** Eleven embeddings — four ImageNet CNNs (`resnet50`, `vgg16`,
-`inception_v3`, `mobilenet_v3`), DINOv2, CLIP, the three YOLO backbones, and
-the two actively-used fine-tuned heads (`mobilenet_v3_graffiti_author_head`,
-`dinov2_graffiti_style_head`). The author-trained DINOv2 head
-(`dinov2_graffiti_author_head`, weights at `models/dinov2_graffiti_author_head.pth`)
-is registered in the codebase but is omitted here — it targets author /
-identity recovery, not style similarity, and so is off-question for this
-experiment.
-
-**Fixed.** UMAP → HDBSCAN baseline, identity segmenter, SQLite, `limit=1000`.
-
-**Why it matters.** This is the single most consequential choice. Self-supervised
-encoders (DINOv2, CLIP) usually beat ImageNet supervision on stylistic tasks;
-fine-tuned heads test whether domain adaptation helps further. This grid also
-covers the "fine-tuned vs pretrained" question directly (compare
-`mobilenet_v3` ↔ `mobilenet_v3_graffiti_author_head` and
-`dinov2_vits14` ↔ `dinov2_graffiti_style_head` in the results).
-
-**Cost.** 11 runs, 11 full ingests (no DB reuse — each embedding produces a
-different vector space).
-
-**Config.** [`configs/01_embedding_comparison.json`](configs/01_embedding_comparison.json)
-
-### 2. Clustering algorithm comparison
-
-**Question.** Once embeddings live in a reduced space, which clustering
-algorithm groups them best?
-
-**Varies.** `hdbscan`, `kmeans`, `gmm`, `dbscan`, `optics` (cosine and
-euclidean — the only clusterer where the metric is configurable),
-`agglomerative` (n_clusters ∈ {5, 10, 20}), `spectral` (n_clusters ∈ {5, 10,
-20}). `affinity_propagation` is intentionally omitted — `best_cluster.md`
-rules it out as impractical. The agglo/spectral `n_clusters` sweep removes the
-k-confound: their silhouette/CH can be compared against HDBSCAN's auto-k by
-selecting the best-k row per algorithm.
-
-**Fixed.** Baseline embedding and UMAP reduction.
-
-**Why it matters.** Tests the recommendation hierarchy in `best_cluster.md`
-against the actual data: HDBSCAN should win, KMeans should be the strong
-baseline, the rest provide ablation evidence.
-
-**Cost.** 12 runs, 1 ingest (the embedding is computed once and reused).
-
-**Config.** [`configs/02_clustering_comparison.json`](configs/02_clustering_comparison.json)
-
-### 3. Reduction technique comparison
-
-**Question.** Does the dimensionality-reduction stage matter, and which method
-helps most?
+**Question.** Does the dimensionality-reduction stage matter for HDBSCAN, and
+which family helps most?
 
 **Varies.** `identity` (no reduction), `pca` (10 and 50 components), `umap`
-(cosine 10d, euclidean 10d, cosine 50d), `isomap`, `kernel_pca` with `rbf`,
-`cosine`, `linear`, and `poly` kernels.
-
-**Fixed.** Baseline embedding and HDBSCAN clustering.
-
-**Why it matters.** Density-based clustering is sensitive to the curse of
-dimensionality. The identity row anchors how much reduction buys; the UMAP rows
-confirm or refute the canonical recipe. The kernel/metric variants directly
-test whether non-cosine geometry pays off when feeding an L2-based clusterer
-(HDBSCAN here).
-
-**Cost.** 11 runs, 1 ingest.
-
-**Config.** [`configs/03_reduction_comparison.json`](configs/03_reduction_comparison.json)
-
-### 4. UMAP hyperparameter tuning
-
-**Question.** Given UMAP is the chosen reduction, what `n_components`,
-`n_neighbors`, and `min_dist` produce the cleanest cluster structure?
-
-**Varies.** A 1-D sweep over `n_components ∈ {2, 5, 10, 20, 50}` (with
-`n_neighbors=15`, `min_dist=0.0`) plus a 3×3 joint mini-grid over
-`n_neighbors ∈ {5, 15, 30}` × `min_dist ∈ {0.0, 0.1, 0.5}` (with
-`n_components=10`). The joint grid exposes interaction between the
-local-vs-global and cluster-tightness knobs, which a pure one-at-a-time sweep
-would miss. `random_state=0` is fixed across all rows so differences reflect
-the hyperparameter, not optimisation noise.
+(10d and 50d cosine), `isomap` (10d), `kernel_pca` (50d, RBF and cosine
+kernels). Linear/poly KernelPCA kernels and UMAP-50/100 sweeps from v1 were
+trimmed — they did not contribute distinctive evidence in early runs.
 
 **Fixed.** Baseline embedding and HDBSCAN.
 
-**Why it matters.** UMAP's local-vs-global tradeoff is controlled by
-`n_neighbors`; cluster tightness by `min_dist`; statistical stability by
-`n_components`. The sweep identifies the regime where HDBSCAN reliably
-recovers clusters.
+**Why it matters.** Density-based clustering degrades in high dimensions. The
+identity row quantifies how much reduction buys; the UMAP rows confirm or
+refute the canonical recipe; the kernel/Isomap rows show whether non-linear
+reductions help.
 
-**Cost.** 13 runs, 1 ingest (one row, `n_components=10 / n_neighbors=15 /
-min_dist=0.0`, is shared between the two sub-sweeps).
+**Cost.** 8 runs, 1 ingest (the embedding DB is reused).
 
-**Config.** [`configs/04_umap_tuning.json`](configs/04_umap_tuning.json)
+**Config.** [`configs/02_reduction.json`](configs/02_reduction.json)
 
-### 5. HDBSCAN `min_cluster_size` tuning
+## §3. Clustering algorithm comparison
+
+**Pillar.** Unsupervised quality (2).
+
+**Question.** Given fixed embeddings and reduction, which clustering algorithm
+groups them best?
+
+**Varies.** `hdbscan`, `kmeans` (auto-k via elbow), `gmm` (auto-k), `dbscan`,
+`optics` (cosine), `agglomerative` (n_clusters ∈ {10, 20}), `spectral`
+(n_clusters ∈ {10, 20}). `affinity_propagation` is omitted as impractical at
+this n (see [`best_cluster.md`](best_cluster.md)). The OPTICS-euclidean and
+agglomerative-5 rows from v1 were trimmed for redundancy.
+
+**Fixed.** Baseline embedding and UMAP.
+
+**Why it matters.** Tests the algorithmic hierarchy recommended in
+`best_cluster.md` against the actual data and provides ablation evidence for
+the HDBSCAN default. The sweep over `n_clusters` for agglomerative and
+spectral removes the k confound when comparing against HDBSCAN's auto-k.
+
+**Cost.** 9 runs, 1 ingest.
+
+**Config.** [`configs/03_clustering.json`](configs/03_clustering.json)
+
+## §4. HDBSCAN `min_cluster_size` tuning
+
+**Pillar.** Unsupervised quality (2).
 
 **Question.** What is the smallest meaningful cluster size for this dataset?
 
-**Varies.** `min_cluster_size` ∈ {10, 25, 50, 100, 200, 500} — sized as
-fractions of a 5000-image dataset (0.2% to 10%) rather than absolute counts.
+**Varies.** `min_cluster_size ∈ {5, 10, 25, 50, 100, 200}` — sized as
+fractions of the 5000-image corpus (0.1 % to 4 %).
 
-**Fixed.** Baseline embedding and UMAP. Note: `limit=5000` here (not the
-catalogue baseline of 1000) so the fractions above resolve to the intended
-absolute counts.
+**Fixed.** Baseline embedding and UMAP. `limit=5000` so the fractions resolve
+to meaningful absolute counts and the density estimates are stable.
 
-**Why it matters.** This is HDBSCAN's main knob. Too low → noisy micro-clusters;
-too high → everything labelled as noise. The right value depends on dataset
-size and the expected granularity of graffiti styles.
+**Why it matters.** This is HDBSCAN's primary knob. Too low → noisy
+micro-clusters; too high → most points fall into noise (label −1). The
+sweep also produces the noise-fraction curve that feeds back into the
+narrative: if noise climbs sharply past a threshold, that's the
+upper bound on cluster granularity the dataset supports.
+
+UMAP hyperparameter tuning (`n_components`, `n_neighbors`, `min_dist`) is
+intentionally omitted: the canonical 10-d / 15-neighbour / `min_dist=0`
+setting is well-established for HDBSCAN preprocessing and an earlier sweep
+produced no surprises. A dedicated UMAP-tuning grid can be reconstructed
+under `infos/configs/` if the reduction sweep (§2) flags UMAP as marginal.
 
 **Cost.** 6 runs, 1 ingest.
 
-**Config.** [`configs/05_hdbscan_tuning.json`](configs/05_hdbscan_tuning.json)
+**Config.** [`configs/04_hdbscan.json`](configs/04_hdbscan.json)
 
-### 6. Segmenter impact
+## §5. Segmenter impact
 
-**Question.** Does YOLO cropping improve clustering over embedding the whole
-image, and which detector / threshold / padding works best?
+**Pillar.** Unsupervised quality (2), with a cost side-effect.
 
-**Varies.** `identity` vs. `yolo` with `yolo26{n,s,m,l}.pt` and
-`yolo11m-train-10.pt` (the fine-tuned detector). For one chosen model, also
-sweeps `threshold` and `padding`.
+**Question.** Does YOLO cropping improve clustering quality over embedding the
+whole image, and which detector / threshold / padding works best?
 
-**Fixed.** Baseline embedding, reduction, clustering.
+**Varies.** `identity` vs. `yolo` with `yolo11{n,s,m}.pt` and
+`yolo11m-train-10.pt` (fine-tuned detector) — five runs total. Earlier
+threshold / padding sweeps and the `yolo11l` row were dropped: at this
+scale, the gap between `m` and `l` is dominated by compute cost, not
+detection quality, and the threshold/padding axis did not produce
+distinctive signal.
+
+**Fixed.** Baseline embedding, reduction, clustering. `limit=1000`.
 
 **Why it matters.** Segmentation removes background noise but introduces
-detection errors. The thesis question is whether the trade-off is worth it.
+detection errors and changes the unit of analysis (image vs. crop). The
+thesis question is whether the trade-off is worth it; the per-run timing
+captures the cost side directly.
 
-**Cost.** 9 runs, 9 full ingests (each segmenter produces different crops).
-This is the most expensive experiment.
+**Format.** Configuration (not a grid). `generate_configuration.py` hashes
+`storage + embedding + limit` to decide DB reuse and does *not* include the
+segmenter, so a grid would incorrectly reuse ingests across segmenter
+variants. The configuration therefore sets explicit `db_path` and
+`clear_storage: true` for every row.
 
-**Format.** Configuration (not grid). The generator hashes `storage+embedding+limit`
-to decide DB reuse and does not include the segmenter, so a grid would
-incorrectly reuse ingests across segmenter variants. The configuration sets
-explicit `db_path` and `clear_storage: true` for every run.
+**Cost.** 5 runs, 5 full ingests — the most expensive quality experiment.
 
-**Config.** [`configs/06_segmenter_comparison.configuration.json`](configs/06_segmenter_comparison.configuration.json)
+**Config.**
+[`configs/05_segmenter.config.json`](configs/05_segmenter.config.json)
 (feed directly to `pipeline-benchmark --configuration`; no `generate_configuration.py`
 step).
 
-### 7. Distance metric impact
+## §6. Storage backend cost
 
-**Question.** Does building the UMAP space with L2 (Euclidean) or L1
-(Manhattan) instead of cosine change cluster quality? And how does the answer
-depend on whether the upstream embedding is L2-normalised to the unit
-hypersphere?
+**Pillar.** Computational cost (1).
 
-**Varies.** UMAP `metric` ∈ {`cosine`, `euclidean`, `manhattan`} crossed with
-clustering ∈ {HDBSCAN (L2-locked), KMeans (L2-locked), OPTICS-cosine,
-OPTICS-euclidean, OPTICS-manhattan}. UMAP `random_state=0` is pinned across
-all rows so the metric is the only varying axis. Three embeddings:
+**Question.** What is the throughput gap between SQLite (linear Python scan)
+and PostgreSQL + pgvector (indexed ANN) for ingest and similarity search,
+and how does it scale with `n`?
 
-- `dinov2_graffiti_style_head` — fine-tuned with explicit L2-normalisation,
-  output lives on the unit hypersphere.
-- `mobilenet_v3` — raw ImageNet features, not normalised.
-- `mobilenet_v3_normalized` — same backbone with a post-hoc L2-normalisation
-  wrapper (`NormalizedEmbeddingModel` in `src/src/embedding/embeddings.py`).
-  Isolates the "norm vs encoder" effect from the metric effect: any gap
-  between `mobilenet_v3` and `mobilenet_v3_normalized` under the same UMAP
-  metric is pure normalisation, while any gap *across* metrics on the
-  normalised variant is geometry on the sphere.
+**Varies.** `storage ∈ {sqlite, postgresql}` × `limit ∈ {500, 1000, 2500,
+5000}`. Similarity search is **enabled** (`top_k=5`) — that is the axis where
+the two backends differ most (O(n) Python scan vs. O(log n) index).
 
-**Fixed.** Identity segmenter, SQLite, `min_cluster_size=5` / `min_samples=5`.
+**Fixed.** Baseline embedding, reduction, clustering, identity segmenter.
 
-**Hypotheses (worth stating before running so the result is interpretable).**
+**Why it matters.** Clustering quality is invariant under storage choice, so
+this experiment isolates pure infrastructure cost. The 10× `limit` span is
+wide enough that the index advantage should be empirically visible rather
+than buried in per-call overhead.
 
-1. On `dinov2_graffiti_style_head`, UMAP-cosine and UMAP-euclidean should
-   produce qualitatively similar clusters under HDBSCAN and OPTICS, because on
-   the unit sphere `‖x − y‖² = 2 − 2·cos(x, y)` makes L2 a monotonic function
-   of cosine — neighbourhood orderings (and hence density-based clustering on
-   the same kNN graph) are invariant. In practice UMAP-cosine uses an angular
-   nearest-neighbour backend with different stochastic init than UMAP-euclidean,
-   so the two reductions are not byte-identical — expect small label
-   differences from optimisation noise rather than from geometry. KMeans may
-   diverge further because centroids drift off the sphere during iteration.
-2. UMAP-manhattan should diverge from both even on normalised data, because
-   L1 is not monotonic in cosine on the sphere.
-3. On `mobilenet_v3`, all three metrics should produce different results;
-   the cosine–L2 gap is real, not a relabel.
-4. `mobilenet_v3_normalized` should behave like `dinov2_graffiti_style_head`
-   under the metric sweep (cosine ≈ euclidean, manhattan distinct) — confirming
-   that the L2-normalisation step alone, not the encoder, is what collapses
-   the cosine–L2 distinction.
+**Prerequisites.** PostgreSQL via the dev container at `localhost:54321`
+(`postgresql://postgres:changethis@localhost:54321/postgres`).
 
-**Why it matters.** If hypothesis 1 holds, the cosine default for UMAP is
-already the right choice on normalised embeddings (no "geometric mismatch" to
-fix). If it fails, something in the pipeline is noisier than the theory
-suggests and the choice becomes empirical. Either result tightens the thesis
-recommendation.
+**Cost.** 8 runs, 8 ingests — every storage × limit combination needs its own
+DB (different storage type or different size invalidates the cached one).
 
-**Cost.** 45 runs (3 embeddings × 3 UMAP metrics × 5 clusterers), 3 ingests
-(`mobilenet_v3_normalized` re-uses the raw `mobilenet_v3` model under the hood
-but stores normalised vectors, so it requires its own ingest pass).
+**Config.** [`configs/06_storage.json`](configs/06_storage.json)
 
-**Config.** [`configs/07_metric_comparison.json`](configs/07_metric_comparison.json)
+## §7. Pipeline scalability sweep (HEADLINE)
 
-### 8. Storage backend performance
+**Pillar.** Computational cost (1) — *the primary deliverable of the thesis.*
 
-**Question.** What is the throughput difference between SQLite (linear scan)
-and PostgreSQL + pgvector (indexed ANN) for ingest and similarity search across
-multiple dataset sizes?
-
-**Varies.** Storage type (`sqlite`, `postgresql`) × `limit` ∈ {500, 1000, 2500,
-5000}. Similarity search is **enabled** (`top_k=5`) — this is the key axis
-where the two backends differ (SQLite: O(n) Python scan; PostgreSQL: O(log n)
-index). The 10× range is wide enough that the index advantage should be
-empirically visible rather than buried in per-call overhead.
-
-**Fixed.** Baseline embedding, reduction, clustering, segmenter.
-
-**Why it matters.** Clustering quality is unaffected by storage choice; this
-experiment isolates infrastructure cost. Testing at four dataset sizes reveals
-how the PostgreSQL index advantage scales with n across the available dataset
-range (up to ~5000 images). The result informs the deployment recommendation
-in the thesis.
-
-**Prerequisites.** PostgreSQL requires the dev container from the `mnt/`
-PostgreSQL setup at `localhost:54321`.
-
-**Cost.** 8 runs, 8 ingests (every storage × limit combination requires a
-separate DB).
-
-**Config.** [`configs/08_storage_comparison.json`](configs/08_storage_comparison.json)
-
-### 9. Scalability sweep
-
-**Question.** How does wall time for each pipeline stage scale with dataset
-size n, and do the O() complexity differences between clustering algorithms
+**Question.** How does wall time scale with `n` for each pipeline stage, and
+do the asymptotic complexity differences between clustering algorithms
 manifest empirically within the available dataset range?
 
-**Varies.** `limit` ∈ {250, 500, 1000, 2000, 5000} (geometric, spanning 20×) ×
-clustering algorithm ∈ {HDBSCAN, KMeans, Agglomerative, Spectral}.
+**Varies.** `limit ∈ {100, 250, 500, 1000, 2000, 3500, 5000}` (~50× span) ×
+clustering algorithm ∈ {HDBSCAN, KMeans, DBSCAN, OPTICS, Agglomerative,
+Spectral}. Similarity search is enabled with `top_k=5` so the search stage
+is timed at every `n` too — this is where the corpus-size sensitivity of
+SQLite is observable as a separate signal.
 
-**Fixed.** Baseline embedding (DINOv2 graffiti head), UMAP reduction (10d,
-cosine), SQLite, identity segmenter.
+**Fixed.** Baseline embedding (`dinov2_graffiti_style_head`), UMAP reduction,
+SQLite, identity segmenter.
 
-**Why it matters.** This is the primary performance characterisation experiment.
-Expected complexity classes:
+**Why it matters.** This is the experiment the thesis exists to deliver
+(`enunciado.md`: *"describir el coste computacional en función del tamaño del
+conjunto de imágenes, de forma experimental"*). Expected complexity classes:
 
 | Stage | Algorithm | Expected scaling |
 |---|---|---|
 | Ingest | Any embedding | O(n) — model inference per image |
 | Reduction | UMAP | ~O(n^1.14) empirically |
-| Clustering | HDBSCAN | O(n log n) amortized |
-| Clustering | KMeans | O(n · k · iterations) ≈ O(n) |
+| Similarity search | SQLite linear scan, all-pairs top-k | O(n²) per full corpus pass |
+| Clustering | HDBSCAN | O(n log n) amortised |
+| Clustering | KMeans | O(n · k · iter) ≈ O(n) |
+| Clustering | DBSCAN | O(n log n) with index, O(n²) worst-case |
+| Clustering | OPTICS | O(n²) |
 | Clustering | Agglomerative | O(n² log n) |
 | Clustering | Spectral | O(n²)–O(n³) |
 
-With the 5000-image dataset, the 20× range from n=250 to n=5000 gives O(n²) and
-O(n² log n) algorithms (Agglomerative, Spectral) enough room to visibly break
-down against the near-linear ones (HDBSCAN, KMeans). On a log-log plot the
-slope of wall time vs. n should be ~1 for the linear pair and ~2 for the
-quadratic pair — that's the headline figure for the performance chapter.
+On a log-log plot the slope of wall time vs. `n` should be ~1 for the
+linear-ish stages and ~2 for the quadratic clusterers. That headline figure
+— *empirically measured slopes* alongside *theoretical complexity classes*
+— is the central result of the cost chapter.
 
-**Cost.** 20 runs, 5 ingests (the embedding DB is reused across the 4 clusterers
-within each limit group).
+**Cost.** 42 runs, 7 ingests (the embedding DB is reused across the 6
+clusterers within each limit group).
 
-**Config.** [`configs/09_scalability_sweep.json`](configs/09_scalability_sweep.json)
+**Config.** [`configs/07_scalability.json`](configs/07_scalability.json)
 
-### 10. Supervised validation on labeled crops
+## §8. Supervised validation on labelled crops
 
-**Question.** When ground-truth style labels exist, which pipeline best recovers
-those classes? Specifically: (a) does fine-tuning a graffiti-specific projection
-head improve cluster–label agreement over the pretrained backbone, and (b) is
-the improvement consistent across backbone families (DINOv2 self-supervised vs.
-MobileNet/ResNet ImageNet-supervised vs. CLIP image–text)?
+**Pillar.** Supervised validation (3).
 
-**Dataset.** [`sample_crop/`](../sample_crop/) — 273 manually labeled crops
+**Question.** When ground-truth style labels are available, which pipeline best
+recovers them? Specifically: (a) does fine-tuning a graffiti-specific
+projection head improve cluster–label agreement over the pretrained backbone,
+and (b) is the improvement consistent across backbone families?
+
+**Dataset.** [`sample_crop/`](../sample_crop/) — 273 manually labelled crops
 across 4 styles: `tag` (116), `piece` (69), `throw-up` (69), `character` (19).
-Labels live in [`sample_crop/labels.csv`](../sample_crop/labels.csv) in the
-`filename,style` schema consumed by `pipeline-benchmark --ground-truth`. The
-crops are already segmented, so the `identity` segmenter is the correct choice
-(this is also a runner requirement — extrinsic metrics are only computed when
-`segmenter == "identity"`, see `runner.py:266`).
+Labels in [`sample_crop/labels.csv`](../sample_crop/labels.csv) follow the
+`filename,style` schema consumed by `--ground-truth`. The crops are already
+segmented, so `identity` is the correct (and required, per the
+segmenter check in `src/src/evaluation/runner.py`) segmenter for extrinsic metrics.
 
-**Metrics.** The runner computes the unsupervised triad (silhouette, CH, DB) as
-usual, plus the supervised triad whenever ground truth is provided:
+**Metrics.** The intrinsic triad (silhouette, CH, DB) plus the extrinsic
+triad:
 
-| Metric | Range | What it measures |
+| Metric | Range | Reads as |
 |---|---|---|
-| Adjusted Rand Index (ARI) | [−1, 1] | Pair agreement, chance-corrected. 0 = random labelling, 1 = perfect. |
-| Normalised Mutual Information (NMI) | [0, 1] | Shared information between predicted and true partitions; insensitive to cluster count. |
-| Pairwise F1 | [0, 1] | Harmonic mean of pairwise precision/recall over same-cluster vs. same-class pairs; treats noise (label −1) as its own cluster. |
+| Adjusted Rand Index (ARI) | [−1, 1] | Pair agreement, chance-corrected. 0 = random, 1 = perfect. |
+| Normalised Mutual Information (NMI) | [0, 1] | Shared info between predicted and true partitions. |
+| Pairwise F1 | [0, 1] | Harmonic mean of pairwise precision / recall; treats noise (−1) as its own cluster. |
 
-ARI is the headline metric (chance-corrected, comparable across runs with
-different k); NMI is reported alongside to flag the "many tiny clusters
-inflating NMI" failure mode; pairwise F1 is the most interpretable for the
-write-up. All three live under `clustering_quality.extrinsic` in the result
-JSON.
+ARI is the headline (chance-corrected, comparable across runs with different
+k); NMI is reported alongside to flag the *many-tiny-clusters-inflates-NMI*
+failure mode; pairwise F1 is the most interpretable for write-up.
 
 **Varies.**
 
-- **Embedding (4).** One fine-tuning pair (`dinov2_vits14` ↔
-  `dinov2_graffiti_style_head`) plus two strong baselines (`clip_vit_b32`
-  self-supervised image–text, `resnet50` ImageNet-supervised CNN). The pair
-  isolates the fine-tuning effect within a fixed backbone; the baselines anchor
-  where the pair sits relative to off-the-shelf encoders. The MobileNet pair is
-  omitted here — its supervised behaviour is already covered by experiment #1,
-  and the DINOv2 family is the canonical fine-tuning testbed for the thesis.
-- **Reduction (3).** `identity` (no reduction — baseline measuring whether the
-  raw embedding space already separates classes), UMAP `n_components=2`
-  (matches the 2-D scatter plots used for visualisation in the thesis), and
-  UMAP `n_components=10` (the canonical pre-clustering reduction from the
-  other experiments). Comparing the three isolates whether dimensionality
-  reduction helps the supervised metric at all and whether aggressive
-  reduction degrades it — important context for any figure that uses the 2-D
-  projection as evidence of cluster structure.
-- **Clustering (7).** `kmeans` with `n_clusters=4` (forced to the ground-truth
-  k — measures recovery quality given oracle k), `agglomerative` with
-  `n_clusters=4` + `linkage="average"` (hierarchical alternative under oracle
-  k), `spectral` with `n_clusters=4` (graph-based alternative under oracle
-  k), and `hdbscan` swept over `min_cluster_size ∈ {3, 5, 10, 20}`
-  (density-based, auto-detects k — sweep tests whether the true class count
-  emerges naturally and how stable it is across the main HDBSCAN knob, given
+- **Embedding (4).** `dinov2_vits14` ↔ `dinov2_graffiti_style_head`
+  (fine-tuning pair, fixed backbone) plus `clip_vit_b32` (self-supervised
+  image–text) and `resnet50` (ImageNet-supervised CNN) as anchors.
+- **Reduction (3).** `identity` (raw embedding space), UMAP `n_components=2`
+  (matches the 2-D scatter plots used in the thesis), UMAP `n_components=10`
+  (the canonical pre-clustering reduction).
+- **Clustering (6).** `kmeans`, `agglomerative`, `spectral` all with
+  `n_clusters=4` (oracle k); `hdbscan` swept over
+  `min_cluster_size ∈ {5, 10, 20}` (density-based auto-k — tests whether
+  the true k=4 emerges and how sensitive that is to the main knob given
   class sizes `tag=116, piece=69, throw-up=69, character=19`).
 
-**Fixed.** SQLite storage, identity segmenter, no `limit` (sample_crop has
-~273 images so every run processes the full set).
+**Fixed.** SQLite, identity segmenter, no `limit` (sample_crop is small
+enough that every run processes the full 273).
 
 **Hypotheses.**
 
-1. The fine-tuned style head should outperform `dinov2_vits14` on ARI/NMI/F1 —
-   **but** the head was trained on `sample_crop`'s style-organised folders
-   via supervised contrastive loss (`SupConLoss`, see
-   `src/train/style_trainer.py`), so this is a *training-set* evaluation,
-   not held-out generalisation. The result
-   establishes a ceiling ("the head learned the training distribution")
-   rather than out-of-sample transfer. State this caveat explicitly in any
-   figure caption.
-2. CLIP should be competitive with DINOv2 base; ResNet50 should be the weakest
-   off-the-shelf encoder for stylistic clustering, consistent with the broader
-   embedding comparison (#1).
-3. KMeans-4 should achieve the highest extrinsic scores on the fine-tuned
-   style head because k matches ground truth and the head was trained to
-   make classes linearly separable; spectral and agglomerative under oracle
-   k=4 should follow closely; HDBSCAN should auto-discover a count near 4 on
-   the fine-tuned head at moderate `min_cluster_size` (≈10–20, the
-   `character` class has only 19 samples so smaller values risk fragmenting
-   it and larger values risk absorbing it into noise) and noticeably
-   different counts on the baselines.
-4. The `identity` reduction should match or beat UMAP on the fine-tuned head
-   (the head has already concentrated discriminative information so further
-   reduction is information loss) and should underperform UMAP on the raw
-   ImageNet features (UMAP's manifold-aware projection helps when the input
-   geometry is poor). UMAP-2 should slightly underperform UMAP-10 on the
-   extrinsic metrics; the gap should be small for fine-tuned embeddings and
-   larger for raw ImageNet features. If UMAP-2 *matches* UMAP-10 even on the
-   unfine-tuned models, the 2-D visualisations in the thesis are honest
-   representations of the cluster structure rather than artefacts of
-   compression.
+1. The fine-tuned style head outperforms `dinov2_vits14` on ARI / NMI / F1
+   — *but* the head was trained on `sample_crop`'s style folders via
+   supervised contrastive loss (see `src/train/style_trainer.py`), so this is
+   a *training-set* evaluation, not held-out generalisation. State the
+   caveat explicitly in every caption.
+2. CLIP is competitive with DINOv2 base; ResNet50 is the weakest off-the-shelf
+   encoder for stylistic clustering, consistent with §1.
+3. KMeans-4 (oracle k) wins on the fine-tuned head because the head was
+   trained to make classes linearly separable; HDBSCAN auto-discovers a
+   count near 4 on the fine-tuned head at moderate `min_cluster_size` (≈10–20).
+4. `identity` reduction matches or beats UMAP on the fine-tuned head
+   (further reduction is information loss when the encoder has already
+   concentrated discriminative axes) and underperforms UMAP on raw ImageNet
+   features. UMAP-2 ≈ UMAP-10 on the fine-tuned head ⇒ the 2-D thesis
+   visualisations are honest representations rather than compression
+   artefacts.
 
-**Why it matters.** Every other experiment in this catalogue uses unsupervised
-proxies (silhouette, CH, DB) as the quality signal — these reward
-within-cluster density and between-cluster separation regardless of whether the
-clusters correspond to anything semantically meaningful. The supervised
-validation is the single experiment where "good clustering" is defined against
-human-labelled categories. Two derived analyses follow naturally:
+**Derived analyses.**
 
-- **Internal–external correlation.** Plot ARI vs. silhouette over the 48 runs.
-  A strong positive correlation means the unsupervised metrics are a defensible
-  proxy on this dataset and we can trust them in the experiments without
-  ground truth; a weak or zero correlation means the unsupervised optima do
-  not coincide with semantic optima, and the thesis must hedge its
-  recommendations accordingly.
-- **k-recovery for HDBSCAN.** Whether HDBSCAN's auto-detected cluster count
-  lands near 4 on the fine-tuned head — across the `min_cluster_size`
-  sweep — is the cleanest evidence for/against the "density-based clustering
-  discovers the true number of styles" claim. The `n_clusters` field is
-  already in every result row; report it alongside the noise fraction so
-  inflated NMI from many-tiny-clusters runs is visible.
+- **Internal–external correlation.** Plot ARI vs. silhouette over the 72 runs.
+  A strong positive correlation means the unsupervised metrics are a
+  defensible proxy on this dataset; a weak one means the thesis must hedge
+  its recommendations elsewhere.
+- **k-recovery for HDBSCAN.** Does HDBSCAN's auto-detected `n_clusters` land
+  near 4 on the fine-tuned head across the `min_cluster_size` sweep? Report
+  alongside `noise_ratio` so the "inflated NMI from many tiny clusters"
+  failure mode is visible.
 
-**Cost.** 84 runs (4 embeddings × 3 reductions × 7 clusterers — 3 fixed-k +
-4 HDBSCAN variants), 4 ingests (one per embedding; reduction and clustering
-re-use the cached DB within an embedding group thanks to
-`generate_configuration.py`'s storage-key hashing).
+**Cost.** 72 runs (4 embeddings × 3 reductions × 6 clusterers), 4 ingests
+(one per embedding; reduction and clustering re-use the cached DB within an
+embedding group thanks to storage-key hashing in `generate_configuration.py`).
 
 **Running.**
 
 ```bash
 cd src
 
-# 1. Expand the grid (48 runs)
 uv run python benchmarks/generate_configuration.py \
-  -i ../infos/configs/10_supervised_validation.json \
-  -o benchmarks/supervised_validation.configuration.json
+  -i ../infos/configs/08_supervised.json \
+  -o benchmarks/08_supervised.configuration.json
 
-# 2. Run, pointing at sample_crop and passing the labels for extrinsic metrics
 uv run pipeline-benchmark \
-  --configuration benchmarks/supervised_validation.configuration.json \
+  --configuration benchmarks/08_supervised.configuration.json \
   --dataset ../sample_crop \
   --ground-truth ../sample_crop/labels.csv \
   --cluster-plot
 
-# 3. Plot — the extrinsic columns (ari, nmi, pairwise_f1) are auto-detected
 uv run pipeline-plot -i benchmark_results/benchmark_*.json -o plots/
 ```
 
 `--cluster-plot` writes an interactive 2-D UMAP scatter per run as a
-self-contained Vega-Lite HTML page (`<output-dir>/<run_id>_cluster.html`).
-The page embeds the per-run metrics table and supports pan/zoom (drag +
-wheel), shift-drag brush selection, a thumbnail grid of the selected
-points, and a click-to-enlarge lightbox with keyboard navigation. The
-image path prefix is editable inline so the page can resolve thumbnails
-without re-running the pipeline; this is useful here precisely because
-ground-truth labels can be overlaid for visual sanity-checking.
+Vega-Lite HTML page (`<output-dir>/<run_id>_cluster.html`) with embedded
+metrics, pan/zoom, shift-drag brush selection, and a thumbnail lightbox —
+useful here because ground-truth labels can be overlaid for visual
+sanity-checking.
 
-**Config.** [`configs/10_supervised_validation.json`](configs/10_supervised_validation.json)
+**Config.** [`configs/08_supervised.json`](configs/08_supervised.json)
+
+---
 
 ## Suggested order
 
-1. **#1 Embedding comparison** first — fixes the strongest variable so later
-   experiments use the actual best embedding rather than a guess.
-2. **#3 Reduction** and **#2 Clustering** next, using the winner of #1.
-3. **#4 UMAP** and **#5 HDBSCAN** to fine-tune the chosen reduction/clustering
-   pair.
-4. **#7 Distance metric impact** — once a UMAP+clusterer pair is chosen, check
-   whether swapping the metric from cosine to L2/L1 changes anything.
-5. **#6 Segmenter** once the rest of the pipeline is settled — it is the most
-   expensive and benefits from comparison against an already-strong baseline.
-6. **#9 Scalability sweep** and **#8 Storage** independently — both are
-   performance-only and can run in any order or in parallel with the quality
-   experiments once the baseline pipeline is fixed.
-7. **#10 Supervised validation** at any point after #1 — provides the
-   ground-truth anchor for the unsupervised metrics used throughout the
-   other experiments. Running it early (right after #1) lets later
-   experiments cite the internal–external correlation when defending the
-   silhouette/CH/DB scores as proxies for semantic quality.
+1. **§1 Embedding** first — fixes the strongest variable so later experiments
+   use the actual best embedding rather than a guess.
+2. **§2 Reduction** and **§3 Clustering** next, using the winner of §1.
+3. **§4 HDBSCAN tuning** to fine-tune the chosen clustering / reduction pair.
+4. **§5 Segmenter** once the rest of the pipeline is settled — it is the most
+   expensive quality experiment.
+5. **§6 Storage** and **§7 Scalability** can run in any order or in parallel
+   with the quality experiments once the baseline pipeline is fixed. They are
+   the headline contribution of the thesis and should be allocated the most
+   careful time-budget (consistent hardware state, no concurrent load).
+6. **§8 Supervised validation** can run any time after §1 — running it early
+   lets later experiments cite the internal–external correlation when
+   defending silhouette / CH / DB as proxies for semantic quality.
+
+## History
+
+An earlier catalogue had ten experiments including UMAP hyperparameter
+tuning and a distance-metric / sphere-geometry deep dive. Both were
+trimmed: the canonical UMAP setting is well-established for HDBSCAN
+preprocessing, and the metric-impact analysis is theoretical context for
+the thesis chapter rather than a separate empirical sweep. The remaining
+eight experiments live under [`configs/`](configs/), with the scalability
+sweep §7 expanded (more `n` points, a sixth clusterer, and similarity
+search) to make it the genuine cost-vs-`n` headline.
