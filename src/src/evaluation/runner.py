@@ -667,7 +667,7 @@ def _maybe_plot_clusters(
         else:
             points_2d = project_to_2d(embeddings_arr)
 
-        output_path = output_dir / f"{run_spec.run_id}_cluster.html"
+        output_path = output_dir / f"{run_spec.name}_{run_spec.run_id}_cluster.html"
         title = f"{run_spec.name} — {run_spec.embedding.type} / {run_spec.clustering.type}"
         plot_clusters_2d(
             points_2d=points_2d,
