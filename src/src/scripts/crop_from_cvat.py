@@ -122,7 +122,7 @@ def crop_from_cvat(
     print(f"  Skipped boxes (in --skip-labels): {skipped}")
     print(f"  Missing image files: {missing}")
     print(f"  Errors: {errors}")
-    print(f"  Crops per label:")
+    print("  Crops per label:")
     for label, count in sorted(label_counts.items(), key=lambda x: -x[1]):
         print(f"    {label}: {count}")
     print(f"  Total crops: {sum(label_counts.values())}")
