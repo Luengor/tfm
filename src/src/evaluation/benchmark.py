@@ -15,7 +15,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--output-dir",
         default="benchmark_results",
-        help="Directory where benchmark CSV/JSON files will be written.",
+        help="Directory where benchmark JSON files will be written.",
     )
     parser.add_argument(
         "--run",
@@ -93,12 +93,11 @@ def main() -> int:
         ground_truth=ground_truth,
         cluster_plot_options=cluster_plot_options,
     )
-    csv_path, json_path = write_results(results=results, output_dir=args.output_dir, prefix=args.prefix)
+    json_path = write_results(results=results, output_dir=args.output_dir, prefix=args.prefix)
 
     success = sum(1 for result in results if result.status == "success")
     failed = len(results) - success
     print(f"Completed {len(results)} runs: {success} success, {failed} failed")
-    print(f"CSV: {csv_path}")
     print(f"JSON: {json_path}")
     return 0 if failed == 0 else 1
 

@@ -68,6 +68,10 @@ def load_configuration_with_options(
             if not isinstance(limit, int) or limit <= 0:
                 raise ConfigurationError(f"Run {run_name}: limit must be a positive integer.")
 
+        repeats = raw.get("repeats", 1)
+        if not isinstance(repeats, int) or isinstance(repeats, bool) or repeats <= 0:
+            raise ConfigurationError(f"Run {run_name}: repeats must be a positive integer.")
+
         run_spec = BenchmarkRunSpec(
             name=run_name,
             storage=storage_spec,
@@ -78,6 +82,7 @@ def load_configuration_with_options(
             similarity_search=similarity_search,
             clear_storage=clear_storage,
             limit=limit,
+            repeats=repeats,
         )
         run_spec.run_id = make_run_id(run_spec)
         run_specs.append(run_spec)

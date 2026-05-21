@@ -27,6 +27,7 @@ from src.cluster.utils import find_elbow
 class KMeansClusterer(ClusteringBase):
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
         n_clusters = kwargs.get("n_clusters")
+        random_state = kwargs.get("random_state", 0)
         embeddings = np.array([img.embedding for img in images])
 
         if n_clusters is None:
@@ -36,10 +37,10 @@ class KMeansClusterer(ClusteringBase):
             else:
                 ks = range(2, max_k + 1)
                 inertias = [
-                    KMeans(n_clusters=k, random_state=0, n_init="auto").fit(embeddings).inertia_
+                    KMeans(n_clusters=k, random_state=random_state, n_init="auto").fit(embeddings).inertia_
                     for k in ks
                 ]
                 n_clusters = ks[find_elbow(np.array(inertias))]
 
-        kmeans = KMeans(n_clusters=n_clusters, random_state=0, n_init="auto").fit(embeddings)
+        kmeans = KMeans(n_clusters=n_clusters, random_state=random_state, n_init="auto").fit(embeddings)
         return list(kmeans.labels_.tolist())  # type: ignore

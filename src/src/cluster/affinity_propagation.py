@@ -27,6 +27,7 @@ class AffinityPropagationClusterer(ClusteringBase):
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
         damping = kwargs.get("damping", 0.5)
         preference = kwargs.get("preference", None)
+        random_state = kwargs.get("random_state", 0)
         embeddings = np.array([img.embedding for img in images])
-        af = AffinityPropagation(damping=damping, preference=preference, random_state=0).fit(embeddings)
+        af = AffinityPropagation(damping=damping, preference=preference, random_state=random_state).fit(embeddings)
         return list(af.labels_.tolist())  # type: ignore

@@ -30,6 +30,7 @@ class GMMClusterer(ClusteringBase):
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
         n_components = kwargs.get("n_clusters")
         covariance_type = kwargs.get("covariance_type", "full")
+        random_state = kwargs.get("random_state", 0)
         embeddings = np.array([img.embedding for img in images])
 
         if n_components is None:
@@ -39,11 +40,11 @@ class GMMClusterer(ClusteringBase):
             else:
                 ks = range(1, max_k + 1)
                 bics = [
-                    GaussianMixture(n_components=k, covariance_type=covariance_type, random_state=0).fit(embeddings).bic(embeddings)
+                    GaussianMixture(n_components=k, covariance_type=covariance_type, random_state=random_state).fit(embeddings).bic(embeddings)
                     for k in ks
                 ]
                 n_components = ks[int(np.argmin(bics))]
 
-        gmm = GaussianMixture(n_components=n_components, covariance_type=covariance_type, random_state=0).fit(embeddings)
+        gmm = GaussianMixture(n_components=n_components, covariance_type=covariance_type, random_state=random_state).fit(embeddings)
         labels = gmm.predict(embeddings)
         return list(labels.tolist())

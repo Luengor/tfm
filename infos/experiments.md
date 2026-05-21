@@ -37,6 +37,11 @@ comparisons are clean:
   non-monotonic quality-vs-`n` behaviour without forcing each grid into a
   full cost-sweep. Cost-focused experiments (§6, §7) keep their finer
   explicit `n` sweeps.
+- **Repeats:** `K=3` for quality experiments, `K=5` for cost experiments
+  (§6, §7). Reduction + clustering loop K times per run; iter 0 is discarded
+  to absorb JIT warm-up; the remaining K-1 samples produce mean ± std for
+  wall time, CPU, RSS, and VRAM. Ingest stays single-shot. See the
+  **Metrics** section for the full rationale.
 
 The working dataset contains roughly 6000 images. The 274 labelled eval
 crops in [`data/style/eval_crop/`](../data/style/eval_crop/) (and the 178
@@ -49,11 +54,25 @@ cost-sweep dataset.
 ## Metrics
 
 **Computational cost (per stage).** Wall time, CPU time, stage-net peak RSS (`peak_rss_delta_mb`, peak above the stage's own baseline), peak VRAM.
-Stages: `setup`, `ingest`, `reduction`, `clustering`, `similarity_search`.
+Stages: `ingest`, `reduction`, `clustering`, `similarity_search`.
 Throughput columns (`ingest_throughput_ips`, `clustering_throughput_ips`) are
-derived automatically. Each configuration runs once; differences smaller than
-~15 % should be read as within-noise. For the scalability sweep (§7) the trend
-across `n` is the headline figure, not any single point.
+derived automatically.
+
+**Repeats and error bars.** Each run sets `repeats: K`. The reduction and
+clustering stages execute K times back-to-back in the same process with seeds
+`0..K-1`; iter 0 is dropped (it absorbs UMAP/numba JIT and CUDA cache warm-up)
+and the remaining K-1 samples are aggregated as mean ± std. Output JSON keeps
+the existing `{stage}_wall_time_s` keys (now the mean) and adds
+`{stage}_wall_time_s_std` and `{stage}_n` siblings — `plot_metrics.py` and
+`table.py` keep working unchanged. Quality and extrinsic metrics are computed
+once, on the last iteration's labels (seed `K-1`, reproducible). Ingest and
+similarity-search remain single-shot — ingest is deterministic and the
+DB-reuse heuristic depends on a single timing.
+
+Defaults: `K=3` for quality-focused experiments (§§1–5, §8) and `K=5` for the
+cost-focused sweeps (§6, §7). Wall-time differences inside one std should be
+read as within-noise; the scalability sweep §7 reports the trend across `n`
+as its headline figure rather than any single point.
 
 **Unsupervised cluster quality.**
 
@@ -268,8 +287,13 @@ than buried in per-call overhead.
 **Prerequisites.** PostgreSQL via the dev container at `localhost:54321`
 (`postgresql://postgres:changethis@localhost:54321/postgres`).
 
-**Cost.** 8 runs, 8 ingests — every storage × limit combination needs its own
-DB (different storage type or different size invalidates the cached one).
+**Cost.** 8 runs at `repeats=5`, 8 ingests — every storage × limit
+combination needs its own DB (different storage type or different size
+invalidates the cached one). Similarity-search wall time is single-shot per
+run (not looped), so the K=5 repeats only multiply reduction + clustering
+cost; the SQLite-vs-pgvector throughput gap on similarity search is the
+headline figure here, and its variance comes from inter-run rather than
+intra-run measurements — read it cautiously against the cost legend in §7.
 
 **Config.** [`configs/06_storage.json`](configs/06_storage.json)
 
@@ -311,8 +335,12 @@ linear-ish stages and ~2 for the quadratic clusterers. That headline figure
 — *empirically measured slopes* alongside *theoretical complexity classes*
 — is the central result of the cost chapter.
 
-**Cost.** 42 runs, 7 ingests (the embedding DB is reused across the 6
-clusterers within each limit group).
+**Cost.** 42 runs at `repeats=5` (4 measured samples per run after iter-0
+drop), 7 ingests (the embedding DB is reused across the 6 clusterers within
+each limit group). The repeat tax falls only on reduction + clustering, so
+the extra cost is small relative to the 7 single-shot ingests — and the
+error bars are essential here because complexity-class claims rest on
+slope estimates rather than single timings.
 
 **Config.** [`configs/07_scalability.json`](configs/07_scalability.json)
 

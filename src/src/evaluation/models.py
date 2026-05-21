@@ -27,6 +27,7 @@ class BenchmarkRunSpec:
     similarity_search: SimilaritySearchSpec = field(default_factory=SimilaritySearchSpec)
     clear_storage: bool = True
     limit: int | None = None
+    repeats: int = 1
     run_id: str = ""
 
 
@@ -51,6 +52,89 @@ class StageMetrics:
             f"{prefix}_rss_delta_mb": self.rss_delta_mb,
             f"{prefix}_peak_rss_delta_mb": self.peak_rss_delta_mb,
             f"{prefix}_vram_peak_mb": self.vram_peak_mb,
+        }
+
+
+@dataclass(slots=True)
+class StageMetricsAgg:
+    """Mean +/- std aggregation of multiple StageMetrics samples."""
+    wall_time_s: float
+    wall_time_s_std: float
+    cpu_time_s: float
+    cpu_time_s_std: float
+    cpu_percent_estimated: float
+    rss_start_mb: float
+    rss_end_mb: float
+    rss_delta_mb: float
+    rss_delta_mb_std: float
+    peak_rss_delta_mb: float | None
+    peak_rss_delta_mb_std: float | None
+    vram_peak_mb: float | None
+    vram_peak_mb_std: float | None
+    n: int
+
+    @classmethod
+    def from_samples(cls, samples: list["StageMetrics"]) -> "StageMetricsAgg":
+        import statistics as _st
+        if not samples:
+            raise ValueError("StageMetricsAgg.from_samples requires at least one sample.")
+
+        def _mean(values: list[float]) -> float:
+            return float(_st.fmean(values))
+
+        def _std(values: list[float]) -> float:
+            return float(_st.pstdev(values)) if len(values) > 1 else 0.0
+
+        def _opt_mean(values: list[float | None]) -> float | None:
+            clean = [v for v in values if v is not None]
+            return _mean(clean) if clean else None
+
+        def _opt_std(values: list[float | None]) -> float | None:
+            clean = [v for v in values if v is not None]
+            return _std(clean) if clean else None
+
+        wall = [s.wall_time_s for s in samples]
+        cpu = [s.cpu_time_s for s in samples]
+        cpup = [s.cpu_percent_estimated for s in samples]
+        rss_s = [s.rss_start_mb for s in samples]
+        rss_e = [s.rss_end_mb for s in samples]
+        rss_d = [s.rss_delta_mb for s in samples]
+        peak = [s.peak_rss_delta_mb for s in samples]
+        vram = [s.vram_peak_mb for s in samples]
+
+        return cls(
+            wall_time_s=_mean(wall),
+            wall_time_s_std=_std(wall),
+            cpu_time_s=_mean(cpu),
+            cpu_time_s_std=_std(cpu),
+            cpu_percent_estimated=_mean(cpup),
+            rss_start_mb=_mean(rss_s),
+            rss_end_mb=_mean(rss_e),
+            rss_delta_mb=_mean(rss_d),
+            rss_delta_mb_std=_std(rss_d),
+            peak_rss_delta_mb=_opt_mean(peak),
+            peak_rss_delta_mb_std=_opt_std(peak),
+            vram_peak_mb=_opt_mean(vram),
+            vram_peak_mb_std=_opt_std(vram),
+            n=len(samples),
+        )
+
+    def to_flat_dict(self, prefix: str) -> dict[str, float | int | None]:
+        return {
+            f"{prefix}_wall_time_s": self.wall_time_s,
+            f"{prefix}_wall_time_s_std": self.wall_time_s_std,
+            f"{prefix}_cpu_time_s": self.cpu_time_s,
+            f"{prefix}_cpu_time_s_std": self.cpu_time_s_std,
+            f"{prefix}_cpu_percent_estimated": self.cpu_percent_estimated,
+            f"{prefix}_rss_start_mb": self.rss_start_mb,
+            f"{prefix}_rss_end_mb": self.rss_end_mb,
+            f"{prefix}_rss_delta_mb": self.rss_delta_mb,
+            f"{prefix}_rss_delta_mb_std": self.rss_delta_mb_std,
+            f"{prefix}_peak_rss_delta_mb": self.peak_rss_delta_mb,
+            f"{prefix}_peak_rss_delta_mb_std": self.peak_rss_delta_mb_std,
+            f"{prefix}_vram_peak_mb": self.vram_peak_mb,
+            f"{prefix}_vram_peak_mb_std": self.vram_peak_mb_std,
+            f"{prefix}_n": self.n,
         }
 
 
@@ -131,13 +215,12 @@ class BenchmarkResult:
     segmenter_type: str | None = None
     reduction_type: str | None = None
     error: str | None = None
-    setup: StageMetrics | None = None
     ingest: StageMetrics | None = None
-    reduction: StageMetrics | None = None
+    reduction: StageMetricsAgg | None = None
     similarity_search: StageMetrics | None = None
     avg_neighbor_distance: float | None = None
     similarity_extrinsic: SimilaritySearchExtrinsicMetrics | None = None
-    clustering: StageMetrics | None = None
+    clustering: StageMetricsAgg | None = None
     clustering_quality: ClusteringQualityMetrics | None = None
     clustering_extrinsic: ExtrinsicMetrics | None = None
     config: BenchmarkRunSpec | None = None
@@ -172,20 +255,21 @@ class BenchmarkResult:
                 "similarity_search_cos_distance": self.config.similarity_search.cos_distance,
                 "clear_storage_enabled": self.config.clear_storage,
                 "limit_parameter": self.config.limit,
+                "repeats": self.config.repeats,
             })
 
-        for stage_name in ("setup", "ingest", "reduction", "similarity_search", "clustering"):
+        for stage_name in ("ingest", "reduction", "similarity_search", "clustering"):
             stage = getattr(self, stage_name)
             if stage is None:
                 continue
-            
+
             stage_dict = stage.to_flat_dict(stage_name)
-            
+
             # Calculate throughput for relevant processing stages
             if stage_name in ("ingest", "similarity_search", "clustering") and self.image_count > 0:
                 if stage.wall_time_s > 0:
                     stage_dict[f"{stage_name}_throughput_ips"] = self.image_count / stage.wall_time_s
-            
+
             record.update(stage_dict)
 
         if self.clustering_quality:

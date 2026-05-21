@@ -27,6 +27,7 @@ class SpectralClusterer(ClusteringBase):
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
         n_clusters = kwargs.get("n_clusters", 5)
         affinity = kwargs.get("affinity", "nearest_neighbors")
+        random_state = kwargs.get("random_state", 0)
         embeddings = np.array([img.embedding for img in images])
-        spectral = SpectralClustering(n_clusters=n_clusters, affinity=affinity, random_state=0).fit(embeddings)
+        spectral = SpectralClustering(n_clusters=n_clusters, affinity=affinity, random_state=random_state).fit(embeddings)
         return list(spectral.labels_.tolist())  # type: ignore

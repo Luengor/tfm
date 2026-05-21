@@ -37,6 +37,7 @@ from src.evaluation.models import (
     ExtrinsicMetrics,
     SimilaritySearchExtrinsicMetrics,
     StageMetrics,
+    StageMetricsAgg,
 )
 from src.reduction import IdentityReduction, PCAReduction, UMAPReduction, KernelPCAReduction, IsomapReduction
 from src.storage.postgresql import PostgreSQLStorage
@@ -153,7 +154,7 @@ def run_benchmarks(
     return results
 
 
-def write_results(results: list[BenchmarkResult], output_dir: str, prefix: str = "benchmark") -> tuple[str, str]:
+def write_results(results: list[BenchmarkResult], output_dir: str, prefix: str = "benchmark") -> str:
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     output_root = Path(output_dir)
     output_root.mkdir(parents=True, exist_ok=True)
@@ -165,15 +166,7 @@ def write_results(results: list[BenchmarkResult], output_dir: str, prefix: str =
     with json_path.open("w", encoding="utf-8") as file:
         json.dump({"runtime": runtime_info, "results": records}, file, indent=2)
 
-    csv_path = output_root / f"{prefix}_{timestamp}.csv"
-    field_names = _build_csv_columns(records)
-    with csv_path.open("w", encoding="utf-8", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=field_names)
-        writer.writeheader()
-        for record in records:
-            writer.writerow(record)
-
-    return str(csv_path), str(json_path)
+    return str(json_path)
 
 
 def _run_single(
@@ -186,16 +179,18 @@ def _run_single(
 ) -> BenchmarkResult:
     started_at = _utc_now()
 
-    setup_metrics = None
     ingest_metrics = None
-    reduction_metrics = None
+    reduction_agg = None
     query_metrics = None
     similarity_metrics = None
     avg_neighbor_distance = None
     similarity_extrinsic = None
-    clustering_metrics = None
+    clustering_agg = None
     clustering_quality = None
     clustering_extrinsic = None
+    embeddings_arr = None
+    reduced_embeddings = None
+    labels_arr = None
 
     image_count = 0
     cluster_count = None
@@ -217,14 +212,12 @@ def _run_single(
             raise ValueError(f"Run {run_spec.name}: no images found in {dataset_root}")
         image_count = len(image_paths)
 
-        with profile_stage() as setup_stage:
-            storage = _build_storage(run_spec, output_dir)
-            embedding = _build_embedding(run_spec)
-            clustering = _build_clustering(run_spec)
-            reduction = _build_reduction(run_spec)
-            segmenter = _build_segmenter(run_spec)
-            config = Configuration(storage=storage, embedding=embedding, clustering=clustering, reduction=reduction, segmenter=segmenter)
-        setup_metrics = setup_stage.metrics
+        storage = _build_storage(run_spec, output_dir)
+        embedding = _build_embedding(run_spec)
+        clustering = _build_clustering(run_spec)
+        reduction = _build_reduction(run_spec)
+        segmenter = _build_segmenter(run_spec)
+        config = Configuration(storage=storage, embedding=embedding, clustering=clustering, reduction=reduction, segmenter=segmenter)
 
         if run_spec.clear_storage:
             _clear_storage(storage)
@@ -298,40 +291,59 @@ def _run_single(
                     f"'{segmenter_type_eff}' (not identity); skipping similarity-search extrinsic metrics."
                 )
 
-        with profile_stage() as cluster_stage:
-            if all_images:
+        if all_images:
+            K = max(1, int(run_spec.repeats))
+            reduction_samples: list[StageMetrics] = []
+            clustering_samples: list[StageMetrics] = []
+            embeddings = [img.embedding for img in all_images]
+            embeddings_arr = np.array(embeddings)
+            labels = None
+
+            for i in range(K):
+                seed_i = i
+                # Rebuild reduction per repeat so UMAP picks up the new seed.
+                reduction = _build_reduction(run_spec, random_state=seed_i)
+
                 with profile_stage() as red_stage:
-                    embeddings = [img.embedding for img in all_images]
-                    reduced_embeddings = config.reduction.reduce(embeddings)
+                    reduced_embeddings = reduction.reduce(embeddings)
                     clustering_images = [
-                        ImageData(filename=img.filename, embedding=emb) 
+                        ImageData(filename=img.filename, embedding=emb)
                         for img, emb in zip(all_images, reduced_embeddings)
                     ]
-                reduction_metrics = red_stage.metrics
-                labels = config.clustering.cluster(clustering_images, **run_spec.clustering.params)
-                    
-                labels_arr = np.array(labels)
-                # Calculate quality metrics against ORIGINAL embeddings
-                embeddings_arr = np.array([img.embedding for img in all_images])
-                
-                clustering_quality = calculate_clustering_metrics(embeddings_arr, labels_arr)
+                reduction_samples.append(red_stage.metrics)
 
-                segmenter_type_eff = (
-                    run_spec.segmenter.type.lower() if run_spec.segmenter else "identity"
+                cluster_kwargs = dict(run_spec.clustering.params)
+                cluster_kwargs["random_state"] = seed_i
+                with profile_stage() as clu_stage:
+                    labels = config.clustering.cluster(clustering_images, **cluster_kwargs)
+                clustering_samples.append(clu_stage.metrics)
+
+            # Drop iter 0 (absorbs JIT / cache warmup) when we have spare samples.
+            if K >= 2:
+                reduction_samples = reduction_samples[1:]
+                clustering_samples = clustering_samples[1:]
+
+            reduction_agg = StageMetricsAgg.from_samples(reduction_samples)
+            clustering_agg = StageMetricsAgg.from_samples(clustering_samples)
+
+            labels_arr = np.array(labels)
+            clustering_quality = calculate_clustering_metrics(embeddings_arr, labels_arr)
+
+            segmenter_type_eff = (
+                run_spec.segmenter.type.lower() if run_spec.segmenter else "identity"
+            )
+            if ground_truth is not None and segmenter_type_eff == "identity":
+                clustering_extrinsic = _compute_extrinsic(all_images, labels_arr, ground_truth)
+            elif ground_truth is not None:
+                print(
+                    f"Run {run_spec.name}: ground truth provided but segmenter is "
+                    f"'{segmenter_type_eff}' (not identity); skipping extrinsic metrics."
                 )
-                if ground_truth is not None and segmenter_type_eff == "identity":
-                    clustering_extrinsic = _compute_extrinsic(all_images, labels_arr, ground_truth)
-                elif ground_truth is not None:
-                    print(
-                        f"Run {run_spec.name}: ground truth provided but segmenter is "
-                        f"'{segmenter_type_eff}' (not identity); skipping extrinsic metrics."
-                    )
 
-                n_clusters = int(np.sum(np.unique(labels_arr) >= 0)) if labels_arr.size > 0 else 0
-                cluster_count = n_clusters
-            else:
-                cluster_count = 0
-        clustering_metrics = cluster_stage.metrics
+            n_clusters = int(np.sum(np.unique(labels_arr) >= 0)) if labels_arr.size > 0 else 0
+            cluster_count = n_clusters
+        else:
+            cluster_count = 0
 
         if all_images and cluster_plot_options and cluster_plot_options.get("enabled"):
             plot_metrics: dict[str, Any] = {
@@ -375,13 +387,12 @@ def _run_single(
         segmenter_type=run_spec.segmenter.type if run_spec.segmenter else "identity",
         reduction_type=run_spec.reduction.type if run_spec.reduction else "identity",
         error=error,
-        setup=setup_metrics,
         ingest=ingest_metrics,
-        reduction=reduction_metrics,
+        reduction=reduction_agg,
         similarity_search=similarity_metrics,
         avg_neighbor_distance=avg_neighbor_distance,
         similarity_extrinsic=similarity_extrinsic,
-        clustering=clustering_metrics,
+        clustering=clustering_agg,
         clustering_quality=clustering_quality,
         clustering_extrinsic=clustering_extrinsic,
         config=run_spec,
@@ -501,16 +512,18 @@ def _build_segmenter(run_spec: BenchmarkRunSpec):
     raise ValueError(f"Run {run_spec.name}: unsupported segmenter type '{run_spec.segmenter.type}'.")
 
 
-def _build_reduction(run_spec: BenchmarkRunSpec):
+def _build_reduction(run_spec: BenchmarkRunSpec, random_state: int | None = None):
     if not run_spec.reduction:
         return IdentityReduction()
 
     name = run_spec.reduction.type.lower()
-    params = run_spec.reduction.params
+    params = dict(run_spec.reduction.params)
 
     if name == "pca":
         return PCAReduction(**params)
     if name == "umap":
+        if random_state is not None:
+            params["random_state"] = random_state
         return UMAPReduction(**params)
     if name == "isomap":
         return IsomapReduction(**params)
@@ -527,39 +540,6 @@ def _clear_storage(storage: Any) -> None:
     if clear_fn is None:
         return
     clear_fn()
-
-
-def _build_csv_columns(records: list[dict[str, Any]]) -> list[str]:
-    if not records:
-        return []
-
-    preferred = [
-        "run_name",
-        "run_id",
-        "status",
-        "started_at",
-        "finished_at",
-        "image_count",
-        "cluster_count",
-        "storage_type",
-        "storage_params",
-        "embedding_type",
-        "embedding_params",
-        "clustering_type",
-        "clustering_params",
-        "segmenter_type",
-        "segmenter_params",
-        "reduction_type",
-        "reduction_params",
-        "similarity_search_enabled",
-        "similarity_search_top_k",
-        "similarity_search_cos_distance",
-        "clear_storage_enabled",
-        "limit_parameter",
-    ]
-
-    dynamic = sorted({key for record in records for key in record.keys() if key not in preferred})
-    return preferred + dynamic
 
 
 def _utc_now() -> str:

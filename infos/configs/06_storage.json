@@ -12,6 +12,7 @@
     {"type": "hdbscan", "params": {"min_cluster_size": 5}}
   ],
   "similarity_search": {"enabled": true, "top_k": 5},
+  "repeats": 5,
   "storage": [
     {"type": "sqlite", "params": {}},
     {"type": "postgresql", "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/postgres"}}
