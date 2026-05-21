@@ -20,5 +20,5 @@
     {"type": "spectral", "params": {"n_clusters": 10, "affinity": "nearest_neighbors"}}
   ],
   "similarity_search": {"enabled": true, "top_k": 5},
-  "limit": [100, 250, 500, 1000, 2000, 3500, 5000]
+  "limit": [100, 250, 500, 1000, 2000, 3500, 5500]
 }

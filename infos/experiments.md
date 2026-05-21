@@ -31,8 +31,12 @@ comparisons are clean:
 - **Segmenter:** `identity` (whole image — isolates the segmenter question to
   experiment §5).
 - **Storage:** SQLite.
-- **Limit:** `1000` images for quality experiments, `5000` for cost-focused
-  experiments and for HDBSCAN tuning where density matters.
+- **Limit:** every experiment is run at three geometrically spaced sizes —
+  `{250, 1000, 5500}` (≈22× span) — so each quality result is reported at
+  small, mid and near-full corpus. Three points are enough to spot
+  non-monotonic quality-vs-`n` behaviour without forcing each grid into a
+  full cost-sweep. Cost-focused experiments (§6, §7) keep their finer
+  explicit `n` sweeps.
 
 The working dataset contains roughly 6000 images. The 274 labelled eval
 crops in [`data/style/eval_crop/`](../data/style/eval_crop/) (and the 178
@@ -109,15 +113,18 @@ backbones (`yolon`, `yolos`, `yolom`), and the two fine-tuned heads
 identity-recovery head (`dinov2_graffiti_author_head`) is omitted — its
 training objective targets a different question.
 
-**Fixed.** Baseline UMAP → HDBSCAN, identity segmenter, SQLite, `limit=1000`.
+**Fixed.** Baseline UMAP → HDBSCAN, identity segmenter, SQLite. Swept at
+`limit ∈ {250, 1000, 5500}`.
 
 **Why it matters.** This is the single most consequential choice in the
 pipeline. Pairs `mobilenet_v3` ↔ `mobilenet_v3_graffiti_author_head` and
 `dinov2_vits14` ↔ `dinov2_graffiti_style_head` answer the fine-tuning vs.
 pretraining question directly.
 
-**Cost.** 11 runs, 11 full ingests (each embedding lives in a different vector
-space, no DB reuse).
+**Cost.** 33 runs (11 embeddings × 3 limits), 33 full ingests (each
+embedding × limit pair gets its own DB; no reuse across embeddings). The
+`limit=250` ingests are cheap, so the marginal cost over the 2-limit
+variant is dominated by the 11 small-`n` runs.
 
 **Config.** [`configs/01_embedding.json`](configs/01_embedding.json)
 
@@ -133,14 +140,16 @@ which family helps most?
 kernels). Linear/poly KernelPCA kernels and UMAP-50/100 sweeps from v1 were
 trimmed — they did not contribute distinctive evidence in early runs.
 
-**Fixed.** Baseline embedding and HDBSCAN.
+**Fixed.** Baseline embedding and HDBSCAN. Swept at
+`limit ∈ {250, 1000, 5500}`.
 
 **Why it matters.** Density-based clustering degrades in high dimensions. The
 identity row quantifies how much reduction buys; the UMAP rows confirm or
 refute the canonical recipe; the kernel/Isomap rows show whether non-linear
 reductions help.
 
-**Cost.** 8 runs, 1 ingest (the embedding DB is reused).
+**Cost.** 24 runs (8 reductions × 3 limits), 3 ingests (one per limit — the
+embedding DB is reused across reductions within each limit group).
 
 **Config.** [`configs/02_reduction.json`](configs/02_reduction.json)
 
@@ -157,14 +166,15 @@ groups them best?
 this n (see [`best_cluster.md`](best_cluster.md)). The OPTICS-euclidean and
 agglomerative-5 rows from v1 were trimmed for redundancy.
 
-**Fixed.** Baseline embedding and UMAP.
+**Fixed.** Baseline embedding and UMAP. Swept at
+`limit ∈ {250, 1000, 5500}`.
 
 **Why it matters.** Tests the algorithmic hierarchy recommended in
 `best_cluster.md` against the actual data and provides ablation evidence for
 the HDBSCAN default. The sweep over `n_clusters` for agglomerative and
 spectral removes the k confound when comparing against HDBSCAN's auto-k.
 
-**Cost.** 9 runs, 1 ingest.
+**Cost.** 27 runs (9 clusterers × 3 limits), 3 ingests.
 
 **Config.** [`configs/03_clustering.json`](configs/03_clustering.json)
 
@@ -175,10 +185,14 @@ spectral removes the k confound when comparing against HDBSCAN's auto-k.
 **Question.** What is the smallest meaningful cluster size for this dataset?
 
 **Varies.** `min_cluster_size ∈ {5, 10, 25, 50, 100, 200}` — sized as
-fractions of the 5000-image corpus (0.1 % to 4 %).
+fractions of the 5500-image corpus (≈0.1 % to ≈3.6 %).
 
-**Fixed.** Baseline embedding and UMAP. `limit=5000` so the fractions resolve
-to meaningful absolute counts and the density estimates are stable.
+**Fixed.** Baseline embedding and UMAP. Swept at
+`limit ∈ {250, 1000, 5500}` so the same `min_cluster_size` axis is read
+across three corpus sizes; the 5500-image row is where the fractions
+resolve to meaningful absolute counts and density estimates are stable,
+while the 250 and 1000 rows reveal whether the optimal `min_cluster_size`
+shifts with `n` (interaction the headline cost-sweep §7 does not measure).
 
 **Why it matters.** This is HDBSCAN's primary knob. Too low → noisy
 micro-clusters; too high → most points fall into noise (label −1). The
@@ -192,7 +206,7 @@ setting is well-established for HDBSCAN preprocessing and an earlier sweep
 produced no surprises. A dedicated UMAP-tuning grid can be reconstructed
 under `infos/configs/` if the reduction sweep (§2) flags UMAP as marginal.
 
-**Cost.** 6 runs, 1 ingest.
+**Cost.** 18 runs (6 `min_cluster_size` × 3 limits), 3 ingests.
 
 **Config.** [`configs/04_hdbscan.json`](configs/04_hdbscan.json)
 
@@ -210,7 +224,8 @@ scale, the gap between `m` and `l` is dominated by compute cost, not
 detection quality, and the threshold/padding axis did not produce
 distinctive signal.
 
-**Fixed.** Baseline embedding, reduction, clustering. `limit=1000`.
+**Fixed.** Baseline embedding, reduction, clustering. Each segmenter row is
+expanded to `limit ∈ {250, 1000, 5500}`.
 
 **Why it matters.** Segmentation removes background noise but introduces
 detection errors and changes the unit of analysis (image vs. crop). The
@@ -223,7 +238,8 @@ segmenter, so a grid would incorrectly reuse ingests across segmenter
 variants. The configuration therefore sets explicit `db_path` and
 `clear_storage: true` for every row.
 
-**Cost.** 5 runs, 5 full ingests — the most expensive quality experiment.
+**Cost.** 15 runs (5 segmenters × 3 limits), 15 full ingests — the most
+expensive quality experiment.
 
 **Config.**
 [`configs/05_segmenter.config.json`](configs/05_segmenter.config.json)
@@ -239,13 +255,13 @@ and PostgreSQL + pgvector (indexed ANN) for ingest and similarity search,
 and how does it scale with `n`?
 
 **Varies.** `storage ∈ {sqlite, postgresql}` × `limit ∈ {500, 1000, 2500,
-5000}`. Similarity search is **enabled** (`top_k=5`) — that is the axis where
+5500}`. Similarity search is **enabled** (`top_k=5`) — that is the axis where
 the two backends differ most (O(n) Python scan vs. O(log n) index).
 
 **Fixed.** Baseline embedding, reduction, clustering, identity segmenter.
 
 **Why it matters.** Clustering quality is invariant under storage choice, so
-this experiment isolates pure infrastructure cost. The 10× `limit` span is
+this experiment isolates pure infrastructure cost. The 11× `limit` span is
 wide enough that the index advantage should be empirically visible rather
 than buried in per-call overhead.
 
@@ -265,7 +281,7 @@ DB (different storage type or different size invalidates the cached one).
 do the asymptotic complexity differences between clustering algorithms
 manifest empirically within the available dataset range?
 
-**Varies.** `limit ∈ {100, 250, 500, 1000, 2000, 3500, 5000}` (~50× span) ×
+**Varies.** `limit ∈ {100, 250, 500, 1000, 2000, 3500, 5500}` (~55× span) ×
 clustering algorithm ∈ {HDBSCAN, KMeans, DBSCAN, OPTICS, Agglomerative,
 Spectral}. Similarity search is enabled with `top_k=5` so the search stage
 is timed at every `n` too — this is where the corpus-size sensitivity of
