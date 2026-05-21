@@ -36,6 +36,7 @@ from src.evaluation.models import (
     BenchmarkRunSpec,
     ClusteringQualityMetricsAgg,
     ExtrinsicMetrics,
+    ExtrinsicMetricsAgg,
     SimilaritySearchExtrinsicMetrics,
     StageMetrics,
     StageMetricsAgg,
@@ -303,9 +304,17 @@ def _run_single(
             reduction_samples: list[StageMetrics] = []
             clustering_samples: list[StageMetrics] = []
             quality_samples = []
+            extrinsic_samples: list[ExtrinsicMetrics] = []
             embeddings = [img.embedding for img in all_images]
             embeddings_arr = np.array(embeddings)
             labels = None
+
+            segmenter_type_eff = (
+                run_spec.segmenter.type.lower() if run_spec.segmenter else "identity"
+            )
+            compute_extrinsic_per_repeat = (
+                ground_truth is not None and segmenter_type_eff == "identity"
+            )
 
             for i in range(K):
                 seed_i = i
@@ -326,16 +335,21 @@ def _run_single(
                     labels = config.clustering.cluster(clustering_images, **cluster_kwargs)
                 clustering_samples.append(clu_stage.metrics)
 
-                # Per-repeat clustering quality so stochastic clusterers report
-                # mean ± std rather than a single realisation.
+                # Per-repeat clustering quality + extrinsic so stochastic
+                # clusterers report mean ± std rather than a single realisation.
+                labels_iter = np.array(labels)
                 quality_samples.append(
-                    calculate_clustering_metrics(embeddings_arr, np.array(labels))
+                    calculate_clustering_metrics(embeddings_arr, labels_iter)
                 )
+                if compute_extrinsic_per_repeat:
+                    extrinsic_samples.append(
+                        _compute_extrinsic(all_images, labels_iter, ground_truth)
+                    )
 
             # Iter 0 drop is delegated to StageMetricsAgg: cost fields drop it
             # (JIT absorption), memory fields keep it (allocator caches make
             # later iters under-report the real peak above baseline). Quality
-            # is unaffected by JIT, so all K samples are aggregated as-is.
+            # and extrinsic are unaffected by JIT, so all K samples aggregate.
             reduction_agg = StageMetricsAgg.from_samples(
                 reduction_samples, drop_first_for_cost=True
             )
@@ -346,11 +360,8 @@ def _run_single(
             labels_arr = np.array(labels)
             clustering_quality = ClusteringQualityMetricsAgg.from_samples(quality_samples)
 
-            segmenter_type_eff = (
-                run_spec.segmenter.type.lower() if run_spec.segmenter else "identity"
-            )
-            if ground_truth is not None and segmenter_type_eff == "identity":
-                clustering_extrinsic = _compute_extrinsic(all_images, labels_arr, ground_truth)
+            if compute_extrinsic_per_repeat:
+                clustering_extrinsic = ExtrinsicMetricsAgg.from_samples(extrinsic_samples)
             elif ground_truth is not None:
                 print(
                     f"Run {run_spec.name}: ground truth provided but segmenter is "

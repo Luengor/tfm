@@ -164,6 +164,11 @@ def make_run_id(spec: BenchmarkRunSpec) -> str:
         "clustering": {"type": spec.clustering.type.lower(), "params": spec.clustering.params},
         "segmenter": {"type": spec.segmenter.type.lower(), "params": spec.segmenter.params} if spec.segmenter else None,
         "reduction": {"type": spec.reduction.type.lower(), "params": spec.reduction.params} if spec.reduction else None,
+        "similarity_search": {
+            "enabled": spec.similarity_search.enabled,
+            "top_k": spec.similarity_search.top_k,
+            "cos_distance": spec.similarity_search.cos_distance,
+        },
         "limit": spec.limit,
     }
     digest = hashlib.sha256(json.dumps(normalized, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()

@@ -118,29 +118,39 @@ momento el coste real de la etapa.
 
 \subsubsection{Instrumentación y cronometría}
 \label{subsubsec:cronometria}
-%TODO: Re-write this now that the runner has changed to include multiple runs,
-%dropped specific warm-up and the setup and clear steps
-El \textit{runner} de evaluación delimita seis etapas susceptibles de medición:
-preparación (\textit{setup}), limpieza del almacenamiento (\textit{clear}),
-ingesta, reducción, agrupamiento y búsqueda por similitud. Cada etapa se
-envuelve en un gestor de contexto (\texttt{profile\_stage}) que captura los
-instantes de entrada y salida mediante \texttt{time.perf\_counter}, un reloj
-monotónico de alta resolución que no se ve afectado por ajustes del reloj del
-sistema. La diferencia entre instantes proporciona el tiempo de pared
-(\textit{wall time}) consumido por la etapa, expresado en segundos con
-resolución de microsegundos.
+El \textit{runner} de evaluación delimita cuatro etapas susceptibles de
+medición: ingesta, reducción, agrupamiento y búsqueda por similitud. Cada
+etapa se envuelve en un gestor de contexto (\texttt{profile\_stage}) que
+captura los instantes de entrada y salida mediante
+\texttt{time.perf\_counter}, un reloj monotónico de alta resolución que no
+se ve afectado por ajustes del reloj del sistema. La diferencia entre
+instantes proporciona el tiempo de pared (\textit{wall time}) consumido por
+la etapa, expresado en segundos con resolución de microsegundos. La
+preparación de componentes y la limpieza del almacenamiento se ejecutan
+fuera de cualquier gestor de contexto y, por tanto, no se contabilizan como
+etapa medida.
 
-Para acotar la variabilidad entre ejecuciones, cada configuración se
-ejecuta varias veces de manera consecutiva. La primera ejecución se
-considera de calentamiento (\textit{warm-up}) y se descarta, ya que
-absorbe los efectos de inicialización (carga de pesos, compilación
-\textit{just-in-time} de operadores y poblamiento de cachés del sistema
-operativo). De las ejecuciones restantes se reportan la mediana y la
-desviación absoluta mediana (MAD), estadísticos robustos frente a valores
-atípicos que pueden aparecer puntualmente por interferencias del sistema.
-Los experimentos se programan además sobre un sistema sin otras cargas
+Para acotar la variabilidad entre ejecuciones, las etapas de reducción y
+agrupamiento se repiten $K$ veces de manera consecutiva dentro del mismo
+proceso, empleando las semillas $0, 1, \ldots, K-1$ tanto para la reducción
+estocástica (UMAP) como para los agrupamientos estocásticos (K-Means, GMM,
+\textit{spectral clustering} y \textit{affinity propagation}). Cuando
+$K \geq 2$, la primera repetición ($i=0$) se descarta porque absorbe los
+efectos de inicialización (compilación \textit{just-in-time} de operadores
+y poblamiento de cachés del sistema operativo); de las $K-1$ repeticiones
+restantes se reportan la media aritmética y la desviación típica de cada
+métrica de coste. La calidad del agrupamiento, en cambio, se evalúa sobre
+las $K$ repeticiones completas, ya que no se ve afectada por los costes de
+inicialización y permite cuantificar la sensibilidad de las métricas
+intrínsecas al muestreo aleatorio del agrupamiento. Las etapas de ingesta y
+búsqueda por similitud se miden una única vez por ejecución: la ingesta es
+determinista y, además, la heurística de reutilización de almacenamiento
+descrita en \ref{subsubsec:reutilizacion} requiere una cronometría única;
+la búsqueda por similitud es comparativamente económica y su variabilidad
+inter-config se observa directamente a lo largo del barrido de tamaños.
+Los experimentos se programan sobre un sistema sin otras cargas
 significativas, tal como se describe en \ref{subsec:entorno}, para
-minimizar dichas interferencias.
+minimizar interferencias externas.
 
 \subsubsection{Selección automática de hiperparámetros}
 \label{subsubsec:hiperparam-auto}
@@ -169,22 +179,36 @@ para que el resultado sea reproducible.
 
 \subsubsection{Protocolo de búsqueda por similitud}
 \label{subsubsec:similarity-search}
-%TODO: check if this is true in the code
 La medición del coste de la búsqueda por similitud se realiza sobre los
 \textit{backends} ya descritos en \ref{subsec:configuraciones}, sin
 reintroducir aquí el contexto sobre índices ANN
-(\ref{subsec:art-similarity-search}). Tras la ingesta, se selecciona un
-conjunto de consultas formado por una muestra aleatoria de $Q$
-\textit{embeddings} del propio banco, escogida con una semilla fija para que la
-selección sea idéntica entre configuraciones. Para cada consulta se solicita al
-\textit{backend} la recuperación de los $k$ vectores más próximos según
-distancia coseno, descartando el propio vector consultado.
+(\ref{subsec:art-similarity-search}). Tras la ingesta, se utiliza el banco
+completo como conjunto de consultas: cada \textit{embedding} almacenado se
+emplea, a su vez, como vector de consulta y se solicita al \textit{backend}
+la recuperación de los $k+1$ vectores más próximos (con $k$ configurable a
+través del bloque \texttt{similarity\_search.top\_k}, por defecto $k=3$),
+descartando posteriormente el propio vector consultado para retener
+exactamente los $k$ vecinos relevantes. La distancia utilizada en la consulta
+es coseno por defecto y puede conmutarse a euclídea mediante el parámetro
+\texttt{cos\_distance}. Recorrer la totalidad del banco como consulta hace
+que la complejidad de la etapa crezca como $O(n^2)$ en el caso lineal de
+\texttt{SQLiteStorage}, comportamiento que coincide con la observación
+empírica del barrido de escalabilidad.
 
-El tiempo total empleado en las $Q$ consultas se mide con el mismo instrumental
-cronométrico que el resto de etapas; la latencia por consulta se reporta como
-cociente entre tiempo total y $Q$. Este diseño permite contrastar de manera
-directa el coste por consulta del recorrido lineal de \texttt{SQLiteStorage}
-(que crece linealmente con el tamaño del banco) con el del índice HNSW de
+El tiempo total empleado en las $n$ consultas se mide con el mismo
+instrumental cronométrico que el resto de etapas. A diferencia de las
+etapas de reducción y agrupamiento, la búsqueda por similitud no se repite
+$K$ veces dentro del proceso: por un lado, los \textit{backends} se
+comportan de manera determinista una vez fijada la semilla del índice; por
+otro, el coste total ya escala cuadráticamente con $n$, de modo que
+repetirlo multiplicaría el coste del experimento sin añadir información
+estadística adicional respecto a la variabilidad entre configuraciones.
+Como métrica derivada se reporta también la distancia media al vecino más
+cercano (\texttt{avg\_neighbor\_distance}), que permite contrastar el
+\textit{backend} no solo en términos de coste sino también de calidad de
+recuperación. Este diseño permite contrastar de manera directa el coste
+por consulta del recorrido lineal de \texttt{SQLiteStorage} (que crece
+linealmente con el tamaño del banco) con el del índice HNSW de
 \texttt{PostgreSQLStorage} (con coste de consulta sublineal) en los mismos
 puntos del barrido de escalabilidad.
 
@@ -235,24 +259,23 @@ sistemáticamente a una mejor calidad supervisada.
 
 \subsubsection{Salida y agregación de resultados}
 \label{subsubsec:salida}
-%TODO: check this now that the runner has changed to include multiple runs and
-%the new output format
-Cada lote de \textit{benchmark} produce dos ficheros con el mismo nombre base y
-distinta extensión. El fichero CSV contiene una fila por configuración con
-todas las métricas y tiempos como columnas, en un formato directamente legible
-por hojas de cálculo y herramientas de análisis tabular. El fichero JSON
-contiene la misma información en estructura anidada, acompañada de un bloque
-\texttt{runtime} con información sobre el entorno de ejecución (versión de
-Python, librerías principales, identificación del \textit{hardware}) capturado
-en el momento de la ejecución. Esta duplicidad permite el análisis interactivo
-sobre los CSV y la trazabilidad completa a partir de los JSON.
+Cada lote de \textit{benchmark} produce un único fichero JSON con dos
+secciones: un bloque \texttt{runtime} con información sobre el entorno de
+ejecución (versión de Python, librerías principales, identificación del
+\textit{hardware}) capturado en el momento de la ejecución, y un bloque
+\texttt{results} con un registro por configuración que contiene todas las
+métricas y tiempos en estructura anidada. Para las etapas repetidas se
+incluyen tanto los valores medios como las desviaciones típicas y el número
+de muestras agregadas en cada caso, de manera que el análisis posterior
+pueda distinguir diferencias dentro del ruido de medición de diferencias
+sistemáticas entre configuraciones.
 
 La agregación posterior se realiza con la herramienta \texttt{pipeline-plot},
 que toma uno o varios JSON como entrada y produce gráficas comparativas por
 métrica utilizando \texttt{seaborn}. Para el estudio de escalabilidad se
-obtienen curvas de tiempo en función del tamaño $N$ por etapa y por componente,
-que permiten estimar empíricamente el exponente de crecimiento de cada
-combinación.
+obtienen curvas de tiempo en función del tamaño $N$ por etapa y por
+componente, que permiten estimar empíricamente el exponente de crecimiento
+de cada combinación.
 
 \subsection{Entrenamiento de modelos auxiliares}
 \label{subsec:entrenamiento}

@@ -262,6 +262,75 @@ class ExtrinsicMetrics:
 
 
 @dataclass(slots=True)
+class ExtrinsicMetricsAgg:
+    """Mean +/- std aggregation of multiple ExtrinsicMetrics samples.
+
+    ARI / NMI / pairwise F1 are aggregated across repeats; the matching
+    counters (n_matched, n_classes, coverage) depend only on ground-truth
+    overlap with the corpus and are constant across repeats, so they pass
+    through unchanged.
+    """
+    ari: float | None
+    ari_std: float | None
+    nmi: float | None
+    nmi_std: float | None
+    pairwise_f1: float | None
+    pairwise_f1_std: float | None
+    n_matched: int
+    n_classes: int
+    coverage: float | None
+    n: int
+
+    @classmethod
+    def from_samples(cls, samples: list["ExtrinsicMetrics"]) -> "ExtrinsicMetricsAgg":
+        import statistics as _st
+        if not samples:
+            raise ValueError("ExtrinsicMetricsAgg.from_samples requires at least one sample.")
+
+        def _opt_mean(values: list[float | None]) -> float | None:
+            clean = [v for v in values if v is not None]
+            return float(_st.fmean(clean)) if clean else None
+
+        def _opt_std(values: list[float | None]) -> float | None:
+            clean = [v for v in values if v is not None]
+            if not clean:
+                return None
+            return float(_st.stdev(clean)) if len(clean) > 1 else 0.0
+
+        aris = [s.ari for s in samples]
+        nmis = [s.nmi for s in samples]
+        f1s = [s.pairwise_f1 for s in samples]
+        last = samples[-1]
+
+        return cls(
+            ari=_opt_mean(aris),
+            ari_std=_opt_std(aris),
+            nmi=_opt_mean(nmis),
+            nmi_std=_opt_std(nmis),
+            pairwise_f1=_opt_mean(f1s),
+            pairwise_f1_std=_opt_std(f1s),
+            n_matched=last.n_matched,
+            n_classes=last.n_classes,
+            coverage=last.coverage,
+            n=len(samples),
+        )
+
+    def to_flat_dict(self, prefix: str = "extrinsic") -> dict[str, float | int | None]:
+        return {
+            f"{prefix}_ari": self.ari,
+            f"{prefix}_ari_std": self.ari_std,
+            f"{prefix}_nmi": self.nmi,
+            f"{prefix}_nmi_std": self.nmi_std,
+            f"{prefix}_pairwise_f1": self.pairwise_f1,
+            f"{prefix}_pairwise_f1_std": self.pairwise_f1_std,
+            f"{prefix}_n_matched": self.n_matched,
+            f"{prefix}_n_classes": self.n_classes,
+            f"{prefix}_coverage": self.coverage,
+            f"{prefix}_n": self.n,
+        }
+
+
+@dataclass(slots=True)
 class SimilaritySearchExtrinsicMetrics:
     precision_at_k: float | None
     recall_at_k: float | None
@@ -307,7 +376,7 @@ class BenchmarkResult:
     similarity_extrinsic: SimilaritySearchExtrinsicMetrics | None = None
     clustering: StageMetricsAgg | None = None
     clustering_quality: ClusteringQualityMetricsAgg | None = None
-    clustering_extrinsic: ExtrinsicMetrics | None = None
+    clustering_extrinsic: ExtrinsicMetricsAgg | None = None
     config: BenchmarkRunSpec | None = None
 
     def to_record(self) -> dict[str, Any]:
