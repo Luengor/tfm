@@ -132,7 +132,6 @@ class BenchmarkResult:
     reduction_type: str | None = None
     error: str | None = None
     setup: StageMetrics | None = None
-    clear_storage: StageMetrics | None = None
     ingest: StageMetrics | None = None
     reduction: StageMetrics | None = None
     similarity_search: StageMetrics | None = None
@@ -175,7 +174,7 @@ class BenchmarkResult:
                 "limit_parameter": self.config.limit,
             })
 
-        for stage_name in ("setup", "clear_storage", "ingest", "reduction", "similarity_search", "clustering"):
+        for stage_name in ("setup", "ingest", "reduction", "similarity_search", "clustering"):
             stage = getattr(self, stage_name)
             if stage is None:
                 continue

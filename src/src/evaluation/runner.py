@@ -187,7 +187,6 @@ def _run_single(
     started_at = _utc_now()
 
     setup_metrics = None
-    clear_metrics = None
     ingest_metrics = None
     reduction_metrics = None
     query_metrics = None
@@ -228,9 +227,7 @@ def _run_single(
         setup_metrics = setup_stage.metrics
 
         if run_spec.clear_storage:
-            with profile_stage() as clear_stage:
-                _clear_storage(storage)
-            clear_metrics = clear_stage.metrics
+            _clear_storage(storage)
 
         with profile_stage() as ingest_stage:
             total_instances = 0
@@ -379,7 +376,6 @@ def _run_single(
         reduction_type=run_spec.reduction.type if run_spec.reduction else "identity",
         error=error,
         setup=setup_metrics,
-        clear_storage=clear_metrics,
         ingest=ingest_metrics,
         reduction=reduction_metrics,
         similarity_search=similarity_metrics,
