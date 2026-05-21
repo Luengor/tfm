@@ -4,98 +4,322 @@
 
 \subsection{Visión general del flujo de trabajo}
 \label{subsec:vision}
-% Descripción a alto nivel del proceso seguido: partir de un conjunto de
-% imágenes, generar representaciones vectoriales, almacenarlas, reducir su
-% dimensionalidad y agruparlas. Diagrama del flujo completo.
-% Justificación de tratar cada etapa como un componente intercambiable para
-% poder medir el rendimiento de combinaciones.
+El sistema implementado articula el procesamiento de cada fotografía como una
+sucesión de cuatro etapas operativas: segmentación opcional de las pintadas
+contenidas en la imagen, extracción de un vector de características por
+recorte, persistencia del vector junto a sus metadatos en un almacenamiento
+estructurado y, en un segundo tiempo, recuperación masiva del conjunto
+almacenado para reducirlo y agruparlo. La separación explícita entre la fase de
+ingesta y la fase de agrupamiento es deliberada: por un lado, refleja el
+escenario operativo previsto (un banco que crece de forma incremental sobre el
+que se ejecutan campañas de análisis puntuales), y por otro permite aislar el
+coste computacional de cada etapa al medir.
 
-\subsection{Arquitectura modular del sistema}
-\label{subsec:arquitectura}
-% Cómo se ha estructurado el código para soportar la evaluación
-% combinatoria.
+Cada una de las etapas se ha implementado como un componente intercambiable
+detrás de una interfaz común, de modo que las configuraciones evaluadas se
+construyen como combinaciones de implementaciones concretas de extracción,
+segmentación, reducción, almacenamiento y agrupamiento descritas en
+\ref{subsec:configuraciones}. Este desacoplamiento es el que habilita la
+evaluación combinatoria que forma el trabajo: cada combinación define una
+configuración independiente y reproducible cuyo coste y calidad pueden
+compararse con cualquier otra.
 
-\subsubsection{Clases abstractas e interfaces}
-% Las cinco interfaces sobre las que se apoya el sistema:
-% \texttt{SegmenterBase}, \texttt{EmbeddingBase}, \texttt{StorageBase},
-% \texttt{ReductionBase} y \texttt{ClusteringBase}. Contratos que cada
-% implementación debe respetar.
-
-\subsubsection{Ensamblado mediante \texttt{Configuration}}
-% Clase \texttt{Configuration} como punto de cableado. Separación clara
-% entre la fase de ingesta (\texttt{save\_image}) y la de agrupamiento
-% (\texttt{cluster\_images}).
-
-\subsection{Pipeline de procesamiento de imágenes}
+\subsection{Pipeline operativo}
 \label{subsec:pipeline}
-% Descripción operativa del recorrido de una imagen por el sistema,
-% suficientemente detallada para permitir replicación.
 
 \subsubsection{Ingesta y generación de \textit{embeddings}}
-% Apertura de la imagen, segmentación (opcional), recorte de cada
-% \textit{bounding box}, generación del \textit{embedding} por recorte y
-% persistencia en el almacenamiento elegido.
+La ingesta de una fotografía sigue siempre la misma secuencia. La imagen se
+carga desde disco y se entrega al segmentador, que devuelve una lista de cajas
+delimitadoras. Existen dos implementaciones de segmentador:
+\texttt{IdentitySegmenter}, que devuelve una única caja que coincide con la
+imagen completa, y \texttt{YoloSegmenter}, que utiliza un modelo de detección
+de objetos basado en la arquitectura YOLOv11 para identificar las pintadas
+presentes en la imagen y devolver una caja por cada una de ellas. Estas cajas
+se fusionan si se solapan por encima de un umbral configurable y se expanden
+mediante un margen también configurable para incluir contexto visual alrededor
+de la pintada.
+
+Cada pintada luego se recorta sobre la imagen original y el recorte se entrega
+al modelo de extracción de características, que produce un vector denso de
+dimensión fija. El vector resultante, junto con la referencia a la fotografía
+original y las coordenadas del recorte, se persiste en el almacenamiento
+elegido.
 
 \subsubsection{Recuperación, reducción y agrupamiento}
-% Carga de todos los \textit{embeddings} desde el almacenamiento, aplicación
-% de la reducción de dimensionalidad si procede, ejecución del algoritmo
-% de \textit{clustering} y reconstrucción del mapeo clúster $\rightarrow$
-% imágenes.
+Una vez completada la ingesta, la fase de agrupamiento opera sobre el contenido
+completo del almacenamiento. En primer lugar, se recuperan todos los
+\textit{embeddings} junto con sus metadatos en una única consulta. A
+continuación, si la configuración declara una reducción distinta de
+\texttt{Identity}, se aplica sobre cada vector de características el método de
+reducción seleccionado, obteniendo un nuevo conjunto de vectores. Finalmente,
+el algoritmo de agrupamiento se ajusta sobre el conjunto reducido, produciendo
+una etiqueta de clúster por cada vector. A partir de esta información se
+calculan las métricas de calidad intrínsecas y extrínsecas, y se conserva el
+mapeo entre identificadores de clúster y listas de recortes para la generación
+de visualizaciones interactivas.
 
 \subsection{Procedimiento experimental}
 \label{subsec:experimental}
-% Núcleo metodológico del trabajo: cómo se ejecutan y miden los
-% experimentos de rendimiento.
 
 \subsubsection{Definición del espacio de configuraciones}
-% Ficheros de \textit{configuration} en JSON declarando cada ejecución como
-% combinación de \texttt{storage}, \texttt{embedding}, \texttt{segmenter},
-% \texttt{reduction} y \texttt{clustering}. Generación automática por
-% producto cartesiano a partir de una rejilla.
+\label{subsubsec:espacio-configs}
+Cada experimento queda completamente caracterizado por un fichero de
+configuración en formato JSON. El fichero contiene una lista de experimentos.
+Cada experimento declara un identificador único y cinco componentes con la
+forma \texttt{\{type, params\}}: \texttt{storage}, \texttt{embedding},
+\texttt{segmenter}, \texttt{reduction} y \texttt{clustering}, además de un
+bloque opcional \texttt{similarity\_search}. Esta forma declarativa garantiza
+que toda la información necesaria para reproducir un experimento queda en un
+único fichero versionable.
+
+Para barrer sistemáticamente el espacio combinatorio se utiliza un fichero
+auxiliar en el que cada componente se sustituye por una lista de alternativas.
+Un \textit{script} expande este fichero mediante producto cartesiano,
+materializando una experimento en el archivo final por cada combinación válida.
+
+\subsubsection{Protocolo de escalabilidad}
+\label{subsubsec:escalabilidad}
+%TODO: check
+La caracterización del coste computacional en función del tamaño del banco
+constituye uno de los ejes centrales del trabajo. Para obtenerla, se ejecuta
+cada configuración seleccionada sobre una sucesión creciente de tamaños $N$
+controlada mediante el parámetro \texttt{--limit}. Los tamaños se escogen
+espaciados geométricamente entre un mínimo que permita estimar el régimen de
+pequeño $N$ y el banco completo de $6\,681$ fotografías, de forma que las
+curvas resultantes cubran al menos dos órdenes de magnitud y permitan
+distinguir comportamientos lineales, cuasi-lineales y superlineales.
+
+El muestreo de las imágenes para cada $N$ es determinista: las fotografías
+se ordenan por su nombre de fichero y se toman las primeras $N$, de modo
+que el banco asociado a un tamaño es siempre un prefijo del asociado al
+tamaño inmediatamente superior. Esta elección, frente a un muestreo
+aleatorio, garantiza que las diferencias observadas entre tamaños
+consecutivos sean atribuibles al incremento del banco y no a la
+variabilidad introducida por el muestreo. Para cada tamaño se obtienen las
+métricas temporales descritas en \ref{subsubsec:cronometria}, lo que
+permite ajustar las curvas tiempo $\propto N$ por etapa y caracterizar la
+escalabilidad empírica de cada componente.
 
 \subsubsection{Reutilización de almacenamientos}
-% Estrategia para evitar repetir la ingesta cuando varias configuraciones
-% comparten \texttt{storage + embedding + limit}: reuso de
-% \texttt{db\_path}, \texttt{clear\_storage: false} y persistencia de las
-% métricas de ingesta en la tabla \texttt{metadata}.
+\label{subsubsec:reutilizacion}
+La ingesta es, en la mayoría de ocasiones, la etapa más costosa del
+\textit{pipeline}. Para evitar repetirla cuando distintas configuraciones
+comparten la configuración de almacenamiento, extracción, segmentación y
+límite, el generador de configuraciones asigna a estas configuraciones el mismo
+\texttt{db\_path} y fija el parámetro \texttt{clear\_storage: false}, de modo
+que la segunda y sucesivas configuraciones encuentran los \textit{embeddings}
+ya calculados y pueden saltarse directamente a las etapas de reducción y
+agrupamiento. Para que esta optimización no contamine las métricas, la primera
+configuración del grupo persiste sus tiempos de ingesta en la tabla
+\texttt{metadata} del almacenamiento; las configuraciones que reutilizan el
+almacenamiento leen esos tiempos y los reportan en lugar del coste despreciable
+del paso por caché. De este modo, los resultados publicados reflejan en todo
+momento el coste real de la etapa.
 
-\subsubsection{Instrumentación y medición de tiempos}
-% Etapas perfiladas por el \textit{runner}: \textit{setup}, limpieza,
-% ingesta, reducción, \textit{clustering} y búsqueda por similitud.
-% Forma exacta de cronometrar cada una.
+\subsubsection{Instrumentación y cronometría}
+\label{subsubsec:cronometria}
+%TODO: Re-write this now that the runner has changed to include multiple runs,
+%dropped specific warm-up and the setup and clear steps
+El \textit{runner} de evaluación delimita seis etapas susceptibles de medición:
+preparación (\textit{setup}), limpieza del almacenamiento (\textit{clear}),
+ingesta, reducción, agrupamiento y búsqueda por similitud. Cada etapa se
+envuelve en un gestor de contexto (\texttt{profile\_stage}) que captura los
+instantes de entrada y salida mediante \texttt{time.perf\_counter}, un reloj
+monotónico de alta resolución que no se ve afectado por ajustes del reloj del
+sistema. La diferencia entre instantes proporciona el tiempo de pared
+(\textit{wall time}) consumido por la etapa, expresado en segundos con
+resolución de microsegundos.
+
+Para acotar la variabilidad entre ejecuciones, cada configuración se
+ejecuta varias veces de manera consecutiva. La primera ejecución se
+considera de calentamiento (\textit{warm-up}) y se descarta, ya que
+absorbe los efectos de inicialización (carga de pesos, compilación
+\textit{just-in-time} de operadores y poblamiento de cachés del sistema
+operativo). De las ejecuciones restantes se reportan la mediana y la
+desviación absoluta mediana (MAD), estadísticos robustos frente a valores
+atípicos que pueden aparecer puntualmente por interferencias del sistema.
+Los experimentos se programan además sobre un sistema sin otras cargas
+significativas, tal como se describe en \ref{subsec:entorno}, para
+minimizar dichas interferencias.
 
 \subsubsection{Selección automática de hiperparámetros}
-% Cuando el usuario no fija ciertos parámetros, el sistema los estima:
-% método del codo sobre la inercia (K-Means), minimización del BIC (GMM)
-% y curva de k-distancias (DBSCAN).
+\label{subsubsec:hiperparam-auto}
+Tres de los algoritmos integrados admiten la estimación automática de su
+hiperparámetro principal cuando el usuario no lo declara en la configuración.
+Esta estimación se utiliza por defecto en todas las configuraciones del
+\textit{benchmark}, salvo que se desee evaluar explícitamente el efecto de
+fijar el parámetro a un valor concreto.
 
-\subsubsection{Cálculo de métricas de calidad}
-% \textit{Silhouette} y Calinski-Harabasz calculadas sobre los
-% \textit{embeddings} originales (sin reducir) para que la distorsión de
-% la proyección no contamine la comparación entre configuraciones.
+Para K-Means se aplica el método del codo sobre la curva de inercia: se ajusta
+el algoritmo para $k \in \{2, 3, \ldots, k_{\max}\}$ con $k_{\max} = \min(n,
+20)$, donde $n$ es el número de \textit{embeddings} disponibles, y se
+selecciona el valor de $k$ correspondiente al codo de la curva mediante el
+criterio de la distancia perpendicular al segmento que une los extremos. Para
+los modelos de mezcla gaussiana se sigue el mismo barrido sobre $k \in \{1, 2,
+\ldots, k_{\max}\}$ y se elige el modelo que minimiza el criterio bayesiano de
+información (BIC); este criterio penaliza de manera explícita la complejidad
+del modelo, lo que mitiga la tendencia del ajuste por máxima verosimilitud a
+favorecer el mayor número de componentes. Para DBSCAN se estima el radio
+$\epsilon$ a partir de la curva de $k$-distancias: para cada punto se calcula
+la distancia al $k$-ésimo vecino con $k = \texttt{min\_samples}$, las
+distancias se ordenan de menor a mayor y se aplica el mismo criterio de codo
+que en K-Means para seleccionar el valor de $\epsilon$ a partir del cual la
+densidad cae abruptamente. En los tres casos, las semillas aleatorias se fijan
+para que el resultado sea reproducible.
+
+\subsubsection{Protocolo de búsqueda por similitud}
+\label{subsubsec:similarity-search}
+%TODO: check if this is true in the code
+La medición del coste de la búsqueda por similitud se realiza sobre los
+\textit{backends} ya descritos en \ref{subsec:configuraciones}, sin
+reintroducir aquí el contexto sobre índices ANN
+(\ref{subsec:art-similarity-search}). Tras la ingesta, se selecciona un
+conjunto de consultas formado por una muestra aleatoria de $Q$
+\textit{embeddings} del propio banco, escogida con una semilla fija para que la
+selección sea idéntica entre configuraciones. Para cada consulta se solicita al
+\textit{backend} la recuperación de los $k$ vectores más próximos según
+distancia coseno, descartando el propio vector consultado.
+
+El tiempo total empleado en las $Q$ consultas se mide con el mismo instrumental
+cronométrico que el resto de etapas; la latencia por consulta se reporta como
+cociente entre tiempo total y $Q$. Este diseño permite contrastar de manera
+directa el coste por consulta del recorrido lineal de \texttt{SQLiteStorage}
+(que crece linealmente con el tamaño del banco) con el del índice HNSW de
+\texttt{PostgreSQLStorage} (con coste de consulta sublineal) en los mismos
+puntos del barrido de escalabilidad.
+
+\subsubsection{Evaluación intrínseca de los agrupamientos}
+\label{subsubsec:eval-intrinseca}
+Las métricas intrínsecas definidas en \ref{subsubsec:metricas} se calculan de
+manera operativa sobre los \textit{embeddings} originales en su espacio de
+partida, no sobre los \textit{embeddings} reducidos utilizados por el
+agrupamiento. Esta decisión es importante: si las métricas se calculasen en el
+espacio reducido, una reducción agresiva podría favorecer artificialmente a un
+agrupamiento al deformar el espacio de modo que los clústeres aparezcan más
+compactos o separados de lo que en realidad están en el espacio original.
+Calcular las métricas sobre $X$ garantiza que las comparaciones entre
+configuraciones midan la calidad real de la partición inducida sobre los datos
+sin distorsiones del paso intermedio.
+
+Los algoritmos basados en densidad (DBSCAN, OPTICS y HDBSCAN) pueden asignar la
+etiqueta $-1$ a puntos considerados ruido. Estos puntos se excluyen del cálculo
+del coeficiente de silueta y del índice de Calinski-Harabász, y se reportan por
+separado como proporción de ruido y coeficiente de variación del tamaño de los
+clústeres no triviales, de modo que un agrupamiento que rechace una fracción
+elevada de los puntos no quede artificialmente premiado por una silueta alta
+sobre los pocos puntos restantes.
+
+\subsubsection{Evaluación extrínseca sobre subconjunto etiquetado}
+\label{subsubsec:eval-extrinseca}
+%TODO: author supervised evaluation should appear here once is done 
+La evaluación supervisada se efectúa según las restricciones ya enunciadas en
+\ref{subsubsec:metricas}: se utiliza el subconjunto anotado por estilo descrito
+en \ref{subsec:dataset} y se limita a las configuraciones que prescinden del
+segmentador, donde la correspondencia entre fotografía anotada y
+\textit{embedding} resultante es unívoca. Sobre las configuraciones con
+segmentador esta correspondencia se diluye al generarse múltiples recortes por
+fotografía, lo que impediría asignar una etiqueta de estilo única a cada
+\textit{embedding}.
+
+Las métricas ARI, NMI y F1 por pares se calculan directamente sobre el
+vector de etiquetas de clúster y el vector de etiquetas de verdad
+fundamental, sin necesidad de resolver explícitamente el problema de
+asignación clúster-clase: las tres métricas son invariantes ante
+permutaciones de etiquetas y comparan las relaciones de coagrupamiento
+entre pares de puntos. Los puntos etiquetados como ruido por los
+algoritmos basados en densidad se tratan como si formasen un único clúster
+adicional, de modo que su presencia influye en la métrica en lugar de ser
+ignorada silenciosamente. Los valores se reportan por configuración y se
+agregan después por componente para identificar qué elecciones contribuyen
+sistemáticamente a una mejor calidad supervisada.
 
 \subsubsection{Salida y agregación de resultados}
-% Generación de ficheros CSV y JSON por lote de \textit{benchmark},
-% formato de los registros y posterior agregación con
-% \texttt{pipeline-plot} para producir las gráficas comparativas.
+\label{subsubsec:salida}
+%TODO: check this now that the runner has changed to include multiple runs and
+%the new output format
+Cada lote de \textit{benchmark} produce dos ficheros con el mismo nombre base y
+distinta extensión. El fichero CSV contiene una fila por configuración con
+todas las métricas y tiempos como columnas, en un formato directamente legible
+por hojas de cálculo y herramientas de análisis tabular. El fichero JSON
+contiene la misma información en estructura anidada, acompañada de un bloque
+\texttt{runtime} con información sobre el entorno de ejecución (versión de
+Python, librerías principales, identificación del \textit{hardware}) capturado
+en el momento de la ejecución. Esta duplicidad permite el análisis interactivo
+sobre los CSV y la trazabilidad completa a partir de los JSON.
 
-\subsection{Procedimientos adicionales}
-\label{subsec:extras-metod}
-% Procesos auxiliares relacionados con las extensiones específicas del
-% dominio, separados del bucle principal de evaluación.
+La agregación posterior se realiza con la herramienta \texttt{pipeline-plot},
+que toma uno o varios JSON como entrada y produce gráficas comparativas por
+métrica utilizando \texttt{seaborn}. Para el estudio de escalabilidad se
+obtienen curvas de tiempo en función del tamaño $N$ por etapa y por componente,
+que permiten estimar empíricamente el exponente de crecimiento de cada
+combinación.
 
-\subsubsection{Entrenamiento del detector de grafiti}
-% Anotación de imágenes con CVAT, preparación del conjunto, entrenamiento
-% del modelo YOLO de detección y exportación de pesos.
+\subsection{Entrenamiento de modelos auxiliares}
+\label{subsec:entrenamiento}
 
-\subsubsection{Entrenamiento de las cabezas de proyección}
-% Construcción de pares de muestras, función de pérdida empleada,
-% hiperparámetros de entrenamiento y proceso de validación de las cabezas
-% sobre MobileNetV3 y DINOv2.
+\subsubsection{Detector de grafiti}
+\label{subsubsec:entrenamiento-detector}
+% TODO: Check this once the detector is re-trainned for the "final" time
+El detector se entrena a partir del subconjunto anotado descrito en
+\ref{subsec:dataset}, cuyas $250$ fotografías contienen un total de $452$ cajas
+anotadas. El conjunto se divide en una partición de entrenamiento y otra de
+validación con proporción $80/20$ manteniendo la distribución aproximada de
+cajas por fotografía. El entrenamiento parte de los pesos preentrenados sobre
+COCO publicados por el autor del modelo y solo ajusta sus parámetros para la
+única clase de interés, ``grafiti''.
+
+Se utilizan los hiperparámetros por defecto de la implementación de referencia,
+salvo el número de épocas, el tamaño de \textit{batch} y la resolución de
+entrada, que se fijan para encajar en la memoria de la GPU descrita en
+\ref{subsec:entorno}. El optimizador, las \textit{augmentations} (jitter HSV,
+escalado, volteo horizontal y \textit{mosaic}) y la \textit{learning rate} con
+\textit{warm-up} y descenso coseno se mantienen en sus valores por defecto. El
+entrenamiento incorpora parada temprana cuando la métrica mAP@$0.5$ sobre
+validación no mejora durante un número fijo de épocas, y como métricas finales
+se reportan mAP@$0.5$ y mAP@$0.5{:}0.95$ sobre la partición de validación.
+
+\subsubsection{Cabezas de proyección}
+\label{subsubsec:entrenamiento-cabezas}
+%TODO: check this once the heads are trained for the "final" time
+Las cuatro cabezas (autoría y estilo sobre MobileNetV3 y DINOv2) se entrenan
+sobre el subconjunto anotado, dividido nuevamente en entrenamiento y validación
+con proporción $80/20$ respetando la distribución por etiqueta. Los
+\textit{backbones} se mantienen estrictamente congelados durante todo el
+proceso y solo se actualizan los parámetros de la cabeza, según el esquema de
+\textit{transfer learning} descrito en \ref{subsubsec:cabezas}.
+
+Las cabezas de autoría se entrenan con la pérdida indicada en
+\ref{subsubsec:cabezas} con margen $1.0$, optimizador Adam con \textit{learning
+rate} $10^{-4}$, tamaño de \textit{batch} $8$ y un máximo de $20$ épocas. Los
+tripletes se forman dentro de cada \textit{batch} a partir de las anotaciones
+de autoría, eligiendo como ancla un recorte cualquiera, como positivo otro
+recorte con el mismo identificador de autor y como negativo un recorte con
+identificador distinto, con la estrategia de muestreo basada en distancia ya
+referida.
+
+Las cabezas de estilo se entrenan con la pérdida y temperatura indicadas en
+\ref{subsubsec:cabezas} ($T = 0.07$), optimizador Adam con \textit{learning
+rate} $10^{-4}$ y un \textit{scheduler} cosenoidal a lo largo de $60$ épocas.
+Para que cada \textit{batch} contenga al menos un par positivo por ancla, se
+utiliza un muestreador balanceado que toma $4$ recortes por clase y construye
+entre $10$ y $30$ \textit{batches} por época en función del tamaño efectivo del
+conjunto. Se aplica parada temprana con paciencia de $15$ épocas sobre la
+pérdida en validación. En ambos casos, la cabeza final seleccionada para los
+\textit{benchmarks} es la que minimiza la pérdida sobre la partición de
+validación.
 
 \subsection{Reproducibilidad}
 \label{subsec:reproducibilidad}
-% Medidas para garantizar la reproducción de los resultados: fijado de
-% semillas aleatorias, versiones congeladas mediante \texttt{uv}, ejecución
-% desde el directorio \texttt{src/} y disponibilidad pública de los
-% \textit{configurations} usados en cada experimento.
+Más allá del entorno de ejecución y de las versiones de las dependencias ya
+recogidas en \ref{subsec:entorno}, la reproducibilidad de los resultados se
+apoya en dos elementos complementarios. En primer lugar, en el código se fijan
+de manera explícita las semillas aleatorias de las librerías estocásticas
+implicadas (\texttt{random} de la biblioteca estándar, \texttt{numpy.random},
+\texttt{torch}); los estimadores de \texttt{scikit-learn} con componente
+estocástica se instancian siempre con \texttt{random\_state} fijo, y la
+inicialización de K-Means, GMM, UMAP, Isomap y la selección automática de
+hiperparámetros descrita en \ref{subsubsec:hiperparam-auto} reutiliza la misma
+semilla. En segundo lugar, todos los ficheros de configuración utilizados para
+los \textit{benchmarks} reportados se publican junto con el código en el
+repositorio del trabajo, de modo que cualquier resultado descrito puede
+reproducirse.
