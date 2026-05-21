@@ -4,117 +4,110 @@
 
 \subsection{Contexto y motivación}
 \label{subsec:intro-contexto}
-% El grafiti como fenómeno urbano cotidiano y su impacto en la gestión
-% municipal: coste económico de la retirada, volumen creciente de
-% incidencias y diversidad estilística de las pintadas.
-%
-% Anclaje social/operativo con Taylor
-% \textit{et al.}~\cite{taylor_twenty-first_2010}: la falta de
-% criterios homogéneos de clasificación entre quien reporta y quien
-% retira es un problema documentado, y la tipología (tags,
-% throw-ups, piezas, etc.) tiene valor operativo para priorizar la
-% retirada.
-%
-% Mención breve y agregada (una sola frase, sin análisis) a que
-% trabajos recientes han abordado detección y cuantificación
-% automática de grafiti sobre imágenes captadas en
-% condiciones reales~\cite{fogaca_deep_2023,tokuda_quantifying_2019},
-% pero la caracterización por similitud entre pintadas queda abierta.
-% El análisis detallado de estos trabajos se reserva para
-% sec.~\ref{sec:art}; aquí solo sirven como gancho de motivación.
-%
-% Conectar con la idea de que una agrupación automática por similitud
-% visual habilita priorización, trazabilidad de autores recurrentes y
-% análisis estadístico del paisaje urbano.
+
+El grafiti no autorizado es un fenómeno urbano cotidiano que las
+administraciones municipales gestionan con un coste económico sostenido y un
+volumen creciente de incidencias. La diversidad estilística de las pintadas,
+desde firmas rápidas (\textit{tags}) hasta piezas elaboradas, y la continua
+aparición de nuevos autores convierten su seguimiento manual en una tarea
+costosa y poco sistemática. \citea[etali]{Taylor}{taylor_twenty-first_2010}
+documentan que la falta de criterios homogéneos de clasificación entre quien
+reporta una pintada y quien la retira es un problema operativo recurrente, y
+proponen una tipología explícita que ha demostrado utilidad para priorizar la
+retirada de pintadas ofensivas o no autorizadas según el tipo y la ofensividad
+del contenido. Esa tipología, sin embargo, sigue aplicándose de forma manual, y
+su extensión a bancos de imágenes crecientes no es viable sin apoyo
+automatizado.
+
+En esta línea, trabajos recientes han abordado la detección y cuantificación
+automática de grafiti sobre imágenes captadas en condiciones no
+controladas~\cite{fogaca_deep_2023,tokuda_quantifying_2019}, pero la
+caracterización por similitud entre las pintadas detectadas queda ampliamente
+abierta. Disponer de una agrupación automática por similitud visual habilita
+una gran cantidad de procedimientos de análisis que van desde el estilístico
+hasta el documental, incluyendo, la priorización de la retirada o la
+trazabilidad de autores recurrentes sobre conjuntos de imágenes en los que la
+inspección manual es inviable.
 
 \subsection{Planteamiento del problema}
 \label{subsec:intro-problema}
-% Definir con precisión el problema técnico abordado: dado un conjunto
-% mayoritariamente no etiquetado de fotografías de grafiti capturadas
-% en condiciones reales, agruparlas automáticamente de modo que
-% pintadas similares queden en el mismo grupo. Subrayar las
-% dificultades centrales:
-%   (i) ausencia de verdad fundamental canónica: no existe un conjunto
-%   de etiquetas de similitud establecido para el dominio; para
-%   habilitar evaluación supervisada se ha etiquetado a mano un
-%   subconjunto reducido y \textit{ad hoc}, que sirve como
-%   instrumento de evaluación parcial, no como GT de referencia.
-%   (ii) abundancia de combinaciones posibles de modelos de
-%   representación, técnicas de reducción y algoritmos de
-%   agrupamiento, sin guía clara sobre cuál funciona mejor en este
-%   dominio.
-%   (iii) coste computacional que escala con el tamaño del conjunto
-%   de imágenes, sin caracterización experimental previa específica
-%   para grafiti.
+
+El problema técnico abordado en este trabajo es el siguiente: dado un conjunto
+mayoritariamente no etiquetado de fotografías de grafiti captadas en
+condiciones reales, agruparlas automáticamente de modo que las pintadas
+visualmente similares queden en el mismo grupo. Este enunciado, aparentemente
+directo, encierra tres dificultades centrales que condicionan tanto el diseño
+como la evaluación de la solución.
+
+En primer lugar, no existe verdad fundamental canónica para la similitud entre
+grafitis: no hay un conjunto de etiquetas establecido sobre el que comparar los
+resultados. Para habilitar una evaluación supervisada se ha etiquetado
+a mano un subconjunto reducido, que se utiliza como método de evaluación
+complementaria y no como referencia absoluta. En segundo lugar, el espacio de
+combinaciones de modelos de representación, técnicas de reducción de
+dimensionalidad y algoritmos de agrupamiento es amplio, y la literatura no
+ofrece una guía clara sobre qué componentes funcionan mejor en este dominio. En
+tercer lugar, el coste computacional de cada combinación escala con el tamaño
+del conjunto de imágenes, sin que exista una caracterización experimental
+previa específica para grafiti que permita anticipar dónde se sitúan los
+cuellos de botella.
 
 \subsection{Objetivos}
 \label{subsec:intro-objetivos}
 
 \subsubsection{Objetivo general}
-% Un único enunciado: diseñar, implementar y evaluar
-% experimentalmente un sistema modular de agrupamiento de imágenes de
-% grafiti que permita caracterizar el coste computacional y la
-% calidad de agrupamiento de combinaciones de segmentación,
-% generación de \textit{embeddings}, reducción de dimensionalidad y
-% \textit{clustering} en función del tamaño del conjunto.
+
+Diseñar, implementar y evaluar experimentalmente un sistema
+modular de agrupamiento de imágenes de grafiti que permita
+caracterizar el coste computacional y la calidad del agrupamiento
+de combinaciones de segmentación, generación de
+\textit{embeddings}, reducción de dimensionalidad y
+\textit{clustering} en función del tamaño del conjunto.
 
 \subsubsection{Objetivos específicos}
-% Lista breve y verificable:
-% \begin{itemize}
-%   \item Construir una arquitectura modular con interfaces
-%   intercambiables para cada etapa del flujo.
-%   \item Integrar modelos de representación representativos del estado
-%   del arte (CNNs preentrenadas, modelos de fundación, detectores
-%   específicos de grafiti).
-%   \item Implementar un \textit{runner} de \textit{benchmark} que
-%   recorra el espacio de configuraciones y mida tiempos por etapa y
-%   calidad de los clústeres resultantes.
-%   \item Caracterizar experimentalmente el coste computacional por
-%   etapa en función del tamaño del conjunto de imágenes ($N$),
-%   identificando cuellos de botella y escalado por componente.
-%   \item Evaluar la calidad del agrupamiento mediante métricas
-%   intrínsecas sobre el conjunto completo y métricas extrínsecas
-%   sobre el subconjunto etiquetado manualmente.
-%   \item Producir un análisis comparativo que identifique qué
-%   combinaciones ofrecen mejor compromiso entre coste computacional y
-%   calidad de agrupamiento sobre el conjunto de datos disponible.
-% \end{itemize}
+
+\begin{itemize}
+    \item Construir una arquitectura modular con interfaces intercambiables
+        para cada etapa del flujo: segmentación, representación,
+        almacenamiento, reducción y agrupamiento.
+    \item Integrar modelos de representación representativos del estado del
+        arte: redes convolucionales preentrenadas, modelos de fundación
+        auto-supervisados y supervisados por lenguaje natural, y detectores
+        específicos de grafiti.
+    \item Implementar un sistema capaz de recorrer un espacio de configuraciones
+        definido por combinaciones de componentes y medir, para cada ejecución, 
+        tiempos por etapa y métricas de calidad de los clústeres resultantes.
+    \item Caracterizar experimentalmente el coste computacional por etapa en
+        función del tamaño del conjunto de imágenes ($N$), identificando
+        cuellos de botella y escalado por componente.
+    \item Evaluar la calidad del agrupamiento mediante métricas intrínsecas
+        sobre el conjunto completo y métricas extrínsecas sobre el subconjunto
+        etiquetado manualmente.
+    \item Producir un análisis comparativo que identifique qué combinaciones
+        ofrecen el mejor compromiso entre coste computacional y calidad de
+        agrupamiento sobre el conjunto de datos disponible.
+\end{itemize}
 
 \subsection{Alcance y limitaciones}
 \label{subsec:intro-alcance}
-% Qué entra y qué queda fuera del trabajo.
-%
-% Dentro:
-%   - evaluación comparativa de combinaciones de componentes,
-%   - métricas intrínsecas de calidad de clustering,
-%   - caracterización de tiempos por etapa y escalado con $N$,
-%   - evaluación extrínseca limitada sobre un subconjunto etiquetado
-%     a mano para este trabajo.
-%
-% Fuera:
-%   - estudio de usuario,
-%   - despliegue en producción,
-%   - anotación a escala con múltiples anotadores ni validación de la
-%     propia etiquetación,
-%   - propuesta de un método nuevo de \textit{clustering}.
-%
-% Limitaciones metodológicas a reconocer abiertamente:
-%   (a) las etiquetas usadas para evaluación supervisada son
-%   \textit{ad hoc}, hechas a mano para este trabajo, sobre un
-%   subconjunto reducido y sin consenso entre anotadores, por lo que
-%   las métricas extrínsecas son indicativas, no concluyentes;
-%   (b) la evaluación extrínseca solo es directamente aplicable a
-%   configuraciones con \texttt{IdentitySegmenter} (ver
-%   sec.~\ref{sec:metodologia}), donde la correspondencia
-%   imagen$\to$etiqueta es inequívoca.
+
+El trabajo se centra en la evaluación comparativa de combinaciones de
+componentes ya existentes, en el cálculo de métricas intrínsecas de calidad de
+\textit{clustering}, en la caracterización de tiempos por etapa y su escalado
+con $N$, y en una evaluación extrínseca limitada sobre el subconjunto
+etiquetado manualmente para este trabajo.
+
+Conviene reconocer abiertamente dos limitaciones metodológicas. Primero, las
+etiquetas utilizadas para la evaluación supervisada han sido generadas a mano
+para este trabajo, sobre un subconjunto reducido y sin consenso entre
+anotadores. Así, las métricas extrínsecas obtenidas son indicativas y no
+concluyentes. Segundo, la evaluación extrínseca solo es directamente aplicable
+a las configuraciones que no hacen uso de segmentación automática. Esto se debe
+a que no es posible evaluar la calidad del agrupamiento de recortes que no
+corresponden exactamente con las etiquetas manuales.
 
 \subsection{Estructura del documento}
 \label{subsec:intro-estructura}
-% Mapa de las secciones siguientes con una frase por capítulo:
-% sec.~\ref{sec:art} resume el estado de la cuestión;
-% sec.~\ref{sec:materiales} describe el conjunto de datos, el marco
-% conceptual y las implementaciones de cada componente;
-% sec.~\ref{sec:metodologia} detalla la arquitectura modular y el
-% procedimiento experimental; la sección de resultados presenta los
-% experimentos; y la de conclusiones recoge hallazgos y líneas
-% futuras.
+
+% TODO
+
