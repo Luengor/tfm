@@ -157,6 +157,73 @@ class ClusteringQualityMetrics:
 
 
 @dataclass(slots=True)
+class ClusteringQualityMetricsAgg:
+    """Mean +/- std aggregation of multiple ClusteringQualityMetrics samples."""
+    silhouette_score: float | None
+    silhouette_score_std: float | None
+    calinski_harabasz_score: float | None
+    calinski_harabasz_score_std: float | None
+    davies_bouldin_score: float | None
+    davies_bouldin_score_std: float | None
+    noise_ratio: float | None
+    noise_ratio_std: float | None
+    cluster_size_cv: float | None
+    cluster_size_cv_std: float | None
+    n: int
+
+    @classmethod
+    def from_samples(cls, samples: list["ClusteringQualityMetrics"]) -> "ClusteringQualityMetricsAgg":
+        import statistics as _st
+        if not samples:
+            raise ValueError("ClusteringQualityMetricsAgg.from_samples requires at least one sample.")
+
+        def _opt_mean(values: list[float | None]) -> float | None:
+            clean = [v for v in values if v is not None]
+            return float(_st.fmean(clean)) if clean else None
+
+        def _opt_std(values: list[float | None]) -> float | None:
+            clean = [v for v in values if v is not None]
+            if not clean:
+                return None
+            return float(_st.pstdev(clean)) if len(clean) > 1 else 0.0
+
+        sils = [s.silhouette_score for s in samples]
+        chs = [s.calinski_harabasz_score for s in samples]
+        dbs = [s.davies_bouldin_score for s in samples]
+        nrs = [s.noise_ratio for s in samples]
+        cvs = [s.cluster_size_cv for s in samples]
+
+        return cls(
+            silhouette_score=_opt_mean(sils),
+            silhouette_score_std=_opt_std(sils),
+            calinski_harabasz_score=_opt_mean(chs),
+            calinski_harabasz_score_std=_opt_std(chs),
+            davies_bouldin_score=_opt_mean(dbs),
+            davies_bouldin_score_std=_opt_std(dbs),
+            noise_ratio=_opt_mean(nrs),
+            noise_ratio_std=_opt_std(nrs),
+            cluster_size_cv=_opt_mean(cvs),
+            cluster_size_cv_std=_opt_std(cvs),
+            n=len(samples),
+        )
+
+    def to_flat_dict(self, prefix: str = "clustering_quality") -> dict[str, float | int | None]:
+        return {
+            f"{prefix}_silhouette": self.silhouette_score,
+            f"{prefix}_silhouette_std": self.silhouette_score_std,
+            f"{prefix}_calinski_harabasz": self.calinski_harabasz_score,
+            f"{prefix}_calinski_harabasz_std": self.calinski_harabasz_score_std,
+            f"{prefix}_davies_bouldin": self.davies_bouldin_score,
+            f"{prefix}_davies_bouldin_std": self.davies_bouldin_score_std,
+            f"{prefix}_noise_ratio": self.noise_ratio,
+            f"{prefix}_noise_ratio_std": self.noise_ratio_std,
+            f"{prefix}_cluster_size_cv": self.cluster_size_cv,
+            f"{prefix}_cluster_size_cv_std": self.cluster_size_cv_std,
+            f"{prefix}_n": self.n,
+        }
+
+
+@dataclass(slots=True)
 class ExtrinsicMetrics:
     ari: float | None
     nmi: float | None
@@ -221,7 +288,7 @@ class BenchmarkResult:
     avg_neighbor_distance: float | None = None
     similarity_extrinsic: SimilaritySearchExtrinsicMetrics | None = None
     clustering: StageMetricsAgg | None = None
-    clustering_quality: ClusteringQualityMetrics | None = None
+    clustering_quality: ClusteringQualityMetricsAgg | None = None
     clustering_extrinsic: ExtrinsicMetrics | None = None
     config: BenchmarkRunSpec | None = None
 

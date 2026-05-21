@@ -34,6 +34,7 @@ from src.evaluation.metrics import get_runtime_info, profile_stage
 from src.evaluation.models import (
     BenchmarkResult,
     BenchmarkRunSpec,
+    ClusteringQualityMetricsAgg,
     ExtrinsicMetrics,
     SimilaritySearchExtrinsicMetrics,
     StageMetrics,
@@ -295,6 +296,7 @@ def _run_single(
             K = max(1, int(run_spec.repeats))
             reduction_samples: list[StageMetrics] = []
             clustering_samples: list[StageMetrics] = []
+            quality_samples = []
             embeddings = [img.embedding for img in all_images]
             embeddings_arr = np.array(embeddings)
             labels = None
@@ -318,7 +320,14 @@ def _run_single(
                     labels = config.clustering.cluster(clustering_images, **cluster_kwargs)
                 clustering_samples.append(clu_stage.metrics)
 
+                # Per-repeat clustering quality so stochastic clusterers report
+                # mean ± std rather than a single realisation.
+                quality_samples.append(
+                    calculate_clustering_metrics(embeddings_arr, np.array(labels))
+                )
+
             # Drop iter 0 (absorbs JIT / cache warmup) when we have spare samples.
+            # Quality is unaffected by JIT, so all K samples are kept.
             if K >= 2:
                 reduction_samples = reduction_samples[1:]
                 clustering_samples = clustering_samples[1:]
@@ -327,7 +336,7 @@ def _run_single(
             clustering_agg = StageMetricsAgg.from_samples(clustering_samples)
 
             labels_arr = np.array(labels)
-            clustering_quality = calculate_clustering_metrics(embeddings_arr, labels_arr)
+            clustering_quality = ClusteringQualityMetricsAgg.from_samples(quality_samples)
 
             segmenter_type_eff = (
                 run_spec.segmenter.type.lower() if run_spec.segmenter else "identity"
