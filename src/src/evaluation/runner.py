@@ -250,6 +250,12 @@ def _run_single(
             storage.set_metadata(METADATA_INGEST_KEY, json.dumps(asdict(ingest_metrics)))
 
         all_images = config.storage.get_all_images()
+        # When the DB is reused (clear_storage=False), the ingest loop above
+        # short-circuits via save_image's `.has()` cache and total_instances
+        # only counts current-run iterations. The actual point count fed to
+        # reduction + clustering is len(all_images); use that for image_count
+        # and throughput so the reported numbers match what was processed.
+        image_count = len(all_images)
 
         if run_spec.similarity_search.enabled:
             with profile_stage() as similarity_stage:
@@ -326,14 +332,16 @@ def _run_single(
                     calculate_clustering_metrics(embeddings_arr, np.array(labels))
                 )
 
-            # Drop iter 0 (absorbs JIT / cache warmup) when we have spare samples.
-            # Quality is unaffected by JIT, so all K samples are kept.
-            if K >= 2:
-                reduction_samples = reduction_samples[1:]
-                clustering_samples = clustering_samples[1:]
-
-            reduction_agg = StageMetricsAgg.from_samples(reduction_samples)
-            clustering_agg = StageMetricsAgg.from_samples(clustering_samples)
+            # Iter 0 drop is delegated to StageMetricsAgg: cost fields drop it
+            # (JIT absorption), memory fields keep it (allocator caches make
+            # later iters under-report the real peak above baseline). Quality
+            # is unaffected by JIT, so all K samples are aggregated as-is.
+            reduction_agg = StageMetricsAgg.from_samples(
+                reduction_samples, drop_first_for_cost=True
+            )
+            clustering_agg = StageMetricsAgg.from_samples(
+                clustering_samples, drop_first_for_cost=True
+            )
 
             labels_arr = np.array(labels)
             clustering_quality = ClusteringQualityMetricsAgg.from_samples(quality_samples)

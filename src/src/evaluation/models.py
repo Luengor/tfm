@@ -74,16 +74,32 @@ class StageMetricsAgg:
     n: int
 
     @classmethod
-    def from_samples(cls, samples: list["StageMetrics"]) -> "StageMetricsAgg":
+    def from_samples(
+        cls,
+        samples: list["StageMetrics"],
+        drop_first_for_cost: bool = False,
+    ) -> "StageMetricsAgg":
+        """Aggregate per-repeat samples.
+
+        Cost fields (wall, cpu, cpu%) drop iter 0 when ``drop_first_for_cost``
+        and ``len(samples) >= 2``, since iter 0 absorbs JIT and cache warm-up.
+        Memory fields (RSS, peak RSS delta, VRAM) keep all K samples: after
+        iter 0 the allocator/runtime hold pages and the per-iter delta above
+        baseline systematically under-reports the real stage cost. Including
+        iter 0 in the memory aggregation surfaces the true load-time peak.
+        """
         import statistics as _st
         if not samples:
             raise ValueError("StageMetricsAgg.from_samples requires at least one sample.")
+
+        cost_samples = samples[1:] if (drop_first_for_cost and len(samples) >= 2) else samples
+        mem_samples = samples
 
         def _mean(values: list[float]) -> float:
             return float(_st.fmean(values))
 
         def _std(values: list[float]) -> float:
-            return float(_st.pstdev(values)) if len(values) > 1 else 0.0
+            return float(_st.stdev(values)) if len(values) > 1 else 0.0
 
         def _opt_mean(values: list[float | None]) -> float | None:
             clean = [v for v in values if v is not None]
@@ -91,16 +107,18 @@ class StageMetricsAgg:
 
         def _opt_std(values: list[float | None]) -> float | None:
             clean = [v for v in values if v is not None]
-            return _std(clean) if clean else None
+            if not clean:
+                return None
+            return float(_st.stdev(clean)) if len(clean) > 1 else 0.0
 
-        wall = [s.wall_time_s for s in samples]
-        cpu = [s.cpu_time_s for s in samples]
-        cpup = [s.cpu_percent_estimated for s in samples]
-        rss_s = [s.rss_start_mb for s in samples]
-        rss_e = [s.rss_end_mb for s in samples]
-        rss_d = [s.rss_delta_mb for s in samples]
-        peak = [s.peak_rss_delta_mb for s in samples]
-        vram = [s.vram_peak_mb for s in samples]
+        wall = [s.wall_time_s for s in cost_samples]
+        cpu = [s.cpu_time_s for s in cost_samples]
+        cpup = [s.cpu_percent_estimated for s in cost_samples]
+        rss_s = [s.rss_start_mb for s in mem_samples]
+        rss_e = [s.rss_end_mb for s in mem_samples]
+        rss_d = [s.rss_delta_mb for s in mem_samples]
+        peak = [s.peak_rss_delta_mb for s in mem_samples]
+        vram = [s.vram_peak_mb for s in mem_samples]
 
         return cls(
             wall_time_s=_mean(wall),
@@ -116,7 +134,7 @@ class StageMetricsAgg:
             peak_rss_delta_mb_std=_opt_std(peak),
             vram_peak_mb=_opt_mean(vram),
             vram_peak_mb_std=_opt_std(vram),
-            n=len(samples),
+            n=len(cost_samples),
         )
 
     def to_flat_dict(self, prefix: str) -> dict[str, float | int | None]:
@@ -185,7 +203,7 @@ class ClusteringQualityMetricsAgg:
             clean = [v for v in values if v is not None]
             if not clean:
                 return None
-            return float(_st.pstdev(clean)) if len(clean) > 1 else 0.0
+            return float(_st.stdev(clean)) if len(clean) > 1 else 0.0
 
         sils = [s.silhouette_score for s in samples]
         chs = [s.calinski_harabasz_score for s in samples]
