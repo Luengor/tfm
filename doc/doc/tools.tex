@@ -47,15 +47,52 @@ en una de cuatro categorías (\textit{tag}, \textit{throw-up}, \textit{piece} y
 adicionales de la misma manera, para un total de $385$ recortes de entrenamiento
 para las cabezas de estilo. Por último, los recortes que parecen pertenecer al
 mismo autor (que son firmados por el mismo nombre) son asignados con un
-identificador común.
+identificador común; el conjunto de Cuenca aporta $169$ recortes con
+identificador de autor que se destinan en exclusiva al entrenamiento de las
+cabezas de autoría, mientras que los $185$ recortes con identificador de autor
+extraídos de las fotografías de Salamanca se reservan para la evaluación
+extrínseca descrita en \ref{subsubsec:eval-extrinseca} y no intervienen en
+ningún momento en el entrenamiento.
 
 Las anotaciones de cajas se emplean para el ajuste fino del detector descrito
 en \ref{subsubsec:segmentador}, las etiquetas de estilo para la cabeza de
 proyección estilística y las de autoría para las cabezas de proyección de autor
 descritas en \ref{subsubsec:cabezas}. Los $294$ recortes de evaluación etiquetados
-por estilo sirven como verdad fundamental para el cálculo de métricas
-extrínsecas (\ref{subsubsec:metricas}) cuando la configuración prescinde del
-segmentador.
+por estilo y los $185$ etiquetados por autor sirven como verdad fundamental para
+el cálculo de métricas extrínsecas (\ref{subsubsec:metricas}) cuando la
+configuración prescinde del segmentador.
+
+El reparto de las anotaciones entre entrenamiento y evaluación es deliberadamente
+asimétrico entre las dos tareas, y conviene justificarlo. Las etiquetas de
+estilo definen una tarea de clasificación cerrada sobre cuatro categorías fijas
+que aparecen en ambas ciudades, por lo que basta con garantizar que no se
+solapen las fotografías concretas entre entrenamiento y evaluación: la
+diversidad estilística buscada se cubre mejor agregando recortes de Salamanca y
+Cuenca al subconjunto de entrenamiento, y el conjunto de evaluación extraído
+del banco principal de Salamanca es disjunto a nivel de fotografía. Las
+etiquetas de autor, en cambio, definen un problema abierto de aprendizaje de
+métricas: en el uso real del sistema, los autores de las pintadas a agrupar son
+en su mayoría desconocidos por el modelo en el momento de la inferencia. Si las
+cabezas de autoría se entrenasen sobre los mismos identificadores de autor que
+luego aparecen en la evaluación, aun usando fotografías distintas, las métricas
+medirían la capacidad del modelo para reidentificar autores ya vistos durante
+el entrenamiento, no su capacidad para construir un espacio en el que autores
+nuevos queden separados. Para evitar este sesgo se sigue la convención habitual
+de los problemas de verificación de identidad (FaceNet\cite{schroff_facenet_2015}
+y la literatura de reidentificación de personas): el conjunto de evaluación
+contiene únicamente identificadores de autor disjuntos de los vistos durante el
+entrenamiento. En este trabajo esa disjunción se materializa entrenando las
+cabezas de autoría exclusivamente con los $169$ recortes de Cuenca y evaluándolas
+sobre los $185$ recortes de Salamanca. La separación geográfica entre ambas
+ciudades hace razonable asumir que los conjuntos de autores no se solapan, si
+bien dicha suposición no se ha verificado de forma exhaustiva confrontando los
+identificadores literales de las firmas, dada la posibilidad teórica de que un
+mismo autor opere en ambas ciudades. Esta elección introduce además un cambio
+de dominio entre ciudades, por lo que un resultado positivo es evidencia de
+que las cabezas capturan rasgos de autoría que generalizan más allá del estilo
+local; un resultado negativo, en cambio, no permite distinguir entre fallo por
+novedad de autor y fallo por cambio de dominio, matiz que se recoge al
+interpretar los resultados.
 
 \subsection{Marco conceptual}
 \label{subsec:conceptos}
@@ -308,9 +345,16 @@ tabla~\ref{tab:embedding-models}, conservando la dimensionalidad del modelo
 base.
 
 Dado que estas cabezas se ajustan sobre el subconjunto anotado, su evaluación
-se realiza siempre sobre el banco principal disjunto, de modo que ninguna
-fotografía vista durante el entrenamiento aparece en los pases de
-\textit{benchmark}.
+se realiza siempre sobre conjuntos disjuntos del utilizado para entrenar la
+cabeza correspondiente: las cabezas estilísticas se evalúan sobre los $294$
+recortes etiquetados por estilo extraídos del banco principal, disjunto del
+subconjunto de entrenamiento; las cabezas de autoría se evalúan sobre los $185$
+recortes etiquetados por autor de Salamanca, disjuntos a nivel de identificador
+de autor de los $169$ recortes de Cuenca empleados en su entrenamiento (véase
+\ref{subsec:dataset}). Por tanto, ninguna cabeza ve durante el entrenamiento un
+recorte que aparezca después en su propia evaluación y las cabezas de autoría
+nunca ven grafiti de los autores de la misma ciudad durante el entrenamiento,
+lo que mitiga el sesgo de reidentificación
 
 \subsection{Entorno de ejecución}
 \label{subsec:entorno}

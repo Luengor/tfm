@@ -9,9 +9,10 @@ Redesigned around the three pillars of the TFM21 brief
 2. **Unsupervised study of cluster quality** — silhouette / Calinski–Harabasz /
    Davies–Bouldin against the same baseline pipeline, while varying one axis at
    a time.
-3. **Supervised validation on the labelled subset** — ARI / NMI / pairwise F1
-   on `data/style/eval_crop/` (294 hand-labelled crops over 4 styles), the only
-   experiment with ground truth.
+3. **Supervised validation on the labelled subsets** — ARI / NMI / pairwise F1
+   on two disjoint hand-labelled sets: `data/style/eval_crop/` (294 crops over
+   4 styles) and `data/author/eval_crop/` (185 crops over 87 authors), the only
+   experiments with ground truth.
 
 The eight experiments below are ordered to support the thesis narrative: the
 quality sweeps (§§1–5) fix the pipeline, the cost sweeps (§§6–7) measure it,
@@ -114,8 +115,9 @@ uv run pipeline-benchmark \
 uv run pipeline-plot -i benchmark_results/benchmark_*.json -o plots/
 ```
 
-For §8 (supervised) add `--ground-truth ../data/style/eval_crop/labels.csv`
-and point `--dataset` at `../data/style/eval_crop`. For §5 (segmenter) skip
+For §8 (supervised) add `--ground-truth <labels.csv>` and point `--dataset` at
+the matching crop folder — `data/style/eval_crop/` for §8a, `data/author/eval_crop/`
+for §8b. For §5 (segmenter) skip
 step 1 — the file is
 already a configuration (segmenter changes invalidate cached crops, so explicit
 `db_path` + `clear_storage: true` per row is required).
@@ -352,24 +354,43 @@ slope estimates rather than single timings.
 
 **Pillar.** Supervised validation (3).
 
-**Question.** When ground-truth style labels are available, which pipeline best
+**Question.** When ground-truth labels are available, which pipeline best
 recovers them? Specifically: (a) does fine-tuning a graffiti-specific
 projection head improve cluster–label agreement over the pretrained backbone,
-and (b) is the improvement consistent across backbone families?
+(b) is the improvement consistent across backbone families, and (c) does the
+ranking hold across two qualitatively different label sets — coarse **style**
+(4 classes, balanced) and fine-grained **author** (87 classes, heavy long
+tail)?
 
-**Dataset.** [`data/style/eval_crop/`](../data/style/eval_crop/) — 294 manually
-labelled crops across 4 styles. Labels in
-[`data/style/eval_crop/labels.csv`](../data/style/eval_crop/labels.csv) follow the
-`filename,style` schema consumed by `--ground-truth`. This is the held-out
-split — the fine-tuned style head was trained on the disjoint
-[`data/style/train_crop/`](../data/style/train_crop/) (385 crops:
-110 from Salamanca + 275 from Cuenca), so §8 measures
-generalisation, not train-set memorisation. The crops are already
-segmented, so `identity` is the correct (and required, per the
-segmenter check in `src/src/evaluation/runner.py`) segmenter for extrinsic metrics.
+**Two label sets.** §8 runs the same embedding × reduction grid against two
+disjoint hand-labelled splits, each with its own clustering grid sized to the
+class count.
 
-**Metrics.** The intrinsic triad (silhouette, CH, DB) plus the extrinsic
-triad:
+- **§8a Style.** [`data/style/eval_crop/`](../data/style/eval_crop/) — 294
+  crops across 4 styles. Held-out from the fine-tuned style head, which was
+  trained on the disjoint [`data/style/train_crop/`](../data/style/train_crop/)
+  (385 crops: 110 from Salamanca + 275 from Cuenca) via supervised
+  contrastive loss (`src/train/style_trainer.py`).
+- **§8b Author.** [`data/author/eval_crop/`](../data/author/eval_crop/) —
+  185 crops across 87 authors, drawn from the Salamanca primary dataset.
+  Highly imbalanced: 53 authors with a single crop, 17 with two; top author
+  has 19 crops. The author heads (`dinov2_graffiti_author_head`,
+  `mobilenet_v3_graffiti_author_head`) were trained with triplet loss
+  (`src/train/dino|mobilenet/train_head.py`, sampler in
+  `src/train/dataset.py`) on a disjoint 169-crop split from the **Cuenca
+  (stopgrafiti) dataset** — see [`infos/dataset.md`](dataset.md). The two
+  sources do not overlap, so §8b measures held-out generalisation across
+  cities as well as across authors (a stronger test than within-dataset
+  hold-out, but also a harder one: city-level domain shift may suppress
+  raw ARI even when author-specific features transfer).
+
+Labels in both `labels.csv` files follow the `filename,style` schema consumed
+by `--ground-truth` (the column header is literal `style` even for author
+labels — the runner does not care about the column name). Crops are
+pre-segmented, so `identity` is the correct (and required, per the segmenter
+check in `src/src/evaluation/runner.py`) segmenter for extrinsic metrics.
+
+**Metrics.** Intrinsic triad (silhouette, CH, DB) plus extrinsic triad:
 
 | Metric | Range | Reads as |
 |---|---|---|
@@ -379,71 +400,117 @@ triad:
 
 ARI is the headline (chance-corrected, comparable across runs with different
 k); NMI is reported alongside to flag the *many-tiny-clusters-inflates-NMI*
-failure mode; pairwise F1 is the most interpretable for write-up.
+failure mode (especially relevant on §8b where 53 singletons make NMI
+inherently inflated); pairwise F1 is the most interpretable for write-up.
+On §8b, the singleton-dominated class distribution caps achievable
+ARI/F1 — report deltas against the per-embedding random baseline rather
+than absolute scores.
 
-**Varies.**
+**Varies (shared across §8a and §8b).**
 
-- **Embedding (4).** `dinov2_vits14` ↔ `dinov2_graffiti_style_head`
-  (fine-tuning pair, fixed backbone) plus `clip_vit_b32` (self-supervised
-  image–text) and `resnet50` (ImageNet-supervised CNN) as anchors.
-- **Reduction (3).** `identity` (raw embedding space), UMAP `n_components=2`
-  (matches the 2-D scatter plots used in the thesis), UMAP `n_components=10`
-  (the canonical pre-clustering reduction).
-- **Clustering (6).** `kmeans`, `agglomerative`, `spectral` all with
-  `n_clusters=4` (oracle k); `hdbscan` swept over
-  `min_cluster_size ∈ {5, 10, 20}` (density-based auto-k — tests whether
-  the true k=4 emerges and how sensitive that is to the main knob).
+- **Embedding (8).** Four pairs that isolate the fine-tuning question on two
+  backbones × two label sets: `dinov2_vits14` ↔
+  `dinov2_graffiti_style_head` ↔ `dinov2_graffiti_author_head`, and
+  `mobilenet_v3` ↔ `mobilenet_v3_graffiti_style_head` ↔
+  `mobilenet_v3_graffiti_author_head`. `clip_vit_b32` and `resnet50` are
+  off-the-shelf anchors.
+- **Reduction (2).** `identity` (raw embedding space) and UMAP
+  `n_components=10, n_neighbors=15, min_dist=0.0, metric="cosine"` (the
+  canonical pre-clustering reduction; matches the baseline).
 
-**Fixed.** SQLite, identity segmenter, no `limit` (`eval_crop` is small
-enough that every run processes the full 294 crops).
+**Varies (§8a clustering, 6 settings).** `kmeans`, `agglomerative` (average
+linkage), `spectral` all with `n_clusters=4` (oracle k); `hdbscan` swept over
+`min_cluster_size ∈ {5, 10, 20}` (density-based auto-k — tests whether
+the true k=4 emerges and how sensitive that is to the main knob).
+
+**Varies (§8b clustering, 6 settings — proposed).** Oracle k=87 destabilises
+KMeans and Spectral on 185 points (many empty / near-empty clusters), so the
+proposed §8b grid uses `agglomerative` (average linkage) at
+`n_clusters ∈ {30, 87}` (a moderate-k proxy plus oracle) and `hdbscan` swept
+over `min_cluster_size ∈ {2, 3, 5, 10}` (2 and 3 are the smallest meaningful
+sizes given the singleton-heavy long tail). `kmeans` and `spectral` are
+omitted — neither has a principled way to handle the singleton classes that
+dominate the label set. Revisit if the §8b run produces uninformative ARI
+across all settings (a sign the chosen grid is too narrow).
+
+**Fixed.** SQLite, identity segmenter, no `limit` (both `eval_crop` folders
+are small enough that every run processes the full set).
 
 **Hypotheses.**
 
-1. The fine-tuned style head outperforms `dinov2_vits14` on ARI / NMI / F1.
-   The head is trained with supervised contrastive loss on `data/style/train_crop/`
-   (see `src/train/style_trainer.py`); §8 evaluates on the disjoint
-   `data/style/eval_crop/`, so the comparison is held-out and a head win is
-   genuine transfer rather than memorisation.
-2. CLIP is competitive with DINOv2 base; ResNet50 is the weakest off-the-shelf
-   encoder for stylistic clustering, consistent with §1.
-3. KMeans-4 (oracle k) wins on the fine-tuned head because the head was
+1. **§8a.** The fine-tuned style head outperforms `dinov2_vits14` on ARI /
+   NMI / F1. Held-out comparison ⇒ a head win is genuine transfer rather than
+   memorisation. Symmetrically on §8b, the author heads outperform their
+   respective pretrained backbones — and since §8b additionally crosses city
+   boundaries (Cuenca-trained, Salamanca-evaluated), a positive result is
+   evidence the heads learn author-discriminative features that generalise
+   across the geographic / dataset shift rather than locality-specific cues.
+2. **Cross-task specificity (relative).** Any graffiti-tuned head will likely
+   beat its pretrained backbone on either task — step one of either head is
+   "learn that graffiti exists." The discriminating claim is *relative
+   magnitude*: on §8b, the gap (author head − backbone) exceeds the gap
+   (style head − backbone), and symmetrically on §8a. A diagonal-dominant
+   transfer matrix (below) is the cleanest evidence that the two heads
+   encode different information; uniform lift across both tasks suggests
+   the heads share a generic graffiti representation.
+3. CLIP is competitive with DINOv2 base on §8a; ResNet50 is the weakest
+   off-the-shelf encoder for stylistic clustering, consistent with §1. On
+   §8b, ResNet50 may close the gap — fine-grained identity discrimination
+   leans on local texture, where CNN features are competitive.
+4. KMeans-4 (oracle k) wins on the §8a fine-tuned head because the head was
    trained to make classes linearly separable; HDBSCAN auto-discovers a
    count near 4 on the fine-tuned head at moderate `min_cluster_size` (≈10–20).
-4. `identity` reduction matches or beats UMAP on the fine-tuned head
+5. `identity` reduction matches or beats UMAP on each fine-tuned head
    (further reduction is information loss when the encoder has already
    concentrated discriminative axes) and underperforms UMAP on raw ImageNet
-   features. UMAP-2 ≈ UMAP-10 on the fine-tuned head ⇒ the 2-D thesis
-   visualisations are honest representations rather than compression
-   artefacts.
+   features.
 
 **Derived analyses.**
 
-- **Internal–external correlation.** Plot ARI vs. silhouette over the 72 runs.
-  A strong positive correlation means the unsupervised metrics are a
-  defensible proxy on this dataset; a weak one means the thesis must hedge
-  its recommendations elsewhere.
+- **Internal–external correlation.** Plot ARI vs. silhouette across all §8a
+  runs and separately across all §8b runs. A strong positive correlation
+  means the unsupervised metrics are a defensible proxy on this label
+  granularity; divergence between §8a and §8b correlations bounds *which*
+  axis silhouette is tracking.
 - **k-recovery for HDBSCAN.** Does HDBSCAN's auto-detected `n_clusters` land
-  near 4 on the fine-tuned head across the `min_cluster_size` sweep? Report
-  alongside `noise_ratio` so the "inflated NMI from many tiny clusters"
-  failure mode is visible.
+  near 4 (§8a) or in the right order of magnitude — tens, not thousands —
+  (§8b) on the fine-tuned head? Report alongside `noise_ratio`.
+- **Cross-task transfer matrix.** Tabulate ARI for every embedding against
+  both label sets. A diagonal-dominant matrix (style heads peak on §8a,
+  author heads on §8b) confirms head specificity; off-diagonal leakage
+  suggests the heads share more than intended.
 
-**Cost.** 72 runs (4 embeddings × 3 reductions × 6 clusterers), 4 ingests
-(one per embedding; reduction and clustering re-use the cached DB within an
-embedding group thanks to storage-key hashing in `generate_configuration.py`).
+**Cost.** §8a: 96 runs (8 embeddings × 2 reductions × 6 clusterers), 8
+ingests. §8b: 96 runs (8 embeddings × 2 reductions × 6 clusterers), 8
+ingests (separate DBs — different dataset path). Reduction and clustering
+re-use the cached DB within each embedding group thanks to storage-key
+hashing in `generate_configuration.py`.
 
 **Running.**
 
 ```bash
 cd src
 
+# §8a Style
 uv run python benchmarks/generate_configuration.py \
-  -i ../infos/configs/08_supervised.json \
-  -o benchmarks/08_supervised.configuration.json
+  -i ../infos/configs/08a_supervised_style.json \
+  -o benchmarks/08a_supervised_style.configuration.json
 
 uv run pipeline-benchmark \
-  --configuration benchmarks/08_supervised.configuration.json \
+  --configuration benchmarks/08a_supervised_style.configuration.json \
   --dataset ../data/style/eval_crop \
   --ground-truth ../data/style/eval_crop/labels.csv \
+  --cluster-plot
+
+# §8b Author
+uv run python benchmarks/generate_configuration.py \
+  -i ../infos/configs/08b_supervised_author.json \
+  -o benchmarks/08b_supervised_author.configuration.json
+
+uv run pipeline-benchmark \
+  --configuration benchmarks/08b_supervised_author.configuration.json \
+  --dataset ../data/author/eval_crop \
+  --ground-truth ../data/author/eval_crop/labels.csv \
   --cluster-plot
 
 uv run pipeline-plot -i benchmark_results/benchmark_*.json -o plots/
@@ -452,10 +519,17 @@ uv run pipeline-plot -i benchmark_results/benchmark_*.json -o plots/
 `--cluster-plot` writes an interactive 2-D UMAP scatter per run as a
 Vega-Lite HTML page (`<output-dir>/<run_id>_cluster.html`) with embedded
 metrics, pan/zoom, shift-drag brush selection, and a thumbnail lightbox —
-useful here because ground-truth labels can be overlaid for visual
-sanity-checking.
+ground-truth labels overlay for visual sanity-checking. At 192 runs (96 + 96)
+the resulting HTML directory is non-trivial; drop the flag on the §8b run
+if disk / browse overhead matters and only re-enable it for the
+fine-tuned-head rows once §8b numbers point at the interesting cases.
 
-**Config.** [`configs/08_supervised.json`](configs/08_supervised.json)
+**Configs.**
+[`configs/08a_supervised_style.json`](configs/08a_supervised_style.json),
+[`configs/08b_supervised_author.json`](configs/08b_supervised_author.json).
+The legacy combined [`configs/08_supervised.json`](configs/08_supervised.json)
+covers §8a only and predates the author split — split into the two files
+above for new runs.
 
 ---
 

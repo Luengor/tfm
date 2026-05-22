@@ -235,27 +235,53 @@ sobre los pocos puntos restantes.
 
 \subsubsection{Evaluación extrínseca sobre subconjunto etiquetado}
 \label{subsubsec:eval-extrinseca}
-%TODO: author supervised evaluation should appear here once is done 
 La evaluación supervisada se efectúa según las restricciones ya enunciadas en
-\ref{subsubsec:metricas}: se utiliza el subconjunto anotado por estilo descrito
-en \ref{subsec:dataset} y se limita a las configuraciones que prescinden del
-segmentador, donde la correspondencia entre fotografía anotada y
-\textit{embedding} resultante es unívoca. Sobre las configuraciones con
-segmentador esta correspondencia se diluye al generarse múltiples recortes por
-fotografía, lo que impediría asignar una etiqueta de estilo única a cada
-\textit{embedding}.
+\ref{subsubsec:metricas} y sobre dos conjuntos etiquetados disjuntos descritos
+en \ref{subsec:dataset}, cada uno asociado a una de las dos tareas supervisadas
+reconocidas en este trabajo: el subconjunto de $294$ recortes etiquetados por
+estilo y el subconjunto de $185$ recortes etiquetados por autor. En ambos casos
+la evaluación se limita a las configuraciones que prescinden del segmentador,
+donde la correspondencia entre recorte anotado y \textit{embedding} resultante
+es unívoca. Sobre las configuraciones con segmentador esta correspondencia se
+diluye al generarse múltiples recortes por fotografía, lo que impediría asignar
+una etiqueta única a cada \textit{embedding}.
 
-Las métricas ARI, NMI y F1 por pares se calculan directamente sobre el
-vector de etiquetas de clúster y el vector de etiquetas de verdad
-fundamental, sin necesidad de resolver explícitamente el problema de
-asignación clúster-clase: las tres métricas son invariantes ante
-permutaciones de etiquetas y comparan las relaciones de coagrupamiento
-entre pares de puntos. Los puntos etiquetados como ruido por los
-algoritmos basados en densidad se tratan como si formasen un único clúster
-adicional, de modo que su presencia influye en la métrica en lugar de ser
-ignorada silenciosamente. Los valores se reportan por configuración y se
-agregan después por componente para identificar qué elecciones contribuyen
-sistemáticamente a una mejor calidad supervisada.
+Las dos evaluaciones supervisadas comparten métricas y procedimiento de
+cálculo, pero responden a preguntas distintas. La evaluación por estilo es una
+evaluación cerrada sobre cuatro categorías que aparecen también durante el
+entrenamiento de las cabezas estilísticas: mide el grado en que el espacio de
+representación agrupa pintadas estilísticamente homogéneas. La evaluación por
+autor es una evaluación de identidad sobre un conjunto de identificadores
+disjuntos de los utilizados durante el entrenamiento de las cabezas de autoría
+(véase la justificación en \ref{subsec:dataset}): mide la capacidad del espacio
+de representación de separar autores nuevos, no la de reidentificar autores ya
+conocidos. La asimetría entre conjuntos de entrenamiento y de evaluación es
+intrínseca al problema de aprendizaje de métricas y se reporta aquí como tal.
+El conjunto de etiquetas de autor es además fuertemente desbalanceado, con un
+número elevado de autores representados por uno o dos recortes, lo que acota
+superiormente los valores absolutos alcanzables por las métricas y obliga a
+interpretar los resultados en términos relativos (diferencias entre
+configuraciones) más que en términos absolutos. Una matización adicional afecta
+a las cabezas estilísticas cuando se evalúan sobre el conjunto de autor: sus
+recortes de entrenamiento ($110$ de los $385$) proceden de las mismas
+fotografías de Salamanca de las que se extraen los $185$ recortes de evaluación
+por autor, por lo que las cabezas estilísticas han visto durante su
+entrenamiento píxeles de algunas de esas fotografías, aunque etiquetados por
+estilo y no por autor. El sesgo introducido es por construcción muy limitado,
+pero se explicita aquí para que cualquier ventaja observada de las cabezas
+estilísticas sobre el conjunto de autor se lea con esa salvedad.
+
+Las métricas ARI, NMI y F1 por pares se calculan directamente sobre el vector
+de etiquetas de clúster y el vector de etiquetas de verdad fundamental, sin
+necesidad de resolver explícitamente el problema de asignación clúster-clase:
+las tres métricas son invariantes ante permutaciones de etiquetas y comparan
+las relaciones de coagrupamiento entre pares de puntos. Los puntos etiquetados
+como ruido por los algoritmos basados en densidad se tratan como si formasen un
+único clúster adicional, de modo que su presencia influye en la métrica en
+lugar de ser ignorada silenciosamente. Los valores se reportan por
+configuración y por conjunto de etiquetas, y se agregan después por componente
+para identificar qué elecciones contribuyen sistemáticamente a una mejor
+calidad supervisada.
 
 \subsubsection{Salida y agregación de resultados}
 \label{subsubsec:salida}
