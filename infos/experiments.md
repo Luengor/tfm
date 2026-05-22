@@ -64,10 +64,14 @@ clustering stages execute K times back-to-back in the same process with seeds
 and the remaining K-1 samples are aggregated as mean ± std. Output JSON keeps
 the existing `{stage}_wall_time_s` keys (now the mean) and adds
 `{stage}_wall_time_s_std` and `{stage}_n` siblings — `plot_metrics.py` and
-`table.py` keep working unchanged. Quality and extrinsic metrics are computed
-once, on the last iteration's labels (seed `K-1`, reproducible). Ingest and
-similarity-search remain single-shot — ingest is deterministic and the
-DB-reuse heuristic depends on a single timing.
+`table.py` keep working unchanged. Clustering quality metrics (silhouette,
+Calinski–Harabasz, Davies–Bouldin, noise ratio, cluster-size CV) are computed
+on every iteration (all K samples, no iter-0 drop — quality is unaffected by
+JIT warm-up) and aggregated as mean ± std under the existing
+`clustering_quality_*` keys, with `_std` and `_n` siblings added. Extrinsic
+metrics are still computed once on the last iteration's labels (seed `K-1`,
+reproducible). Ingest and similarity-search remain single-shot — ingest is
+deterministic and the DB-reuse heuristic depends on a single timing.
 
 Defaults: `K=3` for quality-focused experiments (§§1–5, §8) and `K=5` for the
 cost-focused sweeps (§6, §7). Wall-time differences inside one std should be
