@@ -134,6 +134,8 @@ def _parse_similarity_search(raw: Any, run_index: int) -> SimilaritySearchSpec:
     enabled = raw.get("enabled", False)
     top_k = raw.get("top_k", 3)
     cos_distance = raw.get("cos_distance", True)
+    sample_n = raw.get("sample_n", None)
+    sample_seed = raw.get("sample_seed", None)
 
     if not isinstance(enabled, bool):
         raise ConfigurationError(f"Run index {run_index}: similarity_search.enabled must be a boolean.")
@@ -141,11 +143,17 @@ def _parse_similarity_search(raw: Any, run_index: int) -> SimilaritySearchSpec:
         raise ConfigurationError(f"Run index {run_index}: similarity_search.top_k must be a positive integer.")
     if not isinstance(cos_distance, bool):
         raise ConfigurationError(f"Run index {run_index}: similarity_search.cos_distance must be a boolean.")
+    if sample_n is not None and (not isinstance(sample_n, int) or sample_n <= 0):
+        raise ConfigurationError(f"Run index {run_index}: similarity_search.sample_n must be a positive integer.")
+    if sample_seed is not None and not isinstance(sample_seed, int):
+        raise ConfigurationError(f"Run index {run_index}: similarity_search.sample_seed must be an integer.")
 
     return SimilaritySearchSpec(
         enabled=enabled,
         top_k=top_k,
         cos_distance=cos_distance,
+        sample_n=sample_n,
+        sample_seed=sample_seed,
     )
 
 
@@ -168,6 +176,8 @@ def make_run_id(spec: BenchmarkRunSpec) -> str:
             "enabled": spec.similarity_search.enabled,
             "top_k": spec.similarity_search.top_k,
             "cos_distance": spec.similarity_search.cos_distance,
+            "sample_n": spec.similarity_search.sample_n,
+            "sample_seed": spec.similarity_search.sample_seed,
         },
         "limit": spec.limit,
     }

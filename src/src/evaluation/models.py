@@ -14,6 +14,8 @@ class SimilaritySearchSpec:
     enabled: bool = False
     top_k: int = 3
     cos_distance: bool = True
+    sample_n: int | None = None
+    sample_seed: int | None = None
 
 
 @dataclass(slots=True)
@@ -409,6 +411,8 @@ class BenchmarkResult:
                 "similarity_search_enabled": self.config.similarity_search.enabled,
                 "similarity_search_top_k": self.config.similarity_search.top_k,
                 "similarity_search_cos_distance": self.config.similarity_search.cos_distance,
+                "similarity_search_sample_n": self.config.similarity_search.sample_n,
+                "similarity_search_sample_seed": self.config.similarity_search.sample_seed,
                 "clear_storage_enabled": self.config.clear_storage,
                 "limit_parameter": self.config.limit,
                 "repeats": self.config.repeats,

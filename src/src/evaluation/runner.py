@@ -2,6 +2,7 @@ import csv
 import json
 import multiprocessing
 import os
+import random
 from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -262,7 +263,12 @@ def _run_single(
         if run_spec.similarity_search.enabled:
             with profile_stage() as similarity_stage:
                 distances = []
-                for img in all_images:
+                search_images = all_images
+                if run_spec.similarity_search.sample_n is not None:
+                    rng = random.Random(run_spec.similarity_search.sample_seed)
+                    n = min(run_spec.similarity_search.sample_n, len(all_images))
+                    search_images = rng.sample(all_images, n)
+                for img in search_images:
                     nearest = config.storage.get_by_distance(
                         img.embedding,
                         max_images=run_spec.similarity_search.top_k + 1,
