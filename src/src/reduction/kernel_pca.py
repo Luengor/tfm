@@ -3,6 +3,8 @@ import numpy as np
 from src.abstractions import ReductionBase
 
 class KernelPCAReduction(ReductionBase):
+    is_deterministic = True
+
     def __init__(self, n_components: int = 50, kernel: str = "rbf"):
         self.n_components = n_components
         self.kernel = kernel

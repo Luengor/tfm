@@ -3,6 +3,8 @@ import numpy as np
 from src.abstractions import ReductionBase
 
 class PCAReduction(ReductionBase):
+    is_deterministic = True
+
     def __init__(self, n_components: int = 50):
         self.n_components = n_components
         self.pca = PCA(n_components=n_components)

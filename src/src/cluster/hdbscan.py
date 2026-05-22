@@ -24,6 +24,8 @@ from src.abstractions import ClusteringBase, ImageData
 
 
 class HDBSCANClusterer(ClusteringBase):
+    is_deterministic = True
+
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
         min_cluster_size = kwargs.get("min_cluster_size", 5)
         max_cluster_size = kwargs.get("max_cluster_size", None)

@@ -3,6 +3,8 @@ import numpy as np
 from src.abstractions import ReductionBase
 
 class IsomapReduction(ReductionBase):
+    is_deterministic = True
+
     def __init__(self, n_components: int = 2, n_neighbors: int = 5):
         self.n_components = n_components
         self.n_neighbors = n_neighbors

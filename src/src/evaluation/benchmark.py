@@ -80,6 +80,14 @@ def main() -> int:
             parser.error("None of the provided --run values matched configuration run names or run IDs.")
 
     if args.limit is not None:
+        overridden = [s.name for s in run_specs if s.limit is not None and s.limit != args.limit]
+        if overridden:
+            preview = ", ".join(overridden[:5])
+            suffix = "..." if len(overridden) > 5 else ""
+            print(
+                f"Warning: --limit={args.limit} overrides per-run limits on "
+                f"{len(overridden)} run(s): {preview}{suffix}"
+            )
         from src.evaluation.configuration import make_run_id
         for spec in run_specs:
             spec.limit = args.limit

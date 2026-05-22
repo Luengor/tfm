@@ -25,6 +25,8 @@ from src.abstractions import ClusteringBase, ImageData
 
 
 class AgglomerativeClusterer(ClusteringBase):
+    is_deterministic = True
+
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
         n_clusters = kwargs.get("n_clusters", 5)
         linkage = kwargs.get("linkage", "ward")

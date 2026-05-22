@@ -190,6 +190,7 @@ def _run_single(
     clustering_agg = None
     clustering_quality = None
     clustering_extrinsic = None
+    clusters_per_repeat: list[int] = []
     embeddings_arr = None
     reduced_embeddings = None
     labels_arr = None
@@ -300,11 +301,27 @@ def _run_single(
                 )
 
         if all_images:
-            K = max(1, int(run_spec.repeats))
+            K_requested = max(1, int(run_spec.repeats))
+            # Short-circuit: if both reduction and clustering are deterministic
+            # (e.g. PCA + HDBSCAN), every repeat produces identical labels and
+            # near-identical timings — drop K to 1 to avoid wasting work on
+            # §7-scale sweeps. UMAP and the stochastic clusterers (KMeans /
+            # GMM / Spectral / AffinityPropagation) opt out by leaving the
+            # default ``is_deterministic = False`` on their base classes.
+            reduction_det = getattr(reduction, "is_deterministic", False)
+            clustering_det = getattr(config.clustering, "is_deterministic", False)
+            K = 1 if (reduction_det and clustering_det) else K_requested
+            if K < K_requested:
+                print(
+                    f"Run {run_spec.name}: reduction and clustering are both "
+                    f"deterministic; running K=1 instead of K={K_requested}."
+                )
+
             reduction_samples: list[StageMetrics] = []
             clustering_samples: list[StageMetrics] = []
             quality_samples = []
             extrinsic_samples: list[ExtrinsicMetrics] = []
+            clusters_per_repeat: list[int] = []
             embeddings = [img.embedding for img in all_images]
             embeddings_arr = np.array(embeddings)
             labels = None
@@ -345,6 +362,11 @@ def _run_single(
                     extrinsic_samples.append(
                         _compute_extrinsic(all_images, labels_iter, ground_truth)
                     )
+                # Track cluster count per repeat so KMeans elbow / GMM BIC
+                # flips between seeds are visible in the output.
+                clusters_per_repeat.append(
+                    int(np.sum(np.unique(labels_iter) >= 0))
+                )
 
             # Iter 0 drop is delegated to StageMetricsAgg: cost fields drop it
             # (JIT absorption), memory fields keep it (allocator caches make
@@ -370,6 +392,14 @@ def _run_single(
 
             n_clusters = int(np.sum(np.unique(labels_arr) >= 0)) if labels_arr.size > 0 else 0
             cluster_count = n_clusters
+
+            if len(set(clusters_per_repeat)) > 1:
+                print(
+                    f"Run {run_spec.name}: cluster count varied across repeats "
+                    f"(seeds 0..{len(clusters_per_repeat) - 1}): {clusters_per_repeat}. "
+                    f"Aggregated quality and extrinsic metrics span partitions "
+                    f"with different k."
+                )
         else:
             cluster_count = 0
 
@@ -423,6 +453,7 @@ def _run_single(
         clustering=clustering_agg,
         clustering_quality=clustering_quality,
         clustering_extrinsic=clustering_extrinsic,
+        clusters_per_repeat=clusters_per_repeat,
         config=run_spec,
     )
 

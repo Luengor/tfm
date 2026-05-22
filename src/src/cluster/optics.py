@@ -23,6 +23,8 @@ from src.abstractions import ClusteringBase, ImageData
 
 
 class OPTICSClusterer(ClusteringBase):
+    is_deterministic = True
+
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
         min_samples = kwargs.get("min_samples", 5)
         max_eps = kwargs.get("max_eps", np.inf)

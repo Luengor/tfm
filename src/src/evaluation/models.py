@@ -377,6 +377,7 @@ class BenchmarkResult:
     clustering: StageMetricsAgg | None = None
     clustering_quality: ClusteringQualityMetricsAgg | None = None
     clustering_extrinsic: ExtrinsicMetricsAgg | None = None
+    clusters_per_repeat: list[int] = field(default_factory=list)
     config: BenchmarkRunSpec | None = None
 
     def to_record(self) -> dict[str, Any]:
@@ -394,6 +395,7 @@ class BenchmarkResult:
             "segmenter_type": self.segmenter_type,
             "reduction_type": self.reduction_type,
             "avg_neighbor_distance": self.avg_neighbor_distance,
+            "clusters_per_repeat": list(self.clusters_per_repeat),
             "error": self.error,
         }
 

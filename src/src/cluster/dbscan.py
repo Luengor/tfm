@@ -27,6 +27,8 @@ from src.cluster.utils import find_elbow
 
 
 class DBSCANClusterer(ClusteringBase):
+    is_deterministic = True
+
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
         eps = kwargs.get("eps")
         min_samples = kwargs.get("min_samples", 5)
