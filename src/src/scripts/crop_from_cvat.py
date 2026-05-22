@@ -78,10 +78,12 @@ def crop_from_cvat(
                         text_attr = box.find("attribute[@name='text']")
                         text_val = (text_attr.text or "").strip().lower() if text_attr is not None else ""
                         if text_val:
-                            label = text_val
+                            labels = text_val.split()
                         else:
                             skipped += 1
                             continue
+                    else:
+                        labels = [label]
 
                     try:
                         xtl = float(box.get("xtl", "0"))
@@ -101,12 +103,13 @@ def crop_from_cvat(
                         continue
 
                     crop = img.crop((x0, y0, x1, y1))
-                    label_dir = output_dir / label
-                    label_dir.mkdir(parents=True, exist_ok=True)
                     out_name = f"{Path(filename).stem}_{box_idx:03d}.jpg"
-                    crop.save(label_dir / out_name, quality=95)
-                    label_counts[label] += 1
-                    rows.append((out_name, label))
+                    for lbl in labels:
+                        label_dir = output_dir / lbl
+                        label_dir.mkdir(parents=True, exist_ok=True)
+                        crop.save(label_dir / out_name, quality=95)
+                        label_counts[lbl] += 1
+                        rows.append((out_name, lbl))
         except Exception as e:
             tqdm.write(f"Error processing {filename}: {e}")
             errors += 1
