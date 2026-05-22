@@ -10,7 +10,7 @@ Redesigned around the three pillars of the TFM21 brief
    Davies–Bouldin against the same baseline pipeline, while varying one axis at
    a time.
 3. **Supervised validation on the labelled subset** — ARI / NMI / pairwise F1
-   on `data/style/eval_crop/` (274 hand-labelled crops over 4 styles), the only
+   on `data/style/eval_crop/` (294 hand-labelled crops over 4 styles), the only
    experiment with ground truth.
 
 The eight experiments below are ordered to support the thesis narrative: the
@@ -32,7 +32,7 @@ comparisons are clean:
   experiment §5).
 - **Storage:** SQLite.
 - **Limit:** every experiment is run at three geometrically spaced sizes —
-  `{250, 1000, 5500}` (≈22× span) — so each quality result is reported at
+  `{250, 1000, 6416}` (≈26× span) — so each quality result is reported at
   small, mid and near-full corpus. Three points are enough to spot
   non-monotonic quality-vs-`n` behaviour without forcing each grid into a
   full cost-sweep. Cost-focused experiments (§6, §7) keep their finer
@@ -43,13 +43,13 @@ comparisons are clean:
   wall time, CPU, RSS, and VRAM. Ingest stays single-shot. See the
   **Metrics** section for the full rationale.
 
-The working dataset contains roughly 6000 images. The 274 labelled eval
-crops in [`data/style/eval_crop/`](../data/style/eval_crop/) (and the 178
-train crops in [`data/style/train_crop/`](../data/style/train_crop/)) are
-derived from the full image bank and are *not* deduplicated out for the
-unsupervised experiments — at <10 % of the corpus they do not perturb
-aggregate statistics, and segregating them would artificially shrink the
-cost-sweep dataset.
+The working dataset contains 6416 images. The 294 labelled eval
+crops in [`data/style/eval_crop/`](../data/style/eval_crop/) (and the 385
+train crops in [`data/style/train_crop/`](../data/style/train_crop/) —
+110 from Salamanca, 275 from Cuenca) are derived from the full image bank
+and are *not* deduplicated out for the unsupervised experiments — at <10 %
+of the corpus they do not perturb aggregate statistics, and segregating them
+would artificially shrink the cost-sweep dataset.
 
 ## Metrics
 
@@ -137,7 +137,7 @@ identity-recovery head (`dinov2_graffiti_author_head`) is omitted — its
 training objective targets a different question.
 
 **Fixed.** Baseline UMAP → HDBSCAN, identity segmenter, SQLite. Swept at
-`limit ∈ {250, 1000, 5500}`.
+`limit ∈ {250, 1000, 6416}`.
 
 **Why it matters.** This is the single most consequential choice in the
 pipeline. Pairs `mobilenet_v3` ↔ `mobilenet_v3_graffiti_author_head` and
@@ -164,7 +164,7 @@ kernels). Linear/poly KernelPCA kernels and UMAP-50/100 sweeps from v1 were
 trimmed — they did not contribute distinctive evidence in early runs.
 
 **Fixed.** Baseline embedding and HDBSCAN. Swept at
-`limit ∈ {250, 1000, 5500}`.
+`limit ∈ {250, 1000, 6416}`.
 
 **Why it matters.** Density-based clustering degrades in high dimensions. The
 identity row quantifies how much reduction buys; the UMAP rows confirm or
@@ -190,7 +190,7 @@ this n (see [`best_cluster.md`](best_cluster.md)). The OPTICS-euclidean and
 agglomerative-5 rows from v1 were trimmed for redundancy.
 
 **Fixed.** Baseline embedding and UMAP. Swept at
-`limit ∈ {250, 1000, 5500}`.
+`limit ∈ {250, 1000, 6416}`.
 
 **Why it matters.** Tests the algorithmic hierarchy recommended in
 `best_cluster.md` against the actual data and provides ablation evidence for
@@ -208,11 +208,11 @@ spectral removes the k confound when comparing against HDBSCAN's auto-k.
 **Question.** What is the smallest meaningful cluster size for this dataset?
 
 **Varies.** `min_cluster_size ∈ {5, 10, 25, 50, 100, 200}` — sized as
-fractions of the 5500-image corpus (≈0.1 % to ≈3.6 %).
+fractions of the 6416-image corpus (≈0.1 % to ≈3.1 %).
 
 **Fixed.** Baseline embedding and UMAP. Swept at
-`limit ∈ {250, 1000, 5500}` so the same `min_cluster_size` axis is read
-across three corpus sizes; the 5500-image row is where the fractions
+`limit ∈ {250, 1000, 6416}` so the same `min_cluster_size` axis is read
+across three corpus sizes; the 6416-image row is where the fractions
 resolve to meaningful absolute counts and density estimates are stable,
 while the 250 and 1000 rows reveal whether the optimal `min_cluster_size`
 shifts with `n` (interaction the headline cost-sweep §7 does not measure).
@@ -248,7 +248,7 @@ detection quality, and the threshold/padding axis did not produce
 distinctive signal.
 
 **Fixed.** Baseline embedding, reduction, clustering. Each segmenter row is
-expanded to `limit ∈ {250, 1000, 5500}`.
+expanded to `limit ∈ {250, 1000, 6416}`.
 
 **Why it matters.** Segmentation removes background noise but introduces
 detection errors and changes the unit of analysis (image vs. crop). The
@@ -278,13 +278,13 @@ and PostgreSQL + pgvector (indexed ANN) for ingest and similarity search,
 and how does it scale with `n`?
 
 **Varies.** `storage ∈ {sqlite, postgresql}` × `limit ∈ {500, 1000, 2500,
-5500}`. Similarity search is **enabled** (`top_k=5`) — that is the axis where
+6416}`. Similarity search is **enabled** (`top_k=5`) — that is the axis where
 the two backends differ most (O(n) Python scan vs. O(log n) index).
 
 **Fixed.** Baseline embedding, reduction, clustering, identity segmenter.
 
 **Why it matters.** Clustering quality is invariant under storage choice, so
-this experiment isolates pure infrastructure cost. The 11× `limit` span is
+this experiment isolates pure infrastructure cost. The ~13× `limit` span is
 wide enough that the index advantage should be empirically visible rather
 than buried in per-call overhead.
 
@@ -309,7 +309,7 @@ intra-run measurements — read it cautiously against the cost legend in §7.
 do the asymptotic complexity differences between clustering algorithms
 manifest empirically within the available dataset range?
 
-**Varies.** `limit ∈ {100, 250, 500, 1000, 2000, 3500, 5500}` (~55× span) ×
+**Varies.** `limit ∈ {100, 250, 500, 1000, 2000, 3500, 6416}` (~64× span) ×
 clustering algorithm ∈ {HDBSCAN, KMeans, DBSCAN, OPTICS, Agglomerative,
 Spectral}. Similarity search is enabled with `top_k=5` so the search stage
 is timed at every `n` too — this is where the corpus-size sensitivity of
@@ -357,14 +357,13 @@ recovers them? Specifically: (a) does fine-tuning a graffiti-specific
 projection head improve cluster–label agreement over the pretrained backbone,
 and (b) is the improvement consistent across backbone families?
 
-**Dataset.** [`data/style/eval_crop/`](../data/style/eval_crop/) — 274 manually
-labelled crops across 4 styles: `tag` (117), `piece` (69), `throw-up` (69),
-`character` (19). Labels in
+**Dataset.** [`data/style/eval_crop/`](../data/style/eval_crop/) — 294 manually
+labelled crops across 4 styles. Labels in
 [`data/style/eval_crop/labels.csv`](../data/style/eval_crop/labels.csv) follow the
 `filename,style` schema consumed by `--ground-truth`. This is the held-out
 split — the fine-tuned style head was trained on the disjoint
-[`data/style/train_crop/`](../data/style/train_crop/) (178 crops:
-`tag` 54, `piece` 50, `throw-up` 55, `character` 19), so §8 measures
+[`data/style/train_crop/`](../data/style/train_crop/) (385 crops:
+110 from Salamanca + 275 from Cuenca), so §8 measures
 generalisation, not train-set memorisation. The crops are already
 segmented, so `identity` is the correct (and required, per the
 segmenter check in `src/src/evaluation/runner.py`) segmenter for extrinsic metrics.
@@ -393,11 +392,10 @@ failure mode; pairwise F1 is the most interpretable for write-up.
 - **Clustering (6).** `kmeans`, `agglomerative`, `spectral` all with
   `n_clusters=4` (oracle k); `hdbscan` swept over
   `min_cluster_size ∈ {5, 10, 20}` (density-based auto-k — tests whether
-  the true k=4 emerges and how sensitive that is to the main knob given
-  class sizes `tag=117, piece=69, throw-up=69, character=19`).
+  the true k=4 emerges and how sensitive that is to the main knob).
 
 **Fixed.** SQLite, identity segmenter, no `limit` (`eval_crop` is small
-enough that every run processes the full 274 crops).
+enough that every run processes the full 294 crops).
 
 **Hypotheses.**
 

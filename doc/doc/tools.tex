@@ -4,7 +4,7 @@
 
 \subsection{Conjunto de datos}
 \label{subsec:dataset}
-El banco de imágenes de grafiti utilizado en este trabajo se compone de $6681$
+El banco de imágenes de grafiti utilizado en este trabajo se compone de $6416$
 fotografías capturadas en condiciones reales en la ciudad de Salamanca. Las
 imágenes presentan una alta variabilidad cromática y de escenas urbanas, con
 condiciones de iluminación diversas. Tampoco existe un lienzo por defecto para
@@ -19,35 +19,43 @@ dispositivo móvil Samsung, presentando en su mayoría una resolución de $4032
 postprocesado sobre las imágenes originales, de modo que la evaluación opera
 directamente sobre el material en bruto.
 
-El banco principal de $6681$ fotografías carece de cualquier tipo de
+% TODO: check this after stopgrafiti ok
+El banco principal de $6416$ fotografías carece de cualquier tipo de
 etiquetado, por lo que no existe una verdad fundamental sobre la que validar de
 forma directa la calidad de los clústeres resultantes. Para mitigar esta
-limitación se ha anotado manualmente un subconjunto separado de $250$
-fotografías, disjunto del banco principal y excluido de la mayoría de los pases
-de \textit{benchmark}. Esta separación es necesaria porque varios de los
-modelos evaluados se ajustan a partir de las anotaciones (véase
+limitación, se han anotado manualmente dos conjuntos suplementarios. Por un
+lado, $265$ fotografías de Salamanca y $1207$ de la ciudad de Cuenca
+(procedentes de un repositorio público de grafiti urbano) constituyen el
+subconjunto de entrenamiento, disjunto del banco principal y excluido de todos
+los pases de \textit{benchmark}. Esta separación es necesaria porque varios de
+los modelos evaluados se ajustan a partir de estas anotaciones (véase
 \ref{subsec:extras}), de modo que utilizar imágenes vistas durante el
 entrenamiento para evaluar el sistema introduciría un sesgo optimista en las
-métricas.
+métricas. Por otro lado, $294$ recortes extraídos del banco principal han sido
+etiquetados manualmente por estilo, sin solapamiento con el conjunto de
+entrenamiento, y sirven como verdad fundamental para las métricas extrínsecas.
 
-Sobre las $250$ fotografías de este subconjunto se han producido tres capas
-de anotación. En primer lugar, cada fotografía se ha segmentado manualmente
-delimitando con cajas las pintadas presentes; este proceso de segmentación
-da lugar a un total de $452$ recortes, que constituyen la unidad de trabajo
-sobre la que se aplican el resto de etiquetados. En segundo lugar, cada
-recorte se ha clasificado por estilo en una de cuatro categorías
-(\textit{tag}, \textit{throw-up}, \textit{piece} y \textit{character}),
-correspondientes a la tipología de uso habitual en el dominio del grafiti.
-Por último, los recortes que parecen permanecer al mismo autor (que son
-firmados por el mismo nombre) son asignados con un identificador común.
+% TODO: And this is fake.
+Sobre las $265$ fotografías del subconjunto de entrenamiento de Salamanca se
+han producido tres capas de anotación. En primer lugar, cada fotografía se ha
+segmentado manualmente delimitando con cajas las pintadas presentes; este
+proceso da lugar a un total de $\mathtt{NSEGS\_PLACEHOLDER}$ %NSEGS
+recortes, que constituyen la unidad de trabajo sobre la que se aplican el
+resto de etiquetados. De estos, $110$ recortes han sido clasificados por estilo
+en una de cuatro categorías (\textit{tag}, \textit{throw-up}, \textit{piece} y
+\textit{character}), y el conjunto de Cuenca aporta $275$ recortes etiquetados
+adicionales de la misma manera, para un total de $385$ recortes de entrenamiento
+para las cabezas de estilo. Por último, los recortes que parecen pertenecer al
+mismo autor (que son firmados por el mismo nombre) son asignados con un
+identificador común.
 
 Las anotaciones de cajas se emplean para el ajuste fino del detector descrito
 en \ref{subsubsec:segmentador}, las etiquetas de estilo para la cabeza de
 proyección estilística y las de autoría para las cabezas de proyección de autor
-descritas en \ref{subsubsec:cabezas}. Los recortes anotados por estilo se
-reservan además, en su porción de evaluación, como verdad fundamental para el
-cálculo de métricas extrínsecas (\ref{subsubsec:metricas}) cuando la
-configuración prescinde del segmentador.
+descritas en \ref{subsubsec:cabezas}. Los $294$ recortes de evaluación etiquetados
+por estilo sirven como verdad fundamental para el cálculo de métricas
+extrínsecas (\ref{subsubsec:metricas}) cuando la configuración prescinde del
+segmentador.
 
 \subsection{Marco conceptual}
 \label{subsec:conceptos}
@@ -145,12 +153,12 @@ dispersión intercluster e intracluster. Se complementan con dos indicadores
 estructurales: la proporción de puntos clasificados como ruido y el coeficiente
 de variación del tamaño de los clústeres.
 
-Adicionalmente, sobre el subconjunto anotado de $250$ fotografías descrito en
-\ref{subsec:dataset} se calculan métricas extrínsecas que sí utilizan la verdad
-fundamental disponible: el índice de Rand ajustado (ARI), la información mutua
-normalizada (NMI) y la F1 por pares. Estas métricas se reportan únicamente para
-las configuraciones que prescinden del segmentador, donde la correspondencia
-entre fotografía anotada y \textit{embedding} resultante es unívoca, y
+Adicionalmente, sobre los $294$ recortes de evaluación etiquetados por estilo
+descritos en \ref{subsec:dataset} se calculan métricas extrínsecas que sí utilizan
+la verdad fundamental disponible: el índice de Rand ajustado (ARI), la información
+mutua normalizada (NMI) y la F1 por pares. Estas métricas se reportan únicamente
+para las configuraciones que prescinden del segmentador, donde la correspondencia
+entre recorte anotado y \textit{embedding} resultante es unívoca, y
 constituyen el complemento más sólido a las métricas internas en el plano de
 calidad.
 
@@ -262,11 +270,13 @@ recorte. El resultado es un conjunto de sub-imágenes que se procesan de forma
 independiente y que pueden producir varios \textit{embeddings} por fotografía
 original.
 
-El detector se ha ajustado sobre las $250$ fotografías del subconjunto anotado
-descrito en \ref{subsec:dataset}, partiendo de los pesos preentrenados sobre
-COCO. Las cajas se anotaron manualmente sobre las $452$ pintadas presentes en
-estas fotografías, lo que constituye el total de ejemplos positivos disponibles
-para el ajuste fino. La disjunción de este subconjunto respecto al banco de
+% TODO: check this after dataset is ready
+El detector se ha ajustado sobre las $\mathtt{YOLO\_IMGS\_PLACEHOLDER}$ %YOLO_IMGS
+fotografías del subconjunto anotado
+de Salamanca descrito en \ref{subsec:dataset}, partiendo de los pesos preentrenados sobre
+COCO. Las cajas se anotaron manualmente sobre las $\mathtt{NSEGS\_PLACEHOLDER}$ %NSEGS
+pintadas presentes en estas fotografías, lo que constituye el total de ejemplos
+positivos disponibles para el ajuste fino. La disjunción de este subconjunto respecto al banco de
 evaluación es condición necesaria para que las métricas reportadas sobre las
 configuraciones que utilizan el segmentador no estén sesgadas por el
 solapamiento entre entrenamiento y evaluación.

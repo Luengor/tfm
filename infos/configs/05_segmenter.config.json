@@ -71,12 +71,12 @@
       "repeats": 3
     },
     {
-      "name": "segmenter_identity-l5500",
-      "limit": 5500,
+      "name": "segmenter_identity-l6416",
+      "limit": 6416,
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "{output_dir}/db/v2_seg_identity_l5500.sqlite"
+          "db_path": "{output_dir}/db/v2_seg_identity_l6416.sqlite"
         }
       },
       "segmenter": {
@@ -186,12 +186,12 @@
       "repeats": 3
     },
     {
-      "name": "segmenter_yolo11n-l5500",
-      "limit": 5500,
+      "name": "segmenter_yolo11n-l6416",
+      "limit": 6416,
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "{output_dir}/db/v2_seg_yolo11n_l5500.sqlite"
+          "db_path": "{output_dir}/db/v2_seg_yolo11n_l6416.sqlite"
         }
       },
       "segmenter": {
@@ -306,12 +306,12 @@
       "repeats": 3
     },
     {
-      "name": "segmenter_yolo11s-l5500",
-      "limit": 5500,
+      "name": "segmenter_yolo11s-l6416",
+      "limit": 6416,
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "{output_dir}/db/v2_seg_yolo11s_l5500.sqlite"
+          "db_path": "{output_dir}/db/v2_seg_yolo11s_l6416.sqlite"
         }
       },
       "segmenter": {
@@ -426,12 +426,12 @@
       "repeats": 3
     },
     {
-      "name": "segmenter_yolo11m-l5500",
-      "limit": 5500,
+      "name": "segmenter_yolo11m-l6416",
+      "limit": 6416,
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "{output_dir}/db/v2_seg_yolo11m_l5500.sqlite"
+          "db_path": "{output_dir}/db/v2_seg_yolo11m_l6416.sqlite"
         }
       },
       "segmenter": {
@@ -546,12 +546,12 @@
       "repeats": 3
     },
     {
-      "name": "segmenter_yolo11m_finetuned-l5500",
-      "limit": 5500,
+      "name": "segmenter_yolo11m_finetuned-l6416",
+      "limit": 6416,
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "{output_dir}/db/v2_seg_yolo11m_ft_l5500.sqlite"
+          "db_path": "{output_dir}/db/v2_seg_yolo11m_ft_l6416.sqlite"
         }
       },
       "segmenter": {

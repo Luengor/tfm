@@ -85,7 +85,7 @@ constituye uno de los ejes centrales del trabajo. Para obtenerla, se ejecuta
 cada configuración seleccionada sobre una sucesión creciente de tamaños $N$
 controlada mediante el parámetro \texttt{--limit}. Los tamaños se escogen
 espaciados geométricamente entre un mínimo que permita estimar el régimen de
-pequeño $N$ y el banco completo de $6\,681$ fotografías, de forma que las
+pequeño $N$ y el banco completo de $6\,416$ fotografías, de forma que las
 curvas resultantes cubran al menos dos órdenes de magnitud y permitan
 distinguir comportamientos lineales, cuasi-lineales y superlineales.
 
@@ -284,8 +284,9 @@ de cada combinación.
 \label{subsubsec:entrenamiento-detector}
 % TODO: Check this once the detector is re-trainned for the "final" time
 El detector se entrena a partir del subconjunto anotado descrito en
-\ref{subsec:dataset}, cuyas $250$ fotografías contienen un total de $452$ cajas
-anotadas. El conjunto se divide en una partición de entrenamiento y otra de
+\ref{subsec:dataset}, cuyas $\mathtt{YOLO\_IMGS\_PLACEHOLDER}$ %YOLO_IMGS
+fotografías de Salamanca contienen un total de $\mathtt{NSEGS\_PLACEHOLDER}$ %NSEGS
+cajas anotadas. El conjunto se divide en una partición de entrenamiento y otra de
 validación con proporción $80/20$ manteniendo la distribución aproximada de
 cajas por fotografía. El entrenamiento parte de los pesos preentrenados sobre
 COCO publicados por el autor del modelo y solo ajusta sus parámetros para la

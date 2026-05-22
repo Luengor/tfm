@@ -1,5 +1,5 @@
 {
-  "limit": [250, 1000, 5500],
+  "limit": [250, 1000, 6416],
   "repeats": 3,
   "storage": [
     {"type": "sqlite", "params": {}}
