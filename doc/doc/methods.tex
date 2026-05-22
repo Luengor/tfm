@@ -4,16 +4,15 @@
 
 \subsection{Visión general del flujo de trabajo}
 \label{subsec:vision}
-El sistema implementado articula el procesamiento de cada fotografía como una
-sucesión de cuatro etapas operativas: segmentación opcional de las pintadas
-contenidas en la imagen, extracción de un vector de características por
-recorte, persistencia del vector junto a sus metadatos en un almacenamiento
-estructurado y, en un segundo tiempo, recuperación masiva del conjunto
-almacenado para reducirlo y agruparlo. La separación explícita entre la fase de
-ingesta y la fase de agrupamiento es deliberada: por un lado, refleja el
-escenario operativo previsto (un banco que crece de forma incremental sobre el
-que se ejecutan campañas de análisis puntuales), y por otro permite aislar el
-coste computacional de cada etapa al medir.
+El sistema implementado procesa cada fotografía en cuatro etapas operativas:
+segmentación de las pintadas contenidas en la imagen, extracción de un vector
+de características por recorte, persistencia del vector junto a sus metadatos
+en un almacenamiento estructurado y, en un segundo tiempo, recuperación masiva
+del conjunto almacenado para reducirlo y agruparlo. La separación explícita
+entre la fase de ingesta y la fase de agrupamiento es intencionada. Por un
+lado, refleja el escenario operativo previsto (un banco que crece de forma
+incremental sobre el que se ejecutan sesiones de análisis puntuales), y por
+otro permite aislar el coste computacional de cada etapa al medir.
 
 Cada una de las etapas se ha implementado como un componente intercambiable
 detrás de una interfaz común, de modo que las configuraciones evaluadas se
@@ -28,49 +27,49 @@ compararse con cualquier otra.
 \label{subsec:pipeline}
 
 \subsubsection{Ingesta y generación de \textit{embeddings}}
-La ingesta de una fotografía sigue siempre la misma secuencia. La imagen se
-carga desde disco y se entrega al segmentador, que devuelve una lista de cajas
-delimitadoras. Existen dos implementaciones de segmentador:
-\texttt{IdentitySegmenter}, que devuelve una única caja que coincide con la
-imagen completa, y \texttt{YoloSegmenter}, que utiliza un modelo de detección
-de objetos basado en la arquitectura YOLOv11 para identificar las pintadas
-presentes en la imagen y devolver una caja por cada una de ellas. Estas cajas
-se fusionan si se solapan por encima de un umbral configurable y se expanden
-mediante un margen también configurable para incluir contexto visual alrededor
-de la pintada.
-
-Cada pintada luego se recorta sobre la imagen original y el recorte se entrega
-al modelo de extracción de características, que produce un vector denso de
-dimensión fija. El vector resultante, junto con la referencia a la fotografía
-original y las coordenadas del recorte, se persiste en el almacenamiento
-elegido.
+La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
+\begin{enumerate}
+    \item La imagen se carga desde disco y se proporciona al segmentador.
+    \item El segmentador consume la imagen y devuelve una lista con cajas
+        delimitadoras de las pintadas presentes en la imagen. En el caso en el
+        que no se encuentren pintadas o no se utilice segmentador, se devuelve
+        una caja que abarca toda la imagen.
+    \item Estas cajas se fusionan si se solapan por encima de cierto umbral y
+        se expanden mediante un margen para incluir contexto visual alrededor
+        de la pintada.
+    \item Cada pintada se recorta sobre la imagen original y el recorte se
+        entrega al modelo de extracción de características, que produce un
+        vector de características de dimensión fija.
+    \item El vector resultante, junto con la referencia a la fotografía original
+        y las coordenadas del recorte se almacenan en el sistema elegido.
+\end{enumerate}
 
 \subsubsection{Recuperación, reducción y agrupamiento}
 Una vez completada la ingesta, la fase de agrupamiento opera sobre el contenido
 completo del almacenamiento. En primer lugar, se recuperan todos los
 \textit{embeddings} junto con sus metadatos en una única consulta. A
-continuación, si la configuración declara una reducción distinta de
-\texttt{Identity}, se aplica sobre cada vector de características el método de
-reducción seleccionado, obteniendo un nuevo conjunto de vectores. Finalmente,
-el algoritmo de agrupamiento se ajusta sobre el conjunto reducido, produciendo
-una etiqueta de clúster por cada vector. A partir de esta información se
-calculan las métricas de calidad intrínsecas y extrínsecas, y se conserva el
-mapeo entre identificadores de clúster y listas de recortes para la generación
-de visualizaciones interactivas.
+continuación, si la configuración declara una reducción, se aplica sobre cada
+vector de características el método de reducción seleccionado, obteniendo un
+nuevo conjunto de vectores. Finalmente, el algoritmo de agrupamiento se ajusta
+sobre el conjunto reducido, produciendo una etiqueta de clúster por cada
+vector. A partir de esta información se calculan las métricas de calidad
+intrínsecas y extrínsecas, y se conserva el mapeo entre identificadores de
+clúster y listas de recortes para la generación de visualizaciones
+interactivas.
 
 \subsection{Procedimiento experimental}
 \label{subsec:experimental}
 
 \subsubsection{Definición del espacio de configuraciones}
 \label{subsubsec:espacio-configs}
-Cada experimento queda completamente caracterizado por un fichero de
-configuración en formato JSON. El fichero contiene una lista de experimentos.
-Cada experimento declara un identificador único y cinco componentes con la
-forma \texttt{\{type, params\}}: \texttt{storage}, \texttt{embedding},
-\texttt{segmenter}, \texttt{reduction} y \texttt{clustering}, además de un
-bloque opcional \texttt{similarity\_search}. Esta forma declarativa garantiza
-que toda la información necesaria para reproducir un experimento queda en un
-único fichero versionable.
+Cada experimento queda descrito por un fichero de configuración en formato
+JSON. El fichero contiene una lista de experimentos. Cada experimento declara
+un identificador único y cinco componentes con la forma \texttt{\{type,
+params\}}: \texttt{storage}, \texttt{embedding}, \texttt{segmenter},
+\texttt{reduction} y \texttt{clustering}, además de un bloque opcional
+\texttt{similarity\_search}. Esta forma declarativa garantiza que toda la
+información necesaria para reproducir un experimento queda en un único fichero
+versionable.
 
 Para barrer sistemáticamente el espacio combinatorio se utiliza un fichero
 auxiliar en el que cada componente se sustituye por una lista de alternativas.
@@ -79,27 +78,23 @@ materializando una experimento en el archivo final por cada combinación válida
 
 \subsubsection{Protocolo de escalabilidad}
 \label{subsubsec:escalabilidad}
-%TODO: check
 La caracterización del coste computacional en función del tamaño del banco
 constituye uno de los ejes centrales del trabajo. Para obtenerla, se ejecuta
 cada configuración seleccionada sobre una sucesión creciente de tamaños $N$
-controlada mediante el parámetro \texttt{--limit}. Los tamaños se escogen
-espaciados geométricamente entre un mínimo que permita estimar el régimen de
-pequeño $N$ y el banco completo de $6\,416$ fotografías, de forma que las
-curvas resultantes cubran al menos dos órdenes de magnitud y permitan
-distinguir comportamientos lineales, cuasi-lineales y superlineales.
+controlada mediante el parámetro \texttt{--limit}. La selección de tamaños es
+reducida en la mayoría de experimentos para evitar que el coste total de la
+evaluación se dispare, pero se realiza un barrido completo sobre un rango de
+tamaños lo suficientemente amplio como para identificar tendencias de
+crecimiento.
 
-El muestreo de las imágenes para cada $N$ es determinista: las fotografías
-se ordenan por su nombre de fichero y se toman las primeras $N$, de modo
-que el banco asociado a un tamaño es siempre un prefijo del asociado al
-tamaño inmediatamente superior. Esta elección, frente a un muestreo
-aleatorio, garantiza que las diferencias observadas entre tamaños
-consecutivos sean atribuibles al incremento del banco y no a la
-variabilidad introducida por el muestreo. Para cada tamaño se obtienen las
-métricas temporales descritas en \ref{subsubsec:cronometria}, lo que
-permite ajustar las curvas tiempo $\propto N$ por etapa y caracterizar la
-escalabilidad empírica de cada componente.
+El muestreo de las imágenes para cada $N$ es determinista: las fotografías se
+ordenan por su nombre de fichero y se toman las primeras $N$. Para cada tamaño
+se obtienen las métricas temporales descritas en \ref{subsubsec:cronometria},
+lo que permite caracterizar el crecimiento de cada etapa por separado y, a
+partir de ahí, estimar empíricamente el exponente de crecimiento de cada
+combinación de componentes.
 
+% TODO: continue checking
 \subsubsection{Reutilización de almacenamientos}
 \label{subsubsec:reutilizacion}
 La ingesta es, en la mayoría de ocasiones, la etapa más costosa del
