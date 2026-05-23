@@ -261,6 +261,10 @@ def _run_single(
         image_count = len(all_images)
 
         if run_spec.similarity_search.enabled:
+            # Build ANN index (if configured) BEFORE the timed loop so build
+            # cost does not pollute the similarity-search stage metrics.
+            if hasattr(storage, "ensure_hnsw_index"):
+                storage.ensure_hnsw_index()
             with profile_stage() as similarity_stage:
                 distances = []
                 search_images = all_images
@@ -500,7 +504,8 @@ def _build_storage(run_spec: BenchmarkRunSpec, output_dir: Path):
         db_url = params.get("db_url")
         if not db_url:
             raise ValueError(f"Run {run_spec.name}: storage.params.db_url is required for PostgreSQL.")
-        return PostgreSQLStorage(str(db_url))
+        hnsw = params.get("hnsw")
+        return PostgreSQLStorage(str(db_url), hnsw=hnsw)
 
     raise ValueError(f"Run {run_spec.name}: unsupported storage type '{run_spec.storage.type}'.")
 
