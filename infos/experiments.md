@@ -275,31 +275,43 @@ step).
 
 **Pillar.** Computational cost (1).
 
-**Question.** What is the throughput gap between SQLite (linear Python scan)
-and PostgreSQL + pgvector (indexed ANN) for ingest and similarity search,
-and how does it scale with `n`?
+**Question.** What is the throughput gap between SQLite (linear Python scan),
+PostgreSQL + pgvector exact (sequential scan over the indexed `vector`
+column), and PostgreSQL + pgvector HNSW (approximate) for ingest and
+similarity search, and how does it scale with `n`?
 
-**Varies.** `storage ∈ {sqlite, postgresql}` × `limit ∈ {500, 1000, 2500,
-6416}`. Similarity search is **enabled** (`top_k=5`) — that is the axis where
-the two backends differ most (O(n) Python scan vs. O(log n) index).
+**Varies.** `storage ∈ {sqlite, postgresql_exact, postgresql_hnsw}` ×
+`limit ∈ {500, 1000, 2500, 6416}`. The PostgreSQL HNSW row sets
+`storage.params.hnsw = {ops: "cosine", m: 16, ef_construction: 64}`; the
+runner builds the HNSW index between ingest and the similarity-search loop
+so the index build cost is excluded from the timed query stage and reported
+separately as part of the ingest-adjacent setup. Similarity search is
+**enabled** (`top_k=5`) — that is the axis where the three backends differ
+most (O(n) Python scan vs. exact O(n) sequential scan vs. HNSW
+sub-linear approximate).
 
 **Fixed.** Baseline embedding, reduction, clustering, identity segmenter.
 
 **Why it matters.** Clustering quality is invariant under storage choice, so
 this experiment isolates pure infrastructure cost. The ~13× `limit` span is
-wide enough that the index advantage should be empirically visible rather
-than buried in per-call overhead.
+wide enough that the HNSW advantage should be empirically visible rather
+than buried in per-call overhead. The three-row sweep separates the
+"native vector ops vs. Python" effect (sqlite → pg-exact) from the
+"approximate vs. exact" effect (pg-exact → pg-hnsw).
 
 **Prerequisites.** PostgreSQL via the dev container at `localhost:54321`
-(`postgresql://postgres:changethis@localhost:54321/postgres`).
+(`postgresql://postgres:changethis@localhost:54321/postgres`). Each storage
+× limit combination receives its own database via the storage-key hash; the
+HNSW row hashes to a separate database from the exact row because `hnsw`
+lives under `storage.params`.
 
-**Cost.** 8 runs at `repeats=5`, 8 ingests — every storage × limit
-combination needs its own DB (different storage type or different size
-invalidates the cached one). Similarity-search wall time is single-shot per
-run (not looped), so the K=5 repeats only multiply reduction + clustering
-cost; the SQLite-vs-pgvector throughput gap on similarity search is the
-headline figure here, and its variance comes from inter-run rather than
-intra-run measurements — read it cautiously against the cost legend in §7.
+**Cost.** 12 runs at `repeats=5`, 12 ingests — every storage × limit
+combination needs its own DB. Similarity-search wall time is single-shot
+per run (not looped), so the K=5 repeats only multiply reduction +
+clustering cost; the SQLite-vs-pgvector-exact-vs-pgvector-HNSW throughput
+gap on similarity search is the headline figure here, and its variance
+comes from inter-run rather than intra-run measurements — read it
+cautiously against the cost legend in §7.
 
 **Config.** [`configs/06_storage.json`](configs/06_storage.json)
 
@@ -531,6 +543,81 @@ The legacy combined [`configs/08_supervised.json`](configs/08_supervised.json)
 covers §8a only and predates the author split — split into the two files
 above for new runs.
 
+## §9. HNSW index parameter sweep
+
+**Pillar.** Computational cost (1).
+
+**Question.** Inside the PostgreSQL + pgvector backend, how do the HNSW
+construction parameters (`m`, `ef_construction`) and the query parameter
+(`ef_search`) trade off index build time, query latency, and answer
+quality against the exact baseline on the full 6416-image corpus?
+
+**Varies.** Three one-axis sweeps anchored at the canonical defaults
+`m=16, ef_construction=64, ef_search=40`:
+
+| Axis | Values | Fixed |
+|---|---|---|
+| `m` (graph degree) | {8, 16, 32, 64} | `ef_construction=64, ef_search=40` |
+| `ef_construction` (build candidate list) | {32, 64, 128, 256} | `m=16, ef_search=40` |
+| `ef_search` (query candidate list) | {10, 40, 100, 200} | `m=16, ef_construction=64` |
+
+Plus one **exact** baseline (no HNSW, sequential scan) for ground-truth
+neighbour reference and for the headline speedup ratio.
+
+**Fixed.** Baseline embedding (`dinov2_graffiti_style_head`), UMAP reduction,
+HDBSCAN clustering, identity segmenter, PostgreSQL backend with shared
+`db_url` (`hnsw_sweep` database), `limit=6416` (full corpus — small `n`
+hides the HNSW win in per-call overhead), similarity search enabled with
+`top_k=5, sample_n=200, sample_seed=42`. `repeats=5`.
+
+**Why it matters.** §6 establishes *that* HNSW is faster than exact pgvector
+on this dataset. §9 maps the Pareto frontier: which `m / ef_construction /
+ef_search` setting reaches the best speed/quality trade-off, and whether the
+HDBSCAN-relevant `top_k=5` regime is sensitive to `ef_search` at all. The
+sweep also provides the build-time × query-time decomposition the thesis
+needs to argue HNSW is appropriate for a one-shot ingest → many-query
+workflow vs. a single-query throwaway.
+
+**Index reuse.** All eleven runs share the same PostgreSQL database. Run 1
+(`hnsw_exact_baseline`) ingests with `clear_storage: true`; all subsequent
+runs set `clear_storage: false` and use `hnsw.recreate: true` so the index
+is dropped and rebuilt per run with the new parameters (otherwise the
+existing index from a prior run would persist and silently dominate the
+results). The ingest stage is therefore measured once; the runner's
+metadata-reuse heuristic propagates the original ingest timing to the
+remaining ten runs.
+
+**Quality measurement.** The runner currently reports
+`avg_neighbor_distance` (mean distance to the returned `top_k` neighbours)
+per run. Comparing HNSW rows against the exact baseline on the same
+`sample_seed` gives a proxy for HNSW recall: if average distances grow
+markedly above the exact baseline, the index is returning further (i.e.
+incorrect) neighbours. A dedicated recall@k metric is left as future
+work — the proxy is sufficient to flag pathological settings on the
+`top_k=5` regime.
+
+**Format.** Direct configuration (not a grid). `generate_configuration.py`
+hashes `hnsw` into the storage key (correct in general — see §6) so a
+grid would assign every HNSW variant its own DB and force ten redundant
+ingests. The configuration therefore enumerates the eleven runs explicitly
+with a shared `db_url` and the `clear_storage`/`recreate` flags above.
+
+**Cost.** 11 runs at `repeats=5`, 1 ingest. The dominant cost is the ten
+HNSW index builds plus the eleven similarity-search loops; reduction +
+clustering also re-run at K=5 per run.
+
+**Config.**
+[`configs/09_hnsw.config.json`](configs/09_hnsw.config.json) — feed
+directly to `pipeline-benchmark --configuration` (no
+`generate_configuration.py` step).
+
+```bash
+cd src
+uv run pipeline-benchmark \
+  --configuration ../infos/configs/09_hnsw.config.json \
+  --dataset ../dataset/images
+```
+
 ---
 
 ## Suggested order
@@ -545,7 +632,10 @@ above for new runs.
    with the quality experiments once the baseline pipeline is fixed. They are
    the headline contribution of the thesis and should be allocated the most
    careful time-budget (consistent hardware state, no concurrent load).
-6. **§8 Supervised validation** can run any time after §1 — running it early
+6. **§9 HNSW tuning** runs after §6 has established the SQLite vs.
+   pgvector-exact vs. pgvector-HNSW baseline at multiple `n`. §9 fixes
+   `n=6416` and maps the HNSW Pareto frontier.
+7. **§8 Supervised validation** can run any time after §1 — running it early
    lets later experiments cite the internal–external correlation when
    defending silhouette / CH / DB as proxies for semantic quality.
 

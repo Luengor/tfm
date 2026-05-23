@@ -7,9 +7,10 @@ from pathlib import Path
 from urllib.parse import urlparse, urlunparse
 
 def get_storage_key(run_config):
-    # We care about storage (excluding db_path), embedding and limit
+    # We care about storage (excluding db_path), embedding, segmenter and limit
     storage = run_config.get("storage", {})
     embedding = run_config.get("embedding", {})
+    segmenter = run_config.get("segmenter") or {"type": "identity", "params": {}}
     limit = run_config.get("limit")
 
     storage_type = str(storage.get("type", "")).lower()
@@ -24,10 +25,17 @@ def get_storage_key(run_config):
         parsed = urlparse(storage_params["db_url"])
         storage_params["db_url"] = urlunparse(parsed._replace(path="/"))
 
+    # Normalize segmenter so absent and explicit-identity hash equally.
+    segmenter_norm = {
+        "type": str(segmenter.get("type", "identity")).lower(),
+        "params": dict(segmenter.get("params", {})),
+    }
+
     key_data = {
         "storage_type": storage_type,
         "storage_params": storage_params,
         "embedding": embedding,
+        "segmenter": segmenter_norm,
         "limit": limit
     }
 
@@ -45,6 +53,8 @@ def generate_name(combination, keys):
                 params = value.get("params", {})
                 if type_val == "kmeans" and "n_clusters" in params:
                     parts.append(f"kmeans{params['n_clusters']}")
+                elif key == "storage" and type_val in {"postgres", "postgresql"} and params.get("hnsw"):
+                    parts.append(f"{type_val}_hnsw")
                 else:
                     parts.append(type_val)
             else:

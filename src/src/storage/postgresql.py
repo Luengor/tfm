@@ -69,6 +69,7 @@ class PostgreSQLStorage(StorageBase):
             "m": int(cfg.get("m", 16)),
             "ef_construction": int(cfg.get("ef_construction", 64)),
             "ef_search": cfg.get("ef_search"),
+            "recreate": bool(cfg.get("recreate", False)),
         }
 
     def ensure_hnsw_index(self) -> None:
@@ -92,6 +93,14 @@ class PostgreSQLStorage(StorageBase):
         cfg = self._hnsw_cfg
         m = cfg["m"]
         ef_construction = cfg["ef_construction"]
+        if cfg["recreate"]:
+            # Drop any existing HNSW indexes on the embedding column so the
+            # new ones build with the requested parameters.
+            for ops in self._OPS_MAP:
+                self.session.execute(text(
+                    f"DROP INDEX IF EXISTS images_embedding_hnsw_{ops}"
+                ))
+            self.session.commit()
         for ops in cfg["ops"]:
             op_class = self._OPS_MAP[ops]
             index_name = f"images_embedding_hnsw_{ops}"
