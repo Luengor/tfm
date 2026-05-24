@@ -50,10 +50,13 @@ DEFAULT_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tiff"}
 
 
 def load_ground_truth(csv_path: str | Path) -> dict[str, str]:
-    """Load a ground-truth CSV mapping basename -> style.
+    """Load a ground-truth CSV mapping basename -> label.
 
-    Required columns: ``filename`` and ``style``. Extra columns (e.g. ``surface``)
-    are ignored. Rows with empty ``filename`` or ``style`` are skipped.
+    Required column: ``filename``. The label column is auto-detected as the
+    first of ``style``, ``author`` or ``label`` present in the header — so both
+    the style-labelled and author-labelled evaluation sets load with the same
+    function. Extra columns (e.g. ``surface``) are ignored. Rows with an empty
+    filename or label are skipped.
     """
     path = Path(csv_path)
     if not path.is_file():
@@ -63,16 +66,17 @@ def load_ground_truth(csv_path: str | Path) -> dict[str, str]:
     with path.open(newline="", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         fieldnames = reader.fieldnames or []
-        if "filename" not in fieldnames or "style" not in fieldnames:
+        label_col = next((c for c in ("style", "author", "label") if c in fieldnames), None)
+        if "filename" not in fieldnames or label_col is None:
             raise ValueError(
-                f"Ground-truth CSV must have 'filename' and 'style' columns. "
-                f"Got: {fieldnames}"
+                f"Ground-truth CSV must have a 'filename' column and one of "
+                f"'style'/'author'/'label'. Got: {fieldnames}"
             )
         for row in reader:
             fname = (row.get("filename") or "").strip()
-            style = (row.get("style") or "").strip()
-            if fname and style:
-                mapping[fname] = style
+            label = (row.get(label_col) or "").strip()
+            if fname and label:
+                mapping[fname] = label
     return mapping
 
 
@@ -84,6 +88,7 @@ def _run_single_subprocess(
     ground_truth: dict[str, str] | None,
     cluster_plot_options: dict[str, Any] | None,
     result_queue: "multiprocessing.Queue[BenchmarkResult]",
+    ground_truth_author: dict[str, str] | None = None,
 ) -> None:
     result = _run_single(
         run_spec=run_spec,
@@ -92,6 +97,7 @@ def _run_single_subprocess(
         global_limit=global_limit,
         ground_truth=ground_truth,
         cluster_plot_options=cluster_plot_options,
+        ground_truth_author=ground_truth_author,
     )
     result_queue.put(result)
 
@@ -103,6 +109,7 @@ def run_benchmarks(
     limit: int | None = None,
     ground_truth: dict[str, str] | None = None,
     cluster_plot_options: dict[str, Any] | None = None,
+    ground_truth_author: dict[str, str] | None = None,
 ) -> list[BenchmarkResult]:
     dataset_root = Path(dataset_path)
     if not dataset_root.exists() or not dataset_root.is_dir():
@@ -116,7 +123,9 @@ def run_benchmarks(
     results: list[BenchmarkResult] = []
     print(f"Starting benchmarks: {len(run_specs)} runs to execute.")
     if ground_truth is not None:
-        print(f"Ground truth loaded: {len(ground_truth)} labeled entries.")
+        print(f"Ground truth (style) loaded: {len(ground_truth)} labeled entries.")
+    if ground_truth_author is not None:
+        print(f"Ground truth (author) loaded: {len(ground_truth_author)} labeled entries.")
     if cluster_plot_options.get("enabled"):
         print("Cluster 2D plotting enabled.")
     for run_spec in tqdm(run_specs, desc="Benchmark Runs", unit="run"):
@@ -124,7 +133,7 @@ def run_benchmarks(
         result_queue: multiprocessing.Queue[BenchmarkResult] = ctx.Queue()
         p = ctx.Process(
             target=_run_single_subprocess,
-            args=(run_spec, dataset_root, Path(output_dir), limit, ground_truth, cluster_plot_options, result_queue),
+            args=(run_spec, dataset_root, Path(output_dir), limit, ground_truth, cluster_plot_options, result_queue, ground_truth_author),
         )
         p.start()
         p.join()
@@ -179,6 +188,7 @@ def _run_single(
     global_limit: int | None = None,
     ground_truth: dict[str, str] | None = None,
     cluster_plot_options: dict[str, Any] | None = None,
+    ground_truth_author: dict[str, str] | None = None,
 ) -> BenchmarkResult:
     started_at = _utc_now()
 
@@ -188,9 +198,11 @@ def _run_single(
     similarity_metrics = None
     avg_neighbor_distance = None
     similarity_extrinsic = None
+    similarity_extrinsic_author = None
     clustering_agg = None
     clustering_quality = None
     clustering_extrinsic = None
+    clustering_extrinsic_author = None
     clusters_per_repeat: list[int] = []
     embeddings_arr = None
     reduced_embeddings = None
@@ -297,14 +309,22 @@ def _run_single(
             segmenter_type_eff = (
                 run_spec.segmenter.type.lower() if run_spec.segmenter else "identity"
             )
-            if ground_truth is not None and segmenter_type_eff == "identity":
-                similarity_extrinsic = _compute_similarity_extrinsic(
-                    all_images,
-                    ground_truth,
-                    run_spec.similarity_search.top_k,
-                    run_spec.similarity_search.cos_distance,
-                )
-            elif ground_truth is not None:
+            if segmenter_type_eff == "identity":
+                if ground_truth is not None:
+                    similarity_extrinsic = _compute_similarity_extrinsic(
+                        all_images,
+                        ground_truth,
+                        run_spec.similarity_search.top_k,
+                        run_spec.similarity_search.cos_distance,
+                    )
+                if ground_truth_author is not None:
+                    similarity_extrinsic_author = _compute_similarity_extrinsic(
+                        all_images,
+                        ground_truth_author,
+                        run_spec.similarity_search.top_k,
+                        run_spec.similarity_search.cos_distance,
+                    )
+            elif ground_truth is not None or ground_truth_author is not None:
                 print(
                     f"Run {run_spec.name}: ground truth provided but segmenter is "
                     f"'{segmenter_type_eff}' (not identity); skipping similarity-search extrinsic metrics."
@@ -331,6 +351,7 @@ def _run_single(
             clustering_samples: list[StageMetrics] = []
             quality_samples = []
             extrinsic_samples: list[ExtrinsicMetrics] = []
+            extrinsic_samples_author: list[ExtrinsicMetrics] = []
             clusters_per_repeat: list[int] = []
             embeddings = [img.embedding for img in all_images]
             embeddings_arr = np.array(embeddings)
@@ -341,6 +362,9 @@ def _run_single(
             )
             compute_extrinsic_per_repeat = (
                 ground_truth is not None and segmenter_type_eff == "identity"
+            )
+            compute_extrinsic_author_per_repeat = (
+                ground_truth_author is not None and segmenter_type_eff == "identity"
             )
 
             for i in range(K):
@@ -372,6 +396,10 @@ def _run_single(
                     extrinsic_samples.append(
                         _compute_extrinsic(all_images, labels_iter, ground_truth)
                     )
+                if compute_extrinsic_author_per_repeat:
+                    extrinsic_samples_author.append(
+                        _compute_extrinsic(all_images, labels_iter, ground_truth_author)
+                    )
                 # Track cluster count per repeat so KMeans elbow / GMM BIC
                 # flips between seeds are visible in the output.
                 clusters_per_repeat.append(
@@ -394,7 +422,12 @@ def _run_single(
 
             if compute_extrinsic_per_repeat:
                 clustering_extrinsic = ExtrinsicMetricsAgg.from_samples(extrinsic_samples)
-            elif ground_truth is not None:
+            if compute_extrinsic_author_per_repeat:
+                clustering_extrinsic_author = ExtrinsicMetricsAgg.from_samples(extrinsic_samples_author)
+            if (
+                (ground_truth is not None or ground_truth_author is not None)
+                and segmenter_type_eff != "identity"
+            ):
                 print(
                     f"Run {run_spec.name}: ground truth provided but segmenter is "
                     f"'{segmenter_type_eff}' (not identity); skipping extrinsic metrics."
@@ -460,9 +493,11 @@ def _run_single(
         similarity_search=similarity_metrics,
         avg_neighbor_distance=avg_neighbor_distance,
         similarity_extrinsic=similarity_extrinsic,
+        similarity_extrinsic_author=similarity_extrinsic_author,
         clustering=clustering_agg,
         clustering_quality=clustering_quality,
         clustering_extrinsic=clustering_extrinsic,
+        clustering_extrinsic_author=clustering_extrinsic_author,
         clusters_per_repeat=clusters_per_repeat,
         config=run_spec,
     )

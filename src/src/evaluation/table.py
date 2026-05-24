@@ -40,6 +40,17 @@ _COLS_SIMILARITY = [
     ("MRR", "similarity_extrinsic_mrr", 6, "f3"),
 ]
 
+_COLS_EXTRINSIC_AUTHOR = [
+    ("ARIa", "extrinsic_author_ari", 6, "f3"),
+    ("NMIa", "extrinsic_author_nmi", 6, "f3"),
+    ("F1a", "extrinsic_author_pairwise_f1", 6, "f3"),
+]
+
+_COLS_SIMILARITY_AUTHOR = [
+    ("P@ka", "similarity_extrinsic_author_precision_at_k", 6, "f3"),
+    ("MAPa", "similarity_extrinsic_author_map_at_k", 7, "f3"),
+]
+
 
 def _fmt(val, fmt: str | None) -> str:
     if val is None:
@@ -118,12 +129,18 @@ def print_table(records: list[dict]) -> None:
 
     has_extrinsic = _has_any(records, ["extrinsic_ari", "extrinsic_nmi"])
     has_similarity = _has_any(records, ["similarity_extrinsic_precision_at_k"])
+    has_extrinsic_author = _has_any(records, ["extrinsic_author_ari", "extrinsic_author_nmi"])
+    has_similarity_author = _has_any(records, ["similarity_extrinsic_author_precision_at_k"])
 
     cols = list(_COLS_IDENTITY)
     if has_extrinsic:
         cols += _COLS_EXTRINSIC
+    if has_extrinsic_author:
+        cols += _COLS_EXTRINSIC_AUTHOR
     if has_similarity:
         cols += _COLS_SIMILARITY
+    if has_similarity_author:
+        cols += _COLS_SIMILARITY_AUTHOR
 
     header, sep = _build_header(cols)
     print(header)

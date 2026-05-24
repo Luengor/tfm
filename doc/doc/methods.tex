@@ -34,9 +34,11 @@ La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
         delimitadoras de las pintadas presentes en la imagen. En el caso en el
         que no se encuentren pintadas o no se utilice segmentador, se devuelve
         una caja que abarca toda la imagen.
-    \item Estas cajas se fusionan si se solapan por encima de cierto umbral y
-        se expanden mediante un margen para incluir contexto visual alrededor
-        de la pintada.
+    \item Estas cajas se fusionan si se solapan por encima de cierto umbral y,
+        cuando se configura un margen (\textit{padding}) no nulo, se expanden
+        para incluir contexto visual alrededor de la pintada. Por defecto el
+        margen es cero, de modo que la caja se recorta sin expansión salvo que
+        la configuración del \textit{benchmark} indique lo contrario.
     \item Cada pintada se recorta sobre la imagen original y el recorte se
         entrega al modelo de extracción de características, que produce un
         vector de características de dimensión fija.
@@ -181,11 +183,14 @@ reintroducir aquí el contexto sobre índices ANN
 completo como conjunto de consultas: cada \textit{embedding} almacenado se
 emplea, a su vez, como vector de consulta y se solicita al \textit{backend}
 la recuperación de los $k+1$ vectores más próximos (con $k$ configurable a
-través del bloque \texttt{similarity\_search.top\_k}, por defecto $k=3$),
+través del bloque \texttt{similarity\_search.top\_k}, por defecto $k=3$;
+los experimentos de coste emplean valores mayores, típicamente $k=5$),
 descartando posteriormente el propio vector consultado para retener
 exactamente los $k$ vecinos relevantes. La distancia utilizada en la consulta
 es coseno por defecto y puede conmutarse a euclídea mediante el parámetro
-\texttt{cos\_distance}. Recorrer la totalidad del banco como consulta hace
+\texttt{cos\_distance}. Para bancos grandes, el conjunto de consultas puede
+restringirse a una submuestra aleatoria reproducible (\texttt{sample\_n} con
+semilla \texttt{sample\_seed}) en lugar de recorrer el banco completo. Recorrer la totalidad del banco como consulta hace
 que la complejidad de la etapa crezca como $O(n^2)$ en el caso lineal de
 \texttt{SQLiteStorage}, comportamiento que coincide con la observación
 empírica del barrido de escalabilidad.
@@ -198,10 +203,10 @@ comportan de manera determinista una vez fijada la semilla del índice; por
 otro, el coste total ya escala cuadráticamente con $n$, de modo que
 repetirlo multiplicaría el coste del experimento sin añadir información
 estadística adicional respecto a la variabilidad entre configuraciones.
-Como métrica derivada se reporta también la distancia media al vecino más
-cercano (\texttt{avg\_neighbor\_distance}), que permite contrastar el
-\textit{backend} no solo en términos de coste sino también de calidad de
-recuperación. Este diseño permite contrastar de manera directa el coste
+Como métrica derivada se reporta también la distancia media a los $k$ vecinos
+recuperados (\texttt{avg\_neighbor\_distance}), promediada sobre todas las
+consultas, que permite contrastar el \textit{backend} no solo en términos de
+coste sino también de calidad de recuperación. Este diseño permite contrastar de manera directa el coste
 por consulta del recorrido lineal de \texttt{SQLiteStorage} (que crece
 linealmente con el tamaño del banco) con el del índice HNSW de
 \texttt{PostgreSQLStorage} (con coste de consulta sublineal) en los mismos

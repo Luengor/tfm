@@ -29,15 +29,19 @@ def calculate_clustering_metrics(embeddings: np.ndarray, labels: np.ndarray) -> 
     unique_labels = np.unique(labels)
     n_clusters = len(unique_labels[unique_labels != -1])
     n_samples = len(embeddings)
-    
-    # Filter out noise for standard sklearn metrics if necessary
-    # Silhouette and CH usually treat noise as a separate cluster if included.
-    # We will compute them with all labels provided.
-    
+
+    # Noise points (label == -1) are excluded from silhouette, Calinski-Harabasz
+    # and Davies-Bouldin so a clustering that rejects many points is not
+    # rewarded with an inflated score over the few survivors. Noise is reported
+    # separately via noise_ratio.
+
     s_score = None
-    if 1 < len(unique_labels) < n_samples:
+    noise_mask = labels != -1
+    s_labels = labels[noise_mask]
+    n_s_clusters = len(np.unique(s_labels))
+    if n_s_clusters > 1 and noise_mask.sum() > n_s_clusters:
         try:
-            s_score = float(silhouette_score(embeddings, labels))
+            s_score = float(silhouette_score(embeddings[noise_mask], s_labels))
         except Exception:
             s_score = None
             

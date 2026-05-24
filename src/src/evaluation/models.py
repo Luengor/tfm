@@ -376,9 +376,11 @@ class BenchmarkResult:
     similarity_search: StageMetrics | None = None
     avg_neighbor_distance: float | None = None
     similarity_extrinsic: SimilaritySearchExtrinsicMetrics | None = None
+    similarity_extrinsic_author: SimilaritySearchExtrinsicMetrics | None = None
     clustering: StageMetricsAgg | None = None
     clustering_quality: ClusteringQualityMetricsAgg | None = None
     clustering_extrinsic: ExtrinsicMetricsAgg | None = None
+    clustering_extrinsic_author: ExtrinsicMetricsAgg | None = None
     clusters_per_repeat: list[int] = field(default_factory=list)
     config: BenchmarkRunSpec | None = None
 
@@ -438,7 +440,13 @@ class BenchmarkResult:
         if self.clustering_extrinsic:
             record.update(self.clustering_extrinsic.to_flat_dict())
 
+        if self.clustering_extrinsic_author:
+            record.update(self.clustering_extrinsic_author.to_flat_dict("extrinsic_author"))
+
         if self.similarity_extrinsic:
             record.update(self.similarity_extrinsic.to_flat_dict())
+
+        if self.similarity_extrinsic_author:
+            record.update(self.similarity_extrinsic_author.to_flat_dict("similarity_extrinsic_author"))
 
         return record

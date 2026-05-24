@@ -118,9 +118,12 @@ distancia euclidiana y la distancia coseno. Esta última depende exclusivamente
 de la dirección de los vectores y resulta equivalente a la distancia euclidiana
 cuando los \textit{embeddings} están normalizados a norma unitaria
 (normalización $L_2$), práctica frecuente para evitar que la magnitud del
-vector domine la comparación. En el presente trabajo se considera la
-normalización como un parámetro más del modelo de extracción de
-características.
+vector domine la comparación. En el presente trabajo la normalización se
+trata como un parámetro del modelo de extracción, si bien su disponibilidad
+depende de la arquitectura: CLIP y las cabezas de proyección ajustadas
+normalizan siempre su salida, MobileNetV3 dispone de una variante normalizada
+explícita, y el resto de \textit{backbones} se emplean sin normalización salvo
+que se envuelvan en dicha variante.
 
 \subsubsection{Agrupamiento no supervisado}
 El agrupamiento (\textit{clustering}) consiste en particionar un conjunto de
@@ -186,9 +189,12 @@ silueta\cite{rousseeuw_silhouettes_1987}, que combina para cada punto la
 distancia media a los miembros de su propio clúster con la distancia media al
 clúster más cercano, y el índice de
 Calinski-Harabász\cite{calinski_dendrite_1974}, que mide el cociente entre la
-dispersión intercluster e intracluster. Se complementan con dos indicadores
-estructurales: la proporción de puntos clasificados como ruido y el coeficiente
-de variación del tamaño de los clústeres.
+dispersión intercluster e intracluster, y el índice de
+Davies-Bouldin\cite{davies_cluster_1979}, que promedia la similitud de cada
+clúster con su vecino más parecido (valores menores indican mejor separación).
+Se complementan con dos indicadores estructurales: la proporción de puntos
+clasificados como ruido y el coeficiente de variación del tamaño de los
+clústeres.
 
 Adicionalmente, sobre los $294$ recortes de evaluación etiquetados por estilo
 descritos en \ref{subsec:dataset} se calculan métricas extrínsecas que sí utilizan
@@ -222,7 +228,7 @@ arquitectura, dimensionalidad de salida y preentrenamiento.
   MobileNetV3\cite{howard_searching_2019} & CNN ligera & $1280$ & ImageNet \\ \hline
   DINOv2 ViT-S/14\cite{oquab_dinov2_2024} & \textit{Transformer}\cite{dosovitskiy_image_2021} & $384$ & Autosupervisado (LVD-142M) \\ \hline
   CLIP ViT-B/32\cite{radford_learning_2021} & \textit{Transformer} & $512$ & Imagen-texto (WIT) \\ \hline
-  YOLOv26 (n/s/m)\cite{noauthor_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO + grafiti \\ \hline
+  YOLO11 (n/s/m)\cite{noauthor_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO + grafiti \\ \hline
   \caption{Modelos de extracción de características integrados.}
   \label{tab:embedding-models}
 \end{longtable}
@@ -281,9 +287,12 @@ similitud mediante un recorrido lineal en Python; resulta apropiado para
 despliegues ligeros y como referencia de cálculo exacto frente a alternativas
 aproximadas. \texttt{PostgreSQLStorage} se apoya en la extensión
 \textit{pgvector} de PostgreSQL y delega la búsqueda al motor de la base de
-datos, que utiliza un índice HNSW\cite{malkov_efficient_2018} sobre los
-vectores. Ambos \textit{backends} comparten el esquema lógico y la persistencia
-de metadatos, lo que permite cambiar de uno a otro sin modificar el resto del
+datos. Por defecto la consulta es un recorrido exacto; opcionalmente puede
+habilitarse un índice aproximado HNSW\cite{malkov_efficient_2018} sobre los
+vectores (parámetro \texttt{hnsw} de la configuración), lo que permite
+contrastar el coste de la búsqueda exacta frente a la aproximada. Ambos
+\textit{backends} comparten el esquema lógico y la persistencia de metadatos,
+lo que permite cambiar de uno a otro sin modificar el resto del
 \textit{pipeline}.
 
 \subsection{Extensiones específicas para grafiti}
@@ -327,16 +336,21 @@ learning}\cite{pan_survey_2010} en el que la representación base se mantiene
 congelada y solo se entrena una cabeza ligera, siguiendo la metodología de
 \textit{fine-tuning} de ULMFiT\cite{howard_universal_2018}. La cabeza consiste
 en una secuencia Lineal $\rightarrow$ ReLU $\rightarrow$ Lineal que proyecta
-los \textit{embeddings} base a un espacio adaptado al dominio.
+los \textit{embeddings} base a un espacio adaptado al dominio; en inferencia su
+salida se normaliza a norma unitaria ($L_2$), de modo que el \textit{embedding}
+producido sea directamente comparable mediante distancia coseno.
 
 Se han entrenado dos tipos de cabezas sobre dos arquitecturas base (MobileNetV3
 y DINOv2), utilizando exclusivamente los recortes del subconjunto anotado
 descrito en \ref{subsec:dataset}. Las cabezas de autoría se entrenan con
-\textit{triplet loss} y una estrategia de muestreo de tripletes basada en
-distancia\cite{wu_sampling_2017} sobre las anotaciones de autoría, que agrupan
-los recortes pertenecientes a una misma firma o autor bajo un identificador
-común; el objetivo es acercar pintadas del mismo autor y separar las de autores
-distintos. Las cabezas de estilo se entrenan con la pérdida \textit{Supervised
+\textit{triplet loss} sobre las anotaciones de autoría, que agrupan los
+recortes pertenecientes a una misma firma o autor bajo un identificador
+común; el objetivo es acercar pintadas del mismo autor y separar las de
+autores distintos. Inspirados por la relevancia del muestreo de
+negativos\cite{wu_sampling_2017}, los negativos no se eligen de forma
+uniforme: con probabilidad fija se extraen del conjunto de autores con un
+único recorte (negativos difíciles), reservando el resto de las veces un
+muestreo del banco completo de autores. Las cabezas de estilo se entrenan con la pérdida \textit{Supervised
 Contrastive}\cite{khosla_supervised_2021} sobre las anotaciones estilísticas en
 cuatro categorías (\textit{tag}, \textit{throw-up}, \textit{piece} y
 \textit{character}). Las cuatro cabezas resultantes se integran como modelos de

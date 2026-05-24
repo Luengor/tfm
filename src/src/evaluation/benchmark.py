@@ -38,10 +38,21 @@ def build_parser() -> argparse.ArgumentParser:
         "--ground-truth",
         default=None,
         help=(
-            "Optional path to a ground-truth CSV with at least 'filename' and "
-            "'style' columns. When provided, the runner computes extrinsic "
-            "metrics (ARI, NMI, pairwise F1) for runs that use the identity "
-            "segmenter. Filenames are matched by basename."
+            "Optional path to a style ground-truth CSV with at least a "
+            "'filename' column and a label column ('style'/'author'/'label'). "
+            "When provided, the runner computes extrinsic metrics (ARI, NMI, "
+            "pairwise F1) for runs that use the identity segmenter. Filenames "
+            "are matched by basename."
+        ),
+    )
+    parser.add_argument(
+        "--ground-truth-author",
+        default=None,
+        help=(
+            "Optional path to an author-labelled ground-truth CSV (same format "
+            "as --ground-truth). When provided, a second extrinsic evaluation "
+            "is computed against author identity and reported under the "
+            "'extrinsic_author_*' / 'similarity_extrinsic_author_*' keys."
         ),
     )
     parser.add_argument(
@@ -72,6 +83,9 @@ def main() -> int:
         cluster_plot_options["enabled"] = True
 
     ground_truth = load_ground_truth(args.ground_truth) if args.ground_truth else None
+    ground_truth_author = (
+        load_ground_truth(args.ground_truth_author) if args.ground_truth_author else None
+    )
 
     if args.run:
         selected = set(args.run)
@@ -100,6 +114,7 @@ def main() -> int:
         limit=args.limit,
         ground_truth=ground_truth,
         cluster_plot_options=cluster_plot_options,
+        ground_truth_author=ground_truth_author,
     )
     json_path = write_results(results=results, output_dir=args.output_dir, prefix=args.prefix)
 
