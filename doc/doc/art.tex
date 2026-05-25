@@ -201,24 +201,94 @@ conveniencia de una evaluación empírica comparativa.
 % ---------------------------------------------------------------------
 \subsection{Coste computacional y evaluación empírica}
 \label{subsec:art-cost}
+% TODO: Simplificar esta sección, que es un poco densa
 
-% Justificar la mitad del título ("coste computacional"). Cubrir:
-%   - Comparativas de throughput y FLOPs de extractores de características
-%     (MobileNet vs ResNet vs ViT; trabajos de eficiencia como EfficientNet,
-%     MobileNetV3 \cite{howard_mobilenets_2017}).
-%   - Complejidad asintótica y empírica de los algoritmos de clustering
-%     (mini-batch K-Means \cite{sculley_web-scale_2010}, HDBSCAN, OPTICS).
-%   - Métricas internas de evaluación de clustering: silhouette
-%     \cite{rousseeuw_silhouettes_1987}, Calinski-Harabasz, Davies-Bouldin.
-%   - Métricas externas cuando hay etiquetas: ARI, NMI, F1 por pares;
-%     conectar con el subconjunto etiquetado del enunciado.
-%   - Curse of dimensionality y su impacto sobre métricas de distancia
-%     (Aggarwal et al. 2001) como motivación de la reducción previa al
-%     agrupamiento.
-%   - Trabajos de benchmarking sistemático de pipelines de visión /
-%     clustering, justificando el enfoque comparativo del presente trabajo.
-%   - Caracterización empírica del coste en función del tamaño del banco
-%     de imágenes, eje explícito del enunciado.
+La segunda mitad del título de este trabajo, el coste computacional, está
+presente en todas las etapas del \textit{pipeline} y comienza en la propia
+generación de los \textit{embeddings}. El coste de ingesta es lineal en el
+número de imágenes, pero el factor por imagen varía en órdenes de magnitud
+según el extractor: una red ligera y una arquitectura pesada como ResNet o ViT
+difieren tanto en operaciones en coma flotante (FLOPs) como en rendimiento
+(\textit{throughput}) efectivo. Este eje de eficiencia ha guiado el diseño de
+familias como MobileNet, cuya tercera generación~\cite{howard_searching_2019}
+se construye mediante búsqueda de arquitecturas consciente del hardware
+(\textit{hardware-aware NAS}) que optimiza explícitamente la latencia medida
+sobre el dispositivo, en lugar de un proxy como el número de parámetros. Para
+un sistema que debe procesar bancos de imágenes crecientes, la elección del
+extractor fija el coste dominante de la fase de ingesta, lo que convierte el
+compromiso entre calidad de la representación y coste de cómputo en una
+variable de diseño de primer orden y no en un detalle de implementación.
+
+Una vez generadas las representaciones, el coste se traslada al agrupamiento,
+donde la complejidad asintótica respecto al tamaño del banco $n$ separa con
+claridad a las familias de algoritmos. K-Means clásico tiene un coste por
+iteración $O(nks)$, con $k$ centroides y $s$ características no nulas por
+punto; la variante \textit{mini-batch} de Sculley~\cite{sculley_web-scale_2010}
+lo reduce a $O(bks)$ con lotes de tamaño $b \ll n$, recuperando soluciones
+cercanas al óptimo varios órdenes de magnitud más rápido. Los métodos basados
+en densidad son más sensibles a la escala: OPTICS~\cite{ankerst_optics_1999}
+tiene un coste aproximadamente 1,6 veces el de DBSCAN, que pasa de $O(n \log
+n)$ con un índice espacial a $O(n^2)$ sin él, y
+HDBSCAN~\cite{campello_density-based_2013} construye su jerarquía sobre el
+grafo de alcanzabilidad mutua en $O(dn^2)$. Estas cotas, cuadráticas en el peor
+caso, anticipan que el agrupamiento es uno de los puntos donde el coste crece
+de forma superlineal con el banco, justo el comportamiento que el enunciado
+pide caracterizar de forma experimental.
+
+A este coste se superpone la dimensión de los \textit{embeddings}, que entra
+por partida doble. Por un lado, el cómputo de cada distancia escala con la
+dimensión, encareciendo tanto el agrupamiento como la búsqueda por similitud
+tratada en su apartado correspondiente. Por otro, y de forma más sutil, en
+dimensiones altas las distancias euclídeas pierden poder discriminativo:
+Aggarwal~\cite{aggarwal_k-anonymity_2005} formaliza este fenómeno de
+concentración de distancias, según el cual la distancia al punto más cercano y
+la del más lejano tienden a igualarse a medida que la dimensión crece, lo que
+vacía de contenido la noción de vecindad sobre la que se apoyan los métodos
+basados en distancia y densidad. Esto explica por qué la reducción de
+dimensionalidad previa al agrupamiento no es solo una optimización de coste,
+sino una condición para que tanto las métricas de distancia como los algoritmos
+que las emplean sigan siendo informativos, una consideración que reaparece al
+evaluar la calidad del agrupamiento.
+
+La caracterización del desempeño exige, además del coste, una medida de la
+calidad de las agrupaciones obtenidas. Cuando no se dispone de etiquetas, la
+evaluación recae en métricas internas, que valoran la cohesión y la separación
+de los clústeres a partir únicamente de la geometría de los datos. Las tres de
+referencia son el coeficiente de silueta~\cite{rousseeuw_silhouettes_1987}, que
+contrasta para cada punto la distancia media a su propio clúster con la
+distancia al clúster vecino más próximo; el índice de
+Calinski-Harabász~\cite{calinski_dendrite_1974}, que mide la razón entre la
+dispersión inter e intra-clúster; y el índice de
+Davies-Bouldin~\cite{davies_cluster_1979}, que promedia la similitud de cada
+clúster con su competidor más cercano y que, a diferencia de los dos
+anteriores, se minimiza. Las tres comparten un sesgo hacia los clústeres
+compactos y convexos, por lo que tienden a penalizar las formas irregulares que
+recuperan los métodos basados en densidad, un desacuerdo que resulta en sí
+mismo diagnóstico de la geometría del espacio de representación.
+
+Cuando se cuenta con un subconjunto etiquetado —como el que contempla el
+enunciado para la evaluación supervisada— a las métricas internas se añaden
+métricas externas, que comparan el agrupamiento con la verdad de referencia. El
+índice de Rand ajustado (ARI)\cite{hubert_comparing_1985} corrige por azar el
+recuento de pares de elementos tratados de forma consistente por ambas
+particiones; la información mutua normalizada (NMI)\cite{strehl_cluster_2002}
+mide, desde la teoría de la información, cuánto comparten ambas asignaciones; y
+el F1 por pares~\cite{van_rijsbergen_c_j_information_1979} descompone el
+acuerdo en precisión y exhaustividad, revelando si una configuración yerra por
+sobre-fusionar o por sobre-segmentar. Ninguna de las tres exige que el número
+de clústeres predichos coincida con el de clases reales, propiedad
+imprescindible cuando la selección automática del número de grupos produce
+particiones de tamaño dispar.
+
+La ausencia de una combinación universalmente superior, junto con la evidencia
+de que el rendimiento de estos algoritmos depende fuertemente del conjunto de
+datos~\cite{franti_k-means_2018, ahmed_k-means_2020}, hace que ni el coste ni
+la calidad de un \textit{pipeline} concreto puedan anticiparse sin medirlos. El
+presente trabajo asume esta premisa y la lleva al terreno experimental: evalúa
+de forma sistemática, y sobre un mismo banco de imágenes de grafiti, la calidad
+de cada combinación de extractor, reducción y agrupamiento mediante las
+métricas anteriores, y caracteriza su coste computacional en función del tamaño
+del banco, que es el eje experimental explícito del enunciado.
 
 % ---------------------------------------------------------------------
 \subsection{Aprendizaje profundo de clústeres y posicionamiento de
@@ -227,15 +297,15 @@ este trabajo}
 
 Una línea más reciente integra la representación y el agrupamiento en un mismo
 proceso de entrenamiento. \citea[etali]{Min}{min_survey_2018} ofrecen una
-revisión exhaustiva de estas propuestas de \textit{deep clustering} por
-arquitectura subyacente. Entre las más relevantes se encuentran
-DeepCluster~\cite{caron_deep_2019}, que reagrupa iterativamente las
-características de la red con K-Means y emplea las asignaciones resultantes como
-pseudo-etiquetas para reentrenarla, o SCAN~\cite{van_gansbeke_scan_2020}, que disocia
-el aprendizaje de características auto-supervisado de la asignación de
-clústeres con resultados muy superiores en conjuntos de evaluación estándar.
+revisión exhaustiva de estas propuestas de \textit{deep clustering}. Entre las
+más relevantes se encuentran DeepCluster~\cite{caron_deep_2019}, que reagrupa
+iterativamente las características de la red con K-Means y emplea las
+asignaciones resultantes como pseudo-etiquetas para reentrenarla, o
+SCAN~\cite{van_gansbeke_scan_2020}, que disocia el aprendizaje de
+características auto-supervisadas de la asignación de clústeres con resultados
+muy superiores en conjuntos de evaluación estándar.
 
-Estas aproximaciones, sin embargo, presuponen volúmenes de datos y acceso a
+Estas aproximaciones, sin embargo, presuponen un volumen de datos y acceso a
 cómputo de los que no se dispone en el escenario de este trabajo, y resultan
 más difíciles de interpretar y de operar. Por ese motivo, el presente trabajo
 se sitúa deliberadamente en el enfoque desacoplado: aprovechar las
@@ -244,3 +314,4 @@ ajustadas con una cabeza ligera específica de dominio, y combinarlas con
 algoritmos de \textit{clustering} maduros y bien comprendidos. La contribución
 reside en evaluar de forma sistemática qué combinaciones de extractor,
 reducción y agrupamiento se comportan mejor sobre imágenes de grafiti.
+
