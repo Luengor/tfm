@@ -66,22 +66,22 @@ categoría y separarlos del resto, mejorando la robustez del espacio aprendido
 frente a las pérdidas basadas en tripletes.
 
 Sobre esta base se han utilizado arquitecturas de redes residuales como
-ResNet\cite{he_deep_2015}, MobileNet\cite{howard_mobilenets_2017} y, más
+ResNet~\cite{he_deep_2015}, MobileNet~\cite{howard_mobilenets_2017} y, más
 recientemente, modelos basados en \textit{transformers} para
-visión\cite{dosovitskiy_image_2021} como extractores de características para
+visión~\cite{dosovitskiy_image_2021} como extractores de características para
 tareas de agrupamiento. Es más, el cambio más relevante en este ámbito no ha
 sido la arquitectura, sino el método de entrenamiento. Las redes de
 clasificación clásicas se han visto superadas por modelos de fundación
 entrenados con objetivos de autosupervisión o supervisión por lenguaje natural.
-DINOv2\cite{oquab_dinov2_2024} demuestra que la primera produce características
+DINOv2~\cite{oquab_dinov2_2024} demuestra que la primera produce características
 visuales transferibles a múltiples tareas sin la necesidad de hacer
 \textit{fine-tuning}. Por otro lado, modelos como
-CLIP\cite{radford_learning_2021} alinean un codificador visual con un
+CLIP~\cite{radford_learning_2021} alinean un codificador visual con un
 codificador textual sobre pares imagen-texto, obteniendo un espacio en el que
 la proximidad codifica también semántica. Ambos modelos resultan candidatos
 naturales para representar grafiti, dominio para el que prácticamente no
 existen sets etiquetados de similitud y donde los detectores específicos de
-propósito general, como las familias YOLO\cite{noauthor_ultralytics_2024},
+propósito general, como las familias YOLO~\cite{noauthor_ultralytics_2024},
 ofrecen además sus propios mapas de características como vectores de partida.
 
 % ---------------------------------------------------------------------
@@ -137,10 +137,10 @@ consultada, lo que resulta asumible en escalas modestas, pero deja de serlo a
 medida que el banco crece. La literatura ha respondido a esto con dos grandes
 familias de índices aproximados de vecinos más cercanos (\textit{Approximate
 Nearest Neighbor}, ANN). Por un lado, los basados en cuantificación y
-particionado del espacio ( FAISS\cite{johnson_billion-scale_2017}), que combina
+particionado del espacio ( FAISS~\cite{johnson_billion-scale_2017}), que combina
 listas invertidas con cuantificación de productos para escalar la búsqueda a
 miles de millones de vectores con uso intensivo de GPU. Por otro, los basados
-en grafos de proximidad, encabezados por HNSW\cite{malkov_efficient_2018}, que
+en grafos de proximidad, encabezados por HNSW~\cite{malkov_efficient_2018}, que
 construye una jerarquía de grafos navegables de mundo pequeño con coste de
 consulta logarítmico y que se ha convertido en el estándar de facto de las
 bases de datos vectoriales modernas (pgvector, Qdrant, Milvus).
@@ -164,18 +164,18 @@ tanto las nociones de distancia como los algoritmos clásicos de agrupamiento.
 La técnica establecida para mitigarlo es proyectar a un espacio de menor
 dimensión antes de agrupar, ya sea de forma lineal mediante análisis de
 componentes principales o de forma no lineal con métodos como
-UMAP\cite{mcinnes_umap_2020}, que preserva en mayor medida la estructura local
+UMAP~\cite{mcinnes_umap_2020}, que preserva en mayor medida la estructura local
 y global del \textit{manifold} subyacente.
 
 Sobre el espacio reducido convergen las familias clásicas de
 \textit{clustering}. K-Means sigue siendo la opción más extendida por su
 simplicidad, aunque su sensibilidad a la inicialización y a la geometría de los
-datos está bien documentada. Arthur y Vassilvitskii\cite{arthur_k-means_2007}
+datos está bien documentada. Arthur y Vassilvitskii~\cite{arthur_k-means_2007}
 introdujeron la inicialización \textit{k-means++}, con garantías teóricas y
 mejoras consistentes en calidad y velocidad;
-Sculley\cite{sculley_web-scale_2010} mostró que la variante \textit{mini-batch}
+Sculley~\cite{sculley_web-scale_2010} mostró que la variante \textit{mini-batch}
 reduce el coste computacional varios órdenes de magnitud sin pérdida
-significativa de calidad; y Fränti y Sieranoja\cite{franti_k-means_2018} han
+significativa de calidad; y Fränti y Sieranoja~\cite{franti_k-means_2018} han
 caracterizado experimentalmente las condiciones bajo las que el algoritmo deja
 de funcionar, identificando el solapamiento entre clústeres como el factor
 crítico. La revisión reciente de \citea[etali]{Ahmed}{ahmed_k-means_2020}
@@ -183,15 +183,15 @@ aporta evidencia empírica de que el rendimiento depende del conjunto de datos,
 lo que refuerza el enfoque comparativo adoptado en este trabajo.
 
 Las alternativas basadas en densidad nacen para tratar formas no convexas y
-ruido. DBSCAN\cite{ester_density-based_1996} fija un único umbral de densidad,
+ruido. DBSCAN~\cite{ester_density-based_1996} fija un único umbral de densidad,
 lo que limita su aplicabilidad a datos con densidades heterogéneas;
-OPTICS\cite{ankerst_optics_1999} resuelve esa rigidez devolviendo un orden de
+OPTICS~\cite{ankerst_optics_1999} resuelve esa rigidez devolviendo un orden de
 alcanzabilidad del que pueden extraerse particiones para distintos umbrales; y
-HDBSCAN\cite{campello_density-based_2013} construye una jerarquía de densidades
+HDBSCAN~\cite{campello_density-based_2013} construye una jerarquía de densidades
 de la que selecciona los clústeres más estables, sin requerir parámetros
 geométricos a priori. La implementación moderna de estas tres familias está
-bien estudiada\cite{hahsler_dbscan_2019}. Para agrupamientos jerárquicos
-aglomerativos, los algoritmos descritos por Müllner\cite{mullner_modern_2011}
+bien estudiada~\cite{hahsler_dbscan_2019}. Para agrupamientos jerárquicos
+aglomerativos, los algoritmos descritos por Müllner~\cite{mullner_modern_2011}
 constituyen la referencia computacional actual.
 
 La selección entre estas familias depende de hipótesis sobre los datos que no
@@ -229,9 +229,9 @@ Una línea más reciente integra la representación y el agrupamiento en un mism
 proceso de entrenamiento. \citea[etali]{Min}{min_survey_2018} ofrecen una
 revisión exhaustiva de estas propuestas de \textit{deep clustering} por
 arquitectura subyacente. Entre las más relevantes se encuentran
-DeepCluster\cite{caron_deep_2019}, que reagrupa iterativamente las
+DeepCluster~\cite{caron_deep_2019}, que reagrupa iterativamente las
 características de la red con K-Means y emplea las asignaciones resultantes como
-pseudo-etiquetas para reentrenarla, o SCAN\cite{van_gansbeke_scan_2020}, que disocia
+pseudo-etiquetas para reentrenarla, o SCAN~\cite{van_gansbeke_scan_2020}, que disocia
 el aprendizaje de características auto-supervisado de la asignación de
 clústeres con resultados muy superiores en conjuntos de evaluación estándar.
 

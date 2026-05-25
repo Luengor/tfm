@@ -78,7 +78,7 @@ luego aparecen en la evaluación, aun usando fotografías distintas, las métric
 medirían la capacidad del modelo para reidentificar autores ya vistos durante
 el entrenamiento, no su capacidad para construir un espacio en el que autores
 nuevos queden separados. Para evitar este sesgo se sigue la convención habitual
-de los problemas de verificación de identidad (FaceNet\cite{schroff_facenet_2015}
+de los problemas de verificación de identidad (FaceNet~\cite{schroff_facenet_2015}
 y la literatura de reidentificación de personas): el conjunto de evaluación
 contiene únicamente identificadores de autor disjuntos de los vistos durante el
 entrenamiento. En este trabajo esa disjunción se materializa entrenando las
@@ -106,10 +106,10 @@ proximidad en el espacio latente debe reflejar la similitud perceptual: dos
 fotografías de la misma pintada, de pintadas estilísticamente próximas o del
 mismo autor por ejemplo, deben quedar a menor distancia que dos imágenes no
 relacionadas, paradigma ejemplificado por
-FaceNet\cite{schroff_facenet_2015}. El cálculo directo de distancias sobre
+FaceNet~\cite{schroff_facenet_2015}. El cálculo directo de distancias sobre
 los píxeles de la imagen no captura esta noción de similitud, ya que
 pequeñas transformaciones espaciales o de iluminación producen variaciones
-grandes en el espacio de píxeles\cite{wang_euclidean_2005}, y por ello se
+grandes en el espacio de píxeles~\cite{wang_euclidean_2005}, y por ello se
 recurre a representaciones aprendidas mediante redes profundas (véase
 \ref{subsec:art-embeddings}).
 
@@ -139,7 +139,7 @@ permiten descartar puntos como ruido. Los métodos jerárquicos construyen un
 dendrograma de fusiones o divisiones sucesivas del que pueden extraerse
 particiones a distintos niveles de granularidad. Por último, los enfoques
 probabilísticos (mezclas gaussianas resueltas con el algoritmo
-EM\cite{dempster_maximum_1977}) modelan los datos como una superposición de
+EM~\cite{dempster_maximum_1977}) modelan los datos como una superposición de
 distribuciones y asignan cada punto al componente más probable.
 
 La principal dificultad operativa en un escenario sin etiquetas es la selección
@@ -185,12 +185,12 @@ El segundo eje, secundario, es la calidad de los clústeres resultantes. Sobre
 el banco principal sin etiquetar se recurre a métricas internas, que
 cuantifican la cohesión intracluster y la separación intercluster directamente
 sobre los \textit{embeddings}. Se emplean el coeficiente de
-silueta\cite{rousseeuw_silhouettes_1987}, que combina para cada punto la
+silueta~\cite{rousseeuw_silhouettes_1987}, que combina para cada punto la
 distancia media a los miembros de su propio clúster con la distancia media al
 clúster más cercano, y el índice de
-Calinski-Harabász\cite{calinski_dendrite_1974}, que mide el cociente entre la
+Calinski-Harabász~\cite{calinski_dendrite_1974}, que mide el cociente entre la
 dispersión intercluster e intracluster, y el índice de
-Davies-Bouldin\cite{davies_cluster_1979}, que promedia la similitud de cada
+Davies-Bouldin~\cite{davies_cluster_1979}, que promedia la similitud de cada
 clúster con su vecino más parecido (valores menores indican mejor separación).
 Se complementan con dos indicadores estructurales: la proporción de puntos
 clasificados como ruido y el coeficiente de variación del tamaño de los
@@ -225,12 +225,12 @@ arquitectura, dimensionalidad de salida y preentrenamiento.
 
 \begin{longtable}{|p{3.2cm}|p{3.8cm}|c|p{4.2cm}|} \hline
   \textbf{Modelo} & \textbf{Arquitectura} & \textbf{Dim.} & \textbf{Preentrenamiento} \\ \hline
-  ResNet50\cite{he_deep_2015} & CNN residual & $2048$ & ImageNet \\ \hline
-  VGG16\cite{simonyan_very_2015} & CNN profunda & $4096$ & ImageNet \\ \hline
-  InceptionV3\cite{szegedy_rethinking_2015} & CNN multi-rama & $2048$ & ImageNet \\ \hline
-  MobileNetV3\cite{howard_searching_2019} & CNN ligera & $1280$ & ImageNet \\ \hline
-  DINOv2 ViT-S/14\cite{oquab_dinov2_2024} & \textit{Transformer}\cite{dosovitskiy_image_2021} & $384$ & Autosupervisado (LVD-142M) \\ \hline
-  CLIP ViT-B/32\cite{radford_learning_2021} & \textit{Transformer} & $512$ & Imagen-texto (WIT) \\ \hline
+  ResNet50~\cite{he_deep_2015} & CNN residual & $2048$ & ImageNet \\ \hline
+  VGG16~\cite{simonyan_very_2015} & CNN profunda & $4096$ & ImageNet \\ \hline
+  InceptionV3~\cite{szegedy_rethinking_2015} & CNN multi-rama & $2048$ & ImageNet \\ \hline
+  MobileNetV3~\cite{howard_searching_2019} & CNN ligera & $1280$ & ImageNet \\ \hline
+  DINOv2 ViT-S/14~\cite{oquab_dinov2_2024} & \textit{Transformer}\cite{dosovitskiy_image_2021} & $384$ & Autosupervisado (LVD-142M) \\ \hline
+  CLIP ViT-B/32~\cite{radford_learning_2021} & \textit{Transformer} & $512$ & Imagen-texto (WIT) \\ \hline
   YOLO11 (n/s/m)\cite{noauthor_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO + grafiti \\ \hline
   \caption{Modelos de extracción de características integrados.}
   \label{tab:embedding-models}
@@ -249,13 +249,13 @@ recoge las opciones implementadas con sus hiperparámetros clave.
 
 \begin{longtable}{|l|l|c|} \hline
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
-  K-Means\cite{arthur_k-means_2007} & $n\_clusters$ & sí \\ \hline
-  DBSCAN\cite{ester_density-based_1996} & $\epsilon$, $min\_samples$ & sí ($\epsilon$) \\ \hline
-  HDBSCAN\cite{campello_density-based_2013} & $min\_cluster\_size$, $min\_samples$ & no requiere \\ \hline
-  OPTICS\cite{ankerst_optics_1999} & $min\_samples$, $xi$ & no requiere \\ \hline
-  Aglomerativo\cite{mullner_modern_2011} & $n\_clusters$, $linkage$ & no \\ \hline
-  Espectral\cite{ng_spectral_2001,huang_ultra-scalable_2020} & $n\_clusters$, afinidad & no \\ \hline
-  GMM\cite{dempster_maximum_1977} & $n\_components$, covarianza & sí \\ \hline
+  K-Means~\cite{arthur_k-means_2007} & $n\_clusters$ & sí \\ \hline
+  DBSCAN~\cite{ester_density-based_1996} & $\epsilon$, $min\_samples$ & sí ($\epsilon$) \\ \hline
+  HDBSCAN~\cite{campello_density-based_2013} & $min\_cluster\_size$, $min\_samples$ & no requiere \\ \hline
+  OPTICS~\cite{ankerst_optics_1999} & $min\_samples$, $xi$ & no requiere \\ \hline
+  Aglomerativo~\cite{mullner_modern_2011} & $n\_clusters$, $linkage$ & no \\ \hline
+  Espectral~\cite{ng_spectral_2001,huang_ultra-scalable_2020} & $n\_clusters$, afinidad & no \\ \hline
+  GMM~\cite{dempster_maximum_1977} & $n\_components$, covarianza & sí \\ \hline
   \textit{Affinity Propagation}\cite{frey_clustering_2007} & $damping$, $preference$ & no requiere \\ \hline
   \caption{Algoritmos de agrupamiento implementados.}
   \label{tab:clustering-algos}
@@ -273,10 +273,10 @@ disponibles.
 \begin{longtable}{|l|l|l|} \hline
   \textbf{Técnica} & \textbf{Tipo} & \textbf{Parámetros principales} \\ \hline
   Identity & --- & --- \\ \hline
-  PCA\cite{jolliffe_principal_2002} & Lineal & $n\_components$ \\ \hline
-  Kernel PCA\cite{scholkopf_nonlinear_1998} & No lineal & $n\_components$, \textit{kernel} \\ \hline
-  Isomap\cite{tenenbaum_global_2000} & No lineal & $n\_components$, $n\_neighbors$ \\ \hline
-  UMAP\cite{mcinnes_umap_2020} & No lineal & $n\_components$, $n\_neighbors$, $min\_dist$ \\ \hline
+  PCA~\cite{jolliffe_principal_2002} & Lineal & $n\_components$ \\ \hline
+  Kernel PCA~\cite{scholkopf_nonlinear_1998} & No lineal & $n\_components$, \textit{kernel} \\ \hline
+  Isomap~\cite{tenenbaum_global_2000} & No lineal & $n\_components$, $n\_neighbors$ \\ \hline
+  UMAP~\cite{mcinnes_umap_2020} & No lineal & $n\_components$, $n\_neighbors$, $min\_dist$ \\ \hline
   \caption{Técnicas de reducción de dimensionalidad implementadas.}
   \label{tab:reduction}
 \end{longtable}
@@ -291,7 +291,7 @@ despliegues ligeros y como referencia de cálculo exacto frente a alternativas
 aproximadas. \texttt{PostgreSQLStorage} se apoya en la extensión
 \textit{pgvector} de PostgreSQL y delega la búsqueda al motor de la base de
 datos. Por defecto la consulta es un recorrido exacto; opcionalmente puede
-habilitarse un índice aproximado HNSW\cite{malkov_efficient_2018} sobre los
+habilitarse un índice aproximado HNSW~\cite{malkov_efficient_2018} sobre los
 vectores (parámetro \texttt{hnsw} de la configuración), lo que permite
 contrastar el coste de la búsqueda exacta frente a la aproximada. Ambos
 \textit{backends} comparten el esquema lógico y la persistencia de metadatos,
@@ -312,7 +312,7 @@ lugar de la escena completa. Se han implementado dos variantes.
 \texttt{IdentitySegmenter} devuelve la imagen completa como única región de
 interés y se utiliza como referencia para evaluar el impacto de la
 segmentación. \texttt{YoloSegmenter} ejecuta un modelo
-YOLO\cite{noauthor_ultralytics_2024} ajustado sobre el conjunto de grafiti,
+YOLO~\cite{noauthor_ultralytics_2024} ajustado sobre el conjunto de grafiti,
 fusiona las cajas de detección solapadas para evitar duplicados y aplica un
 margen (\textit{padding}) configurable alrededor de cada caja antes del
 recorte. El resultado es un conjunto de sub-imágenes que se procesan de forma
@@ -337,7 +337,7 @@ pero no necesariamente óptimas para el dominio del grafiti. Para acortar esa
 distancia se ha optado por un esquema de \textit{transfer
 learning}\cite{pan_survey_2010} en el que la representación base se mantiene
 congelada y solo se entrena una cabeza ligera, siguiendo la metodología de
-\textit{fine-tuning} de ULMFiT\cite{howard_universal_2018}. La cabeza consiste
+\textit{fine-tuning} de ULMFiT~\cite{howard_universal_2018}. La cabeza consiste
 en una secuencia Lineal $\rightarrow$ ReLU $\rightarrow$ Lineal que proyecta
 los \textit{embeddings} base a un espacio adaptado al dominio; en inferencia su
 salida se normaliza a norma unitaria ($L_2$), de modo que el \textit{embedding}
@@ -350,7 +350,7 @@ descrito en \ref{subsec:dataset}. Las cabezas de autoría se entrenan con
 recortes pertenecientes a una misma firma o autor bajo un identificador
 común; el objetivo es acercar pintadas del mismo autor y separar las de
 autores distintos. Inspirados por la relevancia del muestreo de
-negativos\cite{wu_sampling_2017}, los negativos no se eligen de forma
+negativos~\cite{wu_sampling_2017}, los negativos no se eligen de forma
 uniforme: con probabilidad fija se extraen del conjunto de autores con un
 único recorte (negativos difíciles), reservando el resto de las veces un
 muestreo del banco completo de autores. Las cabezas de estilo se entrenan con la pérdida \textit{Supervised
