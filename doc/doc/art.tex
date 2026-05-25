@@ -146,13 +146,11 @@ consulta logarítmico y que se ha convertido en el estándar de facto de las
 bases de datos vectoriales modernas (pgvector, Qdrant, Milvus).
 
 El presente trabajo no aporta novedad en este eje y se apoya en estas
-soluciones ya existentes. El pipeline implementado utiliza \texttt{pgvector}
-sobre PostgreSQL cuando el banco lo justifica, delegando la búsqueda a su
-índice HNSW, y mantiene un \textit{backend} alternativo sobre SQLite con
-búsqueda lineal en Python para escenarios de despliegue ligero y para verificar
-los resultados frente al cálculo exacto. La caracterización empírica del coste
-de búsqueda en función del tamaño del banco, planteada por el enunciado, se
-aborda en este marco sin entrar a comparar índices ANN entre sí.
+soluciones ya existentes; su integración concreta en el sistema, sobre
+\texttt{pgvector} y un \textit{backend} de búsqueda lineal, se describe en
+\ref{subsec:configuraciones}. La caracterización empírica del coste de búsqueda
+en función del tamaño del banco, planteada por el enunciado, se aborda en este
+marco sin entrar a comparar índices ANN entre sí.
 
 % ---------------------------------------------------------------------
 \subsection{Reducción de dimensionalidad y agrupamiento clásico}

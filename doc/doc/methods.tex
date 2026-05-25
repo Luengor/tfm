@@ -64,6 +64,16 @@ etapas de reducción y agrupamiento y repetirlas $K$ veces.
 
 \subsection{Procedimiento experimental}
 \label{subsec:experimental}
+La evaluación se articula en dos ejes. El primero, y principal, es el
+rendimiento computacional, cuantificado mediante los tiempos absolutos de cada
+etapa del \textit{pipeline} (preparación, ingesta, reducción, agrupamiento y
+búsqueda por similitud), el \textit{throughput} de ingesta en imágenes por
+segundo, la latencia de búsqueda por consulta y la escalabilidad de estas
+magnitudes con el tamaño del banco; son métricas objetivas, no dependen de la
+existencia de etiquetas y son las que verdaderamente vertebran la comparación
+entre configuraciones. El segundo eje, secundario, es la calidad de los
+clústeres resultantes, evaluada con las métricas internas y extrínsecas
+definidas en \ref{subsubsec:metricas}.
 
 \subsubsection{Definición del espacio de configuraciones}
 \label{subsubsec:espacio-configs}
@@ -158,30 +168,12 @@ minimizar interferencias externas.
 
 \subsubsection{Selección automática de hiperparámetros}
 \label{subsubsec:hiperparam-auto}
-Tres de los algoritmos integrados admiten la estimación automática de su
-hiperparámetro principal cuando el usuario no lo declara en la configuración.
-Esta estimación se utiliza por defecto en todas las configuraciones del
-\textit{benchmark}, salvo que se desee evaluar explícitamente el efecto de
-fijar el parámetro a un valor concreto.
-
-Para K-Means se aplica el método del codo sobre la curva de inercia: se ajusta
-el algoritmo para $k \in \{2, 3, \ldots, k_{\max}\}$ con $k_{\max} = \min(n,
-20)$, donde $n$ es el número de \textit{embeddings} disponibles, y se
-selecciona el valor de $k$ correspondiente al codo de la curva mediante el
-criterio de la distancia perpendicular al segmento que une los extremos. Para
-los modelos de mezcla gaussiana se sigue el mismo barrido sobre $k \in \{1, 2,
-\ldots, k_{\max}\}$ y se elige el modelo que minimiza el criterio bayesiano de
-información (BIC); este criterio penaliza de manera explícita la complejidad
-del modelo, lo que mitiga la tendencia del ajuste por máxima verosimilitud a
-favorecer el mayor número de componentes. Para DBSCAN se estima el radio
-$\epsilon$ a partir de la curva de $k$-distancias: para cada punto se calcula
-la distancia a su $(\texttt{min\_samples}-1)$-ésimo vecino más próximo
-(excluyendo el propio punto, que sklearn devuelve como vecino más cercano de
-sí mismo), las distancias se ordenan de menor a mayor y se aplica el mismo
-criterio de codo
-que en K-Means para seleccionar el valor de $\epsilon$ a partir del cual la
-densidad cae abruptamente. En los tres casos, las semillas aleatorias se fijan
-para que el resultado sea reproducible.
+Salvo que se desee evaluar explícitamente el efecto de fijar un hiperparámetro
+a un valor concreto, todas las configuraciones del \textit{benchmark} emplean
+por defecto la estimación automática del hiperparámetro principal de K-Means,
+DBSCAN y los modelos de mezcla gaussiana, descrita en
+\ref{subsubsec:algoritmos-agrupamiento}. En los tres casos las semillas
+aleatorias se fijan para que el resultado sea reproducible.
 
 \subsubsection{Protocolo de búsqueda por similitud}
 \label{subsubsec:similarity-search}
@@ -247,8 +239,8 @@ sobre los pocos puntos restantes.
 La evaluación supervisada se efectúa según las restricciones ya enunciadas en
 \ref{subsubsec:metricas} y sobre dos conjuntos etiquetados disjuntos descritos
 en \ref{subsec:dataset}, cada uno asociado a una de las dos tareas supervisadas
-reconocidas en este trabajo: el subconjunto de $294$ recortes etiquetados por
-estilo y el subconjunto de $185$ recortes etiquetados por autor. En ambos casos
+reconocidas en este trabajo: el conjunto de evaluación por estilo y el conjunto
+de evaluación por autor. En ambos casos
 la evaluación se limita a las configuraciones que prescinden del segmentador,
 donde la correspondencia entre recorte anotado y \textit{embedding} resultante
 es unívoca. Sobre las configuraciones con segmentador esta correspondencia se
@@ -256,29 +248,49 @@ diluye al generarse múltiples recortes por fotografía, lo que impediría asign
 una etiqueta única a cada \textit{embedding}.
 
 Las dos evaluaciones supervisadas comparten métricas y procedimiento de
-cálculo, pero responden a preguntas distintas. La evaluación por estilo es una
-evaluación cerrada sobre cuatro categorías que aparecen también durante el
-entrenamiento de las cabezas estilísticas: mide el grado en que el espacio de
-representación agrupa pintadas estilísticamente homogéneas. La evaluación por
-autor es una evaluación de identidad sobre un conjunto de identificadores
-disjuntos de los utilizados durante el entrenamiento de las cabezas de autoría
-(véase la justificación en \ref{subsec:dataset}): mide la capacidad del espacio
-de representación de separar autores nuevos, no la de reidentificar autores ya
-conocidos. La asimetría entre conjuntos de entrenamiento y de evaluación es
-intrínseca al problema de aprendizaje de métricas y se reporta aquí como tal.
+cálculo, pero responden a preguntas distintas, y esa diferencia justifica el
+reparto deliberadamente asimétrico de las anotaciones entre entrenamiento y
+evaluación. Las etiquetas de estilo definen una tarea de clasificación cerrada
+sobre cuatro categorías fijas —las mismas que aparecen durante el entrenamiento
+de las cabezas estilísticas y en ambas ciudades—, por lo que basta con
+garantizar que no se solapen las fotografías concretas entre entrenamiento y
+evaluación: la diversidad estilística buscada se cubre mejor agregando recortes
+de Salamanca y Cuenca al subconjunto de entrenamiento, y el conjunto de
+evaluación extraído del banco principal de Salamanca es disjunto a nivel de
+fotografía. La evaluación por estilo mide así el grado en que el espacio de
+representación agrupa pintadas estilísticamente homogéneas. Las etiquetas de
+autor, en cambio, definen un problema abierto de aprendizaje de métricas: en el
+uso real del sistema, los autores de las pintadas a agrupar son en su mayoría
+desconocidos por el modelo en el momento de la inferencia. Si las cabezas de
+autoría se entrenasen sobre los mismos identificadores de autor que luego
+aparecen en la evaluación, aun usando fotografías distintas, las métricas
+medirían la capacidad del modelo para reidentificar autores ya vistos durante el
+entrenamiento, no su capacidad para construir un espacio en el que autores
+nuevos queden separados. Para evitar este sesgo se sigue la convención habitual
+de los problemas de verificación de identidad (FaceNet~\cite{schroff_facenet_2015}
+y la literatura de reidentificación de personas): el conjunto de evaluación
+contiene únicamente identificadores de autor disjuntos de los vistos durante el
+entrenamiento. En este trabajo esa disjunción se materializa entrenando las
+cabezas de autoría exclusivamente con los $169$ recortes de Cuenca y evaluándolas
+sobre los $185$ recortes de Salamanca. La separación geográfica entre ambas
+ciudades hace razonable asumir que los conjuntos de autores no se solapan, si
+bien dicha suposición no se ha verificado de forma exhaustiva confrontando los
+identificadores literales de las firmas, dada la posibilidad teórica de que un
+mismo autor opere en ambas ciudades. Esta elección introduce además un cambio de
+dominio entre ciudades, que deberá tenerse en cuenta al interpretar los
+resultados de la evaluación por autor (\ref{sec:results}). La asimetría entre
+conjuntos de entrenamiento y de evaluación es, por tanto, intrínseca al problema
+de aprendizaje de métricas y se reporta aquí como tal.
 El conjunto de etiquetas de autor es además fuertemente desbalanceado, con un
-número elevado de autores representados por uno o dos recortes, lo que acota
-superiormente los valores absolutos alcanzables por las métricas y obliga a
-interpretar los resultados en términos relativos (diferencias entre
-configuraciones) más que en términos absolutos. Una matización adicional afecta
-a las cabezas estilísticas cuando se evalúan sobre el conjunto de autor: sus
-recortes de entrenamiento ($110$ de los $385$) proceden de las mismas
-fotografías de Salamanca de las que se extraen los $185$ recortes de evaluación
-por autor, por lo que las cabezas estilísticas han visto durante su
+número elevado de autores representados por uno o dos recortes. Una matización
+adicional afecta a las cabezas estilísticas cuando se evalúan sobre el conjunto
+de autor: sus recortes de entrenamiento ($110$ de los $385$) proceden de las
+mismas fotografías de Salamanca de las que se extraen los $185$ recortes de
+evaluación por autor, por lo que las cabezas estilísticas han visto durante su
 entrenamiento píxeles de algunas de esas fotografías, aunque etiquetados por
-estilo y no por autor. El sesgo introducido es por construcción muy limitado,
-pero se explicita aquí para que cualquier ventaja observada de las cabezas
-estilísticas sobre el conjunto de autor se lea con esa salvedad.
+estilo y no por autor. Ambas circunstancias —el desbalance del conjunto y el
+solapamiento fotográfico— condicionan la lectura de las métricas por autor y se
+retoman al discutir los resultados (\ref{sec:results}).
 
 Las métricas ARI, NMI y F1 por pares se calculan directamente sobre el vector
 de etiquetas de clúster y el vector de etiquetas de verdad fundamental, sin
@@ -347,18 +359,21 @@ con proporción $80/20$ respetando la distribución por etiqueta. Los
 proceso y solo se actualizan los parámetros de la cabeza, según el esquema de
 \textit{transfer learning} descrito en \ref{subsubsec:cabezas}.
 
-Las cabezas de autoría se entrenan con la pérdida indicada en
-\ref{subsubsec:cabezas} con margen $1.0$, optimizador Adam con \textit{learning
-rate} $10^{-4}$, tamaño de \textit{batch} $8$ y un máximo de $20$ épocas. Los
-tripletes se forman dentro de cada \textit{batch} a partir de las anotaciones
-de autoría, eligiendo como ancla un recorte cualquiera, como positivo otro
-recorte con el mismo identificador de autor y como negativo un recorte con
-identificador distinto, con la estrategia de muestreo de negativos difíciles
-ya referida.
+Las cabezas de autoría se entrenan con la pérdida de tripletes (\textit{triplet
+loss}) con margen $1.0$, optimizador Adam con \textit{learning rate} $10^{-4}$,
+tamaño de \textit{batch} $8$ y un máximo de $20$ épocas. Los tripletes se forman
+dentro de cada \textit{batch} a partir de las anotaciones de autoría, eligiendo
+como ancla un recorte cualquiera, como positivo otro recorte con el mismo
+identificador de autor y como negativo un recorte con identificador distinto.
+Inspirados por la relevancia del muestreo de negativos~\cite{wu_sampling_2017},
+los negativos no se eligen de forma uniforme: con probabilidad fija se extraen
+del conjunto de autores con un único recorte (negativos difíciles) y el resto de
+las veces se muestrean del banco completo de autores.
 
-Las cabezas de estilo se entrenan con la pérdida y temperatura indicadas en
-\ref{subsubsec:cabezas} ($T = 0.07$), optimizador Adam con \textit{learning
-rate} $10^{-4}$ y un \textit{scheduler} cosenoidal a lo largo de $60$ épocas.
+Las cabezas de estilo se entrenan con la pérdida \textit{Supervised
+Contrastive}~\cite{khosla_supervised_2021} y temperatura $T = 0.07$, optimizador
+Adam con \textit{learning rate} $10^{-4}$ y un \textit{scheduler} cosenoidal a lo
+largo de $60$ épocas.
 Para que cada \textit{batch} contenga al menos un par positivo por ancla, se
 utiliza un muestreador balanceado que toma $4$ recortes por clase y construye
 entre $10$ y $30$ \textit{batches} por época en función del tamaño efectivo del

@@ -60,39 +60,9 @@ proyección estilística y las de autoría para las cabezas de proyección de au
 descritas en \ref{subsubsec:cabezas}. Los $294$ recortes de evaluación etiquetados
 por estilo y los $185$ etiquetados por autor sirven como verdad fundamental para
 el cálculo de métricas extrínsecas (\ref{subsubsec:metricas}) cuando la
-configuración prescinde del segmentador.
-
-El reparto de las anotaciones entre entrenamiento y evaluación es deliberadamente
-asimétrico entre las dos tareas, y conviene justificarlo. Las etiquetas de
-estilo definen una tarea de clasificación cerrada sobre cuatro categorías fijas
-que aparecen en ambas ciudades, por lo que basta con garantizar que no se
-solapen las fotografías concretas entre entrenamiento y evaluación: la
-diversidad estilística buscada se cubre mejor agregando recortes de Salamanca y
-Cuenca al subconjunto de entrenamiento, y el conjunto de evaluación extraído
-del banco principal de Salamanca es disjunto a nivel de fotografía. Las
-etiquetas de autor, en cambio, definen un problema abierto de aprendizaje de
-métricas: en el uso real del sistema, los autores de las pintadas a agrupar son
-en su mayoría desconocidos por el modelo en el momento de la inferencia. Si las
-cabezas de autoría se entrenasen sobre los mismos identificadores de autor que
-luego aparecen en la evaluación, aun usando fotografías distintas, las métricas
-medirían la capacidad del modelo para reidentificar autores ya vistos durante
-el entrenamiento, no su capacidad para construir un espacio en el que autores
-nuevos queden separados. Para evitar este sesgo se sigue la convención habitual
-de los problemas de verificación de identidad (FaceNet~\cite{schroff_facenet_2015}
-y la literatura de reidentificación de personas): el conjunto de evaluación
-contiene únicamente identificadores de autor disjuntos de los vistos durante el
-entrenamiento. En este trabajo esa disjunción se materializa entrenando las
-cabezas de autoría exclusivamente con los $169$ recortes de Cuenca y evaluándolas
-sobre los $185$ recortes de Salamanca. La separación geográfica entre ambas
-ciudades hace razonable asumir que los conjuntos de autores no se solapan, si
-bien dicha suposición no se ha verificado de forma exhaustiva confrontando los
-identificadores literales de las firmas, dada la posibilidad teórica de que un
-mismo autor opere en ambas ciudades. Esta elección introduce además un cambio
-de dominio entre ciudades, por lo que un resultado positivo es evidencia de
-que las cabezas capturan rasgos de autoría que generalizan más allá del estilo
-local; un resultado negativo, en cambio, no permite distinguir entre fallo por
-novedad de autor y fallo por cambio de dominio, matiz que se recoge al
-interpretar los resultados.
+configuración prescinde del segmentador. El reparto deliberadamente asimétrico
+de estas anotaciones entre entrenamiento y evaluación, y su justificación, se
+detallan en \ref{subsubsec:eval-extrinseca}.
 
 \subsection{Marco conceptual}
 \label{subsec:conceptos}
@@ -172,17 +142,8 @@ sección~\ref{subsec:art-clustering} y en la tabla~\ref{tab:reduction}.
 
 \subsubsection{Métricas de evaluación}
 \label{subsubsec:metricas}
-La evaluación en este trabajo se articula en dos ejes. El primero, y principal,
-es el rendimiento computacional, cuantificado mediante los tiempos absolutos de
-cada etapa del \textit{pipeline} (preparación, ingesta, reducción, agrupamiento
-y búsqueda por similitud), el \textit{throughput} de ingesta en imágenes por
-segundo, la latencia de búsqueda por consulta y la escalabilidad de estas
-magnitudes con el tamaño del banco. Estas métricas son objetivas, no dependen
-de la existencia de etiquetas y son las que verdaderamente vertebran la
-comparación entre configuraciones.
-
-El segundo eje, secundario, es la calidad de los clústeres resultantes. Sobre
-el banco principal sin etiquetar se recurre a métricas internas, que
+La calidad de los clústeres resultantes se valora con dos familias de métricas.
+Sobre el banco principal sin etiquetar se recurre a métricas internas, que
 cuantifican la cohesión intracluster y la separación intercluster directamente
 sobre los \textit{embeddings}. Se emplean el coeficiente de
 silueta~\cite{rousseeuw_silhouettes_1987}, que combina para cada punto la
@@ -199,11 +160,9 @@ clústeres.
 Adicionalmente, sobre los $294$ recortes de evaluación etiquetados por estilo
 descritos en \ref{subsec:dataset} se calculan métricas extrínsecas que sí utilizan
 la verdad fundamental disponible: el índice de Rand ajustado (ARI), la información
-mutua normalizada (NMI) y la F1 por pares. Estas métricas se reportan únicamente
-para las configuraciones que prescinden del segmentador, donde la correspondencia
-entre recorte anotado y \textit{embedding} resultante es unívoca, y
-constituyen el complemento más sólido a las métricas internas en el plano de
-calidad.
+mutua normalizada (NMI) y la F1 por pares, que constituyen el complemento más
+sólido a las métricas internas en el plano de calidad. Las condiciones bajo las
+que se reportan se detallan en \ref{subsubsec:eval-extrinseca}.
 
 \subsection{Componentes implementados}
 \label{subsec:configuraciones}
@@ -237,15 +196,31 @@ arquitectura, dimensionalidad de salida y preentrenamiento.
 \end{longtable}
 
 \subsubsection{Algoritmos de agrupamiento}
+\label{subsubsec:algoritmos-agrupamiento}
 El sistema cubre los principales paradigmas de agrupamiento descritos en la
 sección~\ref{subsec:conceptos}. Todas las implementaciones exponen una interfaz
 común y se configuran por hiperparámetros declarados en la configuración
-del \textit{benchmark}. Tres de los algoritmos (K-Means, DBSCAN y mezclas
-gaussianas) admiten la selección automática del hiperparámetro principal cuando
-este no se especifica: K-Means y GMM estiman el número de clústeres mediante el
-método del codo y el BIC, respectivamente, y DBSCAN ajusta el radio $\epsilon$
-a partir de la curva de $k$-distancias. La tabla~\ref{tab:clustering-algos}
-recoge las opciones implementadas con sus hiperparámetros clave.
+del \textit{benchmark}. La tabla~\ref{tab:clustering-algos} recoge las opciones
+implementadas con sus hiperparámetros clave.
+
+Tres de los algoritmos (K-Means, DBSCAN y mezclas gaussianas) admiten la
+selección automática de su hiperparámetro principal cuando este no se declara.
+Para K-Means se aplica el método del codo sobre la curva de inercia: se ajusta
+el algoritmo para $k \in \{2, 3, \ldots, k_{\max}\}$ con $k_{\max} = \min(n,
+20)$, donde $n$ es el número de \textit{embeddings} disponibles, y se selecciona
+el valor de $k$ correspondiente al codo de la curva mediante el criterio de la
+distancia perpendicular al segmento que une los extremos. Para los modelos de
+mezcla gaussiana se sigue el mismo barrido sobre $k \in \{1, 2, \ldots,
+k_{\max}\}$ y se elige el modelo que minimiza el criterio bayesiano de
+información (BIC); este criterio penaliza de manera explícita la complejidad del
+modelo, lo que mitiga la tendencia del ajuste por máxima verosimilitud a
+favorecer el mayor número de componentes. Para DBSCAN se estima el radio
+$\epsilon$ a partir de la curva de $k$-distancias: para cada punto se calcula la
+distancia a su $(\texttt{min\_samples}-1)$-ésimo vecino más próximo (excluyendo
+el propio punto, que sklearn devuelve como vecino más cercano de sí mismo), las
+distancias se ordenan de menor a mayor y se aplica el mismo criterio de codo que
+en K-Means para seleccionar el valor de $\epsilon$ a partir del cual la densidad
+cae abruptamente.
 
 \begin{longtable}{|l|l|c|} \hline
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
@@ -319,16 +294,11 @@ recorte. El resultado es un conjunto de sub-imágenes que se procesan de forma
 independiente y que pueden producir varios \textit{embeddings} por fotografía
 original.
 
-% TODO: check this after dataset is ready
-El detector se ha ajustado sobre las $\mathtt{YOLO\_IMGS\_PLACEHOLDER}$ %YOLO_IMGS
-fotografías del subconjunto anotado
-de Salamanca descrito en \ref{subsec:dataset}, partiendo de los pesos preentrenados sobre
-COCO. Las cajas se anotaron manualmente sobre las $\mathtt{NSEGS\_PLACEHOLDER}$ %NSEGS
-pintadas presentes en estas fotografías, lo que constituye el total de ejemplos
-positivos disponibles para el ajuste fino. La disjunción de este subconjunto respecto al banco de
-evaluación es condición necesaria para que las métricas reportadas sobre las
-configuraciones que utilizan el segmentador no estén sesgadas por el
-solapamiento entre entrenamiento y evaluación.
+El detector se ajusta sobre el subconjunto anotado de Salamanca descrito en
+\ref{subsec:dataset}, disjunto del banco de evaluación, lo que evita que las
+métricas reportadas sobre las configuraciones con segmentador queden sesgadas
+por el solapamiento entre entrenamiento y evaluación. El procedimiento de ajuste
+fino se detalla en \ref{subsubsec:entrenamiento-detector}.
 
 \subsubsection{Cabezas de proyección ajustadas al dominio}
 \label{subsubsec:cabezas}
@@ -343,35 +313,18 @@ los \textit{embeddings} base a un espacio adaptado al dominio; en inferencia su
 salida se normaliza a norma unitaria ($L_2$), de modo que el \textit{embedding}
 producido sea directamente comparable mediante distancia coseno.
 
-Se han entrenado dos tipos de cabezas sobre dos arquitecturas base (MobileNetV3
-y DINOv2), utilizando exclusivamente los recortes del subconjunto anotado
-descrito en \ref{subsec:dataset}. Las cabezas de autoría se entrenan con
-\textit{triplet loss} sobre las anotaciones de autoría, que agrupan los
-recortes pertenecientes a una misma firma o autor bajo un identificador
-común; el objetivo es acercar pintadas del mismo autor y separar las de
-autores distintos. Inspirados por la relevancia del muestreo de
-negativos~\cite{wu_sampling_2017}, los negativos no se eligen de forma
-uniforme: con probabilidad fija se extraen del conjunto de autores con un
-único recorte (negativos difíciles), reservando el resto de las veces un
-muestreo del banco completo de autores. Las cabezas de estilo se entrenan con la pérdida \textit{Supervised
-Contrastive}\cite{khosla_supervised_2021} sobre las anotaciones estilísticas en
-cuatro categorías (\textit{tag}, \textit{throw-up}, \textit{piece} y
-\textit{character}). Las cuatro cabezas resultantes se integran como modelos de
+Se han entrenado dos tipos de cabezas —de autoría y de estilo— sobre dos
+arquitecturas base (MobileNetV3 y DINOv2). Las cabezas de autoría buscan acercar
+en el espacio latente las pintadas de un mismo autor y separar las de autores
+distintos; las de estilo organizan el espacio según las cuatro categorías
+estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
+\textit{character}). Las cuatro cabezas resultantes se entrenan exclusivamente
+sobre el subconjunto anotado descrito en \ref{subsec:dataset} —el procedimiento
+de entrenamiento, las pérdidas empleadas y el muestreo de negativos se detallan
+en \ref{subsubsec:entrenamiento-cabezas}— y se integran como modelos de
 \textit{embedding} adicionales en el catálogo de la
 tabla~\ref{tab:embedding-models}, conservando la dimensionalidad del modelo
 base.
-
-Dado que estas cabezas se ajustan sobre el subconjunto anotado, su evaluación
-se realiza siempre sobre conjuntos disjuntos del utilizado para entrenar la
-cabeza correspondiente: las cabezas estilísticas se evalúan sobre los $294$
-recortes etiquetados por estilo extraídos del banco principal, disjunto del
-subconjunto de entrenamiento; las cabezas de autoría se evalúan sobre los $185$
-recortes etiquetados por autor de Salamanca, disjuntos a nivel de identificador
-de autor de los $169$ recortes de Cuenca empleados en su entrenamiento (véase
-\ref{subsec:dataset}). Por tanto, ninguna cabeza ve durante el entrenamiento un
-recorte que aparezca después en su propia evaluación y las cabezas de autoría
-nunca ven grafiti de los autores de la misma ciudad durante el entrenamiento,
-lo que mitiga el sesgo de reidentificación
 
 \subsection{Entorno de ejecución}
 \label{subsec:entorno}
@@ -396,16 +349,4 @@ con \texttt{uv}, con las siguientes dependencias principales:
     \item SQLAlchemy 2.0.49
     \item pgvector 0.4.2
 \end{itemize}
-
-Se intenta siempre ejecutar cada configuración de manera aislada, limpiando el
-almacenamiento entre pases para evitar que la caché de resultados contamine las
-métricas de tiempo. En las configuraciones que comparten tanto almacenamiento
-como modelo de extracción de características y límite de ingesta, se reutiliza
-el almacenamiento sin limpiarlo, extrayendo los tiempos de ingesta del primer
-pase y así evitar repetir todo el proceso de extracción de características, que
-acostumbra a ser de los más costosos.
-
-También se procura ejecutar los experimentos con un sistema tranquilo, sin
-otros procesos de fondo que puedan interferir con las mediciones, y se fijan
-las semillas aleatorias para garantizar la reproducibilidad de los resultados.
 
