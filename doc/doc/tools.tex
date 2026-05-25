@@ -215,8 +215,11 @@ Se han integrado siete familias de modelos de extracción de características,
 cubriendo redes convolucionales clásicas, modelos de fundación basados en
 \textit{transformers} y detectores específicos reutilizados como extractores.
 Todos los modelos se utilizan congelados, sin reentrenar sus pesos: la salida
-de la última capa intermedia (eliminando la cabeza de clasificación cuando
-procede) constituye el \textit{embedding} de la imagen. La
+de la última capa intermedia constituye el \textit{embedding} de la imagen. En
+las redes convolucionales de \textit{torchvision} (ResNet50, VGG16, InceptionV3
+y MobileNetV3) esto implica sustituir la cabeza de clasificación por una
+identidad; DINOv2, CLIP y YOLO se consultan directamente a través de su propia
+API de extracción de características, sin retirar capa alguna. La
 tabla~\ref{tab:embedding-models} resume las opciones disponibles, indicando
 arquitectura, dimensionalidad de salida y preentrenamiento.
 

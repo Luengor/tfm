@@ -81,14 +81,22 @@ class Configuration:
 
         # Cluster the images
         cluster_index = self.clustering.cluster(clustering_images, **kwargs)
-        n_clusters = max(cluster_index) + 1 if cluster_index else 0
+        non_noise = [c for c in cluster_index if c != -1]
+        n_clusters = max(non_noise) + 1 if non_noise else 0
 
         clusters = [[] for _ in range(n_clusters)]
+        # Noise points (-1) are collected into a single trailing cluster rather
+        # than one singleton each, matching how the benchmark runner and the
+        # extrinsic metrics treat noise (see methods.tex).
+        noise: list[ImageData] = []
         for i, cluster in enumerate(cluster_index):
             if cluster == -1:
-                clusters.append([images[i]])
+                noise.append(images[i])
             else:
                 clusters[cluster].append(images[i])
+
+        if noise:
+            clusters.append(noise)
 
         return clusters
 

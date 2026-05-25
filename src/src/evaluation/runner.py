@@ -381,6 +381,11 @@ def _run_single(
                 reduction_samples.append(red_stage.metrics)
 
                 cluster_kwargs = dict(run_spec.clustering.params)
+                # random_state is passed uniformly through the shared
+                # ClusteringBase.cluster(**kwargs) interface. Stochastic
+                # clusterers (KMeans, GMM, spectral, affinity propagation) use
+                # it; deterministic ones (DBSCAN, OPTICS, HDBSCAN, agglomerative)
+                # silently ignore the unknown kwarg.
                 cluster_kwargs["random_state"] = seed_i
                 with profile_stage() as clu_stage:
                     labels = config.clustering.cluster(clustering_images, **cluster_kwargs)

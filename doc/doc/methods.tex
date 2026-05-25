@@ -57,7 +57,10 @@ sobre el conjunto reducido, produciendo una etiqueta de clúster por cada
 vector. A partir de esta información se calculan las métricas de calidad
 intrínsecas y extrínsecas, y se conserva el mapeo entre identificadores de
 clúster y listas de recortes para la generación de visualizaciones
-interactivas.
+interactivas. Esta secuencia describe el flujo lógico; el \textit{runner} de
+evaluación lo reproduce con su propio bucle interno (en lugar de invocar el
+método de agrupamiento de alto nivel) para poder cronometrar por separado las
+etapas de reducción y agrupamiento y repetirlas $K$ veces.
 
 \subsection{Procedimiento experimental}
 \label{subsec:experimental}
@@ -106,12 +109,13 @@ límite, el generador de configuraciones asigna a estas configuraciones el mismo
 \texttt{db\_path} y fija el parámetro \texttt{clear\_storage: false}, de modo
 que la segunda y sucesivas configuraciones encuentran los \textit{embeddings}
 ya calculados y pueden saltarse directamente a las etapas de reducción y
-agrupamiento. Para que esta optimización no contamine las métricas, la primera
-configuración del grupo persiste sus tiempos de ingesta en la tabla
-\texttt{metadata} del almacenamiento; las configuraciones que reutilizan el
-almacenamiento leen esos tiempos y los reportan en lugar del coste despreciable
-del paso por caché. De este modo, los resultados publicados reflejan en todo
-momento el coste real de la etapa.
+agrupamiento. Para que esta optimización no contamine las métricas, los tiempos
+de ingesta se persisten en la tabla \texttt{metadata} del almacenamiento. En
+ejecuciones posteriores se aplica una heurística: si el tiempo de ingesta
+medido es inferior a la mitad del almacenado (señal inequívoca de un paso por
+caché), se descarta y se reporta el valor persistido; en caso contrario se
+considera una ingesta real y se conserva. De este modo, los resultados
+publicados reflejan en todo momento el coste real de la etapa.
 
 \subsubsection{Instrumentación y cronometría}
 \label{subsubsec:cronometria}
@@ -131,7 +135,10 @@ Para acotar la variabilidad entre ejecuciones, las etapas de reducción y
 agrupamiento se repiten $K$ veces de manera consecutiva dentro del mismo
 proceso, empleando las semillas $0, 1, \ldots, K-1$ tanto para la reducción
 estocástica (UMAP) como para los agrupamientos estocásticos (K-Means, GMM,
-\textit{spectral clustering} y \textit{affinity propagation}). Cuando
+\textit{spectral clustering} y \textit{affinity propagation}). La semilla se
+transmite de manera uniforme a través de la interfaz común de agrupamiento; los
+algoritmos deterministas (DBSCAN, OPTICS, HDBSCAN y aglomerativo) la ignoran.
+Cuando
 $K \geq 2$, la primera repetición ($i=0$) se descarta porque absorbe los
 efectos de inicialización (compilación \textit{just-in-time} de operadores
 y poblamiento de cachés del sistema operativo); de las $K-1$ repeticiones
@@ -168,8 +175,10 @@ información (BIC); este criterio penaliza de manera explícita la complejidad
 del modelo, lo que mitiga la tendencia del ajuste por máxima verosimilitud a
 favorecer el mayor número de componentes. Para DBSCAN se estima el radio
 $\epsilon$ a partir de la curva de $k$-distancias: para cada punto se calcula
-la distancia al $k$-ésimo vecino con $k = \texttt{min\_samples}$, las
-distancias se ordenan de menor a mayor y se aplica el mismo criterio de codo
+la distancia a su $(\texttt{min\_samples}-1)$-ésimo vecino más próximo
+(excluyendo el propio punto, que sklearn devuelve como vecino más cercano de
+sí mismo), las distancias se ordenan de menor a mayor y se aplica el mismo
+criterio de codo
 que en K-Means para seleccionar el valor de $\epsilon$ a partir del cual la
 densidad cae abruptamente. En los tres casos, las semillas aleatorias se fijan
 para que el resultado sea reproducible.
@@ -344,8 +353,8 @@ rate} $10^{-4}$, tamaño de \textit{batch} $8$ y un máximo de $20$ épocas. Los
 tripletes se forman dentro de cada \textit{batch} a partir de las anotaciones
 de autoría, eligiendo como ancla un recorte cualquiera, como positivo otro
 recorte con el mismo identificador de autor y como negativo un recorte con
-identificador distinto, con la estrategia de muestreo basada en distancia ya
-referida.
+identificador distinto, con la estrategia de muestreo de negativos difíciles
+ya referida.
 
 Las cabezas de estilo se entrenan con la pérdida y temperatura indicadas en
 \ref{subsubsec:cabezas} ($T = 0.07$), optimizador Adam con \textit{learning
@@ -353,7 +362,9 @@ rate} $10^{-4}$ y un \textit{scheduler} cosenoidal a lo largo de $60$ épocas.
 Para que cada \textit{batch} contenga al menos un par positivo por ancla, se
 utiliza un muestreador balanceado que toma $4$ recortes por clase y construye
 entre $10$ y $30$ \textit{batches} por época en función del tamaño efectivo del
-conjunto. Se aplica parada temprana con paciencia de $15$ épocas sobre la
+conjunto. El muestreo se realiza con reemplazo, de modo que las clases con
+menos de $4$ recortes repiten ejemplos dentro del \textit{batch} hasta
+completar la cuota. Se aplica parada temprana con paciencia de $15$ épocas sobre la
 pérdida en validación. En ambos casos, la cabeza final seleccionada para los
 \textit{benchmarks} es la que minimiza la pérdida sobre la partición de
 validación.

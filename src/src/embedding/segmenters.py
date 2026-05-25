@@ -103,6 +103,9 @@ class YoloSegmenter(SegmenterBase):
         return (intersection_area / area1 > self.merge_threshold) or (intersection_area / area2 > self.merge_threshold)
 
 class IdentitySegmenter(SegmenterBase):
+    # `padding` is accepted and exposed only to satisfy the abstract
+    # SegmenterBase.padding contract shared with YoloSegmenter; it has no effect
+    # here since segment() always returns the full-image box.
     def __init__(self, padding: float = 0.0):
         self._padding = padding
 
