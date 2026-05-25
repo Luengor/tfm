@@ -201,94 +201,39 @@ conveniencia de una evaluación empírica comparativa.
 % ---------------------------------------------------------------------
 \subsection{Coste computacional y evaluación empírica}
 \label{subsec:art-cost}
-% TODO: Simplificar esta sección, que es un poco densa
 
-La segunda mitad del título de este trabajo, el coste computacional, está
-presente en todas las etapas del \textit{pipeline} y comienza en la propia
-generación de los \textit{embeddings}. El coste de ingesta es lineal en el
-número de imágenes, pero el factor por imagen varía en órdenes de magnitud
-según el extractor: una red ligera y una arquitectura pesada como ResNet o ViT
-difieren tanto en operaciones en coma flotante (FLOPs) como en rendimiento
-(\textit{throughput}) efectivo. Este eje de eficiencia ha guiado el diseño de
-familias como MobileNet, cuya tercera generación~\cite{howard_searching_2019}
-se construye mediante búsqueda de arquitecturas consciente del hardware
-(\textit{hardware-aware NAS}) que optimiza explícitamente la latencia medida
-sobre el dispositivo, en lugar de un proxy como el número de parámetros. Para
-un sistema que debe procesar bancos de imágenes crecientes, la elección del
-extractor fija el coste dominante de la fase de ingesta, lo que convierte el
-compromiso entre calidad de la representación y coste de cómputo en una
-variable de diseño de primer orden y no en un detalle de implementación.
+La eficiencia computacional se ha consolidado como un criterio de diseño de
+primer orden en visión por computador, y no como una preocupación secundaria.
+Buena parte de la investigación reciente en extractores de características
+persigue de forma explícita el compromiso entre la calidad de la representación
+y el coste de cómputo: arquitecturas como
+MobileNetV3~\cite{howard_searching_2019}, cuya topología se obtiene mediante
+búsqueda consciente del hardware que optimiza la latencia medida sobre el propio
+dispositivo, ilustran este giro frente a redes más pesadas como ResNet o ViT. En
+un sistema que debe procesar bancos de imágenes crecientes, esta elección
+determina el coste dominante de la fase de ingesta.
 
-Una vez generadas las representaciones, el coste se traslada al agrupamiento,
-donde la complejidad asintótica respecto al tamaño del banco $n$ separa con
-claridad a las familias de algoritmos. K-Means clásico tiene un coste por
-iteración $O(nks)$, con $k$ centroides y $s$ características no nulas por
-punto; la variante \textit{mini-batch} de Sculley~\cite{sculley_web-scale_2010}
-lo reduce a $O(bks)$ con lotes de tamaño $b \ll n$, recuperando soluciones
-cercanas al óptimo varios órdenes de magnitud más rápido. Los métodos basados
-en densidad son más sensibles a la escala: OPTICS~\cite{ankerst_optics_1999}
-tiene un coste aproximadamente 1,6 veces el de DBSCAN, que pasa de $O(n \log
-n)$ con un índice espacial a $O(n^2)$ sin él, y
-HDBSCAN~\cite{campello_density-based_2013} construye su jerarquía sobre el
-grafo de alcanzabilidad mutua en $O(dn^2)$. Estas cotas, cuadráticas en el peor
-caso, anticipan que el agrupamiento es uno de los puntos donde el coste crece
-de forma superlineal con el banco, justo el comportamiento que el enunciado
-pide caracterizar de forma experimental.
+En la etapa de agrupamiento, la literatura ha caracterizado cómo el coste crece
+con el tamaño del conjunto de datos. K-Means cuenta con variantes escalables
+como la \textit{mini-batch}~\cite{sculley_web-scale_2010}, mientras que los
+métodos basados en densidad —OPTICS~\cite{ankerst_optics_1999},
+HDBSCAN~\cite{campello_density-based_2013}— presentan un crecimiento superlineal
+con el tamaño del banco, agravado por la concentración de distancias propia de
+los espacios de alta dimensión~\cite{aggarwal_k-anonymity_2005}. Para valorar la
+calidad de las agrupaciones, el campo dispone además de un repertorio
+consolidado de métricas, internas cuando no se dispone de etiquetas y externas
+cuando se cuenta con una verdad de referencia~\cite{rousseeuw_silhouettes_1987,
+calinski_dendrite_1974, davies_cluster_1979, hubert_comparing_1985,
+strehl_cluster_2002, van_rijsbergen_c_j_information_1979}, cuyas definiciones se
+detallan en el marco conceptual (sección~\ref{subsubsec:metricas}).
 
-A este coste se superpone la dimensión de los \textit{embeddings}, que entra
-por partida doble. Por un lado, el cómputo de cada distancia escala con la
-dimensión, encareciendo tanto el agrupamiento como la búsqueda por similitud
-tratada en su apartado correspondiente. Por otro, y de forma más sutil, en
-dimensiones altas las distancias euclídeas pierden poder discriminativo:
-Aggarwal~\cite{aggarwal_k-anonymity_2005} formaliza este fenómeno de
-concentración de distancias, según el cual la distancia al punto más cercano y
-la del más lejano tienden a igualarse a medida que la dimensión crece, lo que
-vacía de contenido la noción de vecindad sobre la que se apoyan los métodos
-basados en distancia y densidad. Esto explica por qué la reducción de
-dimensionalidad previa al agrupamiento no es solo una optimización de coste,
-sino una condición para que tanto las métricas de distancia como los algoritmos
-que las emplean sigan siendo informativos, una consideración que reaparece al
-evaluar la calidad del agrupamiento.
-
-La caracterización del desempeño exige, además del coste, una medida de la
-calidad de las agrupaciones obtenidas. Cuando no se dispone de etiquetas, la
-evaluación recae en métricas internas, que valoran la cohesión y la separación
-de los clústeres a partir únicamente de la geometría de los datos. Las tres de
-referencia son el coeficiente de silueta~\cite{rousseeuw_silhouettes_1987}, que
-contrasta para cada punto la distancia media a su propio clúster con la
-distancia al clúster vecino más próximo; el índice de
-Calinski-Harabász~\cite{calinski_dendrite_1974}, que mide la razón entre la
-dispersión inter e intra-clúster; y el índice de
-Davies-Bouldin~\cite{davies_cluster_1979}, que promedia la similitud de cada
-clúster con su competidor más cercano y que, a diferencia de los dos
-anteriores, se minimiza. Las tres comparten un sesgo hacia los clústeres
-compactos y convexos, por lo que tienden a penalizar las formas irregulares que
-recuperan los métodos basados en densidad, un desacuerdo que resulta en sí
-mismo diagnóstico de la geometría del espacio de representación.
-
-Cuando se cuenta con un subconjunto etiquetado —como el que contempla el
-enunciado para la evaluación supervisada— a las métricas internas se añaden
-métricas externas, que comparan el agrupamiento con la verdad de referencia. El
-índice de Rand ajustado (ARI)\cite{hubert_comparing_1985} corrige por azar el
-recuento de pares de elementos tratados de forma consistente por ambas
-particiones; la información mutua normalizada (NMI)\cite{strehl_cluster_2002}
-mide, desde la teoría de la información, cuánto comparten ambas asignaciones; y
-el F1 por pares~\cite{van_rijsbergen_c_j_information_1979} descompone el
-acuerdo en precisión y exhaustividad, revelando si una configuración yerra por
-sobre-fusionar o por sobre-segmentar. Ninguna de las tres exige que el número
-de clústeres predichos coincida con el de clases reales, propiedad
-imprescindible cuando la selección automática del número de grupos produce
-particiones de tamaño dispar.
-
-La ausencia de una combinación universalmente superior, junto con la evidencia
-de que el rendimiento de estos algoritmos depende fuertemente del conjunto de
-datos~\cite{franti_k-means_2018, ahmed_k-means_2020}, hace que ni el coste ni
-la calidad de un \textit{pipeline} concreto puedan anticiparse sin medirlos. El
-presente trabajo asume esta premisa y la lleva al terreno experimental: evalúa
-de forma sistemática, y sobre un mismo banco de imágenes de grafiti, la calidad
-de cada combinación de extractor, reducción y agrupamiento mediante las
-métricas anteriores, y caracteriza su coste computacional en función del tamaño
-del banco, que es el eje experimental explícito del enunciado.
+Pese a la madurez de estos componentes, no se han localizado trabajos que
+evalúen de forma sistemática qué combinación de extractor, reducción y
+agrupamiento se comporta mejor sobre imágenes de grafiti, ni que caractericen su
+coste en función del tamaño del banco —eje explícito del enunciado—, máxime
+cuando el rendimiento de estos algoritmos depende fuertemente del conjunto de
+datos~\cite{franti_k-means_2018, ahmed_k-means_2020}. Esta carencia es la que
+justifica el enfoque comparativo y empírico que vertebra el presente trabajo.
 
 % ---------------------------------------------------------------------
 \subsection{Aprendizaje profundo de clústeres y posicionamiento de
