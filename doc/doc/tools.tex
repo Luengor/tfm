@@ -249,12 +249,12 @@ recoge las opciones implementadas con sus hiperparámetros clave.
 
 \begin{longtable}{|l|l|c|} \hline
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
-  K-Means\cite{arthur_k-means_nodate} & $n\_clusters$ & sí \\ \hline
+  K-Means\cite{arthur_k-means_2007} & $n\_clusters$ & sí \\ \hline
   DBSCAN\cite{ester_density-based_1996} & $\epsilon$, $min\_samples$ & sí ($\epsilon$) \\ \hline
   HDBSCAN\cite{campello_density-based_2013} & $min\_cluster\_size$, $min\_samples$ & no requiere \\ \hline
   OPTICS\cite{ankerst_optics_1999} & $min\_samples$, $xi$ & no requiere \\ \hline
   Aglomerativo\cite{mullner_modern_2011} & $n\_clusters$, $linkage$ & no \\ \hline
-  Espectral\cite{ng_spectral_nodate,huang_ultra-scalable_2020} & $n\_clusters$, afinidad & no \\ \hline
+  Espectral\cite{ng_spectral_2001,huang_ultra-scalable_2020} & $n\_clusters$, afinidad & no \\ \hline
   GMM\cite{dempster_maximum_1977} & $n\_components$, covarianza & sí \\ \hline
   \textit{Affinity Propagation}\cite{frey_clustering_2007} & $damping$, $preference$ & no requiere \\ \hline
   \caption{Algoritmos de agrupamiento implementados.}

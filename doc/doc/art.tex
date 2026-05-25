@@ -145,7 +145,7 @@ y global del \textit{manifold} subyacente.
 Sobre el espacio reducido convergen las familias clásicas de
 \textit{clustering}. K-Means sigue siendo la opción más extendida por su
 simplicidad, aunque su sensibilidad a la inicialización y a la geometría de los
-datos está bien documentada. Arthur y Vassilvitskii\cite{arthur_k-means_nodate}
+datos está bien documentada. Arthur y Vassilvitskii\cite{arthur_k-means_2007}
 introdujeron la inicialización \textit{k-means++}, con garantías teóricas y
 mejoras consistentes en calidad y velocidad;
 Sculley\cite{sculley_web-scale_2010} mostró que la variante \textit{mini-batch}
@@ -204,8 +204,9 @@ Una línea más reciente integra la representación y el agrupamiento en un mism
 proceso de entrenamiento. \citea[etali]{Min}{min_survey_2018} ofrecen una
 revisión exhaustiva de estas propuestas de \textit{deep clustering} por
 arquitectura subyacente. Entre las más relevantes se encuentran
-DeepCluster\cite{tian_deepcluster_2017}, que combina redes profundas con
-K-Means o mezclas gaussianas, o SCAN\cite{van_gansbeke_scan_2020}, que disocia
+DeepCluster\cite{caron_deep_2019}, que reagrupa iterativamente las
+características de la red con K-Means y emplea las asignaciones resultantes como
+pseudo-etiquetas para reentrenarla, o SCAN\cite{van_gansbeke_scan_2020}, que disocia
 el aprendizaje de características auto-supervisado de la asignación de
 clústeres con resultados muy superiores en conjuntos de evaluación estándar.
 
