@@ -84,21 +84,46 @@ existen sets etiquetados de similitud y donde los detectores específicos de
 propósito general, como las familias YOLO\cite{noauthor_ultralytics_2024},
 ofrecen además sus propios mapas de características como vectores de partida.
 
-% % ---------------------------------------------------------------------
-% \subsection{Identificación de autoría a partir de firmas y escritura}
-% \label{subsec:art-author-id}
-% 
-% % Conectar el problema con la literatura forense de writer identification /
-% % signature verification, que es el análogo más directo a la identificación
-% % de grafiteros a partir de sus firmas (tag) tal y como plantea el enunciado.
-% % Aplicación natural de los embeddings de la sección anterior al dominio
-% % específico de la autoría.
-% % Referencias a incorporar:
-% %   - Writer identification offline (Bulacu & Schomaker, Fiel & Sablatnig).
-% %   - Signature verification basada en redes siamesas / triplet loss.
-% %   - Paralelismo con reconocimiento facial (FaceNet) como problema de
-% %     aprendizaje métrico abierto: número de clases desconocido a priori,
-% %     pocas muestras por clase, evaluación por verificación/recuperación.
+% ---------------------------------------------------------------------
+\subsection{Identificación de autoría a partir de firmas y escritura}
+\label{subsec:art-author-id}
+
+La identificación de los grafiteros a partir de las fotografías de sus firmas
+(\textit{tags}), planteada por el enunciado como herramienta para combatir el
+grafiti vandálico, encuentra su análogo más directo en la literatura forense de
+identificación de la escritura (\textit{writer identification}) y de
+verificación de firmas manuscritas. En ambos casos el objetivo es recuperar la
+identidad de un productor a partir de los patrones motores difíciles de
+falsificar que quedan impresos en sus marcas. Este es un problema que Schomaker
+define formalmente como uno de biometría~\cite{schomaker_writer_2008},
+distinguiendo dos tareas que se transladan de manera muy directa al grafiti: la
+identificación, que busca al autor de una muestra entre un conjunto de
+escritores conocidos, y la verificación, que decide si dos muestras proceden de
+la misma mano.
+
+Fiel y Sablatnig~\cite{fiel_writer_2015} abordan la identificación y
+recuperación de escritura entrenando una red convolucional como clasificador
+sobre un conjunto de escritores conocidos para, una vez entrenada, descartar la
+capa de clasificación y utilizar las activaciones de la penúltima capa como
+vector de características. Estos vectores de características se almacenan y la
+consulta se resuelve por vecindad más cercana sobre los vectores guardados.
+Este patrón de <<codificar una vez y recuperar por similitud>> es precisamente
+el que aplica este trabajo, trasladando los descriptores profundos descritos en
+la sección anterior al dominio específico de la autoría.
+
+La identificación de autoría comparte estructura con el reconocimiento facial
+moderno, del que FaceNet~\cite{schroff_facenet_2015} es el más representativo.
+Se trata de un problema de aprendizaje métrico de conjunto abierto, en el que
+el número de identidades no se conoce \textit{a priori}, las muestras por clase
+son escasas y la evaluación se realiza por verificación o recuperación antes
+que por clasificación directa. Esta caracterización justifica el recurso a
+cabezas de proyección entrenadas con aprendizaje métrico para inducir un
+espacio en el que las pintadas de un mismo autor queden próximas, en lugar de
+un clasificador cerrado sobre un catálogo fijo de grafiteros. Este enfoque se
+adapta mejor al caso particular de este trabajo, puesto que resulta más
+sencillo el etiquetado de un subconjunto reducido de imágenes con un par de
+entradas por autor que la construcción de un catálogo exhaustivo de grafiteros
+necesariamente cerrado.
 
 % ---------------------------------------------------------------------
 \subsection{Búsqueda por similitud e indexación en bancos de imágenes}
@@ -213,7 +238,7 @@ clústeres con resultados muy superiores en conjuntos de evaluación estándar.
 Estas aproximaciones, sin embargo, presuponen volúmenes de datos y acceso a
 cómputo de los que no se dispone en el escenario de este trabajo, y resultan
 más difíciles de interpretar y de operar. Por ese motivo, el presente trabajo
-se sitúa deliberadamente en el enfoque \emph{desacoplado}: aprovechar las
+se sitúa deliberadamente en el enfoque desacoplado: aprovechar las
 representaciones ya disponibles en modelos preentrenados, posiblemente
 ajustadas con una cabeza ligera específica de dominio, y combinarlas con
 algoritmos de \textit{clustering} maduros y bien comprendidos. La contribución
