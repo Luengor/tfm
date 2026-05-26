@@ -19,8 +19,6 @@
     {"type": "pca", "params": {"n_components": 50}},
     {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
     {"type": "umap", "params": {"n_components": 50, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
-    {"type": "isomap", "params": {"n_components": 10, "n_neighbors": 10}},
-    {"type": "kernel_pca", "params": {"n_components": 50, "kernel": "rbf"}},
-    {"type": "kernel_pca", "params": {"n_components": 50, "kernel": "cosine"}}
+    {"type": "isomap", "params": {"n_components": 10, "n_neighbors": 10}}
   ]
 }
