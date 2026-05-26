@@ -125,7 +125,7 @@ def calculate_extrinsic_metrics(
         return ExtrinsicMetrics(ari=None, nmi=None, pairwise_f1=None, n_matched=n)
 
     def _scores(lt: np.ndarray, lp: np.ndarray) -> tuple[float | None, float | None, float | None]:
-        if len(lp) < 2 or len(np.unique(lt)) < 2:
+        if len(lp) < 2 or len(np.unique(lt)) < 2 or len(np.unique(lp)) < 2:
             return None, None, None
         _ari = float(adjusted_rand_score(lt, lp))
         _nmi = float(normalized_mutual_info_score(lt, lp))
