@@ -192,7 +192,7 @@ class ClipEmbeddingModel(EmbeddingBase):
             input_tensor = self.preprocessor(image).unsqueeze(0).to(self.device)
             output = self.model.encode_image(input_tensor)
             # Normalize to unit length (standard for CLIP)
-            output /= output.norm(dim=-1, keepdim=True)
+            output = torch.nn.functional.normalize(output, p=2, dim=-1)
         return output.squeeze().cpu().tolist()
 
     @property
