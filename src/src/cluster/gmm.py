@@ -38,7 +38,13 @@ class GMMClusterer(ClusteringBase):
             if max_k < 2:
                 n_components = 1
             else:
-                ks = range(1, max_k + 1)
+                # Start at k=2 (not 1): with a single component every point gets
+                # the same label, which collapses the clustering to one cluster
+                # and leaves silhouette / Calinski-Harabasz / Davies-Bouldin
+                # undefined (they require >1 cluster). BIC's complexity penalty
+                # otherwise favours k=1 on high-dim embeddings, so the run would
+                # report no intrinsic metrics. Mirrors KMeans' elbow search.
+                ks = range(2, max_k + 1)
                 bics = [
                     GaussianMixture(n_components=k, covariance_type=covariance_type, random_state=random_state).fit(embeddings).bic(embeddings)
                     for k in ks

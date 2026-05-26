@@ -374,10 +374,14 @@ def _run_single(
 
                 with profile_stage() as red_stage:
                     reduced_embeddings = reduction.reduce(embeddings)
-                    clustering_images = [
-                        ImageData(filename=img.filename, embedding=emb)
-                        for img, emb in zip(all_images, reduced_embeddings)
-                    ]
+                # Building the ImageData list is O(n) Python object construction,
+                # not reduction work — kept outside the timed block so it does not
+                # inflate reduction cost (it would otherwise dominate the timing of
+                # Identity reduction and add a spurious linear term to complexity fits).
+                clustering_images = [
+                    ImageData(filename=img.filename, embedding=emb)
+                    for img, emb in zip(all_images, reduced_embeddings)
+                ]
                 reduction_samples.append(red_stage.metrics)
 
                 cluster_kwargs = dict(run_spec.clustering.params)

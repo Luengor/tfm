@@ -25,7 +25,25 @@ def calculate_clustering_metrics(embeddings: np.ndarray, labels: np.ndarray) -> 
     - Davies-Bouldin Index (Cluster Similarity)
     - Noise Ratio (Percentage of unclustered points)
     - Cluster Size CV (Coefficient of Variation, measure of balance)
+
+    Embeddings are L2-normalized before the distance-based metrics
+    (silhouette / Calinski-Harabasz / Davies-Bouldin) are computed. Some
+    embedding models L2-normalize their output (CLIP, the graffiti heads,
+    mobilenet_v3_normalized) and some do not (ResNet50, VGG16, InceptionV3,
+    plain MobileNetV3/DINOv2, YOLO); without normalization the Euclidean
+    distances these metrics use live on per-model magnitude scales, so the
+    scores are not comparable across embedding families. On unit vectors
+    Euclidean distance is a monotone function of cosine distance, which is the
+    geometry used everywhere else in the project (similarity search defaults to
+    cos_distance=True). Calinski-Harabasz and Davies-Bouldin have no cosine
+    option, so normalizing the inputs is the only way to make all three
+    consistent. Normalization rescales but does not reduce dimensionality — the
+    metrics are still computed on the original (unreduced) representation.
     """
+    embeddings = np.asarray(embeddings, dtype=np.float64)
+    norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+    embeddings = embeddings / np.clip(norms, 1e-12, None)
+
     unique_labels = np.unique(labels)
     n_clusters = len(unique_labels[unique_labels != -1])
     n_samples = len(embeddings)
