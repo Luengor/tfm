@@ -16,14 +16,19 @@ def get_storage_key(run_config):
     storage_type = str(storage.get("type", "")).lower()
     storage_params = dict(storage.get("params", {}))
 
-    # We ignore db_path / db_url database name so runs that COULD share a database are grouped
-    if "db_path" in storage_params:
-        del storage_params["db_path"]
+    # Include db_path in the hash if explicitly set so that configs with distinct
+    # explicit paths (e.g. 08a vs 08b) never share a database.  Strip it when
+    # absent so auto-assigned paths don't fragment groups unnecessarily.
+    if not storage_params.get("db_path"):
+        storage_params.pop("db_path", None)
 
-    # For PostgreSQL, strip the database name from db_url (only the host/user/port matter)
+    # For PostgreSQL, include the database name only if explicitly set; strip it
+    # otherwise so runs that COULD share a server are grouped by host/port/user.
     if storage_type in {"postgres", "postgresql"} and "db_url" in storage_params:
         parsed = urlparse(storage_params["db_url"])
-        storage_params["db_url"] = urlunparse(parsed._replace(path="/"))
+        if parsed.path in ("", "/"):
+            storage_params["db_url"] = urlunparse(parsed._replace(path="/"))
+        # else: keep the full URL including the database name
 
     # Normalize segmenter so absent and explicit-identity hash equally.
     segmenter_norm = {
