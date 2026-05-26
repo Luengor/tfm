@@ -1,5 +1,6 @@
 {
   "repeats": 3,
+  "similarity_search": {"enabled": true, "top_k": 5, "sample_seed": 42},
   "storage": [
     {"type": "sqlite", "params": {"db_path": "{output_dir}/db/08a_style_{run_id}.sqlite"}}
   ],
