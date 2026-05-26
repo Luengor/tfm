@@ -43,7 +43,13 @@ class DBSCANClusterer(ClusteringBase):
             distances, _ = nbrs.kneighbors(embeddings)
 
             k_distances = np.sort(distances[:, min_samples - 1])
-            eps = float(k_distances[find_elbow(k_distances)])
+            elbow_idx = find_elbow(k_distances)
+            # flat curve (uniform distances) → elbow returns 0 (minimum) which is
+            # too tight and causes all-noise. fall back to 90th percentile.
+            if elbow_idx == 0:
+                eps = float(np.percentile(k_distances, 90))
+            else:
+                eps = float(k_distances[elbow_idx])
 
         dbscan = DBSCAN(eps=eps, min_samples=min_samples).fit(embeddings)
         return list(dbscan.labels_.tolist())  # type: ignore
