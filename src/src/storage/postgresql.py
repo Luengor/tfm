@@ -52,6 +52,12 @@ class PostgreSQLStorage(StorageBase):
         self._hnsw_cfg = self._normalize_hnsw(hnsw)
         self._hnsw_index_created = False
 
+    @property
+    def ann_index_active(self) -> bool:
+        """True once an HNSW index has been built, so similarity queries are
+        approximate and recall@k vs exact kNN is worth measuring."""
+        return self._hnsw_index_created
+
     @staticmethod
     def _normalize_hnsw(hnsw: bool | dict | None) -> dict | None:
         if not hnsw:

@@ -248,6 +248,14 @@ class ExtrinsicMetrics:
     ari: float | None
     nmi: float | None
     pairwise_f1: float | None
+    # Noise-excluded variant: same scores after dropping points the clusterer
+    # labelled -1, so density methods (DBSCAN/HDBSCAN/OPTICS) are comparable to
+    # partitional ones on the points each method actually clustered. The main
+    # fields above keep the noise-as-class reading.
+    ari_no_noise: float | None = None
+    nmi_no_noise: float | None = None
+    pairwise_f1_no_noise: float | None = None
+    n_no_noise: int = 0
     n_matched: int = 0
     n_classes: int = 0
     coverage: float | None = None
@@ -257,6 +265,10 @@ class ExtrinsicMetrics:
             f"{prefix}_ari": self.ari,
             f"{prefix}_nmi": self.nmi,
             f"{prefix}_pairwise_f1": self.pairwise_f1,
+            f"{prefix}_ari_no_noise": self.ari_no_noise,
+            f"{prefix}_nmi_no_noise": self.nmi_no_noise,
+            f"{prefix}_pairwise_f1_no_noise": self.pairwise_f1_no_noise,
+            f"{prefix}_n_no_noise": self.n_no_noise,
             f"{prefix}_n_matched": self.n_matched,
             f"{prefix}_n_classes": self.n_classes,
             f"{prefix}_coverage": self.coverage,
@@ -278,6 +290,13 @@ class ExtrinsicMetricsAgg:
     nmi_std: float | None
     pairwise_f1: float | None
     pairwise_f1_std: float | None
+    ari_no_noise: float | None
+    ari_no_noise_std: float | None
+    nmi_no_noise: float | None
+    nmi_no_noise_std: float | None
+    pairwise_f1_no_noise: float | None
+    pairwise_f1_no_noise_std: float | None
+    n_no_noise: int
     n_matched: int
     n_classes: int
     coverage: float | None
@@ -302,6 +321,9 @@ class ExtrinsicMetricsAgg:
         aris = [s.ari for s in samples]
         nmis = [s.nmi for s in samples]
         f1s = [s.pairwise_f1 for s in samples]
+        aris_nn = [s.ari_no_noise for s in samples]
+        nmis_nn = [s.nmi_no_noise for s in samples]
+        f1s_nn = [s.pairwise_f1_no_noise for s in samples]
         last = samples[-1]
 
         return cls(
@@ -311,6 +333,13 @@ class ExtrinsicMetricsAgg:
             nmi_std=_opt_std(nmis),
             pairwise_f1=_opt_mean(f1s),
             pairwise_f1_std=_opt_std(f1s),
+            ari_no_noise=_opt_mean(aris_nn),
+            ari_no_noise_std=_opt_std(aris_nn),
+            nmi_no_noise=_opt_mean(nmis_nn),
+            nmi_no_noise_std=_opt_std(nmis_nn),
+            pairwise_f1_no_noise=_opt_mean(f1s_nn),
+            pairwise_f1_no_noise_std=_opt_std(f1s_nn),
+            n_no_noise=last.n_no_noise,
             n_matched=last.n_matched,
             n_classes=last.n_classes,
             coverage=last.coverage,
@@ -325,6 +354,13 @@ class ExtrinsicMetricsAgg:
             f"{prefix}_nmi_std": self.nmi_std,
             f"{prefix}_pairwise_f1": self.pairwise_f1,
             f"{prefix}_pairwise_f1_std": self.pairwise_f1_std,
+            f"{prefix}_ari_no_noise": self.ari_no_noise,
+            f"{prefix}_ari_no_noise_std": self.ari_no_noise_std,
+            f"{prefix}_nmi_no_noise": self.nmi_no_noise,
+            f"{prefix}_nmi_no_noise_std": self.nmi_no_noise_std,
+            f"{prefix}_pairwise_f1_no_noise": self.pairwise_f1_no_noise,
+            f"{prefix}_pairwise_f1_no_noise_std": self.pairwise_f1_no_noise_std,
+            f"{prefix}_n_no_noise": self.n_no_noise,
             f"{prefix}_n_matched": self.n_matched,
             f"{prefix}_n_classes": self.n_classes,
             f"{prefix}_coverage": self.coverage,
@@ -375,6 +411,10 @@ class BenchmarkResult:
     reduction: StageMetricsAgg | None = None
     similarity_search: StageMetrics | None = None
     avg_neighbor_distance: float | None = None
+    # Recall@k of the storage's similarity search vs an exact brute-force kNN on
+    # the same queries. 1.0 for exact backends; <1.0 quantifies the ANN (HNSW)
+    # approximation, giving the accuracy axis of the speed-vs-accuracy trade-off.
+    ann_recall_at_k: float | None = None
     similarity_extrinsic: SimilaritySearchExtrinsicMetrics | None = None
     similarity_extrinsic_author: SimilaritySearchExtrinsicMetrics | None = None
     clustering: StageMetricsAgg | None = None
@@ -399,6 +439,7 @@ class BenchmarkResult:
             "segmenter_type": self.segmenter_type,
             "reduction_type": self.reduction_type,
             "avg_neighbor_distance": self.avg_neighbor_distance,
+            "ann_recall_at_k": self.ann_recall_at_k,
             "clusters_per_repeat": list(self.clusters_per_repeat),
             "error": self.error,
         }

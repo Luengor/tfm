@@ -113,30 +113,47 @@ def calculate_extrinsic_metrics(
     Calculates supervised (extrinsic) clustering metrics against ground-truth labels.
 
     Includes ARI, NMI, and pairwise F1 (precision/recall over same-cluster vs
-    same-class pairs). Noise points (label == -1) are treated as their own cluster.
+    same-class pairs), computed in two readings:
+
+    - main fields: noise points (label == -1) treated as their own cluster.
+    - ``*_no_noise`` fields: points the clusterer labelled -1 are dropped before
+      scoring, so density methods that emit noise are comparable to partitional
+      methods on the points each actually clustered.
     """
     n = len(labels_pred)
     if n == 0 or n != len(labels_true):
         return ExtrinsicMetrics(ari=None, nmi=None, pairwise_f1=None, n_matched=n)
 
-    ari = float(adjusted_rand_score(labels_true, labels_pred))
-    nmi = float(normalized_mutual_info_score(labels_true, labels_pred))
+    def _scores(lt: np.ndarray, lp: np.ndarray) -> tuple[float | None, float | None, float | None]:
+        if len(lp) < 2 or len(np.unique(lt)) < 2:
+            return None, None, None
+        _ari = float(adjusted_rand_score(lt, lp))
+        _nmi = float(normalized_mutual_info_score(lt, lp))
+        pcm = pair_confusion_matrix(lt, lp)
+        fp = float(pcm[0, 1])
+        fn = float(pcm[1, 0])
+        tp = float(pcm[1, 1])
+        if tp + fp == 0 or tp + fn == 0:
+            _f1: float | None = None
+        else:
+            precision = tp / (tp + fp)
+            recall = tp / (tp + fn)
+            _f1 = float(2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0.0
+        return _ari, _nmi, _f1
 
-    pcm = pair_confusion_matrix(labels_true, labels_pred)
-    fp = float(pcm[0, 1])
-    fn = float(pcm[1, 0])
-    tp = float(pcm[1, 1])
-    if tp + fp == 0 or tp + fn == 0:
-        pairwise_f1: float | None = None
-    else:
-        precision = tp / (tp + fp)
-        recall = tp / (tp + fn)
-        pairwise_f1 = float(2 * precision * recall / (precision + recall)) if (precision + recall) > 0 else 0.0
+    ari, nmi, pairwise_f1 = _scores(labels_true, labels_pred)
+
+    keep = labels_pred != -1
+    ari_nn, nmi_nn, f1_nn = _scores(labels_true[keep], labels_pred[keep])
 
     return ExtrinsicMetrics(
         ari=ari,
         nmi=nmi,
         pairwise_f1=pairwise_f1,
+        ari_no_noise=ari_nn,
+        nmi_no_noise=nmi_nn,
+        pairwise_f1_no_noise=f1_nn,
+        n_no_noise=int(keep.sum()),
         n_matched=n,
         n_classes=int(len(np.unique(labels_true))),
     )
@@ -237,3 +254,51 @@ def calculate_similarity_search_extrinsic(
         n_matched=n,
         n_classes=n_classes,
     )
+
+
+def calculate_ann_recall(
+    db_embeddings: np.ndarray,
+    query_indices: list[int],
+    returned_indices: list[list[int]],
+    top_k: int,
+    cos_distance: bool,
+) -> float | None:
+    """Recall@k of an approximate similarity search against the exact kNN.
+
+    ``db_embeddings`` is the full corpus (row i is the embedding stored at index
+    i). ``query_indices[q]`` is the corpus index of query q; ``returned_indices[q]``
+    are the corpus indices the storage returned for that query (self already
+    excluded, truncated to top_k). For each query the exact top-k neighbours are
+    computed by brute force (self excluded) and recall is the fraction of exact
+    neighbours that the storage also returned, averaged over queries.
+
+    Returns 1.0 for an exact backend, <1.0 for an ANN index that misses true
+    neighbours, or None if recall is undefined (no queries / k<1).
+    """
+    n = len(db_embeddings)
+    if n < 2 or top_k < 1 or not query_indices:
+        return None
+
+    emb = np.asarray(db_embeddings, dtype=np.float64)
+    if cos_distance:
+        norms = np.linalg.norm(emb, axis=1, keepdims=True)
+        emb = emb / np.clip(norms, 1e-12, None)
+
+    recalls: list[float] = []
+    for q_idx, returned in zip(query_indices, returned_indices):
+        q = emb[q_idx]
+        if cos_distance:
+            dist = 1.0 - emb @ q
+        else:
+            dist = np.sum((emb - q) ** 2, axis=1)
+        dist[q_idx] = np.inf  # exclude self
+
+        k = min(top_k, n - 1)
+        exact = np.argpartition(dist, kth=k - 1)[:k]
+        exact_set = set(exact.tolist())
+        if not exact_set:
+            continue
+        hit = len(exact_set & set(returned))
+        recalls.append(hit / len(exact_set))
+
+    return float(np.mean(recalls)) if recalls else None

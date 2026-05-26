@@ -27,6 +27,7 @@ from src.embedding.custom import CustomEmbeddingModel
 from src.embedding.embeddings import EmbeddingModelNames, get_model
 from src.embedding.segmenters import YoloSegmenter, IdentitySegmenter
 from src.evaluation.clustering_metrics import (
+    calculate_ann_recall,
     calculate_clustering_metrics,
     calculate_extrinsic_metrics,
     calculate_similarity_search_extrinsic,
@@ -197,6 +198,7 @@ def _run_single(
     query_metrics = None
     similarity_metrics = None
     avg_neighbor_distance = None
+    ann_recall_at_k = None
     similarity_extrinsic = None
     similarity_extrinsic_author = None
     clustering_agg = None
@@ -277,6 +279,22 @@ def _run_single(
             # cost does not pollute the similarity-search stage metrics.
             if hasattr(storage, "ensure_hnsw_index"):
                 storage.ensure_hnsw_index()
+
+            # Index the corpus by a hashable key so the returned (freshly built)
+            # ImageData objects can be mapped back to their corpus position for
+            # the recall@k computation. BoundingBox is an unhashable dataclass,
+            # so flatten its fields into the key tuple.
+            def _img_key(im: ImageData) -> tuple:
+                b = im.bbox
+                if b is None:
+                    return (im.filename, None, None, None, None)
+                return (im.filename, b.x1, b.y1, b.x2, b.y2)
+
+            ann_active = getattr(config.storage, "ann_index_active", False)
+            key_to_idx = {_img_key(im): i for i, im in enumerate(all_images)} if ann_active else {}
+            query_indices: list[int] = []
+            returned_indices: list[list[int]] = []
+
             with profile_stage() as similarity_stage:
                 distances = []
                 search_images = all_images
@@ -302,9 +320,30 @@ def _run_single(
                         )
                         distances.append(d)
 
+                    if ann_active:
+                        q_key = _img_key(img)
+                        if q_key in key_to_idx:
+                            query_indices.append(key_to_idx[q_key])
+                            returned_indices.append(
+                                [key_to_idx[_img_key(n)] for n in neighbors if _img_key(n) in key_to_idx]
+                            )
+
                 if distances:
                     avg_neighbor_distance = float(np.mean(distances))
             similarity_metrics = similarity_stage.metrics
+
+            # Recall@k of the (approximate) index vs exact kNN, computed OUTSIDE
+            # the timed block so the brute-force cost is not charged to the query
+            # stage. Only meaningful when an ANN index is active (exact backends
+            # would trivially score 1.0).
+            if ann_active and query_indices:
+                ann_recall_at_k = calculate_ann_recall(
+                    db_embeddings=np.array([im.embedding for im in all_images]),
+                    query_indices=query_indices,
+                    returned_indices=returned_indices,
+                    top_k=run_spec.similarity_search.top_k,
+                    cos_distance=run_spec.similarity_search.cos_distance,
+                )
 
             segmenter_type_eff = (
                 run_spec.segmenter.type.lower() if run_spec.segmenter else "identity"
@@ -367,6 +406,15 @@ def _run_single(
                 ground_truth_author is not None and segmenter_type_eff == "identity"
             )
 
+            # C-3: keep auto-detected k stable across repeats. When the config
+            # does not pin n_clusters, the first repeat's auto-detected count
+            # (KMeans elbow / GMM BIC) is propagated to every later repeat, so
+            # the aggregated quality/extrinsic mean ± std describes a single k
+            # instead of a mix of partitions with different k. It also avoids
+            # re-running the elbow/BIC search on repeats 1..K-1.
+            n_clusters_pinned = "n_clusters" in run_spec.clustering.params
+            propagated_k: int | None = None
+
             for i in range(K):
                 seed_i = i
                 # Rebuild reduction per repeat so UMAP picks up the new seed.
@@ -391,6 +439,10 @@ def _run_single(
                 # it; deterministic ones (DBSCAN, OPTICS, HDBSCAN, agglomerative)
                 # silently ignore the unknown kwarg.
                 cluster_kwargs["random_state"] = seed_i
+                if not n_clusters_pinned and propagated_k is not None:
+                    # Reuse repeat 0's auto-detected k (KMeans/GMM read this;
+                    # clusterers that don't take n_clusters ignore it).
+                    cluster_kwargs["n_clusters"] = propagated_k
                 with profile_stage() as clu_stage:
                     labels = config.clustering.cluster(clustering_images, **cluster_kwargs)
                 clustering_samples.append(clu_stage.metrics)
@@ -409,11 +461,13 @@ def _run_single(
                     extrinsic_samples_author.append(
                         _compute_extrinsic(all_images, labels_iter, ground_truth_author)
                     )
-                # Track cluster count per repeat so KMeans elbow / GMM BIC
-                # flips between seeds are visible in the output.
-                clusters_per_repeat.append(
-                    int(np.sum(np.unique(labels_iter) >= 0))
-                )
+                # Track cluster count per repeat. With k propagated from repeat
+                # 0 this is constant; it stays in the output as a transparency
+                # check that propagation held.
+                k_this = int(np.sum(np.unique(labels_iter) >= 0))
+                clusters_per_repeat.append(k_this)
+                if not n_clusters_pinned and propagated_k is None and k_this >= 1:
+                    propagated_k = k_this
 
             # Iter 0 drop is delegated to StageMetricsAgg: cost fields drop it
             # (JIT absorption), memory fields keep it (allocator caches make
@@ -501,6 +555,7 @@ def _run_single(
         reduction=reduction_agg,
         similarity_search=similarity_metrics,
         avg_neighbor_distance=avg_neighbor_distance,
+        ann_recall_at_k=ann_recall_at_k,
         similarity_extrinsic=similarity_extrinsic,
         similarity_extrinsic_author=similarity_extrinsic_author,
         clustering=clustering_agg,
