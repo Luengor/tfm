@@ -16,7 +16,7 @@ Examples:
         --input ../dataset/images_5k \\
         --output ../dataset/sample_300 \\
         --num 300 \\
-        --model models/yolo26m.pt
+        --model models/yolo11m.pt
 """
 
 import argparse

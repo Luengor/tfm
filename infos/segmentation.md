@@ -30,7 +30,7 @@ Set `merge_threshold` to `1.0` to disable merging.
 {
   "type": "yolo",
   "params": {
-    "model_path": "models/yolo26s.pt",
+    "model_path": "models/yolo11s.pt",
     "threshold": 0.5,
     "merge_threshold": 0.8,
     "padding": 0.05
