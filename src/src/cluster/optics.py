@@ -12,7 +12,8 @@ Pros:
 
 Cons:
   - Slower than DBSCAN and HDBSCAN on large datasets.
-  - Default cosine metric works well for embeddings but increases computation cost.
+  - Defaults to the Euclidean metric for consistency with the other clusterers;
+    pass metric="cosine" in the config for embedding-friendly geometry.
   - Cluster extraction heuristics can be sensitive to xi / min_samples.
 """
 
@@ -28,7 +29,10 @@ class OPTICSClusterer(ClusteringBase):
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:
         min_samples = kwargs.get("min_samples", 5)
         max_eps = kwargs.get("max_eps", np.inf)
-        metric = kwargs.get("metric", "cosine")
+        # Default Euclidean to match DBSCAN/HDBSCAN/Agglomerative/KMeans so the
+        # clusterer comparison runs on one metric. Override per run via
+        # clustering.params.metric (e.g. "cosine") when desired.
+        metric = kwargs.get("metric", "euclidean")
         embeddings = np.array([img.embedding for img in images])
         optics = OPTICS(min_samples=min_samples, max_eps=max_eps, metric=metric).fit(embeddings)
         return list(optics.labels_.tolist())  # type: ignore
