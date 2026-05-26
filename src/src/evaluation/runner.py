@@ -246,7 +246,6 @@ def _run_single(
                 saved_data = config.save_image(image_path)
                 total_instances += len(saved_data)
         ingest_metrics = ingest_stage.metrics
-        image_count = total_instances
         assert ingest_metrics is not None  # for type checker
 
         # Persist/retrieve ingestion metrics, keyed off the explicit
