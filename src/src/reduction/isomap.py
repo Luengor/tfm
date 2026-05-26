@@ -19,7 +19,7 @@ class IsomapReduction(ReductionBase):
         
         # Isomap requires n_neighbors < n_samples
         actual_neighbors = min(n_samples - 1, self.n_neighbors)
-        if actual_neighbors < 1:
+        if actual_neighbors < self.n_components:
             return data.tolist()
 
         if actual_neighbors != self.isomap.n_neighbors:
