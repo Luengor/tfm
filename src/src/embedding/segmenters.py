@@ -5,6 +5,7 @@ from PIL.Image import Image as PILImage
 class YoloSegmenter(SegmenterBase):
     def __init__(self, model_path: str, threshold: float = 0.5, merge_threshold: float = 0.8, padding: float = 0.0):
         self.model = YOLO(model_path)
+        self.model.eval()
         self.threshold = threshold
         self.merge_threshold = merge_threshold
         self._padding = padding

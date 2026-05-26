@@ -205,6 +205,7 @@ class YoloEmbeddingModel(EmbeddingBase):
         self.device = get_device()
         self.model = YOLO(MODELS[name]['model'])
         self.model.to(self.device)
+        self.model.eval()
 
     def gen_embedding(self, image: ImageImage) -> list[float]:
         return self.model.embed(image)[0].cpu().tolist() # type: ignore
@@ -242,6 +243,8 @@ class HeadEmbeddingModel(EmbeddingBase):
         self.projection_head.to(self.device)
         self.base_model.eval()
         self.projection_head.eval()
+        for param in self.base_model.parameters():
+            param.requires_grad = False
 
     def gen_embedding(self, image: ImageImage) -> list[float]:
         with torch.no_grad():
