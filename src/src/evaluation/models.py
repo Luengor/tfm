@@ -325,6 +325,8 @@ class ExtrinsicMetricsAgg:
         nmis_nn = [s.nmi_no_noise for s in samples]
         f1s_nn = [s.pairwise_f1_no_noise for s in samples]
         last = samples[-1]
+        # n_no_noise varies per repeat for density-based clusterers; report mean
+        n_no_noise_mean = round(_st.fmean(s.n_no_noise for s in samples))
 
         return cls(
             ari=_opt_mean(aris),
@@ -339,7 +341,7 @@ class ExtrinsicMetricsAgg:
             nmi_no_noise_std=_opt_std(nmis_nn),
             pairwise_f1_no_noise=_opt_mean(f1s_nn),
             pairwise_f1_no_noise_std=_opt_std(f1s_nn),
-            n_no_noise=last.n_no_noise,
+            n_no_noise=n_no_noise_mean,
             n_matched=last.n_matched,
             n_classes=last.n_classes,
             coverage=last.coverage,
