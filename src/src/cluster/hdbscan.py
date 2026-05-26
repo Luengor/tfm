@@ -14,7 +14,7 @@ Pros:
 Cons:
   - More memory-intensive than DBSCAN due to the hierarchy construction.
   - Still susceptible to the curse of dimensionality in very high-dimensional spaces.
-  - Non-deterministic cluster boundaries can shift between runs when data changes slightly.
+  - Sensitive to data perturbations: small changes in input can shift cluster boundaries.
 """
 
 from sklearn.cluster import HDBSCAN
