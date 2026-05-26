@@ -85,7 +85,10 @@ class SQLiteStorage(StorageBase):
     @staticmethod
     def distance(emb1: list[float], emb2: list[float], cos_distance: bool) -> float:
         if cos_distance:
-            return 1 - np.dot(emb1, emb2) / (np.linalg.norm(emb1) * np.linalg.norm(emb2))
+            denom = np.linalg.norm(emb1) * np.linalg.norm(emb2)
+            if denom == 0:
+                return 1.0
+            return float(1 - np.clip(np.dot(emb1, emb2) / denom, -1.0, 1.0))
         else:
             # Euclidean distance
             return float(np.linalg.norm(np.array(emb1) - np.array(emb2)))
