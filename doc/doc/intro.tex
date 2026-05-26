@@ -10,14 +10,13 @@ administraciones municipales gestionan con un coste económico sostenido y un
 volumen creciente de incidencias. La diversidad estilística de las pintadas,
 desde firmas rápidas (\textit{tags}) hasta piezas elaboradas, y la continua
 aparición de nuevos autores convierten su seguimiento manual en una tarea
-costosa y poco sistemática. \citea[etali]{Taylor}{taylor_twenty-first_2010}
+costosa y complicada. \citea[etali]{Taylor}{taylor_twenty-first_2010}
 documentan que la falta de criterios homogéneos de clasificación entre quien
-reporta una pintada y quien la retira es un problema operativo recurrente, y
-proponen una tipología explícita que ha demostrado utilidad para priorizar la
-retirada de pintadas ofensivas o no autorizadas según el tipo y la ofensividad
-del contenido. Esa tipología, sin embargo, sigue aplicándose de forma manual, y
-su extensión a bancos de imágenes crecientes no es viable sin apoyo
-automatizado.
+reporta una pintada y quien la retira es un problema recurrente, y proponen una
+tipología explícita que ha demostrado ser útil para priorizar la retirada de
+pintadas ofensivas o no autorizadas según el tipo y la ofensividad del
+contenido. Esa tipología, sin embargo, sigue aplicándose de forma manual, y su
+extensión a bancos de imágenes crecientes no es viable sin apoyo automatizado.
 
 En esta línea, trabajos recientes han abordado la detección y cuantificación
 automática de grafiti sobre imágenes captadas en condiciones no
@@ -57,11 +56,10 @@ cuellos de botella.
 
 \subsubsection{Objetivo general}
 
-Diseñar, implementar y evaluar experimentalmente un sistema
-modular de agrupamiento de imágenes de grafiti que permita
-caracterizar el coste computacional y la calidad del agrupamiento
-de combinaciones de segmentación, generación de
-\textit{embeddings}, reducción de dimensionalidad y
+Diseñar, implementar y evaluar experimentalmente un sistema modular de
+agrupamiento de imágenes de grafiti que permita caracterizar el coste
+computacional y la calidad del agrupamiento de combinaciones de segmentación,
+generación de \textit{embeddings}, reducción de dimensionalidad y
 \textit{clustering} en función del tamaño del conjunto.
 
 \subsubsection{Objetivos específicos}
@@ -99,12 +97,13 @@ etiquetado manualmente para este trabajo.
 
 Conviene reconocer abiertamente dos limitaciones metodológicas. Primero, las
 etiquetas utilizadas para la evaluación supervisada han sido generadas a mano
-para este trabajo, sobre un subconjunto reducido y sin consenso entre
-anotadores. Así, las métricas extrínsecas obtenidas son indicativas y no
-concluyentes. Segundo, la evaluación extrínseca solo es directamente aplicable
-a las configuraciones que no hacen uso de segmentación automática. Esto se debe
-a que no es posible evaluar la calidad del agrupamiento de recortes que no
-corresponden exactamente con las etiquetas manuales.
+para este trabajo, sobre un subconjunto reducido y por un solo anotador, sin
+ningún tipo de validación externa o consenso entre anotadores. Así, las
+métricas extrínsecas obtenidas son indicativas y no concluyentes. Segundo, la
+evaluación extrínseca solo es directamente aplicable a las configuraciones que
+no hacen uso de segmentación automática. Esto se debe a que no es posible
+evaluar la calidad del agrupamiento de recortes que no corresponden exactamente
+con las etiquetas manuales.
 
 \subsection{Estructura del documento}
 \label{subsec:intro-estructura}
