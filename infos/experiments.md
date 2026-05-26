@@ -258,10 +258,10 @@ thesis question is whether the trade-off is worth it; the per-run timing
 captures the cost side directly.
 
 **Format.** Configuration (not a grid). `generate_configuration.py` hashes
-`storage + embedding + limit` to decide DB reuse and does *not* include the
-segmenter, so a grid would incorrectly reuse ingests across segmenter
-variants. The configuration therefore sets explicit `db_path` and
-`clear_storage: true` for every row.
+`storage + embedding + segmenter + limit` to decide DB reuse. Segmenter *is*
+included in the hash, so the hand-written format is not strictly required for
+correctness; it was chosen for clarity and explicit control over `db_path`
+and `clear_storage: true` per row.
 
 **Cost.** 15 runs (5 segmenters × 3 limits), 15 full ingests — the most
 expensive quality experiment.
@@ -587,14 +587,12 @@ results). The ingest stage is therefore measured once; the runner's
 metadata-reuse heuristic propagates the original ingest timing to the
 remaining ten runs.
 
-**Quality measurement.** The runner currently reports
-`avg_neighbor_distance` (mean distance to the returned `top_k` neighbours)
-per run. Comparing HNSW rows against the exact baseline on the same
-`sample_seed` gives a proxy for HNSW recall: if average distances grow
-markedly above the exact baseline, the index is returning further (i.e.
-incorrect) neighbours. A dedicated recall@k metric is left as future
-work — the proxy is sufficient to flag pathological settings on the
-`top_k=5` regime.
+**Quality measurement.** The runner reports `ann_recall_at_k` — recall@k of
+the HNSW index neighbours vs. an exact brute-force kNN computed on the same
+query sample, outside the timed loop. It is a first-class result field
+(see `AnnMetrics` in `models.py`). `avg_neighbor_distance` (mean distance to
+returned `top_k` neighbours) is also recorded as a secondary proxy and is
+useful for comparing HNSW rows against the exact baseline.
 
 **Format.** Direct configuration (not a grid). `generate_configuration.py`
 hashes `hnsw` into the storage key (correct in general — see §6) so a
