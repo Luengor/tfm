@@ -44,13 +44,15 @@ comparisons are clean:
   wall time, CPU, RSS, and VRAM. Ingest stays single-shot. See the
   **Metrics** section for the full rationale.
 
-The working dataset contains 6416 images. The 294 labelled eval
-crops in [`data/style/eval_crop/`](../data/style/eval_crop/) (and the 385
-train crops in [`data/style/train_crop/`](../data/style/train_crop/) —
-110 from Salamanca, 275 from Cuenca) are derived from the full image bank
-and are *not* deduplicated out for the unsupervised experiments — at <10 %
-of the corpus they do not perturb aggregate statistics, and segregating them
-would artificially shrink the cost-sweep dataset.
+The working dataset contains 6416 images. The 294 labelled style-eval
+crops in [`data/style/eval_crop/`](../data/style/eval_crop/) are drawn from
+this 6416-image corpus and are *not* deduplicated out for the unsupervised
+experiments — at <5 % of the corpus they do not perturb aggregate statistics,
+and segregating them would artificially shrink the cost-sweep dataset. The 385
+training crops (110 Salamanca style-train + 275 Cuenca) and the 185
+Salamanca author-eval crops come from the separate 265-image Salamanca and
+1207-image Cuenca annotation sets, which are **disjoint** from the 6416-image
+eval corpus.
 
 ## Metrics
 
@@ -70,8 +72,9 @@ Calinski–Harabasz, Davies–Bouldin, noise ratio, cluster-size CV) are compute
 on every iteration (all K samples, no iter-0 drop — quality is unaffected by
 JIT warm-up) and aggregated as mean ± std under the existing
 `clustering_quality_*` keys, with `_std` and `_n` siblings added. Extrinsic
-metrics are still computed once on the last iteration's labels (seed `K-1`,
-reproducible). Ingest and similarity-search remain single-shot — ingest is
+metrics are computed on every iteration and aggregated as mean ± std alongside
+the intrinsic metrics (`ari`, `nmi`, `pairwise_f1`, and their `*_no_noise`
+variants). Ingest and similarity-search remain single-shot — ingest is
 deterministic and the DB-reuse heuristic depends on a single timing.
 
 Defaults: `K=3` for quality-focused experiments (§§1–5, §8) and `K=5` for the
@@ -497,9 +500,11 @@ are small enough that every run processes the full set).
 
 **Cost.** §8a: 96 runs (8 embeddings × 2 reductions × 6 clusterers), 8
 ingests. §8b: 96 runs (8 embeddings × 2 reductions × 6 clusterers), 8
-ingests (separate DBs — different dataset path). Reduction and clustering
-re-use the cached DB within each embedding group thanks to storage-key
-hashing in `generate_configuration.py`.
+ingests (separate DBs — the configs use distinct `db_path` prefixes
+`08a_style_` vs `08b_author_` so the storage-key hash never collides even
+when both sections run against the same `--output-dir`). Reduction and
+clustering re-use the cached DB within each embedding group thanks to
+storage-key hashing in `generate_configuration.py`.
 
 **Running.**
 
@@ -542,9 +547,6 @@ fine-tuned-head rows once §8b numbers point at the interesting cases.
 **Configs.**
 [`configs/08a_supervised_style.json`](configs/08a_supervised_style.json),
 [`configs/08b_supervised_author.json`](configs/08b_supervised_author.json).
-The legacy combined [`configs/08_supervised.json`](configs/08_supervised.json)
-covers §8a only and predates the author split — split into the two files
-above for new runs.
 
 ## §9. HNSW index parameter sweep
 
