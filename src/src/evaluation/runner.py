@@ -249,22 +249,26 @@ def _run_single(
         image_count = total_instances
         assert ingest_metrics is not None  # for type checker
 
-        # Persist/retrieve ingestion metrics
-        # If the database is reused, the original ingestion metrics are retrieved.
+        # Persist/retrieve ingestion metrics, keyed off the explicit
+        # clear_storage flag rather than a timing heuristic. A fresh run
+        # (clear_storage=True) wiped the DB above and just measured a real
+        # ingest, so it persists those metrics. A reusing run
+        # (clear_storage=False) short-circuited save_image via its .has() cache
+        # and only measured cache-hit time, so it reads back the metrics from the
+        # run that populated the DB.
         METADATA_INGEST_KEY = "ingest_metrics"
-        db_metrics_json = storage.get_metadata(METADATA_INGEST_KEY)
-
-        if db_metrics_json:
-            db_metrics_dict = json.loads(db_metrics_json)
-            # Heuristic: if current ingestion was significantly faster than the one in DB,
-            # it means we reused the database, so we use the original metrics.
-            if ingest_metrics.wall_time_s < db_metrics_dict.get("wall_time_s", 0) * 0.5:
-                # Reconstruct StageMetrics from dict
-                print(f"Run {run_spec.name}: reusing ingestion metrics from previous run.")
-                ingest_metrics = StageMetrics(**db_metrics_dict)
-        elif ingest_metrics.wall_time_s > 0.5:
-            # Only save if it looks like a meaningful ingestion run
+        if run_spec.clear_storage:
             storage.set_metadata(METADATA_INGEST_KEY, json.dumps(asdict(ingest_metrics)))
+        else:
+            db_metrics_json = storage.get_metadata(METADATA_INGEST_KEY)
+            if db_metrics_json:
+                print(f"Run {run_spec.name}: reusing ingestion metrics from the run that populated the database.")
+                ingest_metrics = StageMetrics(**json.loads(db_metrics_json))
+            else:
+                print(
+                    f"Run {run_spec.name}: clear_storage=False but no stored ingestion "
+                    f"metrics found; reporting the measured (cache-hit) time."
+                )
 
         all_images = config.storage.get_all_images()
         # When the DB is reused (clear_storage=False), the ingest loop above
