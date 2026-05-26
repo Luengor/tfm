@@ -161,19 +161,22 @@ variant is dominated by the 11 small-`n` runs.
 which family helps most?
 
 **Varies.** `identity` (no reduction), `pca` (10 and 50 components), `umap`
-(10d and 50d cosine), `isomap` (10d), `kernel_pca` (50d, RBF and cosine
-kernels). Linear/poly KernelPCA kernels and UMAP-50/100 sweeps from v1 were
-trimmed — they did not contribute distinctive evidence in early runs.
+(10d and 50d cosine), `isomap` (10d). Linear/poly KernelPCA kernels and
+UMAP-50/100 sweeps from v1 were trimmed — they did not contribute distinctive
+evidence in early runs. KernelPCA was also dropped: the baseline embedding
+(DINOv2 style head) outputs L2-normalised vectors, on which RBF-KernelPCA
+reduces to a monotone transform of cosine similarity and adds no signal beyond
+linear PCA.
 
 **Fixed.** Baseline embedding and HDBSCAN. Swept at
 `limit ∈ {250, 1000, 6416}`.
 
 **Why it matters.** Density-based clustering degrades in high dimensions. The
 identity row quantifies how much reduction buys; the UMAP rows confirm or
-refute the canonical recipe; the kernel/Isomap rows show whether non-linear
+refute the canonical recipe; the Isomap row shows whether non-linear
 reductions help.
 
-**Cost.** 24 runs (8 reductions × 3 limits), 3 ingests (one per limit — the
+**Cost.** 18 runs (6 reductions × 3 limits), 3 ingests (one per limit — the
 embedding DB is reused across reductions within each limit group).
 
 **Config.** [`configs/02_reduction.json`](configs/02_reduction.json)
