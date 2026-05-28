@@ -2,17 +2,157 @@
 \section{Resultados y discusión}
 \label{sec:results}
 
-% TODO: ubicar al redactar la discusión. Material de interpretación reubicado
-% desde la metodología (evaluación extrínseca por autor, \ref{subsubsec:eval-extrinseca}).
-% Dado que la evaluación por autor combina autores no vistos con un cambio de
-% dominio entre ciudades, un resultado positivo es evidencia de que las cabezas de
-% autoría capturan rasgos que generalizan más allá del estilo local; un resultado
-% negativo, en cambio, no permite distinguir entre fallo por novedad de autor y
-% fallo por cambio de dominio.
-% El desbalance del conjunto de etiquetas de autor (muchos autores con uno o dos
-% recortes) acota superiormente los valores absolutos alcanzables por las métricas
-% y obliga a interpretarlas en términos relativos (diferencias entre
-% configuraciones) más que en términos absolutos. Además, cualquier ventaja
-% observada de las cabezas estilísticas sobre el conjunto de autor debe leerse con
-% la salvedad del solapamiento fotográfico entre su entrenamiento y la evaluación
-% por autor; el sesgo introducido es por construcción muy limitado.
+% Estructura temática (no por experimento). El catálogo completo de barridos
+% (ejes variados, baseline fijo, puntos de N, repeticiones) vive en la tabla
+% \ref{tab:catalogo-experimentos}; la prosa de esta sección discute hallazgos,
+% no experimentos. Cada hallazgo cita el barrido del que procede mediante su
+% identificador (E1..E9) de esa tabla.
+
+\subsection{Catálogo de experimentos}
+\label{subsec:catalogo}
+% Tabla-índice: el "extra" que ancla la replicación. Permite que la prosa
+% temática de las subsecciones siguientes se refiera a cada barrido por su
+% identificador sin reintroducir aquí el detalle metodológico (ya en
+% \ref{sec:metodologia}). Los ficheros de configuración correspondientes se
+% publican con el código (\ref{subsec:reproducibilidad}).
+Antes de discutir los hallazgos, la tabla~\ref{tab:catalogo-experimentos}
+resume los barridos ejecutados. Cada uno varía un único eje alrededor de una
+configuración base común para que las comparaciones sean limpias; el eje
+variado, los componentes fijos y los tamaños de banco $N$ evaluados se recogen
+en la tabla. Las subsecciones siguientes se refieren a cada barrido por su
+identificador.
+
+% TODO: rellenar valores definitivos cuando los runs estén cerrados. Los
+% identificadores E1..E9 corresponden a §1..§9 de infos/experiments.md.
+{\footnotesize
+\begin{longtable}{|p{0.5cm}|p{3.1cm}|p{3.3cm}|p{4.6cm}|} \hline
+  \textbf{Id} & \textbf{Eje variado} & \textbf{Fijo} & \textbf{$N$ / repeticiones} \\ \hline
+  \endhead
+  E1 & Extractor (10 modelos) & UMAP, HDBSCAN, identidad, SQLite & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
+  E2 & Reducción (identidad, PCA, UMAP, Isomap) & Extractor base, HDBSCAN & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
+  E3 & Agrupamiento (9 algoritmos) & Extractor base, UMAP & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
+  E4 & HDBSCAN \texttt{min\_cluster\_size} (6 valores) & Extractor base, UMAP & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
+  E5 & Segmentador (identidad vs. YOLO) & Pipeline base & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
+  E6 & Almacenamiento (SQLite, pgvector exacto / HNSW) & Pipeline base, búsqueda activa & $N\in\{500, 1000, 2500, 6416\}$, $K{=}5$ \\ \hline
+  E7 & $N$ $\times$ agrupamiento (6 algoritmos) & Extractor base, UMAP, SQLite & $N\in\{100, 250, 500, 1000,$ $2000, 3500, 6416\}$, $K{=}5$ \\ \hline
+  E8 & Extractor $\times$ reducción $\times$ agrupamiento, dos conjuntos etiquetados (estilo / autor) & SQLite, identidad, sin límite & Conjunto completo, $K{=}3$ \\ \hline
+  E9 & Parámetros HNSW ($m$, \texttt{ef\_construction}, \texttt{ef\_search}) & Pipeline base, PostgreSQL & $N{=}6416$, $K{=}5$ \\ \hline
+  \caption{Catálogo de barridos experimentales. El detalle metodológico común
+  (métricas, cronometría, repeticiones) se describe en \ref{sec:metodologia}.}
+  \label{tab:catalogo-experimentos}
+\end{longtable}
+}
+
+% =====================================================================
+\subsection{Calibración del pipeline}
+\label{subsec:res-calibracion}
+% Hilo narrativo único: "qué componentes ganan", de extractor a segmentador,
+% que culmina fijando la configuración base usada por el resto del trabajo.
+% Funde E1-E5. Métricas: tríada intrínseca (silueta, CH, DB) + ruido/CV.
+Esta subsección recorre las decisiones de diseño del \textit{pipeline} en el
+orden en que se fijaron, de modo que cada elección se apoya en la anterior. El
+resultado es la configuración base — extractor, reducción, agrupamiento,
+\texttt{min\_cluster\_size} y segmentador — sobre la que se asientan los
+estudios de coste (\ref{subsec:res-coste}) y de validación supervisada
+(\ref{subsec:res-supervisada}).
+
+\subsubsection{Extractor de características}
+\label{subsubsec:res-extractor}
+% E1. Pregunta: qué backbone produce clústeres más coherentes. Pares
+% mobilenet<->head y dinov2<->head responden fine-tuning vs preentrenamiento.
+% TODO: figura barras por silueta/CH/DB; discutir ganador y pares fine-tuned.
+
+\subsubsection{Reducción de dimensionalidad}
+\label{subsubsec:res-reduccion}
+% E2. Cuánto aporta reducir (fila identidad) y qué familia ayuda más.
+% TODO.
+
+\subsubsection{Algoritmo de agrupamiento}
+\label{subsubsec:res-agrupamiento}
+% E3. Jerarquía de best_cluster.md frente a los datos; ablación del HDBSCAN
+% por defecto, con n_clusters fijado donde aplica para quitar el confound de k.
+% TODO.
+
+\subsubsection{Granularidad de HDBSCAN}
+\label{subsubsec:res-mincluster}
+% E4. min_cluster_size como fracción del corpus; curva de ruido como cota
+% superior de granularidad soportada.
+% TODO.
+
+\subsubsection{Impacto del segmentador}
+\label{subsubsec:res-segmentador}
+% E5. ¿Compensa el recortado YOLO frente a la imagen completa? Coste como
+% efecto colateral del cambio de unidad de análisis (imagen vs. recorte).
+% TODO. Cerrar aquí la configuración base.
+
+% =====================================================================
+\subsection{Coste computacional}
+\label{subsec:res-coste}
+% HEADLINE del trabajo (enunciado: coste en función del tamaño del conjunto).
+% Funde E7 (escalabilidad, principal), E6 (backends de almacenamiento) y E9
+% (frontera HNSW). Va con el mayor peso visual.
+Este es el eje central del trabajo: caracterizar empíricamente cómo crece el
+coste de cada etapa con el tamaño del banco y contrastar las pendientes
+observadas con las clases de complejidad teóricas.
+
+\subsubsection{Escalabilidad por etapa}
+\label{subsubsec:res-escalabilidad}
+% E7. Figura cabecera: tiempo vs N en log-log, pendiente empírica por etapa y
+% por algoritmo de agrupamiento, junto a la complejidad teórica esperada
+% (tabla de clases en infos/experiments.md §7).
+% TODO.
+
+\subsubsection{Coste del \textit{backend} de almacenamiento}
+\label{subsubsec:res-storage}
+% E6. Separa el efecto "ops vectoriales nativas vs. Python" (sqlite->pg-exacto)
+% del efecto "aproximado vs. exacto" (pg-exacto->pg-hnsw). Búsqueda activa.
+% TODO.
+
+\subsubsection{Frontera de Pareto del índice HNSW}
+\label{subsubsec:res-hnsw}
+% E9. m / ef_construction / ef_search: build-time x query-time x recall@k.
+% Justifica HNSW para el flujo ingesta-única -> muchas-consultas.
+% TODO.
+
+% =====================================================================
+\subsection{Validación supervisada}
+\label{subsec:res-supervisada}
+% E8a/E8b. ARI/NMI/F1 sobre estilo (4 clases) y autor (87 clases, cola larga).
+% Cierra con la correlación interna-externa, que es lo que legitima usar
+% silueta/CH/DB como proxy en la subsección de calibración.
+Cuando se dispone de etiquetas, las métricas extrínsecas miden directamente la
+concordancia entre los clústeres y la verdad de referencia. Esta subsección
+explota los dos conjuntos etiquetados disjuntos —estilo y autor— para responder
+a la pregunta del \textit{fine-tuning} y, finalmente, para validar las métricas
+intrínsecas empleadas en el resto del trabajo.
+
+\subsubsection{Evaluación por estilo}
+\label{subsubsec:res-estilo}
+% E8a. 4 clases balanceadas, held-out de la cabeza estilística.
+% Hipótesis: la cabeza fine-tuned supera al backbone preentrenado.
+% TODO.
+
+\subsubsection{Evaluación por autor}
+\label{subsubsec:res-autor}
+% E8b. 87 autores, cola larga, cambio de dominio Cuenca->Salamanca.
+% Material de interpretación reubicado desde la metodología
+% (\ref{subsubsec:eval-extrinseca}):
+% - Autores no vistos + cambio de dominio entre ciudades: un resultado
+%   positivo evidencia que las cabezas de autoría capturan rasgos que
+%   generalizan más allá del estilo local; uno negativo no distingue fallo
+%   por novedad de autor de fallo por cambio de dominio.
+% - Desbalance del conjunto (muchos autores con 1-2 recortes) acota
+%   superiormente los valores absolutos; leer en términos relativos
+%   (diferencias entre configuraciones), no absolutos.
+% - Ventaja de cabezas estilísticas sobre el conjunto de autor: leer con la
+%   salvedad del solapamiento fotográfico entrenamiento/evaluación; sesgo
+%   introducido muy limitado por construcción.
+% TODO.
+
+\subsubsection{Correlación interna-externa}
+\label{subsubsec:res-correlacion}
+% Análisis derivado: ARI vs. silueta sobre E8a y, por separado, sobre E8b.
+% Correlación positiva fuerte => las métricas no supervisadas son un proxy
+% defendible; divergencia entre E8a y E8b acota qué eje rastrea la silueta.
+% Esta subsección es la que legitima retrospectivamente \ref{subsec:res-calibracion}.
+% TODO.
