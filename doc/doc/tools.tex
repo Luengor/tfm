@@ -4,7 +4,7 @@
 
 \subsection{Conjunto de datos}
 \label{subsec:dataset}
-El banco de imágenes de grafiti utilizado en este trabajo se compone de $6416$
+El banco de imágenes de grafiti utilizado en este trabajo se compone de $6681$
 fotografías capturadas en condiciones reales en la ciudad de Salamanca. Las
 imágenes presentan una alta variabilidad cromática y de escenas urbanas, con
 condiciones de iluminación diversas. Tampoco existe un lienzo por defecto para
@@ -19,50 +19,46 @@ dispositivo móvil Samsung, presentando en su mayoría una resolución de $4032
 postprocesado sobre las imágenes originales, de modo que la evaluación opera
 directamente sobre el material en bruto.
 
-% TODO: check this after stopgrafiti ok
-El banco principal de $6416$ fotografías carece de cualquier tipo de
-etiquetado, por lo que no existe una verdad fundamental sobre la que validar de
-forma directa la calidad de los clústeres resultantes. Para mitigar esta
-limitación, se han anotado manualmente dos conjuntos suplementarios. Por un
-lado, $265$ fotografías de Salamanca y $1207$ de la ciudad de Cuenca
-(procedentes de un repositorio público de grafiti urbano) constituyen el
-subconjunto de entrenamiento, disjunto del banco principal y excluido de todos
-los pases de \textit{benchmark}. Esta separación es necesaria porque varios de
-los modelos evaluados se ajustan a partir de estas anotaciones (véase
-\ref{subsec:extras}), de modo que utilizar imágenes vistas durante el
-entrenamiento para evaluar el sistema introduciría un sesgo optimista en las
-métricas. Por otro lado, $294$ recortes extraídos del banco principal han sido
-etiquetados manualmente por estilo, sin solapamiento con el conjunto de
-entrenamiento, y sirven como verdad fundamental para las métricas extrínsecas.
+De manera adicional a este banco de datos, se dispone de otro conjunto de
+$1106$ imágenes cedidas por la iniciativa
+StopGrafiti\footnote{\url{https://stopgrafiti.com/}}. Estas imágenes, aunque no
+se incluyen en el banco principal, se utilizan para el ajuste fino del detector
+de pintadas, así como de las cabezas de proyección ajustadas al dominio. El
+conjunto de StopGrafiti fue especialmente útil para esto, puesto que se trata
+de un banco de grafiti con autores, estilos y entornos distintos a los de
+Salamanca, lo que permite evitar el sesgo de solapamiento entre entrenamiento y
+evaluación que se produciría si se empleara el banco principal para ajustar
+todos los modelos.
 
-% TODO: And this is fake.
-Sobre las $265$ fotografías del subconjunto de entrenamiento de Salamanca se
-han producido tres capas de anotación. En primer lugar, cada fotografía se ha
-segmentado manualmente delimitando con cajas las pintadas presentes; este
-proceso da lugar a un total de $\mathtt{NSEGS\_PLACEHOLDER}$ %NSEGS
-recortes, que constituyen la unidad de trabajo sobre la que se aplican el
-resto de etiquetados. De estos, $110$ recortes han sido clasificados por estilo
-en una de cuatro categorías (\textit{tag}, \textit{throw-up}, \textit{piece} y
-\textit{character}), y el conjunto de Cuenca aporta $275$ recortes etiquetados
-adicionales de la misma manera, para un total de $385$ recortes de entrenamiento
-para las cabezas de estilo. Por último, los recortes que parecen pertenecer al
-mismo autor (que son firmados por el mismo nombre) son asignados con un
-identificador común; el conjunto de Cuenca aporta $169$ recortes con
-identificador de autor que se destinan en exclusiva al entrenamiento de las
-cabezas de autoría, mientras que los $185$ recortes con identificador de autor
-extraídos de las fotografías de Salamanca se reservan para la evaluación
-extrínseca descrita en \ref{subsubsec:eval-extrinseca} y no intervienen en
-ningún momento en el entrenamiento.
+Ninguno de los dos bancos de datos cuenta con anotaciones de ningún estilo, lo
+que impide la evaluación supervisada directa de los modelos. Además, la
+existencia de varios grafitis por imagen hace que la anotación a nivel de
+imagen no sea suficiente para evaluar la calidad de los clústeres. Por tanto,
+se opta por recortar y etiquetar manualmente varios subconjuntos de pintadas,
+de modo que la evaluación supervisada se realice sobre estos recortes
+etiquetados.
 
-Las anotaciones de cajas se emplean para el ajuste fino del detector descrito
-en \ref{subsubsec:segmentador}, las etiquetas de estilo para la cabeza de
-proyección estilística y las de autoría para las cabezas de proyección de autor
-descritas en \ref{subsubsec:cabezas}. Los $294$ recortes de evaluación etiquetados
-por estilo y los $185$ etiquetados por autor sirven como verdad fundamental para
-el cálculo de métricas extrínsecas (\ref{subsubsec:metricas}) cuando la
-configuración prescinde del segmentador. El reparto deliberadamente asimétrico
-de estas anotaciones entre entrenamiento y evaluación, y su justificación, se
-detallan en \ref{subsubsec:eval-extrinseca}.
+$385$ recortes ($275$ de StopGrafiti y $110$ de Salamanca) se etiquetan por
+estilo, asignándoles una de las cuatro categorías estilísticas (\textit{tag},
+\textit{throw-up}, \textit{piece} y \textit{character}). Este entrenamiento se
+evalua con otros $294$ recortes del banco completo. Por otro lado, $169$
+recortes de StopGrafiti se etiquetan por autoría para el entrenamiento de las
+cabezas de autoría, y se evalúan con $185$ recortes de Salamanca. En el primero
+de los casos, se consideró que, puesto que las etiquetas de estilo son más
+generales, el solapamiento entre entrenamiento y evaluación era menos
+problemático, y se permitió que los recortes de entrenamiento por estilo
+procedieran del banco principal. En el caso de las cabezas de autoría, sin
+embargo, se optó por evitar cualquier solapamiento entre entrenamiento y
+evaluación, lo que motivó que los recortes de entrenamiento procedieran
+exclusivamente del conjunto de StopGrafiti. De cualquier modo, durante la
+evaluación del sistema completo, solo se utiliza un subconjunto de imágenes del
+banco principal del que nunca se extraen recortes de entrenamiento (compuesto
+por $6416$ imágenes), lo que garantiza que la evaluación sin supervisión se
+realice sobre un banco completamente disjunto.
+
+Por último, se utilizan imágenes de ambos grupos para el ajuste fino del
+detector de pintadas, con un total de $447$ imágenes completamente anotadas con
+las cajas de las pintadas.
 
 \subsection{Marco conceptual}
 \label{subsec:conceptos}
