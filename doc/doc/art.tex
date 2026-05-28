@@ -137,7 +137,7 @@ consultada, lo que resulta asumible en escalas modestas, pero deja de serlo a
 medida que el banco crece. La literatura ha respondido a esto con dos grandes
 familias de índices aproximados de vecinos más cercanos (\textit{Approximate
 Nearest Neighbor}, ANN). Por un lado, los basados en cuantificación y
-particionado del espacio ( FAISS~\cite{johnson_billion-scale_2017}), que combina
+particionado del espacio (FAISS~\cite{johnson_billion-scale_2017}), que combina
 listas invertidas con cuantificación de productos para escalar la búsqueda a
 miles de millones de vectores con uso intensivo de GPU. Por otro, los basados
 en grafos de proximidad, encabezados por HNSW~\cite{malkov_efficient_2018}, que
@@ -205,32 +205,36 @@ primer orden en visión por computador, y no como una preocupación secundaria.
 Buena parte de la investigación reciente en extractores de características
 persigue de forma explícita el compromiso entre la calidad de la representación
 y el coste de cómputo: arquitecturas como
-MobileNetV3~\cite{howard_searching_2019}, cuya topología se obtiene mediante
-búsqueda consciente del hardware que optimiza la latencia medida sobre el propio
-dispositivo, ilustran este giro frente a redes más pesadas como ResNet o ViT. En
-un sistema que debe procesar bancos de imágenes crecientes, esta elección
-determina el coste dominante de la fase de ingesta.
+MobileNetV3~\cite{howard_searching_2019} se buscan teniendo en cuenta el
+hardware objetivo. Mientras que otras arquitecturas más pesadas como ResNet o
+ViT se centran en obtener mejores resultados, MobileNet trata de optimizar la
+relación calidad-coste, teniendo más en cuenta factores como la latencia de la
+propia red. En un sistema que debe procesar bancos de imágenes crecientes, esta
+elección determina el coste dominante de la fase de ingesta.
 
-En la etapa de agrupamiento, la literatura ha caracterizado cómo el coste crece
+En la etapa de agrupamiento, la literatura ya ha descrito cómo el coste crece
 con el tamaño del conjunto de datos. K-Means cuenta con variantes escalables
 como la \textit{mini-batch}~\cite{sculley_web-scale_2010}, mientras que los
-métodos basados en densidad —OPTICS~\cite{ankerst_optics_1999},
-HDBSCAN~\cite{campello_density-based_2013}— presentan un crecimiento superlineal
-con el tamaño del banco, agravado por la concentración de distancias propia de
-los espacios de alta dimensión~\cite{aggarwal_k-anonymity_2005}. Para valorar la
-calidad de las agrupaciones, el campo dispone además de un repertorio
-consolidado de métricas, internas cuando no se dispone de etiquetas y externas
-cuando se cuenta con una verdad de referencia~\cite{rousseeuw_silhouettes_1987,
-calinski_dendrite_1974, davies_cluster_1979, hubert_comparing_1985,
-strehl_cluster_2002, van_rijsbergen_c_j_information_1979}, cuyas definiciones se
-detallan en el marco conceptual (sección~\ref{subsubsec:metricas}).
+métodos basados en densidad (OPTICS~\cite{ankerst_optics_1999} o
+HDBSCAN~\cite{campello_density-based_2013}) presentan un crecimiento
+superlineal con el tamaño del banco, agravado por la normalización de
+distancias propia de los espacios de alta
+dimensión~\cite{aggarwal_k-anonymity_2005}. Para valorar la calidad de las
+agrupaciones, el campo dispone además de un repertorio consolidado de métricas,
+internas cuando no se dispone de etiquetas y externas cuando se cuenta con una
+verdad de referencia~\cite{rousseeuw_silhouettes_1987, calinski_dendrite_1974,
+davies_cluster_1979, hubert_comparing_1985, strehl_cluster_2002,
+van_rijsbergen_c_j_information_1979}, cuyas definiciones se detallan en el
+marco conceptual (sección~\ref{subsubsec:metricas}).
 
 Pese a la madurez de estos componentes, no se han localizado trabajos que
 evalúen de forma sistemática qué combinación de extractor, reducción y
-agrupamiento se comporta mejor sobre imágenes de grafiti, ni que caractericen su
-coste en función del tamaño del banco —eje explícito del enunciado—, máxime
-cuando el rendimiento de estos algoritmos depende fuertemente del conjunto de
-datos~\cite{franti_k-means_2018, ahmed_k-means_2020}. Esta carencia es la que
+agrupamiento se comporta mejor sobre imágenes de grafiti, ni que caractericen
+su coste en función del tamaño del banco. La falta de casos en los que se
+aplican estos algoritmos al tipo de datos particular del grafiti es
+especialmente importante, ya que el rendimiento de estos sistemas depende
+fuertemente del conjunto de datos sobre el que se aplica
+~\cite{franti_k-means_2018,ahmed_k-means_2020}. Esta carencia es la que
 justifica el enfoque comparativo y empírico que vertebra el presente trabajo.
 
 % ---------------------------------------------------------------------
