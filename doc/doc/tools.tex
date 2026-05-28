@@ -82,12 +82,12 @@ distancia euclidiana y la distancia coseno. Esta última depende exclusivamente
 de la dirección de los vectores y resulta equivalente a la distancia euclidiana
 cuando los \textit{embeddings} están normalizados a norma unitaria
 (normalización $L_2$), práctica frecuente para evitar que la magnitud del
-vector domine la comparación. En el presente trabajo la normalización se trata
-como un parámetro del modelo de extracción, aunque su disponibilidad depende de
-la arquitectura: CLIP y las cabezas de proyección ajustadas normalizan siempre
-su salida, MobileNetV3 dispone de una variante normalizada explícita, y el
-resto de \textit{backbones} se emplean sin normalización salvo que se envuelvan
-en dicha variante.
+vector domine la comparación. La disponibilidad de salida normalizada depende de
+la arquitectura: CLIP y las cabezas de proyección ajustadas al dominio
+normalizan siempre su salida, mientras que el resto de \textit{backbones} se
+emplean sin normalización. No obstante, las métricas internas que dependen de
+distancias normalizan los \textit{embeddings} antes del cálculo, de modo que las
+puntuaciones resulten comparables entre familias de modelos.
 
 \subsubsection{Agrupamiento no supervisado}
 El agrupamiento (\textit{clustering}) consiste en particionar un conjunto de
@@ -171,12 +171,12 @@ cubriendo redes convolucionales clásicas, modelos de fundación basados en
 \textit{transformers} y detectores específicos reutilizados como extractores.
 Todos los modelos se utilizan congelados, sin reentrenar sus pesos: la salida
 de la última capa intermedia constituye el \textit{embedding} de la imagen. En
-las redes convolucionales de \textit{torchvision} (ResNet50, VGG16, InceptionV3
-y MobileNetV3) esto implica sustituir la cabeza de clasificación por una
-identidad; DINOv2, CLIP y YOLO se consultan directamente a través de su propia
-API de extracción de características, sin retirar capa alguna. La
-tabla~\ref{tab:embedding-models} resume las opciones disponibles, indicando
-arquitectura, dimensionalidad de salida y preentrenamiento.
+las redes convolucionales de (ResNet50, VGG16, InceptionV3 y MobileNetV3) esto
+implica sustituir la cabeza de clasificación por una identidad; DINOv2, CLIP y
+YOLO se consultan directamente a través de su propia API de extracción de
+características, sin retirar capa alguna. La tabla~\ref{tab:embedding-models}
+resume las opciones disponibles, indicando arquitectura, dimensionalidad de
+salida y pre entrenamiento.
 
 \begin{longtable}{|p{3.2cm}|p{3.8cm}|c|p{4.2cm}|} \hline
   \textbf{Modelo} & \textbf{Arquitectura} & \textbf{Dim.} & \textbf{Preentrenamiento} \\ \hline
@@ -186,7 +186,7 @@ arquitectura, dimensionalidad de salida y preentrenamiento.
   MobileNetV3~\cite{howard_searching_2019} & CNN ligera & $1280$ & ImageNet \\ \hline
   DINOv2 ViT-S/14~\cite{oquab_dinov2_2024} & \textit{Transformer}\cite{dosovitskiy_image_2021} & $384$ & Autosupervisado (LVD-142M) \\ \hline
   CLIP ViT-B/32~\cite{radford_learning_2021} & \textit{Transformer} & $512$ & Imagen-texto (WIT) \\ \hline
-  YOLO11 (n/s/m)\cite{noauthor_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO + grafiti \\ \hline
+  YOLO11 (n/m)\cite{noauthor_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO \\ \hline
   \caption{Modelos de extracción de características integrados.}
   \label{tab:embedding-models}
 \end{longtable}
@@ -233,13 +233,14 @@ cae abruptamente.
 \end{longtable}
 
 \subsubsection{Técnicas de reducción de dimensionalidad}
-La etapa de reducción es opcional y se controla a través del componente
-\texttt{ReductionBase}. La implementación por defecto, \texttt{Identity},
-desactiva la reducción y permite comparar de manera limpia el efecto de
-introducir esta etapa. Las técnicas no lineales se aplican sobre el mismo
-espacio de \textit{embeddings} que las lineales, lo que facilita aislar el
-factor de la transformación. La tabla~\ref{tab:reduction} resume las opciones
-disponibles.
+La etapa de reducción es opcional, siendo la implementación por defecto una
+identidad que no aplica ninguna transformación, permitiendo comparar el efecto
+de añadir esta etapa.
+% - Ensure this is correct 
+Las técnicas no lineales se aplican sobre el mismo espacio de
+\textit{embeddings} que las lineales, lo que facilita aislar el factor de la
+transformación. La tabla~\ref{tab:reduction} resume las opciones disponibles.
+% -
 
 \begin{longtable}{|l|l|l|} \hline
   \textbf{Técnica} & \textbf{Tipo} & \textbf{Parámetros principales} \\ \hline
@@ -253,6 +254,9 @@ disponibles.
 \end{longtable}
 
 \subsubsection{Sistemas de almacenamiento}
+% TODO: should implementation-specific details (like the name of the classes)
+% be included here? or should a more abstract description (like the one on the
+% previous section) be given instead?
 La persistencia de los \textit{embeddings} y los metadatos asociados se abstrae
 en la interfaz \texttt{StorageBase}, de la que se han implementado dos
 \textit{backends} con características operativas distintas.
@@ -279,16 +283,16 @@ lo que permite cambiar de uno a otro sin modificar el resto del
 \label{subsubsec:segmentador}
 La etapa de segmentación localiza las pintadas dentro de la fotografía para que
 el extractor de características opere sobre los recortes correspondientes en
-lugar de la escena completa. Se han implementado dos variantes.
-\texttt{IdentitySegmenter} devuelve la imagen completa como única región de
-interés y se utiliza como referencia para evaluar el impacto de la
-segmentación. \texttt{YoloSegmenter} ejecuta un modelo
-YOLO~\cite{noauthor_ultralytics_2024} ajustado sobre el conjunto de grafiti,
-fusiona las cajas de detección solapadas para evitar duplicados y aplica un
-margen (\textit{padding}) configurable alrededor de cada caja antes del
-recorte. El resultado es un conjunto de sub-imágenes que se procesan de forma
-independiente y que pueden producir varios \textit{embeddings} por fotografía
-original.
+lugar de la escena completa. Se han implementado dos variantes. La primera
+de ellas no aplica ningún tipo de segmentación, de modo que el extractor de
+características se aplica sobre la fotografía completa. La segunda, utiliza
+un modelo de YOLO~\cite{noauthor_ultralytics_2024} ajustado sobre el conjunto
+de grafiti para detectar las cajas que encierran cada pintada, y recorta la imagen
+en consecuencia. Además, este proceso de recorte fusiona las cajas de detección
+solapadas para evitar duplicados y aplica un margen configurable alrededor de
+cada caja antes del recorte. El resultado es un conjunto de sub-imágenes que se
+procesan de forma independiente y que pueden producir varios
+\textit{embeddings} por fotografía original.
 
 El detector se ajusta sobre el subconjunto anotado de Salamanca descrito en
 \ref{subsec:dataset}, disjunto del banco de evaluación, lo que evita que las
@@ -301,7 +305,7 @@ fino se detalla en \ref{subsubsec:entrenamiento-detector}.
 Los modelos de fundación generalistas producen representaciones transferibles,
 pero no necesariamente óptimas para el dominio del grafiti. Para acortar esa
 distancia se ha optado por un esquema de \textit{transfer
-learning}\cite{pan_survey_2010} en el que la representación base se mantiene
+learning}~\cite{pan_survey_2010} en el que la representación base se mantiene
 congelada y solo se entrena una cabeza ligera, siguiendo la metodología de
 \textit{fine-tuning} de ULMFiT~\cite{howard_universal_2018}. La cabeza consiste
 en una secuencia Lineal $\rightarrow$ ReLU $\rightarrow$ Lineal que proyecta
@@ -309,16 +313,15 @@ los \textit{embeddings} base a un espacio adaptado al dominio; en inferencia su
 salida se normaliza a norma unitaria ($L_2$), de modo que el \textit{embedding}
 producido sea directamente comparable mediante distancia coseno.
 
-Se han entrenado dos tipos de cabezas —de autoría y de estilo— sobre dos
-arquitecturas base (MobileNetV3 y DINOv2). Las cabezas de autoría buscan acercar
-en el espacio latente las pintadas de un mismo autor y separar las de autores
-distintos; las de estilo organizan el espacio según las cuatro categorías
-estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
+Se han entrenado dos tipos de cabezas (de autoría y de estilo) sobre dos
+arquitecturas base (MobileNetV3 y DINOv2). Las cabezas de autoría buscan
+acercar en el espacio latente las pintadas de un mismo autor y separar las de
+autores distintos; las de estilo organizan el espacio según las cuatro
+categorías estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
 \textit{character}). Las cuatro cabezas resultantes se entrenan exclusivamente
-sobre el subconjunto anotado descrito en \ref{subsec:dataset} —el procedimiento
-de entrenamiento, las pérdidas empleadas y el muestreo de negativos se detallan
-en \ref{subsubsec:entrenamiento-cabezas}— y se integran como modelos de
-\textit{embedding} adicionales en el catálogo de la
+sobre el subconjunto anotado descrito en \ref{subsec:dataset} (detalles sobre
+el entrenamiento en  \ref{subsubsec:entrenamiento-cabezas}) y se integran como
+modelos de \textit{embedding} adicionales en el catálogo de la
 tabla~\ref{tab:embedding-models}, conservando la dimensionalidad del modelo
 base.
 
@@ -326,7 +329,7 @@ base.
 \label{subsec:entorno}
 % TODO: Ensure this stays true. If at any moment another environment is used,
 % update this section accordingly.
-El entorno de ejecución de los experimnetos es el ordenador personal del autor,
+El entorno de ejecución de los experimentos es el ordenador personal del autor,
 con las siguientes características:
 \begin{itemize}
     \item CPU: AMD Ryzen 7 5800H (8 núcleos, 16 hilos, 3.2 GHz base, 4.4 GHz turbo).
