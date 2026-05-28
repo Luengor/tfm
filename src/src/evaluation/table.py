@@ -18,6 +18,7 @@ _COLS_IDENTITY = [
     ("N", "cluster_count", 4, None),
     ("Imgs", "image_count", 5, None),
     ("Sil", "clustering_quality_silhouette", 6, "f3"),
+    ("SilM", "clustering_quality_silhouette_macro", 6, "f3"),
     ("CH", "clustering_quality_calinski_harabasz", 8, "f1"),
     ("DB", "clustering_quality_davies_bouldin", 6, "f3"),
     ("Noise%", "clustering_quality_noise_ratio", 6, "pct"),

@@ -4,7 +4,7 @@ from sklearn.metrics import (
     calinski_harabasz_score,
     davies_bouldin_score,
     normalized_mutual_info_score,
-    silhouette_score,
+    silhouette_samples,
 )
 from sklearn.metrics.cluster import pair_confusion_matrix
 
@@ -20,7 +20,10 @@ def calculate_clustering_metrics(embeddings: np.ndarray, labels: np.ndarray) -> 
     Calculates unsupervised clustering metrics.
     
     Includes:
-    - Silhouette Score (Density/Separation)
+    - Silhouette Score (Density/Separation), micro-averaged over points
+    - Silhouette Macro (mean of per-cluster mean silhouette), weights each
+      cluster equally regardless of size; diverges from the micro average
+      under cluster-size imbalance
     - Calinski-Harabasz Index (Variance Ratio)
     - Davies-Bouldin Index (Cluster Similarity)
     - Noise Ratio (Percentage of unclustered points)
@@ -54,15 +57,22 @@ def calculate_clustering_metrics(embeddings: np.ndarray, labels: np.ndarray) -> 
     # separately via noise_ratio.
 
     s_score = None
+    s_macro = None
     noise_mask = labels != -1
     s_labels = labels[noise_mask]
     n_s_clusters = len(np.unique(s_labels))
     if n_s_clusters > 1 and noise_mask.sum() > n_s_clusters:
         try:
-            s_score = float(silhouette_score(embeddings[noise_mask], s_labels))
+            samples = silhouette_samples(embeddings[noise_mask], s_labels)
+            s_score = float(samples.mean())
+            cluster_means = [
+                samples[s_labels == lbl].mean() for lbl in np.unique(s_labels)
+            ]
+            s_macro = float(np.mean(cluster_means))
         except Exception:
             s_score = None
-            
+            s_macro = None
+
     ch_score = None
     if n_clusters > 1:
         try:
@@ -98,6 +108,7 @@ def calculate_clustering_metrics(embeddings: np.ndarray, labels: np.ndarray) -> 
 
     return ClusteringQualityMetrics(
         silhouette_score=s_score,
+        silhouette_macro=s_macro,
         calinski_harabasz_score=ch_score,
         davies_bouldin_score=db_score,
         noise_ratio=noise_ratio,

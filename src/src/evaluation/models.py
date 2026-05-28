@@ -161,6 +161,7 @@ class StageMetricsAgg:
 @dataclass(slots=True)
 class ClusteringQualityMetrics:
     silhouette_score: float | None
+    silhouette_macro: float | None
     calinski_harabasz_score: float | None
     davies_bouldin_score: float | None
     noise_ratio: float | None
@@ -169,6 +170,7 @@ class ClusteringQualityMetrics:
     def to_flat_dict(self, prefix: str = "clustering_quality") -> dict[str, float | None]:
         return {
             f"{prefix}_silhouette": self.silhouette_score,
+            f"{prefix}_silhouette_macro": self.silhouette_macro,
             f"{prefix}_calinski_harabasz": self.calinski_harabasz_score,
             f"{prefix}_davies_bouldin": self.davies_bouldin_score,
             f"{prefix}_noise_ratio": self.noise_ratio,
@@ -181,6 +183,8 @@ class ClusteringQualityMetricsAgg:
     """Mean +/- std aggregation of multiple ClusteringQualityMetrics samples."""
     silhouette_score: float | None
     silhouette_score_std: float | None
+    silhouette_macro: float | None
+    silhouette_macro_std: float | None
     calinski_harabasz_score: float | None
     calinski_harabasz_score_std: float | None
     davies_bouldin_score: float | None
@@ -208,6 +212,7 @@ class ClusteringQualityMetricsAgg:
             return float(_st.stdev(clean)) if len(clean) > 1 else 0.0
 
         sils = [s.silhouette_score for s in samples]
+        sils_macro = [s.silhouette_macro for s in samples]
         chs = [s.calinski_harabasz_score for s in samples]
         dbs = [s.davies_bouldin_score for s in samples]
         nrs = [s.noise_ratio for s in samples]
@@ -216,6 +221,8 @@ class ClusteringQualityMetricsAgg:
         return cls(
             silhouette_score=_opt_mean(sils),
             silhouette_score_std=_opt_std(sils),
+            silhouette_macro=_opt_mean(sils_macro),
+            silhouette_macro_std=_opt_std(sils_macro),
             calinski_harabasz_score=_opt_mean(chs),
             calinski_harabasz_score_std=_opt_std(chs),
             davies_bouldin_score=_opt_mean(dbs),
@@ -231,6 +238,8 @@ class ClusteringQualityMetricsAgg:
         return {
             f"{prefix}_silhouette": self.silhouette_score,
             f"{prefix}_silhouette_std": self.silhouette_score_std,
+            f"{prefix}_silhouette_macro": self.silhouette_macro,
+            f"{prefix}_silhouette_macro_std": self.silhouette_macro_std,
             f"{prefix}_calinski_harabasz": self.calinski_harabasz_score,
             f"{prefix}_calinski_harabasz_std": self.calinski_harabasz_score_std,
             f"{prefix}_davies_bouldin": self.davies_bouldin_score,
