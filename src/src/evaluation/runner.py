@@ -49,6 +49,11 @@ from src.storage.sqlite import SQLiteStorage
 
 DEFAULT_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tiff"}
 
+# Marker written to the storage metadata table once an ingest finishes. Its
+# presence (with a matching source image count + embedding) lets a later run
+# reuse the DB instead of wiping it, even when clear_storage=True.
+INGEST_COMPLETE_KEY = "ingest_complete"
+
 
 def load_ground_truth(csv_path: str | Path) -> dict[str, str]:
     """Load a ground-truth CSV mapping basename -> label.
@@ -237,7 +242,33 @@ def _run_single(
         segmenter = _build_segmenter(run_spec)
         config = Configuration(storage=storage, embedding=embedding, clustering=clustering, reduction=reduction, segmenter=segmenter)
 
-        if run_spec.clear_storage:
+        # Cross-config DB reuse. The db_path is derived from a hash of
+        # (storage, embedding, segmenter, limit), so an existing DB at this path
+        # was necessarily built with the same spec. clear_storage=True is set on
+        # the *first* occurrence of a storage key within each generated config,
+        # but that "first" resets per config file — so the shared baseline DB
+        # would be wiped and rebuilt once per experiment. If a prior run already
+        # completed its ingest here (INGEST_COMPLETE_KEY present, matching source
+        # image count + embedding), skip the wipe and reuse it. An interrupted
+        # ingest leaves no marker, so it correctly falls through to a rebuild.
+        effective_clear = run_spec.clear_storage
+        if effective_clear:
+            marker_json = storage.get_metadata(INGEST_COMPLETE_KEY)
+            if marker_json:
+                marker = json.loads(marker_json)
+                spec_matches = (
+                    marker.get("source_image_count") == len(image_paths)
+                    and marker.get("embedding_type") == run_spec.embedding.type.lower()
+                )
+                if spec_matches:
+                    print(
+                        f"Run {run_spec.name}: existing DB matches spec "
+                        f"({len(image_paths)} images, {run_spec.embedding.type}); "
+                        f"skipping wipe and reusing it."
+                    )
+                    effective_clear = False
+
+        if effective_clear:
             _clear_storage(storage)
 
         with profile_stage() as ingest_stage:
@@ -248,16 +279,29 @@ def _run_single(
         ingest_metrics = ingest_stage.metrics
         assert ingest_metrics is not None  # for type checker
 
-        # Persist/retrieve ingestion metrics, keyed off the explicit
-        # clear_storage flag rather than a timing heuristic. A fresh run
-        # (clear_storage=True) wiped the DB above and just measured a real
-        # ingest, so it persists those metrics. A reusing run
-        # (clear_storage=False) short-circuited save_image via its .has() cache
-        # and only measured cache-hit time, so it reads back the metrics from the
-        # run that populated the DB.
+        # Persist/retrieve ingestion metrics, keyed off effective_clear (the
+        # clear_storage flag after the reuse check above) rather than a timing
+        # heuristic. A fresh run (effective_clear=True) wiped the DB above and
+        # just measured a real ingest, so it persists those metrics. A reusing
+        # run (effective_clear=False, whether by config or by the reuse check)
+        # short-circuited save_image via its .has() cache and only measured
+        # cache-hit time, so it reads back the metrics from the run that
+        # populated the DB.
         METADATA_INGEST_KEY = "ingest_metrics"
-        if run_spec.clear_storage:
+        if effective_clear:
             storage.set_metadata(METADATA_INGEST_KEY, json.dumps(asdict(ingest_metrics)))
+            storage.set_metadata(
+                INGEST_COMPLETE_KEY,
+                json.dumps(
+                    {
+                        "source_image_count": len(image_paths),
+                        "embedding_type": run_spec.embedding.type.lower(),
+                        "segmenter_type": (
+                            run_spec.segmenter.type.lower() if run_spec.segmenter else "identity"
+                        ),
+                    }
+                ),
+            )
         else:
             db_metrics_json = storage.get_metadata(METADATA_INGEST_KEY)
             if db_metrics_json:

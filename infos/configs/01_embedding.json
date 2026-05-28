@@ -23,7 +23,6 @@
     {"type": "dinov2_graffiti_style_head", "params": {}},
     {"type": "clip_vit_b32", "params": {}},
     {"type": "yolon", "params": {}},
-    {"type": "yolos", "params": {}},
     {"type": "yolom", "params": {}}
   ]
 }

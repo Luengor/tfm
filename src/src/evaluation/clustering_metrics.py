@@ -31,8 +31,8 @@ def calculate_clustering_metrics(embeddings: np.ndarray, labels: np.ndarray) -> 
 
     Embeddings are L2-normalized before the distance-based metrics
     (silhouette / Calinski-Harabasz / Davies-Bouldin) are computed. Some
-    embedding models L2-normalize their output (CLIP, the graffiti heads,
-    mobilenet_v3_normalized) and some do not (ResNet50, VGG16, InceptionV3,
+    embedding models L2-normalize their output (CLIP, the graffiti heads)
+    and some do not (ResNet50, VGG16, InceptionV3,
     plain MobileNetV3/DINOv2, YOLO); without normalization the Euclidean
     distances these metrics use live on per-model magnitude scales, so the
     scores are not comparable across embedding families. On unit vectors

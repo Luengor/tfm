@@ -134,9 +134,9 @@ already a configuration (segmenter changes invalidate cached crops, so explicit
 **Question.** Which embedding backbone produces the most semantically coherent
 graffiti clusters under a fixed downstream pipeline?
 
-**Varies.** Eleven embeddings: four ImageNet CNNs (`resnet50`, `vgg16`,
-`inception_v3`, `mobilenet_v3`), DINOv2 ViT-S/14, CLIP ViT-B/32, three YOLO
-backbones (`yolon`, `yolos`, `yolom`), and the two fine-tuned heads
+**Varies.** Ten embeddings: four ImageNet CNNs (`resnet50`, `vgg16`,
+`inception_v3`, `mobilenet_v3`), DINOv2 ViT-S/14, CLIP ViT-B/32, two YOLO
+backbones (`yolon`, `yolom`), and the two fine-tuned heads
 (`mobilenet_v3_graffiti_author_head`, `dinov2_graffiti_style_head`). The author /
 identity-recovery head (`dinov2_graffiti_author_head`) is omitted — its
 training objective targets a different question.
@@ -149,10 +149,10 @@ pipeline. Pairs `mobilenet_v3` ↔ `mobilenet_v3_graffiti_author_head` and
 `dinov2_vits14` ↔ `dinov2_graffiti_style_head` answer the fine-tuning vs.
 pretraining question directly.
 
-**Cost.** 33 runs (11 embeddings × 3 limits), 33 full ingests (each
+**Cost.** 30 runs (10 embeddings × 3 limits), 30 full ingests (each
 embedding × limit pair gets its own DB; no reuse across embeddings). The
 `limit=250` ingests are cheap, so the marginal cost over the 2-limit
-variant is dominated by the 11 small-`n` runs.
+variant is dominated by the 10 small-`n` runs.
 
 **Config.** [`configs/01_embedding.json`](configs/01_embedding.json)
 

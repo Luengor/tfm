@@ -31,7 +31,6 @@ class EmbeddingModelNames(str, Enum):
     VGG16 = "vgg16"
     INCEPTION_V3 = "inception_v3"
     MOBILENET_V3 = "mobilenet_v3"
-    MOBILENET_V3_NORMALIZED = "mobilenet_v3_normalized"
     MOBILENET_V3_GRAFFITI_AUTHOR_HEAD = "mobilenet_v3_graffiti_author_head"
     MOBILENET_V3_GRAFFITI_STYLE_HEAD = "mobilenet_v3_graffiti_style_head"
     DINOV2_VITS14 = "dinov2_vits14"
@@ -258,28 +257,11 @@ class HeadEmbeddingModel(EmbeddingBase):
     def embedding_size(self) -> int:
         return MODELS[self.name]['embedding_size']
 
-class NormalizedEmbeddingModel(EmbeddingBase):
-    def __init__(self, inner: EmbeddingBase):
-        self._inner = inner
-
-    def gen_embedding(self, image: ImageImage) -> list[float]:
-        vec = torch.tensor(self._inner.gen_embedding(image))
-        vec = torch.nn.functional.normalize(vec, p=2, dim=-1)
-        return vec.tolist()
-
-    @property
-    def embedding_size(self) -> int:
-        return self._inner.embedding_size
-
-
 def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
     match name:
         case EmbeddingModelNames.YOLOm | EmbeddingModelNames.YOLOs | EmbeddingModelNames.YOLOn:
             return YoloEmbeddingModel(name)
 
-        case EmbeddingModelNames.MOBILENET_V3_NORMALIZED:
-            return NormalizedEmbeddingModel(TorchEmbeddingModel(EmbeddingModelNames.MOBILENET_V3))
-        
         case EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD | EmbeddingModelNames.MOBILENET_V3_GRAFFITI_STYLE_HEAD:
             weights = models.MobileNet_V3_Large_Weights.DEFAULT
             base = models.mobilenet_v3_large(weights=weights)

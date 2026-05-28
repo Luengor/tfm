@@ -73,7 +73,7 @@ The pipeline is assembled via `Configuration` (`src/src/configuration.py`), whic
 | Abstract class | Role | Implementations |
 |---|---|---|
 | `StorageBase` | Persist/query embeddings | `SQLiteStorage`, `PostgreSQLStorage` (with pgvector) |
-| `EmbeddingBase` | Generate float vectors from images | ResNet50, VGG16, InceptionV3, MobileNetV3, MobileNetV3 (normalized), DINOv2, CLIP ViT-B/32, YOLO (n/s/m), custom graffiti-finetuned heads (author + style) |
+| `EmbeddingBase` | Generate float vectors from images | ResNet50, VGG16, InceptionV3, MobileNetV3, DINOv2, CLIP ViT-B/32, YOLO (n/s/m), custom graffiti-finetuned heads (author + style) |
 | `SegmenterBase` | Detect graffiti bounding boxes | `YoloSegmenter` (YOLO detection + merge + padding), `IdentitySegmenter` (full image) |
 | `ReductionBase` | Dimensionality reduction before clustering | PCA, UMAP, Isomap, KernelPCA, Identity |
 | `ClusteringBase` | Cluster reduced embeddings | KMeans, DBSCAN, HDBSCAN, OPTICS, Agglomerative, Spectral, GMM, AffinityPropagation |
@@ -87,7 +87,6 @@ The pipeline is assembled via `Configuration` (`src/src/configuration.py`), whic
 - `EmbeddingModelNames` enum in `embeddings.py` — names used in configuration `type` field
 - `TorchEmbeddingModel` — torchvision backbones (ResNet50, VGG16, InceptionV3, MobileNetV3)
 - `HeadEmbeddingModel` — frozen backbone + two-layer projection head (Linear→ReLU→Linear) for graffiti-specific heads
-- `NormalizedEmbeddingModel` — wrapper that L2-normalizes any model's output
 - `DinoEmbeddingModel` — DINOv2 ViT-S/14 via `torch.hub`
 - `ClipEmbeddingModel` — CLIP ViT-B/32 via `open_clip`
 - `YoloEmbeddingModel` — YOLO backbone features
