@@ -1,6 +1,6 @@
 {
   "storage": [
-    {"type": "sqlite", "params": {"db_path": "../exp/.common_db/{run_id}.sqlite"}}
+    {"type": "sqlite", "params": {"db_path": "exp/.common_db/{run_id}.sqlite"}}
   ],
   "segmenter": [
     {"type": "identity", "params": {}}

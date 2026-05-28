@@ -6,7 +6,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_identity_l250.sqlite"
+          "db_path": "exp/.common_db/v2_seg_identity_l250.sqlite"
         }
       },
       "segmenter": {
@@ -41,7 +41,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_identity_l1000.sqlite"
+          "db_path": "exp/.common_db/v2_seg_identity_l1000.sqlite"
         }
       },
       "segmenter": {
@@ -76,7 +76,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_identity_l6416.sqlite"
+          "db_path": "exp/.common_db/v2_seg_identity_l6416.sqlite"
         }
       },
       "segmenter": {
@@ -111,7 +111,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_yolo11s_l250.sqlite"
+          "db_path": "exp/.common_db/v2_seg_yolo11s_l250.sqlite"
         }
       },
       "segmenter": {
@@ -151,7 +151,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_yolo11s_l1000.sqlite"
+          "db_path": "exp/.common_db/v2_seg_yolo11s_l1000.sqlite"
         }
       },
       "segmenter": {
@@ -191,7 +191,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_yolo11s_l6416.sqlite"
+          "db_path": "exp/.common_db/v2_seg_yolo11s_l6416.sqlite"
         }
       },
       "segmenter": {
@@ -231,7 +231,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_yolo11m_l250.sqlite"
+          "db_path": "exp/.common_db/v2_seg_yolo11m_l250.sqlite"
         }
       },
       "segmenter": {
@@ -271,7 +271,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_yolo11m_l1000.sqlite"
+          "db_path": "exp/.common_db/v2_seg_yolo11m_l1000.sqlite"
         }
       },
       "segmenter": {
@@ -311,7 +311,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_yolo11m_l6416.sqlite"
+          "db_path": "exp/.common_db/v2_seg_yolo11m_l6416.sqlite"
         }
       },
       "segmenter": {
@@ -351,7 +351,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_yolo11m_ft_l250.sqlite"
+          "db_path": "exp/.common_db/v2_seg_yolo11m_ft_l250.sqlite"
         }
       },
       "segmenter": {
@@ -391,7 +391,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_yolo11m_ft_l1000.sqlite"
+          "db_path": "exp/.common_db/v2_seg_yolo11m_ft_l1000.sqlite"
         }
       },
       "segmenter": {
@@ -431,7 +431,7 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "../exp/.common_db/v2_seg_yolo11m_ft_l6416.sqlite"
+          "db_path": "exp/.common_db/v2_seg_yolo11m_ft_l6416.sqlite"
         }
       },
       "segmenter": {
