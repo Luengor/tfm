@@ -71,25 +71,23 @@ entre imágenes se traducen en relaciones geométricas entre vectores. La
 proximidad en el espacio latente debe reflejar la similitud perceptual: dos
 fotografías de la misma pintada, de pintadas estilísticamente próximas o del
 mismo autor por ejemplo, deben quedar a menor distancia que dos imágenes no
-relacionadas, paradigma ejemplificado por
-FaceNet~\cite{schroff_facenet_2015}. El cálculo directo de distancias sobre
-los píxeles de la imagen no captura esta noción de similitud, ya que
-pequeñas transformaciones espaciales o de iluminación producen variaciones
-grandes en el espacio de píxeles~\cite{wang_euclidean_2005}, y por ello se
-recurre a representaciones aprendidas mediante redes profundas (véase
-\ref{subsec:art-embeddings}).
+relacionadas. El cálculo directo de distancias sobre los píxeles de la imagen
+no captura esta noción de similitud, ya que pequeñas transformaciones
+espaciales o de iluminación producen variaciones grandes en el espacio de
+píxeles~\cite{wang_euclidean_2005}, y por ello se recurre a representaciones
+aprendidas mediante redes profundas (véase \ref{subsec:art-embeddings}).
 
 Las métricas de distancia utilizadas habitualmente en este contexto son la
 distancia euclidiana y la distancia coseno. Esta última depende exclusivamente
 de la dirección de los vectores y resulta equivalente a la distancia euclidiana
 cuando los \textit{embeddings} están normalizados a norma unitaria
 (normalización $L_2$), práctica frecuente para evitar que la magnitud del
-vector domine la comparación. En el presente trabajo la normalización se
-trata como un parámetro del modelo de extracción, si bien su disponibilidad
-depende de la arquitectura: CLIP y las cabezas de proyección ajustadas
-normalizan siempre su salida, MobileNetV3 dispone de una variante normalizada
-explícita, y el resto de \textit{backbones} se emplean sin normalización salvo
-que se envuelvan en dicha variante.
+vector domine la comparación. En el presente trabajo la normalización se trata
+como un parámetro del modelo de extracción, aunque su disponibilidad depende de
+la arquitectura: CLIP y las cabezas de proyección ajustadas normalizan siempre
+su salida, MobileNetV3 dispone de una variante normalizada explícita, y el
+resto de \textit{backbones} se emplean sin normalización salvo que se envuelvan
+en dicha variante.
 
 \subsubsection{Agrupamiento no supervisado}
 El agrupamiento (\textit{clustering}) consiste en particionar un conjunto de
@@ -129,22 +127,23 @@ dimensión preservando la estructura relevante.
 
 Las técnicas se dividen en lineales y no lineales. Las primeras, como el
 análisis de componentes principales (PCA), proyectan sobre ejes de máxima
-varianza y suponen que la estructura relevante es lineal, lo que limita su
-capacidad cuando los datos viven en una variedad curva. Las técnicas no
-lineales relajan esta hipótesis preservando relaciones de vecindad, distancias
-geodésicas o estructura topológica. Las opciones concretas integradas en el
-sistema y las referencias canónicas se recogen en la
-sección~\ref{subsec:art-clustering} y en la tabla~\ref{tab:reduction}.
+varianza y suponen que la estructura de datos subyacente es lineal, lo que
+limita su efectividad cuando los datos viven en una variedad curva. Las
+técnicas no lineales relajan esta hipótesis preservando relaciones de vecindad,
+distancias o estructura. Las opciones concretas integradas en el sistema y las
+referencias canónicas se recogen en la sección~\ref{subsec:art-clustering} y en
+la tabla~\ref{tab:reduction}.
 
 \subsubsection{Métricas de evaluación}
 \label{subsubsec:metricas}
+% TODO: a macro-silhouette score is also calculated, add it here?
 La calidad de los clústeres resultantes se valora con dos familias de métricas.
 Sobre el banco principal sin etiquetar se recurre a métricas internas, que
 cuantifican la cohesión intracluster y la separación intercluster directamente
 sobre los \textit{embeddings}. Se emplean el coeficiente de
 silueta~\cite{rousseeuw_silhouettes_1987}, que combina para cada punto la
 distancia media a los miembros de su propio clúster con la distancia media al
-clúster más cercano, y el índice de
+clúster más cercano; el índice de
 Calinski-Harabász~\cite{calinski_dendrite_1974}, que mide el cociente entre la
 dispersión intercluster e intracluster, y el índice de
 Davies-Bouldin~\cite{davies_cluster_1979}, que promedia la similitud de cada
@@ -153,12 +152,13 @@ Se complementan con dos indicadores estructurales: la proporción de puntos
 clasificados como ruido y el coeficiente de variación del tamaño de los
 clústeres.
 
-Adicionalmente, sobre los $294$ recortes de evaluación etiquetados por estilo
-descritos en \ref{subsec:dataset} se calculan métricas extrínsecas que sí utilizan
-la verdad fundamental disponible: el índice de Rand ajustado (ARI), la información
-mutua normalizada (NMI) y la F1 por pares, que constituyen el complemento más
-sólido a las métricas internas en el plano de calidad. Las condiciones bajo las
-que se reportan se detallan en \ref{subsubsec:eval-extrinseca}.
+Adicionalmente, sobre los $294$ recortes de evaluación etiquetados por estilo o
+los $110$ etiquetados por autoría, ambos descritos en \ref{subsec:dataset}, se
+calculan métricas extrínsecas que sí utilizan la verdad fundamental disponible:
+el índice de Rand ajustado (ARI), la información mutua normalizada (NMI) y la
+F1 por pares, que constituyen el complemento más sólido a las métricas internas
+en el plano de calidad. Las condiciones bajo las que se reportan se detallan en
+\ref{subsubsec:eval-extrinseca}.
 
 \subsection{Componentes implementados}
 \label{subsec:configuraciones}
