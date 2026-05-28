@@ -199,6 +199,7 @@ def _run_single(
     started_at = _utc_now()
 
     ingest_metrics = None
+    hnsw_index_build_metrics = None
     reduction_agg = None
     query_metrics = None
     similarity_metrics = None
@@ -325,7 +326,9 @@ def _run_single(
             # Build ANN index (if configured) BEFORE the timed loop so build
             # cost does not pollute the similarity-search stage metrics.
             if hasattr(storage, "ensure_hnsw_index"):
-                storage.ensure_hnsw_index()
+                with profile_stage() as hnsw_build_stage:
+                    storage.ensure_hnsw_index()
+                hnsw_index_build_metrics = hnsw_build_stage.metrics
 
             # Index the corpus by a hashable key so the returned (freshly built)
             # ImageData objects can be mapped back to their corpus position for
@@ -599,6 +602,7 @@ def _run_single(
         reduction_type=run_spec.reduction.type if run_spec.reduction else "identity",
         error=error,
         ingest=ingest_metrics,
+        hnsw_index_build=hnsw_index_build_metrics,
         reduction=reduction_agg,
         similarity_search=similarity_metrics,
         avg_neighbor_distance=avg_neighbor_distance,

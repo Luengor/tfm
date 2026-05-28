@@ -428,6 +428,7 @@ class BenchmarkResult:
     ann_recall_at_k: float | None = None
     similarity_extrinsic: SimilaritySearchExtrinsicMetrics | None = None
     similarity_extrinsic_author: SimilaritySearchExtrinsicMetrics | None = None
+    hnsw_index_build: StageMetrics | None = None
     clustering: StageMetricsAgg | None = None
     clustering_quality: ClusteringQualityMetricsAgg | None = None
     clustering_extrinsic: ExtrinsicMetricsAgg | None = None
@@ -472,7 +473,7 @@ class BenchmarkResult:
                 "repeats": self.config.repeats,
             })
 
-        for stage_name in ("ingest", "reduction", "similarity_search", "clustering"):
+        for stage_name in ("ingest", "hnsw_index_build", "reduction", "similarity_search", "clustering"):
             stage = getattr(self, stage_name)
             if stage is None:
                 continue
