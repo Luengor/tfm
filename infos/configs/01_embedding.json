@@ -2,7 +2,7 @@
   "limit": [250, 1000, 6416],
   "repeats": 3,
   "storage": [
-    {"type": "sqlite", "params": {}}
+    {"type": "sqlite", "params": {"db_path": "../exp/.common_db/{run_id}.sqlite"}}
   ],
   "segmenter": [
     {"type": "identity", "params": {}}

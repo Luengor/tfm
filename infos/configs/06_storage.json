@@ -14,7 +14,7 @@
   "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 100, "sample_seed": 42},
   "repeats": 5,
   "storage": [
-    {"type": "sqlite", "params": {}},
+    {"type": "sqlite", "params": {"db_path": "../exp/.common_db/{run_id}.sqlite"}},
     {"type": "postgresql", "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/postgres"}},
     {"type": "postgresql", "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/postgres", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64}}}
   ],
