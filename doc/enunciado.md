@@ -24,3 +24,11 @@ Sobre la dualidad memoria de TFM/artículo, te recomiendo escribir la memoria y 
 
 Esta estructura es solo un modelo, puede salirte de ella según convenga a aquello que quieras contar con más énfasis.
 
+## Otros aspectos a tener en cuenta
+ * El objetivo del trabajo es puramente técnico. En ningún caso se pretende dar
+   opinión sobre el grafiti, vandálico o no, ni sobre la legalidad/moralidad de
+   su práctica. Este es un fenómeno social complejo, cuya descripción y
+   análisis caen fuera del alcance de este trabajo. Se debería tratar el
+   grafiti como un fenómeno visual neutro, sin prejuicios, y centrarse en la
+   parte técnica de su análisis.
+
