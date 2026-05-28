@@ -286,13 +286,13 @@ el extractor de características opere sobre los recortes correspondientes en
 lugar de la escena completa. Se han implementado dos variantes. La primera
 de ellas no aplica ningún tipo de segmentación, de modo que el extractor de
 características se aplica sobre la fotografía completa. La segunda, utiliza
-un modelo de YOLO~\cite{noauthor_ultralytics_2024} ajustado sobre el conjunto
-de grafiti para detectar las cajas que encierran cada pintada, y recorta la imagen
-en consecuencia. Además, este proceso de recorte fusiona las cajas de detección
-solapadas para evitar duplicados y aplica un margen configurable alrededor de
-cada caja antes del recorte. El resultado es un conjunto de sub-imágenes que se
-procesan de forma independiente y que pueden producir varios
-\textit{embeddings} por fotografía original.
+un modelo de YOLO~\cite{noauthor_ultralytics_2024} en su versión oficial o
+ajustado sobre el conjunto de grafiti para detectar las cajas que encierran
+cada pintada, y recorta la imagen en consecuencia. Además, este proceso de
+recorte fusiona las cajas de detección solapadas para evitar duplicados y
+aplica un margen configurable alrededor de cada caja antes del recorte. El
+resultado es un conjunto de sub-imágenes que se procesan de forma independiente
+y que pueden producir varios \textit{embeddings} por fotografía original.
 
 El detector se ajusta sobre el subconjunto anotado de Salamanca descrito en
 \ref{subsec:dataset}, disjunto del banco de evaluación, lo que evita que las
