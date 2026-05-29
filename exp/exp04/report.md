@@ -137,9 +137,8 @@ Two distinct answers, both needed:
    structure vanishes — but since `mcs=5` already wins, this only matters as a
    safety margin, not a tuning recommendation.
 
-This confirms the audit M.5 prediction empirically: `mcs ∈ {100, 200}` at
-`limit ∈ {250, 1000}` produces degenerate all-noise cells with no metrics
-(250@{100,200} and 1000@200 → 0 clusters).
+`mcs ∈ {100, 200}` at `limit ∈ {250, 1000}` produces degenerate all-noise
+cells with no metrics (250@{100,200} and 1000@200 → 0 clusters).
 
 ## Repeat stability
 

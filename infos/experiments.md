@@ -251,12 +251,14 @@ under `infos/configs/` if the reduction sweep (§2) flags UMAP as marginal.
 **Question.** Does YOLO cropping improve clustering quality over embedding the
 whole image, and which detector / threshold / padding works best?
 
-**Varies.** `identity` vs. `yolo` with `yolo11{n,s,m}.pt` and
-`yolo11m-train-10.pt` (fine-tuned detector) — five runs total. Earlier
+**Varies.** `identity` vs. `yolo` with `yolo11{s,m}.pt` and
+`yolo11m-train-10.pt` (fine-tuned detector) — four segmenters total. Earlier
 threshold / padding sweeps and the `yolo11l` row were dropped: at this
 scale, the gap between `m` and `l` is dominated by compute cost, not
 detection quality, and the threshold/padding axis did not produce
-distinctive signal.
+distinctive signal. The `yolo11n` row was also dropped — at this scale its
+detection quality is strictly below `yolo11s`/`yolo11m` while clustering
+behaviour tracks them, so it added cost without distinctive signal.
 
 **Fixed.** Baseline embedding, reduction, clustering. Each segmenter row is
 expanded to `limit ∈ {250, 1000, 6416}`.
@@ -272,7 +274,7 @@ included in the hash, so the hand-written format is not strictly required for
 correctness; it was chosen for clarity and explicit control over `db_path`
 and `clear_storage: true` per row.
 
-**Cost.** 15 runs (5 segmenters × 3 limits), 15 full ingests — the most
+**Cost.** 12 runs (4 segmenters × 3 limits), 12 full ingests — the most
 expensive quality experiment.
 
 **Config.**
