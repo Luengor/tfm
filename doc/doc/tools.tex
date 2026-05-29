@@ -184,9 +184,9 @@ salida y pre entrenamiento.
   VGG16~\cite{simonyan_very_2015} & CNN profunda & $4096$ & ImageNet \\ \hline
   InceptionV3~\cite{szegedy_rethinking_2015} & CNN multi-rama & $2048$ & ImageNet \\ \hline
   MobileNetV3~\cite{howard_searching_2019} & CNN ligera & $1280$ & ImageNet \\ \hline
-  DINOv2 ViT-S/14~\cite{oquab_dinov2_2024} & \textit{Transformer}\cite{dosovitskiy_image_2021} & $384$ & Autosupervisado (LVD-142M) \\ \hline
+  DINOv2 ViT-S/14~\cite{oquab_dinov2_2024} & \textit{Transformer}~\cite{dosovitskiy_image_2021} & $384$ & Autosupervisado (LVD-142M) \\ \hline
   CLIP ViT-B/32~\cite{radford_learning_2021} & \textit{Transformer} & $512$ & Imagen-texto (WIT) \\ \hline
-  YOLO11 (n/m)\cite{noauthor_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO \\ \hline
+  YOLO11 (n/m)~\cite{noauthor_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO \\ \hline
   \caption{Modelos de extracción de características integrados.}
   \label{tab:embedding-models}
 \end{longtable}
@@ -227,7 +227,7 @@ cae abruptamente.
   Aglomerativo~\cite{mullner_modern_2011} & $n\_clusters$, $linkage$ & no \\ \hline
   Espectral~\cite{ng_spectral_2001,huang_ultra-scalable_2020} & $n\_clusters$, afinidad & no \\ \hline
   GMM~\cite{dempster_maximum_1977} & $n\_components$, covarianza & sí \\ \hline
-  \textit{Affinity Propagation}\cite{frey_clustering_2007} & $damping$, $preference$ & no requiere \\ \hline
+  \textit{Affinity Propagation}~\cite{frey_clustering_2007} & $damping$, $preference$ & no requiere \\ \hline
   \caption{Algoritmos de agrupamiento implementados.}
   \label{tab:clustering-algos}
 \end{longtable}
