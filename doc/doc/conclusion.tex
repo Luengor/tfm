@@ -1,3 +1,17 @@
 %! TeX root: ../informe.tex
 \section{Conclusiones}
 \label{sec:conclusion}
+
+% TODO future work: extrapolated cost-vs-n via embedding resampling.
+% The §7 scalability sweep is bounded above by the available graffiti corpus
+% (n=6416), which limits the log-range to ~1.8 decades — too narrow to
+% empirically separate O(n log n) from O(n²) clusterers. A natural follow-up
+% is to bootstrap embeddings (sample-with-replacement from the 6416 real
+% DINOv2 vectors) up to n ∈ {10k, 25k, 50k, 100k} and re-measure
+% reduction + clustering + similarity-search cost. This stays on-thesis
+% (the enunciado motivates the work by future graffiti-DB growth:
+% "su dificultad aumenta con el crecimiento de las bases de datos") while
+% extending the empirical slope estimates to a range where asymptotic
+% classes can be distinguished. Ingest is excluded (real-image-bound) and
+% quality metrics are skipped (resampled labels are meaningless) — the
+% extrapolation is cost-only and labelled as a projection, not a measurement.
