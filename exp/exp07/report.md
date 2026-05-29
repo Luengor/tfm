@@ -163,6 +163,78 @@ Absolute magnitudes matter more than slopes for downstream choices:
   stay sub-1 MB. If the corpus grew 10×, Agglomerative would hit ~30 GB
   RAM and Agglomerative becomes infeasible long before its wall time does.
 
+## Memory
+
+Peak RSS per stage (mean over K samples — *no* iter-0 drop, since the
+allocator holds pages after the first iteration and per-iter deltas
+under-report the true peak) plus VRAM peak. RSS columns are
+`peak_rss_delta_mb` — the stage-net peak above the stage's own baseline,
+not absolute RSS.
+
+| n | ingest_rss | ingest_vram | red_rss | red_vram | ss_rss (hdb) | ss_vram (hdb) |
+|--:|--:|--:|--:|--:|--:|--:|
+| 250 | 281.5 | 100.2 | 4.7 | 85.6 | 0.0 | 85.6 |
+| 500 | 282.5 | 100.2 | 5.0 | 85.6 | 4.6 | 85.6 |
+| 1000 | 282.6 | 100.2 | 13.3 | 94.8 | 12.2 | 94.8 |
+| 2000 | 282.6 | 100.2 | 21.4 | 94.8 | 24.5 | 94.8 |
+| 3500 | 282.6 | 100.2 | 77.3 | 94.8 | 42.8 | 94.8 |
+| 6416 | 282.6 | 100.2 | **72.3** | 94.8 | 82.0 | 94.8 |
+
+Clustering RSS (peak above clustering's own baseline) per clusterer:
+
+| n | hdbscan | kmeans | dbscan | optics | agglomerative |
+|--:|--:|--:|--:|--:|--:|
+| 250 | 0.17 | 0.13 | 0.14 | 0.15 | 0.11 |
+| 500 | 0.20 | 0.11 | 0.14 | 0.14 | 0.13 |
+| 1000 | 0.18 | 0.12 | 0.14 | 0.14 | 0.13 |
+| 2000 | 0.18 | 0.11 | 0.14 | 0.13 | **3.18** |
+| 3500 | 0.23 | 0.11 | 0.14 | 0.13 | **93.54** |
+| 6416 | 0.35 | 0.12 | 0.14 | 0.14 | **314.12** |
+
+Five readings:
+
+1. **Ingest RSS is the model floor (~282 MB) and is n-invariant.** The
+   per-image delta is absorbed by the DINOv2 weights; loading the model
+   sets the ceiling. VRAM is similarly fixed at ~100 MB. The implication
+   for §6/§9: storage backend choice cannot move the ingest RSS curve —
+   the model dominates.
+
+2. **UMAP reduction RSS shows the same regime change as wall time** —
+   monotone rise 4.7 → 5.0 → 13.3 → 21.4 → 77.3 MB through 250→3500, then
+   *drops to 72.3 MB at n=6416*. pynndescent's approximate kNN graph is
+   not just faster than exact construction, it is cheaper in memory too.
+   The 77.3 MB at n=3500 is the worst case in the sweep — past the
+   crossover the curve bends down. Same caveat as the wall-time slope:
+   a single straight-line extrapolation past n=4 k overstates memory.
+
+3. **HDBSCAN/KMeans/DBSCAN/OPTICS clustering RSS is essentially flat
+   (≤0.5 MB) at every n.** The four density / partitional algorithms
+   operate on the 10-d reduced input (≈250 KB at n=6416 in float64) and
+   the working set is dominated by labels and a small graph structure.
+   Memory is not a constraint for any of them on this corpus or one
+   plausibly 10× larger.
+
+4. **Agglomerative clustering RSS climbs quadratically:** 0.13 → 0.13 →
+   3.18 → 93.54 → **314.12** MB across n ∈ {1000, 2000, 3500, 6416}.
+   The 3500 → 6416 jump (93.5 → 314 MB, ×3.36 for ×1.83 in n) is the
+   condensed pairwise distance matrix made explicit. Extrapolation: at
+   n=20 k Agglomerative would need ~3 GB; at n=50 k ~19 GB. This — not
+   wall time — is the binding constraint that pushes Agglomerative off
+   the candidate list for any corpus past ~20 k images, and is the
+   strongest single argument for HDBSCAN / DBSCAN / OPTICS at scale.
+
+5. **Similarity-search RSS scales linearly with n** (4.6 → 12.2 → 24.5
+   → 42.8 → 82.0 MB across n=500…6416, slope ≈ 1.0). The per-query top-k
+   result set is the dominant allocation; corpus-side embeddings are
+   streamed from SQLite rather than held in memory. So sim-search is
+   O(n²) in *time* but O(n) in *memory* — relevant for §6: a backend
+   change (pgvector exact / HNSW) reduces the time slope without
+   inflating the memory ceiling.
+
+VRAM stays clamped at 85.6 MB (small n) and 94.8 MB (n≥1000) across
+reduction and sim-search — the GPU context carried over from ingest, not
+new allocations. UMAP itself runs on CPU.
+
 ## Repeat stability
 
 The K=5 repeat protocol is delivering tight error bars at n=6416:
