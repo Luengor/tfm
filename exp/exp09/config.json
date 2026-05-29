@@ -4,7 +4,7 @@
       "name": "hnsw_exact_baseline",
       "storage": {
         "type": "postgresql",
-        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep"}
+        "params": {"db_url": "postgresql://localhost:54321/hnsw_sweep"}
       },
       "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
       "segmenter": {"type": "identity", "params": {}},
@@ -19,7 +19,7 @@
       "name": "hnsw_m8_efc64_efs40",
       "storage": {
         "type": "postgresql",
-        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 8, "ef_construction": 64, "ef_search": 40, "recreate": true}}
+        "params": {"db_url": "postgresql://@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 8, "ef_construction": 64, "ef_search": 40, "recreate": true}}
       },
       "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
       "segmenter": {"type": "identity", "params": {}},
@@ -34,7 +34,7 @@
       "name": "hnsw_m16_efc64_efs40",
       "storage": {
         "type": "postgresql",
-        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 40, "recreate": true}}
+        "params": {"db_url": "postgresql://localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 40, "recreate": true}}
       },
       "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
       "segmenter": {"type": "identity", "params": {}},
@@ -49,7 +49,7 @@
       "name": "hnsw_m32_efc64_efs40",
       "storage": {
         "type": "postgresql",
-        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 32, "ef_construction": 64, "ef_search": 40, "recreate": true}}
+        "params": {"db_url": "postgresql://localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 32, "ef_construction": 64, "ef_search": 40, "recreate": true}}
       },
       "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
       "segmenter": {"type": "identity", "params": {}},
@@ -64,7 +64,7 @@
       "name": "hnsw_m64_efc64_efs40",
       "storage": {
         "type": "postgresql",
-        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 64, "ef_construction": 64, "ef_search": 40, "recreate": true}}
+        "params": {"db_url": "postgresql://localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 64, "ef_construction": 64, "ef_search": 40, "recreate": true}}
       },
       "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
       "segmenter": {"type": "identity", "params": {}},
@@ -79,7 +79,7 @@
       "name": "hnsw_m16_efc32_efs40",
       "storage": {
         "type": "postgresql",
-        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 32, "ef_search": 40, "recreate": true}}
+        "params": {"db_url": "postgresql://localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 32, "ef_search": 40, "recreate": true}}
       },
       "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
       "segmenter": {"type": "identity", "params": {}},
@@ -94,7 +94,7 @@
       "name": "hnsw_m16_efc128_efs40",
       "storage": {
         "type": "postgresql",
-        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 128, "ef_search": 40, "recreate": true}}
+        "params": {"db_url": "postgresql://localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 128, "ef_search": 40, "recreate": true}}
       },
       "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
       "segmenter": {"type": "identity", "params": {}},
@@ -109,7 +109,7 @@
       "name": "hnsw_m16_efc256_efs40",
       "storage": {
         "type": "postgresql",
-        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 256, "ef_search": 40, "recreate": true}}
+        "params": {"db_url": "postgresql://localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 256, "ef_search": 40, "recreate": true}}
       },
       "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
       "segmenter": {"type": "identity", "params": {}},
@@ -124,7 +124,7 @@
       "name": "hnsw_m16_efc64_efs10",
       "storage": {
         "type": "postgresql",
-        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 10, "recreate": true}}
+        "params": {"db_url": "postgresql://localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 10, "recreate": true}}
       },
       "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
       "segmenter": {"type": "identity", "params": {}},
@@ -139,7 +139,7 @@
       "name": "hnsw_m16_efc64_efs100",
       "storage": {
         "type": "postgresql",
-        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 100, "recreate": true}}
+        "params": {"db_url": "postgresql://localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 100, "recreate": true}}
       },
       "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
       "segmenter": {"type": "identity", "params": {}},
@@ -154,7 +154,7 @@
       "name": "hnsw_m16_efc64_efs200",
       "storage": {
         "type": "postgresql",
-        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 200, "recreate": true}}
+        "params": {"db_url": "postgresql://localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 200, "recreate": true}}
       },
       "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
       "segmenter": {"type": "identity", "params": {}},
