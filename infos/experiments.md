@@ -14,10 +14,10 @@ Redesigned around the three pillars of the TFM21 brief
    4 styles) and `data/author/eval_crop/` (185 crops over 87 authors), the only
    experiments with ground truth.
 
-The eight experiments below are ordered to support the thesis narrative: the
+The nine experiments below are ordered to support the thesis narrative: the
 quality sweeps (§§1–5) fix the pipeline, the cost sweeps (§§6–7) measure it,
-and the supervised study (§8) anchors the unsupervised metrics used everywhere
-else.
+the supervised study (§8) anchors the unsupervised metrics used everywhere
+else, and the HNSW sweep (§9) tunes the approximate-search index.
 
 ## Baseline pipeline
 
@@ -39,10 +39,12 @@ comparisons are clean:
   full cost-sweep. Cost-focused experiments (§6, §7) keep their finer
   explicit `n` sweeps.
 - **Repeats:** `K=3` for quality experiments, `K=5` for cost experiments
-  (§6, §7). Reduction + clustering loop K times per run; iter 0 is discarded
-  to absorb JIT warm-up; the remaining K-1 samples produce mean ± std for
-  wall time, CPU, RSS, and VRAM. Ingest stays single-shot. See the
-  **Metrics** section for the full rationale.
+  (§6, §7). Reduction + clustering loop K times per run; for the cost fields
+  (wall time, CPU) iter 0 is discarded to absorb JIT warm-up, so they aggregate
+  over the remaining K-1 samples. The memory fields (RSS, VRAM) keep all K
+  samples: after iter 0 the allocator holds pages and per-iter deltas
+  under-report the true peak. Ingest stays single-shot. See the **Metrics**
+  section for the full rationale.
 
 The working dataset contains 6416 images. The 294 labelled style-eval
 crops in [`data/style/eval_crop/`](../data/style/eval_crop/) are drawn from
@@ -51,7 +53,7 @@ experiments — at <5 % of the corpus they do not perturb aggregate statistics,
 and segregating them would artificially shrink the cost-sweep dataset. The 385
 training crops (110 Salamanca style-train + 275 Cuenca) and the 185
 Salamanca author-eval crops come from the separate 265-image Salamanca and
-1207-image Cuenca annotation sets, which are **disjoint** from the 6416-image
+1106-image Cuenca annotation sets, which are **disjoint** from the 6416-image
 eval corpus.
 
 ## Metrics
@@ -654,6 +656,6 @@ tuning and a distance-metric / sphere-geometry deep dive. Both were
 trimmed: the canonical UMAP setting is well-established for HDBSCAN
 preprocessing, and the metric-impact analysis is theoretical context for
 the thesis chapter rather than a separate empirical sweep. The remaining
-eight experiments live under [`configs/`](configs/), with the scalability
+nine experiments live under [`configs/`](configs/), with the scalability
 sweep §7 expanded (more `n` points, a sixth clusterer, and similarity
 search) to make it the genuine cost-vs-`n` headline.

@@ -206,9 +206,10 @@ el algoritmo para $k \in \{2, 3, \ldots, k_{\max}\}$ con $k_{\max} = \min(n,
 20)$, donde $n$ es el número de \textit{embeddings} disponibles, y se selecciona
 el valor de $k$ correspondiente al codo de la curva mediante el criterio de la
 distancia perpendicular al segmento que une los extremos. Para los modelos de
-mezcla gaussiana se sigue el mismo barrido sobre $k \in \{1, 2, \ldots,
-k_{\max}\}$ y se elige el modelo que minimiza el criterio bayesiano de
-información (BIC); este criterio penaliza de manera explícita la complejidad del
+mezcla gaussiana se sigue el mismo barrido sobre $k \in \{2, \ldots,
+k_{\max}\}$ (se excluye $k=1$, que colapsa el agrupamiento en un único grupo y
+deja indefinidas las métricas internas) y se elige el modelo que minimiza el
+criterio bayesiano de información (BIC); este criterio penaliza de manera explícita la complejidad del
 modelo, lo que mitiga la tendencia del ajuste por máxima verosimilitud a
 favorecer el mayor número de componentes. Para DBSCAN se estima el radio
 $\epsilon$ a partir de la curva de $k$-distancias: para cada punto se calcula la
@@ -222,8 +223,8 @@ cae abruptamente.
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
   K-Means~\cite{arthur_k-means_2007} & $n\_clusters$ & sí \\ \hline
   DBSCAN~\cite{ester_density-based_1996} & $\epsilon$, $min\_samples$ & sí ($\epsilon$) \\ \hline
-  HDBSCAN~\cite{campello_density-based_2013} & $min\_cluster\_size$, $min\_samples$ & no requiere \\ \hline
-  OPTICS~\cite{ankerst_optics_1999} & $min\_samples$, $xi$ & no requiere \\ \hline
+  HDBSCAN~\cite{campello_density-based_2013} & $min\_cluster\_size$, $max\_cluster\_size$ & no requiere \\ \hline
+  OPTICS~\cite{ankerst_optics_1999} & $min\_samples$, $max\_eps$, $metric$ & no requiere \\ \hline
   Aglomerativo~\cite{mullner_modern_2011} & $n\_clusters$, $linkage$ & no \\ \hline
   Espectral~\cite{ng_spectral_2001,huang_ultra-scalable_2020} & $n\_clusters$, afinidad & no \\ \hline
   GMM~\cite{dempster_maximum_1977} & $n\_components$, covarianza & sí \\ \hline
@@ -289,7 +290,7 @@ aplica un margen configurable alrededor de cada caja antes del recorte. El
 resultado es un conjunto de sub-imágenes que se procesan de forma independiente
 y que pueden producir varios \textit{embeddings} por fotografía original.
 
-El detector se ajusta sobre el subconjunto anotado de Salamanca descrito en
+El detector se ajusta sobre el subconjunto anotado de ambos bancos descrito en
 \ref{subsec:dataset}, disjunto del banco de evaluación, lo que evita que las
 métricas reportadas sobre las configuraciones con segmentador queden sesgadas
 por el solapamiento entre entrenamiento y evaluación. El procedimiento de ajuste
@@ -315,10 +316,9 @@ autores distintos; las de estilo organizan el espacio según las cuatro
 categorías estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
 \textit{character}). Las cuatro cabezas resultantes se entrenan exclusivamente
 sobre el subconjunto anotado descrito en \ref{subsec:dataset} (detalles sobre
-el entrenamiento en  \ref{subsubsec:entrenamiento-cabezas}) y se integran como
-modelos de \textit{embedding} adicionales en el catálogo de la
-tabla~\ref{tab:embedding-models}, conservando la dimensionalidad del modelo
-base.
+el entrenamiento en  \ref{subsubsec:entrenamiento-cabezas}) y se añaden al
+catálogo de modelos de \textit{embedding}, conservando la dimensionalidad del
+modelo base.
 
 \subsection{Entorno de ejecución}
 \label{subsec:entorno}

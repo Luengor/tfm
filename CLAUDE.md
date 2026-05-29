@@ -73,7 +73,7 @@ The pipeline is assembled via `Configuration` (`src/src/configuration.py`), whic
 | Abstract class | Role | Implementations |
 |---|---|---|
 | `StorageBase` | Persist/query embeddings | `SQLiteStorage`, `PostgreSQLStorage` (with pgvector) |
-| `EmbeddingBase` | Generate float vectors from images | ResNet50, VGG16, InceptionV3, MobileNetV3, DINOv2, CLIP ViT-B/32, YOLO (n/s/m), custom graffiti-finetuned heads (author + style) |
+| `EmbeddingBase` | Generate float vectors from images | ResNet50, VGG16, InceptionV3, MobileNetV3, DINOv2, CLIP ViT-B/32, YOLO (n/s/m; `yolos` is implemented but not used by any benchmark config, which sweep only n/m), custom graffiti-finetuned heads (author + style) |
 | `SegmenterBase` | Detect graffiti bounding boxes | `YoloSegmenter` (YOLO detection + merge + padding), `IdentitySegmenter` (full image) |
 | `ReductionBase` | Dimensionality reduction before clustering | PCA, UMAP, Isomap, KernelPCA, Identity |
 | `ClusteringBase` | Cluster reduced embeddings | KMeans, DBSCAN, HDBSCAN, OPTICS, Agglomerative, Spectral, GMM, AffinityPropagation |
@@ -97,7 +97,7 @@ The pipeline is assembled via `Configuration` (`src/src/configuration.py`), whic
 `pipeline-benchmark` drives systematic evaluation:
 
 1. **Configuration JSON** (`benchmarks/*.json`) declares a JSON object with a `runs` list. Each run **must have a `name`** and specifies `storage`, `embedding`, `clustering`, and optionally `segmenter`, `reduction`, and `similarity_search` as `{type, params}` objects. A top-level `cluster_plot` key can enable/configure cluster visualizations.
-2. **Grid generation** (`benchmarks/generate_configuration.py`) takes a grid JSON (lists of options per key) and generates the cartesian product as a configuration. It also handles SQLite database reuse: runs sharing the same storage+embedding+limit combination get `clear_storage: false` and the same `db_path`.
+2. **Grid generation** (`benchmarks/generate_configuration.py`) takes a grid JSON (lists of options per key) and generates the cartesian product as a configuration. It also handles SQLite database reuse: runs sharing the same storage+embedding+segmenter+limit combination get `clear_storage: false` and the same `db_path`.
 3. **Runner** (`src/src/evaluation/runner.py`) builds components from the configuration spec, profiles each stage (ingest, reduction, clustering, similarity search), computes clustering quality metrics, and writes JSON results.
 4. **Plotting** (`pipeline-plot`) reads the JSON results and produces seaborn bar charts per metric.
 
