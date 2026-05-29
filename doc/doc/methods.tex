@@ -10,14 +10,14 @@ de características por recorte, persistencia del vector junto a sus metadatos
 en un almacenamiento estructurado y, en un segundo tiempo, recuperación masiva
 del conjunto almacenado para reducirlo y agruparlo. La separación explícita
 entre la fase de ingesta y la fase de agrupamiento es intencionada. Por un
-lado, refleja el escenario operativo previsto (un banco que crece de forma
+lado, refleja el escenario de uso previsto (un banco que crece de forma
 incremental sobre el que se ejecutan sesiones de análisis puntuales), y por
 otro permite aislar el coste computacional de cada etapa al medir.
 
-Cada una de las etapas se ha implementado como un componente intercambiable
-detrás de una interfaz común, de modo que las configuraciones evaluadas se
-construyen como combinaciones de implementaciones concretas de extracción,
-segmentación, reducción, almacenamiento y agrupamiento descritas en
+Las etapas se han implementado de manera modular, como componentes
+intercambiables que cumplen una interfaz común. Así, las configuraciones
+evaluadas se construyen como combinaciones de implementaciones concretas de
+extracción, segmentación, reducción, almacenamiento y agrupamiento descritas en
 \ref{subsec:configuraciones}. Este desacoplamiento es el que habilita la
 evaluación combinatoria que forma el trabajo: cada combinación define una
 configuración independiente y reproducible cuyo coste y calidad pueden
@@ -57,10 +57,9 @@ sobre el conjunto reducido, produciendo una etiqueta de clúster por cada
 vector. A partir de esta información se calculan las métricas de calidad
 intrínsecas y extrínsecas, y se conserva el mapeo entre identificadores de
 clúster y listas de recortes para la generación de visualizaciones
-interactivas. Esta secuencia describe el flujo lógico; el \textit{runner} de
-evaluación lo reproduce con su propio bucle interno (en lugar de invocar el
-método de agrupamiento de alto nivel) para poder cronometrar por separado las
-etapas de reducción y agrupamiento y repetirlas $K$ veces.
+interactivas. Esta secuencia de pasos se ejecuta además varias veces para cada
+configuración para obtener estadísticas sobre la variabilidad de las métricas
+de coste y calidad.
 
 \subsection{Procedimiento experimental}
 \label{subsec:experimental}
