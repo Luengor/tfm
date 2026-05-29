@@ -257,9 +257,13 @@ def _run_single(
             marker_json = storage.get_metadata(INGEST_COMPLETE_KEY)
             if marker_json:
                 marker = json.loads(marker_json)
+                segmenter_type_eff = (
+                    run_spec.segmenter.type.lower() if run_spec.segmenter else "identity"
+                )
                 spec_matches = (
                     marker.get("source_image_count") == len(image_paths)
                     and marker.get("embedding_type") == run_spec.embedding.type.lower()
+                    and marker.get("segmenter_type") == segmenter_type_eff
                 )
                 if spec_matches:
                     print(
