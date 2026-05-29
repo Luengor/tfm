@@ -153,7 +153,7 @@ clasificados como ruido y el coeficiente de variación del tamaño de los
 clústeres.
 
 Adicionalmente, sobre los $294$ recortes de evaluación etiquetados por estilo o
-los $110$ etiquetados por autoría, ambos descritos en \ref{subsec:dataset}, se
+los $185$ etiquetados por autoría, ambos descritos en \ref{subsec:dataset}, se
 calculan métricas extrínsecas que sí utilizan la verdad fundamental disponible:
 el índice de Rand ajustado (ARI), la información mutua normalizada (NMI) y la
 F1 por pares, que constituyen el complemento más sólido a las métricas internas
@@ -254,24 +254,19 @@ transformación. La tabla~\ref{tab:reduction} resume las opciones disponibles.
 \end{longtable}
 
 \subsubsection{Sistemas de almacenamiento}
-% TODO: should implementation-specific details (like the name of the classes)
-% be included here? or should a more abstract description (like the one on the
-% previous section) be given instead?
 La persistencia de los \textit{embeddings} y los metadatos asociados se abstrae
-en la interfaz \texttt{StorageBase}, de la que se han implementado dos
-\textit{backends} con características operativas distintas.
-\texttt{SQLiteStorage} no requiere servicios externos y realiza la búsqueda por
-similitud mediante un recorrido lineal en Python; resulta apropiado para
-despliegues ligeros y como referencia de cálculo exacto frente a alternativas
-aproximadas. \texttt{PostgreSQLStorage} se apoya en la extensión
-\textit{pgvector} de PostgreSQL y delega la búsqueda al motor de la base de
-datos. Por defecto la consulta es un recorrido exacto; opcionalmente puede
-habilitarse un índice aproximado HNSW~\cite{malkov_efficient_2018} sobre los
-vectores (parámetro \texttt{hnsw} de la configuración), lo que permite
-contrastar el coste de la búsqueda exacta frente a la aproximada. Ambos
-\textit{backends} comparten el esquema lógico y la persistencia de metadatos,
-lo que permite cambiar de uno a otro sin modificar el resto del
-\textit{pipeline}.
+tras una interfaz común, de la que se han implementado dos \textit{backends}
+con características operativas distintas. El primero, basado en SQLite, no
+requiere servicios externos y realiza la búsqueda por similitud mediante un
+recorrido lineal; resulta apropiado para despliegues ligeros y como referencia
+de cálculo exacto frente a alternativas aproximadas. El segundo se apoya en la
+extensión \textit{pgvector} de PostgreSQL y delega la búsqueda al motor de la
+base de datos. Por defecto la consulta es un recorrido exacto; opcionalmente
+puede habilitarse un índice aproximado HNSW~\cite{malkov_efficient_2018} sobre
+los vectores, lo que permite contrastar el coste de la búsqueda exacta frente a
+la aproximada. Ambos \textit{backends} comparten el esquema lógico y la
+persistencia de metadatos, lo que permite cambiar de uno a otro sin modificar
+el resto del \textit{pipeline}.
 
 \subsection{Extensiones específicas para grafiti}
 \label{subsec:extras}
