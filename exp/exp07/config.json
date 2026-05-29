@@ -11,47 +11,6 @@
       "storage": {
         "type": "sqlite",
         "params": {
-          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "hdbscan",
-        "params": {
-          "min_cluster_size": 5
-        }
-      },
-      "limit": 100,
-      "name": "hdbscan-l100",
-      "clear_storage": true
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
           "db_path": "exp/.common_db/storage_17ff827561f8.sqlite"
         }
       },
@@ -288,53 +247,6 @@
       "clear_storage": true
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
-          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "kmeans",
-        "params": {
-          "n_clusters": 10
-        }
-      },
-      "limit": 100,
-      "name": "kmeans10-l100",
-      "clear_storage": false
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -370,12 +282,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -411,12 +317,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -452,12 +352,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -493,12 +387,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -534,12 +422,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -575,53 +457,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
-          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "dbscan",
-        "params": {
-          "min_samples": 5
-        }
-      },
-      "limit": 100,
-      "name": "dbscan-l100",
-      "clear_storage": false
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -657,12 +492,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -698,12 +527,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -739,12 +562,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -780,12 +597,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -821,12 +632,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -862,54 +667,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
-          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "optics",
-        "params": {
-          "min_samples": 5,
-          "metric": "cosine"
-        }
-      },
-      "limit": 100,
-      "name": "optics-l100",
-      "clear_storage": false
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -937,8 +694,7 @@
       "clustering": {
         "type": "optics",
         "params": {
-          "min_samples": 5,
-          "metric": "cosine"
+          "min_samples": 5
         }
       },
       "limit": 250,
@@ -946,12 +702,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -979,8 +729,7 @@
       "clustering": {
         "type": "optics",
         "params": {
-          "min_samples": 5,
-          "metric": "cosine"
+          "min_samples": 5
         }
       },
       "limit": 500,
@@ -988,12 +737,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -1021,8 +764,7 @@
       "clustering": {
         "type": "optics",
         "params": {
-          "min_samples": 5,
-          "metric": "cosine"
+          "min_samples": 5
         }
       },
       "limit": 1000,
@@ -1030,12 +772,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -1063,8 +799,7 @@
       "clustering": {
         "type": "optics",
         "params": {
-          "min_samples": 5,
-          "metric": "cosine"
+          "min_samples": 5
         }
       },
       "limit": 2000,
@@ -1072,12 +807,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -1105,8 +834,7 @@
       "clustering": {
         "type": "optics",
         "params": {
-          "min_samples": 5,
-          "metric": "cosine"
+          "min_samples": 5
         }
       },
       "limit": 3500,
@@ -1114,12 +842,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -1147,8 +869,7 @@
       "clustering": {
         "type": "optics",
         "params": {
-          "min_samples": 5,
-          "metric": "cosine"
+          "min_samples": 5
         }
       },
       "limit": 6416,
@@ -1156,54 +877,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
-          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "agglomerative",
-        "params": {
-          "n_clusters": 10,
-          "linkage": "average"
-        }
-      },
-      "limit": 100,
-      "name": "agglomerative-l100",
-      "clear_storage": false
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -1240,12 +913,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -1282,12 +949,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -1324,12 +985,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -1366,12 +1021,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -1408,12 +1057,6 @@
       "clear_storage": false
     },
     {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
       "repeats": 5,
       "storage": {
         "type": "sqlite",
@@ -1447,300 +1090,6 @@
       },
       "limit": 6416,
       "name": "agglomerative-l6416",
-      "clear_storage": false
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
-          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "spectral",
-        "params": {
-          "n_clusters": 10,
-          "affinity": "nearest_neighbors"
-        }
-      },
-      "limit": 100,
-      "name": "spectral-l100",
-      "clear_storage": false
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
-          "db_path": "exp/.common_db/storage_17ff827561f8.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "spectral",
-        "params": {
-          "n_clusters": 10,
-          "affinity": "nearest_neighbors"
-        }
-      },
-      "limit": 250,
-      "name": "spectral-l250",
-      "clear_storage": false
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
-          "db_path": "exp/.common_db/storage_06c5a7a08c1f.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "spectral",
-        "params": {
-          "n_clusters": 10,
-          "affinity": "nearest_neighbors"
-        }
-      },
-      "limit": 500,
-      "name": "spectral-l500",
-      "clear_storage": false
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
-          "db_path": "exp/.common_db/storage_63cebb1d0bad.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "spectral",
-        "params": {
-          "n_clusters": 10,
-          "affinity": "nearest_neighbors"
-        }
-      },
-      "limit": 1000,
-      "name": "spectral-l1000",
-      "clear_storage": false
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
-          "db_path": "exp/.common_db/storage_ee98e2fe3bfa.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "spectral",
-        "params": {
-          "n_clusters": 10,
-          "affinity": "nearest_neighbors"
-        }
-      },
-      "limit": 2000,
-      "name": "spectral-l2000",
-      "clear_storage": false
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
-          "db_path": "exp/.common_db/storage_03507858e979.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "spectral",
-        "params": {
-          "n_clusters": 10,
-          "affinity": "nearest_neighbors"
-        }
-      },
-      "limit": 3500,
-      "name": "spectral-l3500",
-      "clear_storage": false
-    },
-    {
-      "similarity_search": {
-        "enabled": true,
-        "top_k": 5,
-        "sample_n": null,
-        "sample_seed": 42
-      },
-      "repeats": 5,
-      "storage": {
-        "type": "sqlite",
-        "params": {
-          "db_path": "exp/.common_db/storage_8ee4871cff20.sqlite"
-        }
-      },
-      "segmenter": {
-        "type": "identity",
-        "params": {}
-      },
-      "embedding": {
-        "type": "dinov2_graffiti_style_head",
-        "params": {}
-      },
-      "reduction": {
-        "type": "umap",
-        "params": {
-          "n_components": 10,
-          "n_neighbors": 15,
-          "min_dist": 0.0,
-          "metric": "cosine"
-        }
-      },
-      "clustering": {
-        "type": "spectral",
-        "params": {
-          "n_clusters": 10,
-          "affinity": "nearest_neighbors"
-        }
-      },
-      "limit": 6416,
-      "name": "spectral-l6416",
       "clear_storage": false
     }
   ]

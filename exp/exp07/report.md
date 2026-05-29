@@ -1,253 +1,236 @@
-# §7 — Pipeline Scalability Sweep: Report
+# §7 — Pipeline Scalability Sweep (HEADLINE): Report
 
-**Source:** `exp/exp07/output/benchmark_20260528T160305Z.json`
-**Date:** 2026-05-28 · **Host:** FullCreamMilk (Linux, 16 logical CPU, Python 3.14)
-**Status:** 42/42 runs `success`.
+**Source:** `exp/exp07/output/benchmark_20260529T225953Z.json`
+**Date:** 2026-05-29 · **Host:** FullCreamMilk (Linux, 16 logical CPU, Python 3.14)
+**Status:** 30/30 runs `success`.
 
 ## Setup
 
-Pillar 1 (computational cost) — the headline experiment of the thesis. Question: how
-does wall time scale with `n` for each pipeline stage, and do the asymptotic complexity
-differences between clustering algorithms manifest empirically within the available
-dataset range?
+Pillar 1 (computational cost) — the **headline** deliverable of the thesis.
+Question: how does wall time scale with corpus size `n` for each pipeline
+stage on the available graffiti corpus (n ≤ 6416)?
 
-Fixed baseline (one axis varied = `clustering` × `limit`):
+Per the thesis brief, this is a cost-vs-corpus-size *characterisation*, not
+an asymptotic-complexity proof: ~1.8 log decades is too narrow to separate
+O(n log n) from O(n²) cleanly. Slopes are reported as **observed** in this
+regime; theoretical references are quoted as context, not headline claims.
+
+Fixed baseline (varied axis = `limit` × `clustering`):
 
 | Component | Value |
 |---|---|
 | Embedding | `dinov2_graffiti_style_head` (DINOv2 ViT-S/14 + style head, L2-normalised) |
 | Reduction | UMAP 10-d (cosine, n_neighbors=15, min_dist=0) |
-| Clustering | Varied: HDBSCAN, KMeans (k=10), DBSCAN, OPTICS, Agglomerative (k=10), Spectral (k=10) |
 | Segmenter | `identity` (whole image) |
-| Storage | SQLite; similarity search enabled (`top_k=5`) |
-| Repeats | `K=5` (reduction+clustering looped; iter 0 dropped → 4 measured samples) |
+| Storage | SQLite |
+| Repeats | `K=5` (reduction+clustering looped; iter 0 dropped for wall/CPU, all K kept for RSS/VRAM) |
 
-6 clusterers × 7 corpus sizes `{100, 250, 500, 1000, 2000, 3500, 6416}` = 42 runs.
-7 ingests total — the embedding DB is reused across all 6 clusterers within each limit
-group.
+5 clusterers × 6 corpus sizes `{250, 500, 1000, 2000, 3500, 6416}` = 30 runs.
+6 ingests (one shared SQLite DB per limit, reused across the 5 clusterers).
 
-## Summary — empirical complexity classes
+> **Reading note — similarity search timed only on HDBSCAN.** To keep the
+> sweep tractable, `similarity_search.enabled` was set only on the 6 HDBSCAN
+> rows (which run first per limit); the 24 KMeans/DBSCAN/OPTICS/Agglomerative
+> rows skip it. Sim-search cost is storage-invariant under fixed embedding
+> + corpus, so reading it off the HDBSCAN rows alone is sound — the
+> clustering algorithm does not change the SQLite all-pairs top-k cost.
+> All `ss_s = 0` entries below mean "not timed in this run," not "instant."
 
-Log-log slopes of clustering wall time vs. `n` (linear regression over all 7 points):
+## Summary — cost (HEADLINE)
 
-| Algorithm | Measured slope | Expected complexity | Notes |
-|---|---|---|---|
-| KMeans (k=10) | **0.35** | O(n·k·iter) ≈ O(n) | k and iter fixed; assignment step dominates but at k=10 scales sub-linearly in practice |
-| DBSCAN | **0.86** | O(n log n) with kd-tree | kd-tree keeps it sub-linear throughout the range |
-| OPTICS | **1.09** | O(n²) worst-case | sklearn kd-tree neighbour queries suppress quadratic behaviour; actual scaling is near-linear here |
-| HDBSCAN | **1.30** | O(n log n) | Slightly super-linear over this range, consistent with the O(n log n) amortised claim |
-| Spectral (k=10) | **1.21** | O(n²)–O(n³) | Still well below quadratic, but high variance at large n masks the true slope |
-| Agglomerative (k=10) | **1.49** | O(n² log n) | Fastest-growing in the sweep; crosses HDBSCAN around n=2000 |
+`red_s` = UMAP reduction wall time, `clu_s` = clustering wall time, `ss_s` =
+similarity-search wall time (HDBSCAN only). All values mean over K−1 samples
+(iter 0 dropped). Ingest is shared per `n` and listed once.
 
-All density-based algorithms (OPTICS, HDBSCAN, DBSCAN) grow more slowly than their
-theoretical worst-case because sklearn's implementations exploit kd-trees / ball trees
-for neighbour queries. OPTICS in particular is commonly cited as O(n²) but posts slope
-1.09 here — the tree structures compress the constant dramatically. The O(n² log n)
-claim for Agglomerative holds in direction (steepest measured slope) even though the
-absolute slope 1.49 is below 2; at n ≤ 6416 the O(n²) constant of the linkage matrix
-is the binding term, not the log factor, giving a sub-quadratic empirical fit.
+| n | ingest_s | red_s | clu_s hdbscan | clu_s kmeans | clu_s dbscan | clu_s optics | clu_s agglo | ss_s (hdb) |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 250 | 58.7 | 0.253 | 0.0038 | 0.0025 | 0.0035 | 0.208 | 0.0019 | 3.66 |
+| 500 | 115.7 | 0.603 | 0.0069 | 0.0027 | 0.0055 | 0.347 | 0.0046 | 16.32 |
+| 1000 | 231.6 | 1.514 | 0.0144 | 0.0033 | 0.0103 | 0.631 | 0.0117 | 63.28 |
+| 2000 | 455.9 | 4.542 | 0.1106 | 0.0047 | 0.0228 | 1.305 | 0.0427 | 306.81 |
+| 3500 | 776.0 | 11.870 | 0.1863 | 0.0066 | 0.0471 | 2.282 | 0.1405 | 995.52 |
+| 6416 | 1294.9 | **6.237** | 0.3580 | 0.0098 | 0.0768 | 4.322 | 0.5988 | **3266.60** |
 
-## Summary — wall-time tables
+The two largest cells at n=6416 dominate every other entry: ingest (≈21.6 min)
+and HDBSCAN similarity search (≈54.4 min). Everything else stays sub-13 s.
 
-All times are mean over 4 measured repeats (K=5, iter-0 dropped). Ingest is
-single-shot per limit, shared across all 6 clusterers.
+**Observed slopes** (least-squares log–log fit) on two regimes — the full
+range and the n=500…3500 window that excludes the n=6416 UMAP anomaly
+documented below:
 
-### Ingest (shared per limit)
+| Stage | Algorithm | Theoretical scaling | Observed slope (250…6416) | Observed slope (500…3500) |
+|---|---|--:|--:|--:|
+| Ingest | DINOv2 inference | O(n) | 0.95 | — |
+| Reduction | UMAP | ~O(n^1.14) | 1.15 | 1.53 |
+| Clustering | KMeans (k=10 fixed) | ≈O(n) | 0.43 | 0.46 |
+| Clustering | DBSCAN | O(n log n)–O(n²) | 0.99 | 1.10 |
+| Clustering | OPTICS | O(n log n)–O(n²) | 0.94 | 0.98 |
+| Clustering | HDBSCAN | O(n log n) amortised | 1.53 | 1.84 |
+| Clustering | Agglomerative | O(n² log n) | 1.77 | 1.76 |
+| Similarity search | SQLite linear scan (all-pairs top-k) | O(n²) | **2.10** | 2.13 |
 
-| n | ingest_s | throughput (ips) |
-|--:|--:|--:|
-| 100 | 23.0 | 4.35 |
-| 250 | 57.8 | 4.33 |
-| 500 | 116.6 | 4.29 |
-| 1000 | 231.6 | 4.32 |
-| 2000 | 457.7 | 4.37 |
-| 3500 | 798.8 | 4.38 |
-| 6416 | 1233.7 | 5.20 |
+The 500…3500 column is the cleaner read because the n=6416 reduction value
+breaks the trend (see *UMAP anomaly* section). Inside the safe window, the
+ranking matches theory: KMeans (sub-linear, fixed k) < DBSCAN ≈ OPTICS
+(near-linear) < Agglomerative ≈ HDBSCAN (super-linear), with similarity
+search firmly in the O(n²) band.
 
-Ingest slope: **0.97** — effectively O(n). Throughput ≈ 4.3 ips is stable across all
-sizes (DINOv2 inference is the bottleneck; IO is negligible). The slight throughput
-uptick at n=6416 reflects better GPU/batch utilisation at larger corpus size.
+## The headline figure: similarity search is the bottleneck at corpus size
 
-### UMAP reduction (representative — identical across all 6 clustering rows)
+At every n the SQLite all-pairs top-k scan dominates *all* downstream work.
+Per-query throughput collapses from **68 ips at n=250 to 2 ips at n=6416**
+— a 35× drop over a 26× `n` span, the empirical signature of the per-query
+O(n) inner scan. Wall-time per stage at n=6416:
 
-| n | reduction_s | std |
-|--:|--:|--:|
-| 100 | 0.091 | 0.002 |
-| 250 | 0.243 | 0.002 |
-| 500 | 0.583 | 0.007 |
-| 1000 | 1.511 | 0.018 |
-| 2000 | 4.512 | 0.015 |
-| 3500 | 11.427 | 0.075 |
-| **6416** | **5.882** | **0.015** |
+| Stage | Wall | Share of post-ingest cost |
+|---|--:|--:|
+| Similarity search (HDBSCAN row) | 3266.6 s | **99.6 %** |
+| Reduction (UMAP) | 6.2 s | 0.2 % |
+| Clustering (HDBSCAN) | 0.4 s | <0.1 % |
 
-UMAP slope over all 7 points: **1.17**. The n=6416 entry is non-monotonic — it drops
-from 11.4 s at n=3500 to 5.9 s at n=6416. The std is tight (±0.015 s, tight across 4
-repeats), ruling out noise. The most likely cause is a PyNNDescent / HNSW internal mode
-switch: above a threshold UMAP switches to a denser approximate-neighbour graph regime
-that amortises better at high n. This anomaly is worth flagging in the thesis narrative:
-the headline n=6416 UMAP time is faster than the n=3500 point, so a naive "UMAP
-dominates at large n" story under-estimates UMAP's eventual throughput at scale.
+Ingest is even larger in absolute terms (1294.9 s = 21.6 min) but is a
+one-shot per corpus and is dominated by GPU embedding inference (CPU=6 %,
+VRAM peak ≈100 MB, RSS peak ≈283 MB) — its cost is independent of every
+downstream choice. The similarity-search cost, by contrast, is paid on
+every full-corpus query pass under the SQLite backend.
 
-### Clustering wall time (mean, seconds)
+This is the empirical hook §6 (storage backends) and §9 (HNSW tuning) hang
+on: 54 min for one full-corpus top-5 sweep at n=6416 on SQLite is what
+those experiments are measured *against*. The slope 2.10 confirms the
+linear-scan O(n²) cost class — projection to a 50 k-image corpus
+(≈8× from here) extrapolates to ~58× wall time (~52 hours per pass) if the
+backend is unchanged.
 
-| n | HDBSCAN | KMeans | DBSCAN | OPTICS | Agglo | Spectral |
-|--:|--:|--:|--:|--:|--:|--:|
-| 100 | 0.003 | 0.002 | 0.002 | 0.080 | 0.001 | 0.013 |
-| 250 | 0.004 | 0.002 | 0.003 | 0.199 | 0.002 | 0.018 |
-| 500 | 0.007 | 0.003 | 0.005 | 0.398 | 0.004 | 0.026 |
-| 1000 | 0.014 | 0.003 | 0.010 | 0.837 | 0.011 | 0.068 |
-| 2000 | 0.123 | 0.005 | 0.021 | 1.778 | 0.044 | 0.220 |
-| 3500 | 0.179 | 0.007 | 0.043 | 3.453 | 0.133 | 0.486 |
-| 6416 | 0.324 | 0.010 | 0.072 | 7.560 | 0.513 | 1.791 |
+## Ingest scales linearly and is GPU-bound
 
-OPTICS is the only algorithm whose clustering time is non-negligible compared to the
-reduction stage at small n (80 ms at n=100, when UMAP takes 91 ms). At n=6416 OPTICS
-costs 7.56 s, ~23× HDBSCAN and ~756× KMeans. In absolute terms all algorithms except
-OPTICS are cheap at every tested n — clustering is not the bottleneck; ingest and
-(for large n) reduction dominate.
+Ingest IPS is essentially flat across the sweep (4.26 → 4.95 ips, slope
+0.95) — the small upward drift is fixed-overhead amortisation, not
+super-linearity. CPU utilisation hangs at 6 % at every n (matches a
+single-process GPU pipeline waiting on inference); peak RSS holds at
+~282 MB regardless of n (the DINOv2 model itself is the floor; the
+per-image delta is negligible). VRAM peak is ~100 MB.
 
-### Similarity search — SQLite linear scan (mean, seconds)
+Ingest is therefore linear in n with a per-image constant of ≈0.20 s. This
+is the cleanest scaling result of the sweep — and the largest single
+contributor to total wall time at every n except n=6416, where sim-search
+overtakes it.
 
-| n | sim_search_s | throughput (ips) |
-|--:|--:|--:|
-| 100 | ~0.5 | ~188 |
-| 250 | ~1.3 | ~188 |
-| 500 | ~2.8 | ~178 |
-| 1000 | ~5.8 | ~172 |
-| 2000 | ~12.7 | ~158 |
-| 3500 | ~22.6 | ~155 |
-| 6416 | ~41.9 | ~153 |
+## Reduction: UMAP slope is regime-dependent (the n=6416 anomaly)
 
-Similarity-search slope: **0.96** — linear in n, as expected for SQLite's Python-side
-exhaustive scan. Throughput declines from ~188 ips at small n to ~153 ips at full
-corpus; the overhead grows from per-query Python iteration over an increasingly large
-embedding set. At n=6416, sim-search (42 s) exceeds even UMAP (5.9 s) by 7×, making
-SQLite's linear scan the second-most-expensive stage after ingest.
+UMAP wall time rises monotonically through 250→3500 (0.25 → 11.87 s,
+local slope ~1.5) and then **drops sharply to 6.24 s at n=6416** — *47 %
+faster than at n=3500 despite an 83 % larger input*. The break is
+reproducible (std 0.017 s on 4 samples, 0.3 %) so it is not noise.
 
-## Summary — memory (peak RSS delta)
+Cause: UMAP switches to its pynndescent-based approximate nearest-neighbour
+backend once `n` exceeds the threshold for exact kNN (the default crossover
+sits around a few thousand points in this UMAP build). Below that
+threshold UMAP runs an exact graph construction whose per-call cost grows
+super-linearly in `n`; above it, pynndescent's near-linear approximate kNN
+takes over and the absolute wall time drops.
 
-| Algorithm | n=3500 pkRSS (MB) | n=6416 pkRSS (MB) | Notes |
-|---|--:|--:|---|
-| KMeans | 0.1 | 0.1 | O(n·k) in-memory centroids — trivial |
-| DBSCAN | 0.1 | 0.1 | Neighbour graph fits compactly |
-| HDBSCAN | 0.2 | 0.2 | Single-linkage tree + condensed tree — still trivial |
-| Spectral | 0.3 | 0.7 | Laplacian eigenvector matrix; k=10 keeps this cheap |
-| Agglomerative | 93.6 | 314.1 | Linkage matrix grows O(n²); first significant allocation |
-| **OPTICS** | **186.9** | **773.7** | Reachability array stores all pairwise-order info; dominates |
+Consequence: the **full-range reduction slope (1.15) is not a single
+scaling regime — it is a mean over two regimes** stitched at n≈4096. The
+500–3500 slope (1.53) describes the exact-kNN regime; n=6416 is the first
+point of the approximate regime. Slope claims must specify which window;
+the report uses both columns above to make the discontinuity explicit.
 
-OPTICS and Agglomerative are the only algorithms with non-trivial memory footprints at
-large n. OPTICS at n=6416 consumes 774 MB above its own stage baseline — for the
-hardware available (16 logical CPUs, no VRAM reported) this is manageable but would
-constrain a deployment with concurrent workloads. Agglomerative's 314 MB at n=6416 is
-milder but still ~1500× HDBSCAN's 0.2 MB.
+This is itself a useful operational finding: scaling past ~4 k images is
+*cheaper* per call than the small-n trend predicts, because UMAP changes
+algorithm under the hood.
 
-## Summary — cluster quality
+## Clustering: theoretical hierarchy reproduces on this corpus
 
-> **Reading note.** This is a cost experiment; quality is a secondary output. The
-> fixed k=10 for KMeans, Agglomerative, and Spectral is far below the ~556 clusters
-> HDBSCAN discovers at n=6416, so those three algorithms' quality scores measure
-> coarse-partition cohesion, not per-cluster granularity. Silhouette must be read
-> jointly with `cluster_count`.
+Inside the n=500…3500 window the observed slopes line up with the
+theoretical reference column (above). The agglomerative slope ≈1.76 is
+the closest in the sweep to its theoretical O(n² log n); HDBSCAN's 1.84 is
+above the amortised O(n log n) prediction, which is unsurprising at this
+`n` — the log factor is not visible in 1.8 log decades. KMeans's 0.43
+reflects fixed k=10 and few iterations: total cost is dominated by
+distance computations whose count is `n · k · iter` with `k · iter`
+≈ constant; in this regime the small-`n` rows are floored by Python
+overhead.
 
-| n | algo | cls | noise | sil | CH | DB | csCV |
-|--:|---|--:|--:|--:|--:|--:|--:|
-| 100 | optics | 12 | 0.174 | **0.287** | 19.7 | **1.222** | 0.544 |
-| 100 | hdbscan | 9 | 0.028 | 0.237 | 19.7 | 1.326 | 0.553 |
-| 100 | dbscan | 9 | 0.106 | 0.270 | 21.5 | 1.245 | 0.510 |
-| 100 | kmeans | 10 | 0.000 | 0.231 | 19.1 | 1.383 | 0.437 |
-| 100 | agglom | 10 | 0.000 | 0.231 | 19.1 | 1.344 | 0.558 |
-| 100 | spectral | 10 | 0.000 | 0.225 | 18.4 | 1.511 | 0.351 |
-| 6416 | optics | 640 | 0.246 | **0.175** | 29.6 | **1.646** | 0.456 |
-| 6416 | hdbscan | 556 | 0.193 | 0.149 | 33.1 | 1.706 | 0.727 |
-| 6416 | dbscan | 258 | 0.061 | −0.013 | 45.5 | 1.963 | 2.457 |
-| 6416 | kmeans | 10 | 0.000 | 0.035 | 658.9 | 3.227 | 0.430 |
-| 6416 | agglom | 10 | 0.000 | −0.015 | 505.7 | 3.119 | 1.348 |
-| 6416 | spectral | 10 | 0.000 | −0.135 | 204.8 | 3.263 | 1.737 |
+Absolute magnitudes matter more than slopes for downstream choices:
 
-Full tables for all 7 limits are in the JSON. Key observations:
-
-1. **OPTICS leads on silhouette at every n.** Its advantage shrinks as n grows (0.287@100
-   vs. 0.175@6416) but it never drops below 0.175. DB also best at every n. The cost is
-   its O(n²)-memory profile and the 7.56 s at n=6416.
-2. **HDBSCAN is the best cost–quality trade-off.** Second-best silhouette at every n
-   (0.237 → 0.149), sub-second clustering through n=6416, and 0.2 MB RSS overhead. Its
-   cluster count scales with the corpus (9 → 556), maintaining granularity where the
-   fixed-k algorithms collapse.
-3. **Fixed-k algorithms (KMeans, Agglomerative, Spectral) degrade at scale.** With
-   k=10 pinned, silhouette falls monotonically as n grows: KMeans 0.231 → 0.035,
-   Agglomerative 0.231 → −0.015, Spectral 0.225 → −0.135. Negative silhouette at
-   n=6416 means the forced-10-cluster partitions are geometrically incoherent at that
-   corpus size. CH inflates for these algorithms at large n (KMeans CH=658@6416) because
-   the 10 fat blobs maximise between/within variance — the same CH inflation trap
-   documented in §4. Silhouette and DB are the honest metrics here.
-4. **DBSCAN quality also degrades at large n.** Cluster count grows to 258@6416 but
-   silhouette turns negative and cluster-size CV hits 2.457 (highly imbalanced), pointing
-   to over-fragmentation. DBSCAN's auto-eps (elbow) heuristic produces increasingly
-   uneven cluster sizes as n grows.
-5. **Spectral variance is high at large n.** Spectral clustering at n=2000–6416 shows
-   clustering_wall_time_s_std up to ±0.745 s at n=6416 (vs. mean 1.791 s — 42 % CoV).
-   The eigenvalue solver behaviour is sensitive to random initialisation and the
-   near-degenerate Laplacian at large n.
+- At n=6416, OPTICS (4.32 s) > Agglomerative (0.60 s) > HDBSCAN (0.36 s) >
+  DBSCAN (0.08 s) > KMeans (0.010 s). OPTICS is ~12× HDBSCAN, ~440× KMeans.
+- Every clusterer finishes under 5 s at full corpus — clustering is **not**
+  a wall-time bottleneck anywhere in this sweep.
+- Memory tells a different story: Agglomerative's `clustering_peak_rss_delta`
+  climbs 0.1 → 3.2 → 93.5 → 314 MB across n ∈ {1000, 2000, 3500, 6416} —
+  the O(n²) condensed distance matrix made explicit. HDBSCAN/DBSCAN/OPTICS
+  stay sub-1 MB. If the corpus grew 10×, Agglomerative would hit ~30 GB
+  RAM and Agglomerative becomes infeasible long before its wall time does.
 
 ## Repeat stability
 
-HDBSCAN, DBSCAN, OPTICS, and KMeans are stable across K=5 repeats in cluster count.
-Notable variation:
+The K=5 repeat protocol is delivering tight error bars at n=6416:
 
-- **DBSCAN@3500:** `clusters_per_repeat = [206, 154, 223, 176, 160]` — 30 % swing
-  between min and max. Auto-eps is sensitive to the UMAP seed at this n; the
-  aggregated `cluster_count=160` is the per-run mean and should not be read as a
-  stable partition.
-- **Spectral@6416:** clustering std ±0.745 s (42 % CoV) — eigenvalue solver
-  non-determinism. The mean 1.791 s understates the per-run risk.
-- **HDBSCAN@250:** `[23, 24, 23, 25, 23]` — small spread (±1 cluster), stable.
-- **OPTICS** is deterministic given fixed input (no random component) but receives
-  different UMAP embeddings each repeat; `[634, 636, 648, 643, 640]` at n=6416 is
-  correspondingly tight (±7 clusters).
+| Algorithm | red rel-std | clu rel-std |
+|---|--:|--:|
+| HDBSCAN | 0.3 % | 0.6 % |
+| OPTICS | 0.4 % | 0.4 % |
+| KMeans | 0.4 % | 5.3 % |
+| DBSCAN | 0.6 % | 2.7 % |
+| Agglomerative | 0.6 % | 3.8 % |
 
-## The dominant stage at each n
+All slope fits are far above the per-cell noise floor — the slope estimates
+are signal-bound, not noise-bound. HDBSCAN's per-repeat cluster count at
+n=6416 is `[549, 537, 563, 548, 556]` (±~2 %), consistent with §4's UMAP
+stochasticity floor on this baseline.
 
-| n | dominant stage | notes |
-|--:|---|---|
-| 100 | ingest (23 s) | all other stages < 0.1 s |
-| 250 | ingest (57.8 s) | UMAP 0.24 s; clustering < 0.2 s except OPTICS (0.2 s) |
-| 500 | ingest (116.6 s) | UMAP 0.58 s |
-| 1000 | ingest (231.6 s) | UMAP 1.5 s; sim-search 5.8 s |
-| 2000 | ingest (457.7 s) | UMAP 4.5 s; sim-search 12.7 s |
-| 3500 | ingest (798.8 s) | UMAP 11.4 s; sim-search 22.6 s |
-| 6416 | ingest (1233.7 s) | sim-search 41.9 s; UMAP 5.9 s\* |
+## Summary — quality (side-effect)
 
-\* UMAP anomaly: 5.9 s at n=6416 is faster than 11.4 s at n=3500 (see above).
+§7 is not a quality experiment, but the per-cell quality is recorded and
+worth quoting briefly. At n=6416 with the baseline embedding + UMAP:
 
-Ingest dominates at every n — it is the only stage that cannot be parallelised within
-a run without additional hardware (GPU batching is already applied). Sim-search
-(SQLite linear scan) becomes the second-most expensive stage by n=1000 and accounts for
-~3.4 % of total pipeline time at n=6416. UMAP is third except at n=3500 where it
-briefly exceeds sim-search before the anomalous drop at n=6416.
+| Algorithm | k | sil | CH | DB | noise | csCV |
+|---|--:|--:|--:|--:|--:|--:|
+| HDBSCAN (mcs=5) | 556 | 0.149 | 33 | 1.71 | 0.193 | 0.73 |
+| OPTICS (ms=5) | 627 | **0.184** | 30 | **1.60** | 0.278 | **0.44** |
+| DBSCAN (ms=5) | 258 | −0.013 | 46 | 1.96 | 0.061 | 2.46 |
+| KMeans (k=10) | 10 | 0.035 | 659 | 3.23 | 0.000 | 0.43 |
+| Agglomerative (k=10, avg) | 10 | −0.015 | 506 | 3.12 | 0.000 | 1.35 |
 
-## Conclusions for the thesis
+The density-based row dominates the joint criterion (non-trivial k,
+moderate noise, balanced clusters) — consistent with §3's clusterer
+comparison. The k=10 partitional rows post low silhouette because the
+true cluster count is far higher than 10 (HDBSCAN/OPTICS auto-detect
+500–600 clusters at this `n`); CH and DB invert for the same degenerate
+reason §4 documented at high `min_cluster_size`. None of this changes the
+cost reading, which is the §7 deliverable.
 
-1. **KMeans is the cheapest clusterer** by a large margin at every n (0.010 s at
-   n=6416). When granularity is fixed externally (oracle k), it is the obvious choice
-   for production pipelines. Its quality degradation at large n (sil→0.035) is an
-   artefact of the fixed k=10 — it is not a property of KMeans itself.
-2. **HDBSCAN is the best cost–quality trade-off among auto-k algorithms.** 0.324 s
-   at n=6416, second-best silhouette, 0.2 MB memory, stable repeats. It is the
-   correct baseline choice confirmed here empirically.
-3. **OPTICS matches or beats HDBSCAN on quality but costs 23× more in wall time and
-   3800× more in memory at n=6416.** Not a practical choice for large corpora unless
-   quality gains justify the OPTICS-specific overhead.
-4. **Agglomerative and Spectral should be avoided at large n** with fixed k=10 — both
-   post negative silhouette at n=6416, meaning the 10-cluster partitions are worse than
-   random at full corpus. Memory cost (314 MB for Agglomerative) also makes them
-   impractical without re-tuning k.
-5. **SQLite similarity search is O(n) but expensive in absolute terms.** At n=6416 it
-   costs more than UMAP reduction (42 s vs. 5.9 s) and is the primary motivation for
-   the pgvector/HNSW upgrade tested in §6 and §9.
-6. **The UMAP non-monotonicity at n=6416 is reproducible** (tight std across 4
-   repeats). The thesis narrative should note this as a mode-switch artefact rather
-   than measurement error; it means UMAP does not strictly bound the pipeline cost at
-   large n from below.
-7. **Ingest is the unambiguous bottleneck across all n.** Any throughput optimisation
-   that does not address DINOv2 inference time will have bounded impact. At n=6416 the
-   ingest:cluster ratio is ~3800:1 for KMeans and ~3800:1 for HDBSCAN.
+## Conclusion for downstream experiments
+
+1. **Similarity-search slope ≈ 2.10 is the headline cost result.** SQLite
+   all-pairs top-k is O(n²) in practice on this corpus, and at n=6416 it
+   already costs 54 min per pass — more than ingest itself, and 5000× the
+   clustering stage. This is the cost-side anchor §6 and §9 measure against;
+   the thesis chapter should lead with this curve.
+2. **Ingest is linear and is the second wall-time bottleneck** (21.6 min
+   at n=6416). It is paid once per corpus per embedding, so it shapes the
+   amortisation argument (one-shot ingest → many queries) rather than
+   per-query latency. The cost is GPU-bound (CPU 6 %), so optimisations
+   should target batch size / model precision, not Python overhead.
+3. **The UMAP reduction slope changes regime at n≈4 k.** Quoting a single
+   exponent (1.15 full-range vs 1.53 below 4 k) is misleading; the report
+   should plot the curve and call out the pynndescent crossover. Past
+   n=6416 UMAP is empirically cheaper than its small-n trend predicts —
+   good news for resampling-based extrapolation but a caveat for any
+   straight-line projection of this sweep.
+4. **Clustering wall time is not a bottleneck on this corpus.** All five
+   clusterers finish under 5 s at n=6416. The constraint that matters at
+   scale is **memory**, not wall: Agglomerative's 314 MB peak at 6416 grows
+   quadratically in n, so the algorithm is wall-time-cheap but
+   memory-feasibility-bounded. HDBSCAN/DBSCAN/OPTICS stay sub-1 MB and are
+   the only candidates that survive a 10× corpus growth in-memory.
+5. **The observed clustering ranking matches theory inside 500…3500** and
+   keeps the same order at 6416, modulo the UMAP-regime caveat. Slopes
+   should be reported as *observed on this corpus*, not as asymptotic
+   exponents — the n range is too narrow for either claim.
+6. **Asymptotic-complexity claims are deferred.** The brief explicitly
+   frames this as cost-vs-corpus-size on the available data, not as a
+   complexity-class study. The slope columns above are reported in that
+   spirit, and the resampling-extrapolation idea in `doc/conclusion.tex`
+   is the right place to argue beyond n=6416.
