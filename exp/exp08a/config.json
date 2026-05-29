@@ -1,0 +1,3476 @@
+{
+  "runs": [
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_vits14-identity-kmeans4",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "dinov2_vits14-identity-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_vits14-identity-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "dinov2_vits14-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "dinov2_vits14-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "dinov2_vits14-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_vits14-umap-kmeans4",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "dinov2_vits14-umap-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_vits14-umap-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "dinov2_vits14-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "dinov2_vits14-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "dinov2_vits14-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_graffiti_author_head-identity-kmeans4",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "dinov2_graffiti_author_head-identity-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_graffiti_author_head-identity-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "dinov2_graffiti_author_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "dinov2_graffiti_author_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "dinov2_graffiti_author_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_graffiti_author_head-umap-kmeans4",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "dinov2_graffiti_author_head-umap-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_graffiti_author_head-umap-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "dinov2_graffiti_author_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "dinov2_graffiti_author_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "dinov2_graffiti_author_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_graffiti_style_head-identity-kmeans4",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "dinov2_graffiti_style_head-identity-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_graffiti_style_head-identity-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "dinov2_graffiti_style_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "dinov2_graffiti_style_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "dinov2_graffiti_style_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_graffiti_style_head-umap-kmeans4",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "dinov2_graffiti_style_head-umap-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "dinov2_graffiti_style_head-umap-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "dinov2_graffiti_style_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "dinov2_graffiti_style_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "dinov2_graffiti_style_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3-identity-kmeans4",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "mobilenet_v3-identity-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3-identity-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "mobilenet_v3-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "mobilenet_v3-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "mobilenet_v3-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3-umap-kmeans4",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "mobilenet_v3-umap-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3-umap-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "mobilenet_v3-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "mobilenet_v3-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "mobilenet_v3-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-identity-kmeans4",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-identity-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-identity-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-umap-kmeans4",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-umap-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-umap-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-identity-kmeans4",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-identity-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-identity-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-umap-kmeans4",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-umap-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-umap-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "clip_vit_b32-identity-kmeans4",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "clip_vit_b32-identity-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "clip_vit_b32-identity-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "clip_vit_b32-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "clip_vit_b32-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "clip_vit_b32-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "clip_vit_b32-umap-kmeans4",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "clip_vit_b32-umap-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "clip_vit_b32-umap-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "clip_vit_b32-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "clip_vit_b32-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "clip_vit_b32-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "resnet50-identity-kmeans4",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "resnet50-identity-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "resnet50-identity-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "resnet50-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "resnet50-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "identity"
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "resnet50-identity-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "resnet50-umap-kmeans4",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 4,
+          "linkage": "average"
+        }
+      },
+      "name": "resnet50-umap-agglomerative",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 4
+        }
+      },
+      "name": "resnet50-umap-spectral",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "name": "resnet50-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 10
+        }
+      },
+      "name": "resnet50-umap-hdbscan",
+      "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 20
+        }
+      },
+      "name": "resnet50-umap-hdbscan",
+      "clear_storage": false
+    }
+  ]
+}

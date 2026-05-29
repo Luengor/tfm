@@ -8,4 +8,6 @@ dataset
 /cc
 /train_crop
 /data
-/exp
+/exp/.common_db
+/exp/**/*.sqlite
+/exp/**/*.html

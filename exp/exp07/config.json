@@ -1,0 +1,1747 @@
+{
+  "runs": [
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "limit": 100,
+      "name": "hdbscan-l100",
+      "clear_storage": true
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_17ff827561f8.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "limit": 250,
+      "name": "hdbscan-l250",
+      "clear_storage": true
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_06c5a7a08c1f.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "limit": 500,
+      "name": "hdbscan-l500",
+      "clear_storage": true
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_63cebb1d0bad.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "limit": 1000,
+      "name": "hdbscan-l1000",
+      "clear_storage": true
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_ee98e2fe3bfa.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "limit": 2000,
+      "name": "hdbscan-l2000",
+      "clear_storage": true
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_03507858e979.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "limit": 3500,
+      "name": "hdbscan-l3500",
+      "clear_storage": true
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_8ee4871cff20.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "limit": 6416,
+      "name": "hdbscan-l6416",
+      "clear_storage": true
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 10
+        }
+      },
+      "limit": 100,
+      "name": "kmeans10-l100",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_17ff827561f8.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 10
+        }
+      },
+      "limit": 250,
+      "name": "kmeans10-l250",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_06c5a7a08c1f.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 10
+        }
+      },
+      "limit": 500,
+      "name": "kmeans10-l500",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_63cebb1d0bad.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 10
+        }
+      },
+      "limit": 1000,
+      "name": "kmeans10-l1000",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_ee98e2fe3bfa.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 10
+        }
+      },
+      "limit": 2000,
+      "name": "kmeans10-l2000",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_03507858e979.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 10
+        }
+      },
+      "limit": 3500,
+      "name": "kmeans10-l3500",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_8ee4871cff20.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "kmeans",
+        "params": {
+          "n_clusters": 10
+        }
+      },
+      "limit": 6416,
+      "name": "kmeans10-l6416",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "min_samples": 5
+        }
+      },
+      "limit": 100,
+      "name": "dbscan-l100",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_17ff827561f8.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "min_samples": 5
+        }
+      },
+      "limit": 250,
+      "name": "dbscan-l250",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_06c5a7a08c1f.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "min_samples": 5
+        }
+      },
+      "limit": 500,
+      "name": "dbscan-l500",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_63cebb1d0bad.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "min_samples": 5
+        }
+      },
+      "limit": 1000,
+      "name": "dbscan-l1000",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_ee98e2fe3bfa.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "min_samples": 5
+        }
+      },
+      "limit": 2000,
+      "name": "dbscan-l2000",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_03507858e979.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "min_samples": 5
+        }
+      },
+      "limit": 3500,
+      "name": "dbscan-l3500",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_8ee4871cff20.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "dbscan",
+        "params": {
+          "min_samples": 5
+        }
+      },
+      "limit": 6416,
+      "name": "dbscan-l6416",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "optics",
+        "params": {
+          "min_samples": 5,
+          "metric": "cosine"
+        }
+      },
+      "limit": 100,
+      "name": "optics-l100",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_17ff827561f8.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "optics",
+        "params": {
+          "min_samples": 5,
+          "metric": "cosine"
+        }
+      },
+      "limit": 250,
+      "name": "optics-l250",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_06c5a7a08c1f.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "optics",
+        "params": {
+          "min_samples": 5,
+          "metric": "cosine"
+        }
+      },
+      "limit": 500,
+      "name": "optics-l500",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_63cebb1d0bad.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "optics",
+        "params": {
+          "min_samples": 5,
+          "metric": "cosine"
+        }
+      },
+      "limit": 1000,
+      "name": "optics-l1000",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_ee98e2fe3bfa.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "optics",
+        "params": {
+          "min_samples": 5,
+          "metric": "cosine"
+        }
+      },
+      "limit": 2000,
+      "name": "optics-l2000",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_03507858e979.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "optics",
+        "params": {
+          "min_samples": 5,
+          "metric": "cosine"
+        }
+      },
+      "limit": 3500,
+      "name": "optics-l3500",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_8ee4871cff20.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "optics",
+        "params": {
+          "min_samples": 5,
+          "metric": "cosine"
+        }
+      },
+      "limit": 6416,
+      "name": "optics-l6416",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 10,
+          "linkage": "average"
+        }
+      },
+      "limit": 100,
+      "name": "agglomerative-l100",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_17ff827561f8.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 10,
+          "linkage": "average"
+        }
+      },
+      "limit": 250,
+      "name": "agglomerative-l250",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_06c5a7a08c1f.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 10,
+          "linkage": "average"
+        }
+      },
+      "limit": 500,
+      "name": "agglomerative-l500",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_63cebb1d0bad.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 10,
+          "linkage": "average"
+        }
+      },
+      "limit": 1000,
+      "name": "agglomerative-l1000",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_ee98e2fe3bfa.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 10,
+          "linkage": "average"
+        }
+      },
+      "limit": 2000,
+      "name": "agglomerative-l2000",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_03507858e979.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 10,
+          "linkage": "average"
+        }
+      },
+      "limit": 3500,
+      "name": "agglomerative-l3500",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_8ee4871cff20.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "agglomerative",
+        "params": {
+          "n_clusters": 10,
+          "linkage": "average"
+        }
+      },
+      "limit": 6416,
+      "name": "agglomerative-l6416",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_3eb67ccceca5.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 10,
+          "affinity": "nearest_neighbors"
+        }
+      },
+      "limit": 100,
+      "name": "spectral-l100",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_17ff827561f8.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 10,
+          "affinity": "nearest_neighbors"
+        }
+      },
+      "limit": 250,
+      "name": "spectral-l250",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_06c5a7a08c1f.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 10,
+          "affinity": "nearest_neighbors"
+        }
+      },
+      "limit": 500,
+      "name": "spectral-l500",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_63cebb1d0bad.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 10,
+          "affinity": "nearest_neighbors"
+        }
+      },
+      "limit": 1000,
+      "name": "spectral-l1000",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_ee98e2fe3bfa.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 10,
+          "affinity": "nearest_neighbors"
+        }
+      },
+      "limit": 2000,
+      "name": "spectral-l2000",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_03507858e979.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 10,
+          "affinity": "nearest_neighbors"
+        }
+      },
+      "limit": 3500,
+      "name": "spectral-l3500",
+      "clear_storage": false
+    },
+    {
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_n": null,
+        "sample_seed": 42
+      },
+      "repeats": 5,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/storage_8ee4871cff20.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "spectral",
+        "params": {
+          "n_clusters": 10,
+          "affinity": "nearest_neighbors"
+        }
+      },
+      "limit": 6416,
+      "name": "spectral-l6416",
+      "clear_storage": false
+    }
+  ]
+}

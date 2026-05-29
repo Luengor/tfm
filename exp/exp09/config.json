@@ -1,0 +1,169 @@
+{
+  "runs": [
+    {
+      "name": "hnsw_exact_baseline",
+      "storage": {
+        "type": "postgresql",
+        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep"}
+      },
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "segmenter": {"type": "identity", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 200, "sample_seed": 42},
+      "repeats": 5,
+      "limit": 6416,
+      "clear_storage": true
+    },
+    {
+      "name": "hnsw_m8_efc64_efs40",
+      "storage": {
+        "type": "postgresql",
+        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 8, "ef_construction": 64, "ef_search": 40, "recreate": true}}
+      },
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "segmenter": {"type": "identity", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 200, "sample_seed": 42},
+      "repeats": 5,
+      "limit": 6416,
+      "clear_storage": false
+    },
+    {
+      "name": "hnsw_m16_efc64_efs40",
+      "storage": {
+        "type": "postgresql",
+        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 40, "recreate": true}}
+      },
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "segmenter": {"type": "identity", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 200, "sample_seed": 42},
+      "repeats": 5,
+      "limit": 6416,
+      "clear_storage": false
+    },
+    {
+      "name": "hnsw_m32_efc64_efs40",
+      "storage": {
+        "type": "postgresql",
+        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 32, "ef_construction": 64, "ef_search": 40, "recreate": true}}
+      },
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "segmenter": {"type": "identity", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 200, "sample_seed": 42},
+      "repeats": 5,
+      "limit": 6416,
+      "clear_storage": false
+    },
+    {
+      "name": "hnsw_m64_efc64_efs40",
+      "storage": {
+        "type": "postgresql",
+        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 64, "ef_construction": 64, "ef_search": 40, "recreate": true}}
+      },
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "segmenter": {"type": "identity", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 200, "sample_seed": 42},
+      "repeats": 5,
+      "limit": 6416,
+      "clear_storage": false
+    },
+    {
+      "name": "hnsw_m16_efc32_efs40",
+      "storage": {
+        "type": "postgresql",
+        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 32, "ef_search": 40, "recreate": true}}
+      },
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "segmenter": {"type": "identity", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 200, "sample_seed": 42},
+      "repeats": 5,
+      "limit": 6416,
+      "clear_storage": false
+    },
+    {
+      "name": "hnsw_m16_efc128_efs40",
+      "storage": {
+        "type": "postgresql",
+        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 128, "ef_search": 40, "recreate": true}}
+      },
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "segmenter": {"type": "identity", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 200, "sample_seed": 42},
+      "repeats": 5,
+      "limit": 6416,
+      "clear_storage": false
+    },
+    {
+      "name": "hnsw_m16_efc256_efs40",
+      "storage": {
+        "type": "postgresql",
+        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 256, "ef_search": 40, "recreate": true}}
+      },
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "segmenter": {"type": "identity", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 200, "sample_seed": 42},
+      "repeats": 5,
+      "limit": 6416,
+      "clear_storage": false
+    },
+    {
+      "name": "hnsw_m16_efc64_efs10",
+      "storage": {
+        "type": "postgresql",
+        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 10, "recreate": true}}
+      },
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "segmenter": {"type": "identity", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 200, "sample_seed": 42},
+      "repeats": 5,
+      "limit": 6416,
+      "clear_storage": false
+    },
+    {
+      "name": "hnsw_m16_efc64_efs100",
+      "storage": {
+        "type": "postgresql",
+        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 100, "recreate": true}}
+      },
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "segmenter": {"type": "identity", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 200, "sample_seed": 42},
+      "repeats": 5,
+      "limit": 6416,
+      "clear_storage": false
+    },
+    {
+      "name": "hnsw_m16_efc64_efs200",
+      "storage": {
+        "type": "postgresql",
+        "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/hnsw_sweep", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64, "ef_search": 200, "recreate": true}}
+      },
+      "embedding": {"type": "dinov2_graffiti_style_head", "params": {}},
+      "segmenter": {"type": "identity", "params": {}},
+      "reduction": {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+      "clustering": {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+      "similarity_search": {"enabled": true, "top_k": 5, "sample_n": 200, "sample_seed": 42},
+      "repeats": 5,
+      "limit": 6416,
+      "clear_storage": false
+    }
+  ]
+}
