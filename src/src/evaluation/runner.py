@@ -135,7 +135,8 @@ def run_benchmarks(
     if cluster_plot_options.get("enabled"):
         print("Cluster 2D plotting enabled.")
     for run_spec in tqdm(run_specs, desc="Benchmark Runs", unit="run"):
-        print(f"Running benchmark: {run_spec.name} (ID: {run_spec.run_id})")
+        start_time = datetime.now(timezone.utc).isoformat()
+        print(f"[{start_time}] Running benchmark: {run_spec.name} (ID: {run_spec.run_id})")
         result_queue: multiprocessing.Queue[BenchmarkResult] = ctx.Queue()
         p = ctx.Process(
             target=_run_single_subprocess,
@@ -278,7 +279,7 @@ def _run_single(
 
         with profile_stage() as ingest_stage:
             total_instances = 0
-            for image_path in image_paths:
+            for image_path in tqdm(image_paths, desc="Ingesting", unit="image", position=1, leave=False):
                 saved_data = config.save_image(image_path)
                 total_instances += len(saved_data)
         ingest_metrics = ingest_stage.metrics
@@ -356,7 +357,7 @@ def _run_single(
                     rng = random.Random(run_spec.similarity_search.sample_seed)
                     n = min(run_spec.similarity_search.sample_n, len(all_images))
                     search_images = rng.sample(all_images, n)
-                for img in search_images:
+                for img in tqdm(search_images, desc="Similarity Search", unit="query", position=1, leave=False):
                     nearest = config.storage.get_by_distance(
                         img.embedding,
                         max_images=run_spec.similarity_search.top_k + 1,
@@ -469,7 +470,7 @@ def _run_single(
             n_clusters_pinned = "n_clusters" in run_spec.clustering.params
             propagated_k: int | None = None
 
-            for i in range(K):
+            for i in tqdm(range(K), desc="Clustering Repeats", unit="repeat", position=1, leave=False):
                 seed_i = i
                 # Rebuild reduction per repeat so UMAP picks up the new seed.
                 reduction = _build_reduction(run_spec, random_state=seed_i)
