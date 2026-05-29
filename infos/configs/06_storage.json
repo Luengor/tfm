@@ -15,8 +15,8 @@
   "repeats": 5,
   "storage": [
     {"type": "sqlite", "params": {"db_path": "exp/.common_db/{run_id}.sqlite"}},
-    {"type": "postgresql", "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/postgres"}},
-    {"type": "postgresql", "params": {"db_url": "postgresql://postgres:changethis@localhost:54321/postgres", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64}}}
+    {"type": "postgresql", "params": {"db_url": "postgresql://localhost:54321/postgres"}},
+    {"type": "postgresql", "params": {"db_url": "postgresql://localhost:54321/postgres", "hnsw": {"ops": "cosine", "m": 16, "ef_construction": 64}}}
   ],
   "limit": [500, 1000, 2500, 6416]
 }
