@@ -134,12 +134,15 @@ already a configuration (segmenter changes invalidate cached crops, so explicit
 **Question.** Which embedding backbone produces the most semantically coherent
 graffiti clusters under a fixed downstream pipeline?
 
-**Varies.** Ten embeddings: four ImageNet CNNs (`resnet50`, `vgg16`,
+**Varies.** Twelve embeddings: four ImageNet CNNs (`resnet50`, `vgg16`,
 `inception_v3`, `mobilenet_v3`), DINOv2 ViT-S/14, CLIP ViT-B/32, two YOLO
-backbones (`yolon`, `yolom`), and the two fine-tuned heads
-(`mobilenet_v3_graffiti_author_head`, `dinov2_graffiti_style_head`). The author /
-identity-recovery head (`dinov2_graffiti_author_head`) is omitted — its
-training objective targets a different question.
+backbones (`yolon`, `yolom`), and the **full 2×2 fine-tuned head matrix**
+(author + style heads × DINOv2 + MobileNetV3:
+`dinov2_graffiti_author_head`, `dinov2_graffiti_style_head`,
+`mobilenet_v3_graffiti_author_head`, `mobilenet_v3_graffiti_style_head`).
+Running both heads on both backbones gives the complete cross-task matrix that
+§8 hypothesis 2 reads — and lets §1 contrast the author vs. style head on each
+backbone directly.
 
 **Fixed.** Baseline UMAP → HDBSCAN, identity segmenter, SQLite. Swept at
 `limit ∈ {250, 1000, 6416}`.
@@ -149,10 +152,10 @@ pipeline. Pairs `mobilenet_v3` ↔ `mobilenet_v3_graffiti_author_head` and
 `dinov2_vits14` ↔ `dinov2_graffiti_style_head` answer the fine-tuning vs.
 pretraining question directly.
 
-**Cost.** 30 runs (10 embeddings × 3 limits), 30 full ingests (each
+**Cost.** 36 runs (12 embeddings × 3 limits), 36 full ingests (each
 embedding × limit pair gets its own DB; no reuse across embeddings). The
 `limit=250` ingests are cheap, so the marginal cost over the 2-limit
-variant is dominated by the 10 small-`n` runs.
+variant is dominated by the 12 small-`n` runs.
 
 **Config.** [`configs/01_embedding.json`](configs/01_embedding.json)
 
