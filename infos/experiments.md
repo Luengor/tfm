@@ -333,13 +333,20 @@ cautiously against the cost legend in §7.
 
 **Pillar.** Computational cost (1) — *the primary deliverable of the thesis.*
 
-**Question.** How does wall time scale with `n` for each pipeline stage, and
-do the asymptotic complexity differences between clustering algorithms
-manifest empirically within the available dataset range?
+**Question.** How does wall time scale with `n` for each pipeline stage on
+the available graffiti corpus (n ≤ 6416)? The thesis brief frames this as a
+cost-vs-corpus-size characterisation, not as an asymptotic-complexity study:
+the corpus upper-bounds the sweep and slopes are reported as *observed in
+this regime* rather than as asymptotic exponents.
 
-**Varies.** `limit ∈ {100, 250, 500, 1000, 2000, 3500, 6416}` (~64× span) ×
-clustering algorithm ∈ {HDBSCAN, KMeans, DBSCAN, OPTICS, Agglomerative,
-Spectral}. Similarity search is enabled with `top_k=5` so the search stage
+**Varies.** `limit ∈ {250, 500, 1000, 2000, 3500, 6416}` (~26× span) ×
+clustering algorithm ∈ {HDBSCAN, KMeans, DBSCAN, OPTICS, Agglomerative}.
+The smallest point (n=100) and the Spectral clusterer were trimmed: n=100
+sat in the timer-noise / fixed-overhead floor and the report already
+excluded it from slope fits, while Spectral with `affinity=nearest_neighbors`
+produced a slope in the same band as DBSCAN/HDBSCAN (not a distinct
+asymptotic anchor) and the highest variance of the six, contributing noise
+without distinctive signal. Similarity search is enabled with `top_k=5` so the search stage
 is timed at every `n` too — this is where the corpus-size sensitivity of
 SQLite is observable as a separate signal.
 
@@ -348,9 +355,15 @@ SQLite, identity segmenter.
 
 **Why it matters.** This is the experiment the thesis exists to deliver
 (`enunciado.md`: *"describir el coste computacional en función del tamaño del
-conjunto de imágenes, de forma experimental"*). Expected complexity classes:
+conjunto de imágenes, de forma experimental"*). Theoretical complexity
+classes (below) are quoted as *reference context*, not as the headline
+deliverable — n ≤ 6416 is too narrow a span (~1.8 log decades) to
+empirically separate O(n log n) from O(n²) clusterers. Slope numbers are
+reported as observed scaling on this corpus; asymptotic claims are
+deferred to future work (see resampling extrapolation idea in
+`doc/doc/conclusion.tex`).
 
-| Stage | Algorithm | Expected scaling |
+| Stage | Algorithm | Theoretical scaling (reference) |
 |---|---|---|
 | Ingest | Any embedding | O(n) — model inference per image |
 | Reduction | UMAP | ~O(n^1.14) empirically |
@@ -358,17 +371,15 @@ conjunto de imágenes, de forma experimental"*). Expected complexity classes:
 | Clustering | HDBSCAN | O(n log n) amortised |
 | Clustering | KMeans | O(n · k · iter) ≈ O(n) |
 | Clustering | DBSCAN | O(n log n) with index, O(n²) worst-case |
-| Clustering | OPTICS | O(n²) |
+| Clustering | OPTICS (Minkowski + kd-tree) | O(n log n) typical, O(n²) worst-case |
 | Clustering | Agglomerative | O(n² log n) |
-| Clustering | Spectral | O(n²)–O(n³) |
 
-On a log-log plot the slope of wall time vs. `n` should be ~1 for the
-linear-ish stages and ~2 for the quadratic clusterers. That headline figure
-— *empirically measured slopes* alongside *theoretical complexity classes*
-— is the central result of the cost chapter.
+The headline figure is *observed wall time vs. n per stage* on the graffiti
+corpus, with slope estimates restricted to the n ≥ 500 regime so the
+small-n fixed-overhead floor does not contaminate the fit.
 
-**Cost.** 42 runs at `repeats=5` (4 measured samples per run after iter-0
-drop), 7 ingests (the embedding DB is reused across the 6 clusterers within
+**Cost.** 30 runs at `repeats=5` (4 measured samples per run after iter-0
+drop), 6 ingests (the embedding DB is reused across the 5 clusterers within
 each limit group). The repeat tax falls only on reduction + clustering, so
 the extra cost is small relative to the 7 single-shot ingests — and the
 error bars are essential here because complexity-class claims rest on
