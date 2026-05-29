@@ -88,13 +88,14 @@ as its headline figure rather than any single point.
 
 | Metric | Range | Interpretation |
 |---|---|---|
-| Silhouette | [−1, 1] | Cohesion vs. separation, per-point average. |
+| Silhouette (micro) | [−1, 1] | Cohesion vs. separation, averaged over all points. |
+| Silhouette (macro) | [−1, 1] | Same per-point score, averaged per cluster then across clusters (`silhouette_macro`); weights every cluster equally so small clusters are not drowned out by large ones. |
 | Calinski–Harabasz | [0, ∞) | Between-cluster vs. within-cluster dispersion. |
 | Davies–Bouldin | [0, ∞) | Average max-similarity between clusters; lower is better. |
 | Noise ratio | [0, 1] | Fraction labelled −1 (HDBSCAN / DBSCAN / OPTICS only). |
 | Cluster-size CV | [0, ∞) | Balance — standard deviation of cluster sizes ÷ mean. |
 
-All five are computed against the **original unreduced** embeddings so the
+All six are computed against the **original unreduced** embeddings so the
 reduction stage is not graded by its own loss.
 
 **Supervised cluster quality** (only when `--ground-truth` is supplied and
