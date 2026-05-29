@@ -108,24 +108,21 @@ lo que permite caracterizar el crecimiento de cada etapa por separado y, a
 partir de ahí, estimar empíricamente el exponente de crecimiento de cada
 combinación de componentes.
 
-% TODO: continue checking
 \subsubsection{Reutilización de almacenamientos}
 \label{subsubsec:reutilizacion}
 La ingesta es, en la mayoría de ocasiones, la etapa más costosa del
-\textit{pipeline}. Para evitar repetirla cuando distintas configuraciones
-comparten la configuración de almacenamiento, extracción, segmentación y
-límite, el generador de configuraciones asigna a estas configuraciones el mismo
-\texttt{db\_path} y fija el parámetro \texttt{clear\_storage: false}, de modo
-que la segunda y sucesivas configuraciones encuentran los \textit{embeddings}
-ya calculados y pueden saltarse directamente a las etapas de reducción y
-agrupamiento. Para que esta optimización no contamine las métricas, los tiempos
-de ingesta se persisten en la tabla \texttt{metadata} del almacenamiento. En
-ejecuciones posteriores se aplica una heurística: si el tiempo de ingesta
-medido es inferior a la mitad del almacenado (señal inequívoca de un paso por
-caché), se descarta y se reporta el valor persistido; en caso contrario se
-considera una ingesta real y se conserva. De este modo, los resultados
-publicados reflejan en todo momento el coste real de la etapa.
+\textit{pipeline}. Para evitar repetirla, se crea un identificador para cada
+almacenamiento a partir de la configuración de ingesta (segmentador, modelo de
+representación y parámetros asociados) que luego es usado para situar la base
+de datos en un directorio específico (o nombrar la tabla en el caso de
+PostgreSQL). Cuando el sistema detecta que el almacenamiento ya existe y no se
+ha declarado explícitamente que se limpie (\texttt{clear\_storage: true}), la
+fase de ingesta se omite y se reutiliza el almacenamiento existente. Las
+métricas de ingesta se almacenan en la tabla de metadatos del almacenamiento
+para que, en casos como estos, se reporten los tiempos reales de ingesta en
+lugar de los tiempos de caché, que no reflejarían el coste real de la etapa.
 
+% TODO: continue checking
 \subsubsection{Instrumentación y cronometría}
 \label{subsubsec:cronometria}
 El \textit{runner} de evaluación delimita cuatro etapas susceptibles de
