@@ -168,165 +168,138 @@ DBSCAN y los modelos de mezcla gaussiana, descrita en
 \ref{subsubsec:algoritmos-agrupamiento}. En los tres casos las semillas
 aleatorias se fijan para que el resultado sea reproducible.
 
-% TODO: this section repeats itself a lot
+% TODO: maybe extend/develop 
 \subsubsection{Protocolo de búsqueda por similitud}
 \label{subsubsec:similarity-search}
-La medición del coste de la búsqueda por similitud se realiza sobre los
-\textit{backends} descritos en \ref{subsec:configuraciones}. Tras la ingesta,
-se utiliza el banco completo como conjunto de consultas: cada
-\textit{embedding} almacenado actúa, a su vez, como vector de consulta, y se
-piden al \textit{backend} los $k+1$ vectores más próximos; luego se descarta el
-propio vector consultado para retener exactamente sus $k$ vecinos. El parámetro
-$k$ se fija con \texttt{similarity\_search.top\_k} (por defecto $k=3$; los
-experimentos de coste emplean valores mayores, típicamente $k=5$). La distancia
-es coseno por defecto y puede conmutarse a euclídea con \texttt{cos\_distance}.
-En bancos grandes, el conjunto de consultas puede restringirse a una submuestra
-aleatoria reproducible (\texttt{sample\_n} con semilla \texttt{sample\_seed}).
-Recorrer todo el banco como consulta hace que el coste de la etapa crezca como
-$O(n^2)$ en el recorrido lineal de \texttt{SQLiteStorage}, lo que coincide con
-la observación empírica del barrido de escalabilidad.
+La medición del coste de busca por similitud se realiza sobre los
+\textit{backends} de almacenamiento descritos anteriormente. Tras realizarse la
+ingesta, se seleccionan $n$ embeddings de manera aleatoria (pero reproducible)
+y se buscan los $k$ vecinos más próximos a cada uno de ellos, midiendo el
+tiempo total de las consultas. La distancia utilizada para la búsqueda puede
+ser tanto euclidiana como coseno, y el número de vecinos también es
+configurable. 
 
-El tiempo total de las $n$ consultas se mide con el mismo instrumental
-cronométrico que el resto de etapas. A diferencia de la reducción y el
-agrupamiento, la búsqueda por similitud no se repite $K$ veces: los
-\textit{backends} son deterministas una vez fijada la semilla del índice y, como
-el coste ya escala cuadráticamente con $n$, repetirlo encarecería el experimento
-sin añadir información sobre la variabilidad entre configuraciones. Como métrica
-derivada se reporta la distancia media a los $k$ vecinos recuperados
-(\texttt{avg\_neighbor\_distance}), promediada sobre todas las consultas, que
-contrasta los \textit{backends} también en calidad de recuperación, no solo en
-coste. Para los \textit{backends} con índice ANN se mide además el
-\textit{recall}@$k$ de sus vecinos frente a una búsqueda exacta por fuerza bruta
-(\texttt{ann\_recall\_at\_k}), que cuantifica la pérdida de exactitud del índice
-aproximado y es nulo en los \textit{backends} exactos. Este diseño compara
-directamente el coste por consulta del recorrido
-lineal de \texttt{SQLiteStorage} (lineal con el tamaño del banco) con el del
-índice HNSW de \texttt{PostgreSQLStorage} (sublineal) en los mismos puntos del
-barrido de escalabilidad.
+El tiempo total de las consultas se mide con el mismo procedimiento que el
+resto de etapas. De la misma forma que en el almacenamiento, la búsqueda por
+similitud es determinista una vez fijada la semilla que determina las entradas
+que buscar, así que no se repite varias veces como la reducción y el
+agrupamiento. El coste de esta etapa se espera que crezca como $O(n^2)$ para el
+recorrido lineal de \texttt{SQLiteStorage} y como $O(n \log n)$ para el índice
+HNSW de \texttt{PostgreSQLStorage}. Repetir la búsqueda varias veces solo
+conseguiría aumentar el coste del experimento sin aportar información relevante
+sobre este.
 
-% TODO: continue checking
+De esta etapa también se reporta la distancia media a los $k$ vecinos
+recuperados, promediada sobre todas las consultas. Si el \textit{backend}
+dispone de índice ANN (como es el caso de \texttt{PostgreSQL} con
+\texttt{HNSW}), tambien se reporta el \textit{recall}@$k$ de sus vecinos frente
+a una búsqueda exacta por fuerza bruta, que cuantifica la pérdida de exactitud del índice
+aproximado y es nulo en los \textit{backends} exactos.
+
 \subsubsection{Evaluación intrínseca de los agrupamientos}
 \label{subsubsec:eval-intrinseca}
 Las métricas intrínsecas definidas en \ref{subsubsec:metricas} se calculan de
 manera operativa sobre los \textit{embeddings} originales en su espacio de
 partida, no sobre los \textit{embeddings} reducidos utilizados por el
-agrupamiento. Esta decisión es importante: si las métricas se calculasen en el
-espacio reducido, una reducción agresiva podría favorecer artificialmente a un
-agrupamiento al deformar el espacio de modo que los clústeres aparezcan más
-compactos o separados de lo que en realidad están en el espacio original.
-Calcular las métricas sobre $X$ garantiza que las comparaciones entre
-configuraciones midan la calidad real de la partición inducida sobre los datos
-sin distorsiones del paso intermedio.
+agrupamiento. Esto se hace porque el objetivo de estas métricas es evaluar la
+calidad del agrupamiento de los datos originales, no la habilidad del reductor
+para deformar el espacio de modo que los clústeres aparezcan más compactos o
+separados.
 
 Los algoritmos basados en densidad (DBSCAN, OPTICS y HDBSCAN) pueden asignar la
 etiqueta $-1$ a puntos considerados ruido. Estos puntos se excluyen del cálculo
 del coeficiente de silueta y de los índices de Calinski-Harabász y
-Davies-Bouldin, y se reportan por
-separado como proporción de ruido y coeficiente de variación del tamaño de los
-clústeres no triviales, de modo que un agrupamiento que rechace una fracción
-elevada de los puntos no quede artificialmente premiado por una silueta alta
-sobre los pocos puntos restantes.
+Davies-Bouldin. Esto implica que estas métricas no presentan la imagen completa
+de la calidad del agrupamiento, haciendo necesario complementarlas con datos
+como la cantidad de puntos etiquetados como ruido o la variedad de tamaños de
+los clústeres resultantes. Por otro lado, este sistema permite que los
+algoritmos que identifican y reportan ruido no puedan ser penalizados por ello,
+o que agrupamientos que rechacen una gran fracción de los puntos como ruido no
+queden artificialmente premiados por solo agrupar puntos muy cercanos entre sí.
 
 \subsubsection{Evaluación extrínseca sobre subconjunto etiquetado}
 \label{subsubsec:eval-extrinseca}
-La evaluación supervisada sigue las restricciones de \ref{subsubsec:metricas} y
-opera sobre dos conjuntos etiquetados disjuntos (\ref{subsec:dataset}), uno por
-cada tarea supervisada del trabajo: evaluación por estilo y evaluación por
-autor. En ambos casos se limita a las configuraciones sin segmentador, donde la
-correspondencia entre recorte anotado y \textit{embedding} es unívoca. Con
-segmentador, cada fotografía genera varios recortes y esa correspondencia se
-diluye, lo que impediría asignar una etiqueta única a cada \textit{embedding}.
+La evaluación supervisada sigue las restricciones mencionadas anteriormente
+(sección \ref{subsubsec:metricas}) y opera sobre dos conjuntos de recortes
+etiquetados, uno por cada tarea supervisada del trabajo: evaluación por estilo
+y evaluación por autor. En ambos casos, se utilizan los recortes directamente
+como imágenes a evaluar en vez de aportar la imagen original y utilizar un
+segmentador para extraer los recortes de evaluación, porque el objetivo es
+medir la calidad del espacio de representación para agrupar pintadas, no la
+capacidad de un sistema completo. Tampoco se utilizan imágenes completas puesto
+que muchas de estas contienen varias pintadas de estilos y autores distintos,
+haciendo difícil atribuir una etiqueta de estilo o autor a la imagen completa y
+complicando la interpretación de las métricas.
 
 Ambas evaluaciones comparten métricas y procedimiento, pero responden a
 preguntas distintas, y esa diferencia justifica el reparto asimétrico de las
 anotaciones entre entrenamiento y evaluación. Las etiquetas de estilo definen
-una tarea de clasificación cerrada sobre cuatro categorías fijas —las mismas en
-el entrenamiento de las cabezas estilísticas y en ambas ciudades—, así que
-basta con que no se solapen las fotografías entre entrenamiento y evaluación.
-La diversidad estilística se cubre mejor agregando recortes de Salamanca y de
+una tarea de clasificación cerrada sobre cuatro categorías fijas, así que basta
+con que no se solapen las fotografías entre entrenamiento y evaluación. La
+diversidad estilística se cubre mejor agregando recortes de Salamanca y de
 Cuenca (el banco StopGrafiti) al entrenamiento, y el conjunto de evaluación,
 extraído del banco principal de Salamanca, es disjunto a nivel de fotografía.
 La evaluación por estilo mide así el grado en que el espacio de representación
 agrupa pintadas estilísticamente homogéneas.
 
-Las etiquetas de autor, en cambio, definen un problema abierto de aprendizaje de
-métricas: en el uso real del sistema, los autores de las pintadas a agrupar son
-en su mayoría desconocidos para el modelo en el momento de la inferencia. Si las
-cabezas de autoría se entrenasen sobre los mismos identificadores de autor que
-luego aparecen en la evaluación —aun con fotografías distintas—, las métricas
-medirían la capacidad de reidentificar autores ya vistos, no la de construir un
-espacio en el que autores nuevos queden separados. Para evitar este sesgo se
-sigue la convención habitual de la verificación de identidad
-(FaceNet~\cite{schroff_facenet_2015} y la literatura de reidentificación de
-personas): el conjunto de evaluación contiene únicamente identificadores de
-autor disjuntos de los vistos durante el entrenamiento.
+Las etiquetas de autor, en cambio, definen un problema abierto de aprendizaje
+de métricas: en el uso real del sistema, los autores de las pintadas a agrupar
+son en su mayoría desconocidos para el modelo en el momento de la inferencia.
+Si las cabezas de autoría se entrenasen sobre los mismos identificadores de
+autor que luego aparecen en la evaluación (aun utilizando fotografías
+distintas), las métricas medirían la capacidad de reidentificar autores ya
+vistos, no la de construir un espacio en el que autores nuevos queden
+separados. Para evitar este sesgo se sigue la convención habitual de la
+verificación de identidad (FaceNet~\cite{schroff_facenet_2015} y la literatura
+de reidentificación de personas): el conjunto de evaluación contiene únicamente
+identificadores de autor disjuntos de los vistos durante el entrenamiento.
 
-Esa disjunción se materializa entrenando las cabezas de autoría exclusivamente
-con los $169$ recortes de Cuenca y evaluándolas sobre los $185$ de Salamanca. La
-separación geográfica entre ambas ciudades hace razonable asumir que los
-conjuntos de autores no se solapan, si bien no se ha verificado confrontando los
-identificadores literales de las firmas, dada la posibilidad teórica de que un
-mismo autor opere en ambas. Esta elección introduce además un cambio de dominio
-entre ciudades, que deberá tenerse en cuenta al interpretar los resultados de la
-evaluación por autor (\ref{sec:results}). La asimetría entre entrenamiento y
-evaluación es, por tanto, intrínseca al problema de aprendizaje de métricas.
+Esta restricción se cumple entrenando las cabezas de autoría exclusivamente con
+los recortes de Cuenca y evaluándolas sobre los de Salamanca. Dado que ambas
+ciudades están geográficamente separadas, es razonable asumir que los conjuntos
+de autores no se solapan. Esto, aunque no se ha verificado formalmente, se ha
+comprobado de manera informal al realizar la segmentación y anotación de los
+recortes, y no se ha encontrado ningún caso de un mismo autor operando en ambas
+ciudades. Esta elección introduce además un cambio de dominio entre ciudades,
+que deberá tenerse en cuenta al interpretar los resultados de la evaluación por
+autor (\ref{sec:results}). La asimetría entre entrenamiento y evaluación es,
+por tanto, intrínseca al problema de aprendizaje de métricas.
 
-El conjunto de etiquetas de autor es además fuertemente desbalanceado, con
-muchos autores representados por uno o dos recortes. Una matización adicional
-afecta a las cabezas estilísticas evaluadas sobre el conjunto de autor: sus
-recortes de entrenamiento ($110$ de los $385$) proceden de las mismas
-fotografías de Salamanca de las que se extraen los $185$ recortes de evaluación
-por autor, de modo que durante su entrenamiento han visto píxeles de algunas de
-esas fotografías, aunque etiquetados por estilo y no por autor. Ambas
-circunstancias —desbalance y solapamiento fotográfico— condicionan la lectura de
-las métricas por autor y se retoman al discutir los resultados
-(\ref{sec:results}).
-
-Las métricas ARI, NMI y F1 por pares se calculan directamente sobre los vectores
-de etiquetas de clúster y de verdad fundamental, sin resolver explícitamente el
-problema de asignación clúster-clase: las tres son invariantes ante
-permutaciones de etiquetas y comparan las relaciones de coagrupamiento entre
-pares de puntos. Los puntos etiquetados como ruido por los algoritmos basados en
-densidad se tratan como un único clúster adicional, de modo que influyen en la
-métrica en lugar de ignorarse silenciosamente. Los valores se reportan por
-configuración y conjunto de etiquetas, y se agregan después por componente para
-identificar qué elecciones contribuyen sistemáticamente a una mejor calidad
-supervisada.
+Las métricas ARI, NMI y F1 por pares se calculan directamente sobre los
+vectores de etiquetas de clúster y de verdad fundamental, sin resolver
+explícitamente el problema de asignación clúster-clase: las tres son
+invariantes ante permutaciones de etiquetas y comparan las relaciones de
+coagrupamiento entre pares de puntos. Para los algoritmos que pueden etiquetar
+puntos como ruido ($-1$) se reportan dos lecturas de cada métrica. En la
+lectura por defecto los puntos de ruido se tratan como un único clúster
+adicional, de modo que influyen en la métrica en lugar de ignorarse
+silenciosamente. En la lectura complementaria (\texttt{*\_no\_noise}) esos
+puntos se descartan antes de puntuar, de forma que los algoritmos de densidad y
+los particionales se comparan sobre el subconjunto que cada uno realmente
+agrupa. Esta doble lectura es asimétrica respecto al tratamiento del ruido en
+las métricas intrínsecas, donde el ruido siempre se excluye y se complementan
+con valores como el porcentaje de ruido.
 
 \subsubsection{Salida y agregación de resultados}
 \label{subsubsec:salida}
 Cada lote de \textit{benchmark} produce un único fichero JSON con dos
-secciones: un bloque \texttt{runtime} con información sobre el entorno de
-ejecución (versión de Python, librerías principales, identificación del
-\textit{hardware}) capturado en el momento de la ejecución, y un bloque
-\texttt{results} con un registro por configuración que contiene todas las
-métricas y tiempos en estructura anidada. Para las etapas repetidas se
-incluyen tanto los valores medios como las desviaciones típicas y el número
-de muestras agregadas en cada caso, de manera que el análisis posterior
-pueda distinguir diferencias dentro del ruido de medición de diferencias
-sistemáticas entre configuraciones.
-
-La agregación posterior se realiza con la herramienta \texttt{pipeline-plot},
-que toma uno o varios JSON como entrada y produce gráficas comparativas por
-métrica utilizando \texttt{seaborn}. Para el estudio de escalabilidad se
-obtienen curvas de tiempo en función del tamaño $N$ por etapa y por
-componente, que permiten estimar empíricamente el exponente de crecimiento
-de cada combinación.
+secciones: un bloque con información sobre el entorno de ejecución (versión de
+Python, librerías principales, identificación del \textit{hardware}) capturado
+en el momento de la ejecución, y otro bloque con un registro por configuración
+que contiene todas las métricas y tiempos capturados. Para las etapas repetidas
+se incluyen tanto los valores medios como las desviaciones típicas y el número
+de muestras agregadas en cada caso, de manera que el análisis posterior pueda
+distinguir diferencias dentro del ruido de medición.
 
 \subsection{Entrenamiento de modelos auxiliares}
 \label{subsec:entrenamiento}
 
 \subsubsection{Detector de grafiti}
 \label{subsubsec:entrenamiento-detector}
-% TODO: Check this once the detector is re-trainned for the "final" time
 El detector se entrena a partir del subconjunto anotado descrito en
-\ref{subsec:dataset}, cuyas $\mathtt{YOLO\_IMGS\_PLACEHOLDER}$ %YOLO_IMGS
-fotografías de ambos bancos contienen un total de $\mathtt{NSEGS\_PLACEHOLDER}$ %NSEGS
-cajas anotadas. El conjunto se divide según la complejidad visual de cada
-fotografía: las imágenes limpias forman la partición de entrenamiento y las
-marcadas como abigarradas (\textit{cluttered}) durante la anotación se reservan
-para validación. El entrenamiento parte de los pesos preentrenados sobre
-COCO publicados por el autor del modelo y solo ajusta sus parámetros para la
+\ref{subsec:dataset}, cuyas $447$ fotografías de ambos bancos contienen un
+total de $\mathtt{NSEGS\_PLACEHOLDER}$ cajas anotadas. El entrenamiento parte
+de los pesos preentrenados sobre COCO y solo ajusta sus parámetros para la
 única clase de interés, ``grafiti''.
 
 Se utilizan los hiperparámetros por defecto de la implementación de referencia,
@@ -341,39 +314,37 @@ se reportan mAP@$0.5$ y mAP@$0.5{:}0.95$ sobre la partición de validación.
 
 \subsubsection{Cabezas de proyección}
 \label{subsubsec:entrenamiento-cabezas}
-%TODO: check this once the heads are trained for the "final" time
 Las cuatro cabezas (autoría y estilo sobre MobileNetV3 y DINOv2) se entrenan
 sobre la totalidad del subconjunto anotado, sin reservar una partición de
-validación. Los
-\textit{backbones} se mantienen estrictamente congelados durante todo el
-proceso y solo se actualizan los parámetros de la cabeza, según el esquema de
-\textit{transfer learning} descrito en \ref{subsubsec:cabezas}.
+validación. Los \textit{backbones} se mantienen estrictamente congelados
+durante todo el proceso y solo se actualizan los parámetros de la cabeza, según
+el esquema de \textit{transfer learning} descrito en \ref{subsubsec:cabezas}.
 
 Las cabezas de autoría se entrenan con la pérdida de tripletes (\textit{triplet
 loss}) con margen $1.0$, optimizador Adam con \textit{learning rate} $10^{-4}$,
-tamaño de \textit{batch} $8$ y $20$ épocas, sin parada temprana: se conservan los
-pesos de la última época. Los tripletes se forman
-dentro de cada \textit{batch} a partir de las anotaciones de autoría, eligiendo
-como ancla un recorte cualquiera, como positivo otro recorte con el mismo
-identificador de autor y como negativo un recorte con identificador distinto.
-Inspirados por la relevancia del muestreo de negativos~\cite{wu_sampling_2017},
-los negativos no se eligen de forma uniforme: con probabilidad fija se extraen
-del conjunto de autores con un único recorte (negativos difíciles) y el resto de
-las veces se muestrean del banco completo de autores.
+tamaño de \textit{batch} $8$ y $20$ épocas, sin parada temprana: se conservan
+los pesos de la última época. Los tripletes se forman dentro de cada
+\textit{batch} a partir de las anotaciones de autoría, eligiendo como ancla un
+recorte cualquiera, como positivo otro recorte con el mismo identificador de
+autor y como negativo un recorte con identificador distinto. Inspirados por la
+relevancia del muestreo de negativos~\cite{wu_sampling_2017}, los negativos no
+se eligen de forma uniforme: con probabilidad fija se extraen del conjunto de
+autores con un único recorte (negativos difíciles) y el resto de las veces se
+muestrean del banco completo de autores.
 
 Las cabezas de estilo se entrenan con la pérdida \textit{Supervised
-Contrastive}~\cite{khosla_supervised_2021} y temperatura $T = 0.07$, optimizador
-Adam con \textit{learning rate} $10^{-4}$ y un \textit{scheduler} cosenoidal a lo
-largo de $60$ épocas.
-Para que cada \textit{batch} contenga al menos un par positivo por ancla, se
-utiliza un muestreador balanceado que toma $4$ recortes por clase y construye
-entre $10$ y $30$ \textit{batches} por época en función del tamaño efectivo del
-conjunto. El muestreo se realiza con reemplazo, de modo que las clases con
-menos de $4$ recortes repiten ejemplos dentro del \textit{batch} hasta
-completar la cuota. Se aplica parada temprana con paciencia de $15$ épocas sobre
-la pérdida de entrenamiento, y la cabeza seleccionada para los \textit{benchmarks}
-es la que minimiza dicha pérdida.
+Contrastive}~\cite{khosla_supervised_2021} y temperatura $T = 0.07$,
+optimizador Adam con \textit{learning rate} $10^{-4}$ y un \textit{scheduler}
+cosenoidal a lo largo de $60$ épocas. Para que cada \textit{batch} contenga al
+menos un par positivo por ancla, se utiliza un muestreador balanceado que toma
+$4$ recortes por clase y construye entre $10$ y $30$ \textit{batches} por época
+en función del tamaño efectivo del conjunto. El muestreo se realiza con
+reemplazo, de modo que las clases con menos de $4$ recortes repiten ejemplos
+dentro del \textit{batch} hasta completar la cuota. Se aplica parada temprana
+con paciencia de $15$ épocas sobre la pérdida de entrenamiento, y la cabeza
+seleccionada para los \textit{benchmarks} es la que minimiza dicha pérdida.
 
+% Remove this?
 \subsection{Reproducibilidad}
 \label{subsec:reproducibilidad}
 Más allá del entorno de ejecución y de las versiones de las dependencias ya
