@@ -56,7 +56,7 @@ y de validación supervisada (\ref{subsec:res-supervisada}).
 A lo largo de toda la subsección las métricas intrínsecas (silueta, CH, DB) se
 leen siempre de forma conjunta con el número de clústeres, la fracción de
 ruido y el coeficiente de variación de los tamaños de clúster. Tal y como se
-documenta repetidamente en los informes de E2, E3 y E4, leer la silueta o el
+documenta repetidamente en E2, E3 y E4, leer la silueta o el
 CH de forma aislada lleva a inversiones consistentes del ranking, porque ambos
 premian configuraciones degeneradas: pocos clústeres grandes y bien separados
 (CH alto) o particiones binarias triviales (silueta alta). El juicio final se
@@ -93,8 +93,7 @@ tabla~\ref{tab:e1-quality-6416} recoge la calidad intrínseca a $N=6416$.
   \texttt{mob.\_graffiti\_style\_head}    & 631 & 0.202 & 0.144 & 13.7 & 1.89 & 0.63 \\ \hline
   \texttt{yolom}                          & 480 & 0.253 & 0.131 & 32.2 & 1.75 & 0.74 \\ \hline
   \texttt{yolon}                          & 348 & 0.341 & 0.085 & 51.2 & 1.91 & 0.81 \\ \hline
-  \caption{E1, calidad intrínseca a $N=6416$ (extracto del informe del
-  experimento). Las CNN ImageNet encabezan la silueta; el extractor base
+  \caption{E1, calidad intrínseca a $N=6416$. Las CNN ImageNet encabezan la silueta; el extractor base
   (\texttt{dinov2\_graffiti\_style\_head}) presenta el segundo CH más alto del
   panel pese a una silueta inferior a la de su \textit{backbone} DINOv2,
   ejemplificando la inversión silueta$\downarrow$/CH$\uparrow$ que induce el
@@ -164,7 +163,7 @@ $\sim$825~MB de RSS), y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
   % una serie por tamaño de banco N ∈ {250, 1000, 6416}. Resaltar el par
   % dinov2 -> style head para mostrar la caída de silueta, y anotar el CH de
   % la cabeza estilística (33.1) sobre su barra para hacer visible la
-  % inversión silueta/CH. Datos: tabla de calidad en exp/exp01/report.md.
+  % inversión silueta/CH.
   % \includegraphics[width=\linewidth]{figures/e1_silhouette_by_embedding.pdf}
   \caption{E1: silueta por extractor a tres tamaños de banco. Las CNN ImageNet
   encabezan la columna, pero la cabeza estilística de DINOv2 invierte
@@ -243,7 +242,6 @@ UMAP-10 y UMAP-50 son indistinguibles en calidad (silueta 0.151 vs 0.142, csCV
   % Panel B: barras horizontales del tiempo de reducción y del tiempo de
   % clustering inducido (apiladas o lado a lado) a N=6416 — muestra la
   % traslación de coste identidad -> reducción.
-  % Fuente: tablas de calidad y coste en exp/exp02/report.md.
   % \includegraphics[width=\linewidth]{figures/e2_reduction_quality_cost.pdf}
   \caption{E2: calidad intrínseca (panel izquierdo) y coste por etapa (panel
   derecho) por familia de reducción a $N=6416$. La fila identidad colapsa el
@@ -253,8 +251,8 @@ UMAP-10 y UMAP-50 son indistinguibles en calidad (silueta 0.151 vs 0.142, csCV
 
 \subsubsection{Algoritmo de agrupamiento}
 \label{subsubsec:res-agrupamiento}
-% E3. Jerarquía de best_cluster.md frente a los datos; ablación del HDBSCAN
-% por defecto, con n_clusters fijado donde aplica para quitar el confound de k.
+% E3. Ablación del HDBSCAN por defecto, con n_clusters fijado donde aplica
+% para quitar el confound de k.
 HDBSCAN es el único agrupador del panel que combina silueta competitiva,
 escalado sensato del número de clústeres con $N$, ruido moderado, tamaños
 balanceados y coste despreciable bajo el criterio conjunto. El barrido (E3)
@@ -278,8 +276,7 @@ familia.
   Espectral $k=10$       &  10 & 0.000 & -0.117 & 264 & 3.33 & 1.56 & 2.073 \\ \hline
   \caption{E3, fila representativa de cada familia a $N=6416$. Sólo HDBSCAN
   combina un número no trivial de clústeres, ruido moderado, tamaños
-  balanceados y coste despreciable. La tabla completa con las 14
-  configuraciones figura en el informe del experimento.}
+  balanceados y coste despreciable.}
   \label{tab:e3-summary-6416}
 \end{longtable}
 }
@@ -321,8 +318,7 @@ describen una mezcla de tres particiones distintas, no una sola.
   % en log; silueta, eje y) a N=6416, una marca por configuración de E3, con
   % glifo distinto por familia (HDBSCAN, KMeans, GMM, DBSCAN, OPTICS, agglo,
   % spectral). Resaltar HDBSCAN y OPTICS en la esquina cohesiva-y-cara y
-  % anotar el frente de Pareto que justifica HDBSCAN. Datos: tabla cost en
-  % exp/exp03/report.md.
+  % anotar el frente de Pareto que justifica HDBSCAN.
   % \includegraphics[width=\linewidth]{figures/e3_pareto_quality_cost.pdf}
   \caption{E3: frente de calidad–coste a $N=6416$. HDBSCAN es el único punto
   con silueta competitiva y coste despreciable; OPTICS es par en calidad pero
@@ -443,8 +439,7 @@ asintóticos.
 \subsubsection{Escalabilidad por etapa}
 \label{subsubsec:res-escalabilidad}
 % E7. Figura cabecera: tiempo vs N en log-log, pendiente empírica por etapa y
-% por algoritmo de agrupamiento, junto a la complejidad teórica esperada
-% (tabla de clases en infos/experiments.md §7).
+% por algoritmo de agrupamiento, junto a la complejidad teórica esperada.
 La búsqueda por similitud sobre SQLite domina absolutamente el coste a
 $N=6416$ con una pendiente log-log empírica de $\approx 2.10$, consistente
 con la exploración lineal todos-contra-todos y motivación cuantitativa
@@ -452,8 +447,7 @@ directa de los barridos de almacenamiento e índice ANN. El barrido de
 escalabilidad (E7) mide ingesta, reducción, agrupamiento (cinco algoritmos)
 y búsqueda por similitud sobre seis tamaños de banco; la
 tabla~\ref{tab:e7-cost} consolida los tiempos por etapa a las tres escalas
-extremas con HDBSCAN como agrupador de referencia (los cinco algoritmos con
-su columna completa figuran en el informe del experimento), y la
+extremas con HDBSCAN como agrupador de referencia, y la
 tabla~\ref{tab:e7-slopes} contrasta las pendientes log-log observadas con la
 complejidad teórica de referencia.
 
@@ -470,7 +464,7 @@ complejidad teórica de referencia.
   \caption{E7, tiempo de pared por etapa frente a $N$ (extracto). A $N=6416$
   la búsqueda por similitud SQLite domina absolutamente, con la ingesta como
   segundo coste. La caída de UMAP a $N=6416$ (anomalía pynndescent) se discute
-  en el texto. La columna completa con DBSCAN y OPTICS figura en el informe.}
+  en el texto.}
   \label{tab:e7-cost}
 \end{longtable}
 }
@@ -539,8 +533,7 @@ de los puntos pequeños sobreestima el coste futuro.
   % en el mismo panel con tipo de línea distinto, una línea por algoritmo de
   % agrupamiento (HDBSCAN, KMeans, DBSCAN, OPTICS, aglomerativo). Anotar la
   % pendiente ajustada en la ventana N>=500. Marcar el punto N=6416 de UMAP
-  % como anomalía (cambio de régimen pynndescent). Datos: tabla cost en
-  % exp/exp07/report.md.
+  % como anomalía (cambio de régimen pynndescent).
   % \includegraphics[width=\linewidth]{figures/e7_scalability_loglog.pdf}
   \caption{E7 (figura titular): tiempo de pared vs $N$ por etapa del
   \textit{pipeline}, escala log-log. La pendiente de la búsqueda por
@@ -554,7 +547,7 @@ de los puntos pequeños sobreestima el coste futuro.
   % FIGURE: dos paneles. Panel A: RSS pico de la etapa aglomerativa vs N
   % (línea con marcadores), comparado con la línea plana de
   % HDBSCAN/DBSCAN/OPTICS. Panel B: RSS pico de la búsqueda por similitud vs
-  % N (lineal). Datos: tabla de memoria en exp/exp07/report.md.
+  % N (lineal).
   % \includegraphics[width=\linewidth]{figures/e7_memory.pdf}
   \caption{E7: memoria pico por etapa. El aglomerativo materializa la matriz
   $O(n^2)$ de distancias y crece cuadráticamente con $N$; HDBSCAN, DBSCAN y
@@ -627,8 +620,8 @@ elección por defecto recomendada para la búsqueda; SQLite queda como
 \begin{figure}[h]
   \centering
   % FIGURE: gráfico log-log de latencia por consulta (eje y) vs N (eje x),
-  % una línea por backend (SQLite, pgvector exacto, pgvector+HNSW). Datos:
-  % tabla en exp/exp06/report.md. Resaltar el cruce a N~2500. Añadir como
+  % una línea por backend (SQLite, pgvector exacto, pgvector+HNSW).
+  % Resaltar el cruce a N~2500. Añadir como
   % segundo panel pequeño la curva idx_s vs N (build HNSW).
   % \includegraphics[width=\linewidth]{figures/e6_storage_latency.pdf}
   \caption{E6: latencia de búsqueda por consulta frente a tamaño del banco
@@ -710,7 +703,7 @@ sustituir al exacto sin pérdida significativa de calidad.
   % FIGURE: nube de puntos en el plano (latencia por consulta s, eje x;
   % recall@5, eje y) con un punto por configuración HNSW de E9 y otro para el
   % baseline exacto. Etiquetar cada punto con su (m, ef_c, ef_s) y conectar
-  % el frente de Pareto con una línea. Datos: tabla en exp/exp09/report.md.
+  % el frente de Pareto con una línea.
   % \includegraphics[width=\linewidth]{figures/e9_hnsw_pareto.pdf}
   \caption{E9: frente de Pareto recall–latencia del índice HNSW a $N=6416$.
   El ancla (\texttt{m}=16, \texttt{ef\_c}=64, \texttt{ef\_s}=40) ocupa el
@@ -965,9 +958,8 @@ futuro: véase \ref{sec:conclusion}).
   % FIGURE: dos paneles lado a lado en formato scatter:
   % Panel A: silueta (x) vs ARI (y) para los 96 runs de E8a, con marcador
   % distinto por algoritmo y color por (k oráculo / k auto). Anotar Pearson
-  % r=+0.66 en el subconjunto k-oráculo. Datos: exp/exp08a/report.md.
+  % r=+0.66 en el subconjunto k-oráculo.
   % Panel B: lo mismo para los 96 runs de E8b. Anotar Pearson r=-0.52.
-  % Datos: exp/exp08b/report.md.
   % El contraste visual entre los dos paneles es el mensaje principal.
   % \includegraphics[width=\linewidth]{figures/e8_silhouette_vs_ari.pdf}
   \caption{Correlación silueta--ARI sobre E8a (panel izquierdo, etiquetas de
@@ -977,11 +969,11 @@ futuro: véase \ref{sec:conclusion}).
   \label{fig:e8-correlation}
 \end{figure}
 
-% TODO (autor): figuras E1, E2, E3, E5, E6, E7, E8, E9 — generar con los
-% scripts de exp/bench_summary.py y guardar como PDF bajo doc/figures/ con
-% los nombres sugeridos en cada \includegraphics comentado. La prosa y las
-% tablas son autosuficientes sin las figuras, pero las figuras incrementan
-% claramente la legibilidad del coste-vs-N y de la frontera HNSW.
+% TODO (autor): figuras E1, E2, E3, E5, E6, E7, E8, E9 — generar y guardar
+% como PDF bajo doc/figures/ con los nombres sugeridos en cada
+% \includegraphics comentado. La prosa y las tablas son autosuficientes sin
+% las figuras, pero las figuras incrementan claramente la legibilidad del
+% coste-vs-N y de la frontera HNSW.
 %
 % TODO (autor): si se reejecuta E9 con la celda (m=64, ef_c=128, ef_s=40)
 % para completar el barrido de m, actualizar la tabla \ref{tab:e9-hnsw}
