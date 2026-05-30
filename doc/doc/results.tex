@@ -175,13 +175,10 @@ cualquier ranking basado en una sola métrica intrínseca.
 
 \subsubsection{Reducción de dimensionalidad}
 \label{subsubsec:res-reduccion}
-% E2. Cuánto aporta reducir (fila identidad) y qué familia ayuda más.
-Reducir la dimensionalidad no es un ajuste fino sobre el extractor base: es la
-condición que vuelve operativo el agrupamiento por densidad. Sobre los
-vectores de 384 dimensiones L2-normalizados de
+Reducir la dimensionalidad de los vectores de características es un paso común
+en los pipelines de agrupamiento. Sobre los vectores de 384 dimensiones de
 \texttt{dinov2\_graffiti\_style\_head}, el barrido (E2) compara seis
-configuraciones —identidad (sin reducción), PCA-10 y PCA-50, UMAP-10 y
-UMAP-50, e Isomap-10— y revela a UMAP como la única familia que produce
+configuraciones y revela a UMAP como la única familia que produce
 simultáneamente un número de clústeres no trivial, ruido moderado y tamaños
 balanceados. La tabla~\ref{tab:e2-quality-6416} resume el resultado al tamaño
 de corpus completo.
@@ -204,30 +201,27 @@ de corpus completo.
 }
 
 La fila \emph{identidad} responde directamente a la pregunta de cuánto aporta
-reducir: agrupando los 384-d crudos, HDBSCAN sólo produce entre 2 y 4
-clústeres a las tres escalas (2 a $N=250$, 4 a $N=1000$, 2 a $N=6416$). La
-estimación de densidad se degrada en alta dimensionalidad, las distancias se
-concentran y el corpus colapsa a una partición casi binaria. UMAP-10 sobre
-los mismos datos escala a 23, 96 y 563 clústeres respectivamente. La
-reducción no es un detalle de ajuste fino; es lo que hace operativo el
-agrupamiento por densidad sobre estos vectores.
-
-La cara de coste agrava la conclusión. Aunque la fila identidad es nominalmente
-gratuita (\texttt{red\_s}~$\approx$~0), \emph{empuja} el coste hacia la
-etapa de agrupamiento: a $N=6416$ HDBSCAN tarda 24.1~s sobre la representación
-identidad frente a 0.34~s sobre UMAP-10, un factor $\sim$70$\times$. PCA-10 y
-PCA-50 ilustran la otra inestabilidad: PCA-10 colapsa a $k=2$ con silueta
+reducir: agrupando los 384-d crudos, HDBSCAN sólo produce entre 2 y 4 clústeres
+a las tres escalas (2 a $N=250$, 4 a $N=1000$, 2 a $N=6416$). La estimación de
+densidad se degrada en alta dimensionalidad y las distancias se concentran.
+UMAP-10 sobre los mismos datos escala a 23, 96 y 563 clústeres respectivamente.
+PCA-10 y PCA-50 ilustran otra inestabilidad: PCA-10 colapsa a $k=2$ con silueta
 negativa ($-0.028$), mientras que PCA-50 explota a $k=188$ con un 62.7\% de
-ruido y un coeficiente de variación de 5.61, ambos lecturas degeneradas que
-las métricas individuales premian engañosamente (PCA-50 obtiene el CH más
-alto de la tabla, $43.0$, por delante de UMAP-10). Isomap-10 fracasa por la otra vía: 23.6~s y 1.2~GB de
-RSS pico, lo más caro del experimento, para colapsar también a $k=2$ a
-$N=6416$.
+ruido y un coeficiente de variación de 5.61, ambos lecturas degeneradas que las
+métricas individuales premian engañosamente (PCA-50 obtiene el CH más alto de
+la tabla, $43.0$, por delante de UMAP-10).
 
-UMAP-10 y UMAP-50 son indistinguibles en calidad (silueta 0.151 vs 0.142, csCV
-0.75 vs 0.82), pero UMAP-50 cuesta el doble en tiempo de reducción (11.2~s vs
-6.2~s a $N=6416$). La recomendación es por tanto específicamente UMAP con
-\texttt{n\_components=10}, no UMAP en general.
+Las métricas de coste empeoran la posición de la identidad. Esta reducción no
+es gratuita como podría parecer, sino que empuja el coste hacia la etapa de
+agrupamiento. Con $N=6416$ imágenes, HDBSCAN tarda 24.1~s sobre la
+representación identidad frente a 0.34~s sobre UMAP-10, $\sim 70$ veces más.
+Isomap-10 fracasa en la misma vía: 23.6~s y 1.2~GB de RSS pico, lo más caro del
+experimento, para colapsar también a $k=2$ a $N=6416$.
+UMAP-10 y UMAP-50 son indistinguibles en calidad, pero UMAP-50 cuesta el doble
+en tiempo de reducción (11.2~s vs 6.2~s a $N=6416$). La recomendación es por
+tanto específicamente UMAP con \texttt{n\_components=10}, no UMAP en general.
+
+% TODO: cost table here?
 
 \begin{figure}[h]
   \centering
@@ -246,18 +240,16 @@ UMAP-10 y UMAP-50 son indistinguibles en calidad (silueta 0.151 vs 0.142, csCV
 
 \subsubsection{Algoritmo de agrupamiento}
 \label{subsubsec:res-agrupamiento}
-% E3. Ablación del HDBSCAN por defecto, con n_clusters fijado donde aplica
-% para quitar el confound de k.
-HDBSCAN es el único agrupador del panel que combina silueta competitiva,
+HDBSCAN es el único agrupador del panel que combina una silueta competitiva,
 escalado sensato del número de clústeres con $N$, ruido moderado, tamaños
 balanceados y coste despreciable bajo el criterio conjunto. El barrido (E3)
 cubre 14 configuraciones sobre el extractor base y UMAP-10: HDBSCAN, KMeans
 (codo), GMM diagonal (BIC con tres techos), DBSCAN (auto-$\varepsilon$ y tres
 $\varepsilon$ fijos), OPTICS coseno, aglomerativo (\textit{average linkage},
 $k\in\{10, 20\}$) y espectral ($k\in\{10, 20\}$); la
-tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada
-familia.
+tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
 
+% Add memory to this table?
 {\footnotesize
 \begin{longtable}{|p{2.4cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{0.9cm}|p{0.9cm}|p{1.0cm}|p{1.1cm}|} \hline
   \textbf{Algoritmo} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} & \textbf{clu (s)} \\ \hline
@@ -276,36 +268,27 @@ familia.
 \end{longtable}
 }
 
-La trampa central del barrido es el confundimiento entre silueta y cobertura:
-las métricas de distancia se calculan sólo sobre los puntos no etiquetados
-como ruido, así que los métodos basados en densidad (HDBSCAN, DBSCAN, OPTICS)
-son juzgados sobre el subconjunto que \emph{decidieron} agrupar, mientras
-que los métodos particionales (KMeans, GMM, aglomerativo, espectral) son
-juzgados sobre el corpus completo. La silueta penaliza menos a un método que
-se abstiene de los puntos difíciles. El espejo de esta trampa es el colapso a
-$k$ trivial: KMeans obtiene el CH más alto de toda la tabla (805 a $N=6416$)
-porque el codo detecta sólo $k{=}8$; CH premia compactación, no captura de
-estructura. La conclusión, igual que en E2, sólo es defensible bajo el
-criterio conjunto.
+En este barrido es especialmente importante recordar como se leen las métricas
+intrínsecas: no de manera aislada, sino en conjunto con el número de clústeres,
+la fracción de ruido y el coeficiente de variación de los tamaños de clúster.
+Los algoritmos basados en densidad (HDBSCAN, DBSCAN, OPTICS) son juzgados sólo
+sobre el subconjunto que agrupan, mientras que los métodos particionales
+(KMeans, GMM, aglomerativo, espectral) son juzgados sobre el corpus completo.
+La silueta penaliza menos a un método que se abstiene de los puntos difíciles y
+CH premia la compactación, sin importar la estructura.
 
-Bajo ese criterio, HDBSCAN es el único punto que combina escalado sensato del
-número de clústeres con el tamaño del corpus (23$\to$96$\to$563), ruido
-moderado (0.06$\to$0.11$\to$0.20), balance de tamaños bajo (csCV
-0.53$\to$0.60$\to$0.75) y coste despreciable (0.35~s, 0.3~MB a $N=6416$). OPTICS
-es su único par en calidad —incluso le supera ligeramente en silueta a las
-tres escalas— pero está estrictamente dominado en coste: 8.6~s y 763~MB de RSS
-pico, $\sim$25$\times$ el tiempo y $\sim$2500$\times$ la memoria de HDBSCAN
-para una ganancia marginal y confundida con su mayor abstención. Las
-alternativas particionales con $k$ libre por BIC (GMM·300) son el plan B si
-las etiquetas de ruido ($-1$) no son admisibles aguas abajo: a $N=6416$
-obtiene la mejor partición sin ruido del barrido, a 1.8~s y 50~MB de RSS pico.
-El resto del panel queda dominado o por baja calidad (DBSCAN inestable,
-espectral con silueta negativa) o por escalado de memoria (el aglomerativo
-necesita la matriz de distancias completa, 314~MB pico a $N=6416$). La
-inestabilidad de DBSCAN tiene además una manifestación concreta sobre la
-auto-selección de $\varepsilon$: las repeticiones a $N=6416$ producen
-particiones con $[247, 219, 239]$ clústeres, así que las métricas agregadas
-describen una mezcla de tres particiones distintas, no una sola.
+Bajo este criterio, HDBSCAN parece ser el único algoritmo que produce
+resultados defendibles en el rango de escalas evaluado: obtiene un ruido
+moderado y un balance de tamaños razonable, una silueta competitiva y un coste
+despreciable. OPTICS es su único par en calidad (superándolo ligeramente en
+todas las escalas en silueta y sustancialmente en variación de tamaños), pero
+se ve completamente dominado en coste, con un tiempo de ejecución $\sim$25
+veces mayor y un uso de memoria $\sim$2500 veces mayor que HDBSCAN a $N=6416$.
+
+Por otro lado, entre los métodos particionales, GMM con selección de $k$ por
+BIC (GMM·300) es la mejor alternativa si es necesario una agrupación sin ruido. 
+El resto de métodos quedan dominados por baja calidad (DBSCAN es inestable,
+espectral presenta la peor silueta del panel) o por el escalado de memoria.
 
 \begin{figure}[h]
   \centering
