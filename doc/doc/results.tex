@@ -6,23 +6,8 @@
 \sloppy
 \setlength{\tabcolsep}{4pt}
 
-% Estructura temática (no por experimento). El catálogo completo de barridos
-% (ejes variados, baseline fijo, puntos de N, repeticiones) vive en la tabla
-% \ref{tab:catalogo-experimentos}; la prosa de esta sección discute hallazgos,
-% no experimentos. Cada hallazgo cita el barrido del que procede mediante su
-% identificador (E1..E9) de esa tabla.
-%
-% Datos numéricos extraídos de los informes por experimento en exp/exp01..09/
-% report.md (no existe un fichero exp/big_report.md). Las tablas reproducen
-% sólo las celdas que aparecen explícitamente en esos informes.
-
 \subsection{Catálogo de experimentos}
 \label{subsec:catalogo}
-% Tabla-índice: el "extra" que ancla la replicación. Permite que la prosa
-% temática de las subsecciones siguientes se refiera a cada barrido por su
-% identificador sin reintroducir aquí el detalle metodológico (ya en
-% \ref{sec:metodologia}). Los ficheros de configuración correspondientes se
-% publican con el código (\ref{subsec:reproducibilidad}).
 Antes de discutir los hallazgos, la tabla~\ref{tab:catalogo-experimentos}
 resume los barridos ejecutados. Cada uno varía un único eje alrededor de una
 configuración base común para que las comparaciones sean limpias; el eje
@@ -31,19 +16,19 @@ en la tabla. Las subsecciones siguientes se refieren a cada barrido por su
 identificador.
 
 {\footnotesize
-\begin{longtable}{|p{0.6cm}|p{3.6cm}|p{3.3cm}|p{4.4cm}|} \hline
+\begin{longtable}{|p{0.6cm}|p{3.9cm}|p{3.6cm}|p{4.7cm}|} \hline
   \textbf{Id} & \textbf{Eje variado} & \textbf{Fijo} & \textbf{$N$ / repeticiones} \\ \hline
   \endhead
-  E1 & Extractor (12 modelos) & UMAP-10, HDBSCAN \texttt{mcs}=5, identidad, SQLite & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
-  E2 & Reducción (identidad, PCA-10/50, UMAP-10/50, Isomap) & Extractor base, HDBSCAN \texttt{mcs}=5 & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
-  E3 & Agrupamiento (14 configuraciones sobre 7 algoritmos) & Extractor base, UMAP-10 & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
-  E4 & HDBSCAN \texttt{min\_cluster\_size} $\in\{5, 10, 25, 50, 100, 200\}$ & Extractor base, UMAP-10 & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
-  E5 & Segmentador (identidad vs. YOLO11s/m y \textit{fine-tuned}) & \textit{Pipeline} base & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
-  E6 & Almacenamiento (SQLite, pgvector exacto, pgvector + HNSW) & \textit{Pipeline} base, búsqueda activa & $N\in\{500, 1000, 2500, 6416\}$, $K{=}5$ \\ \hline
-  E7 & $N$ $\times$ agrupamiento (5 algoritmos) & Extractor base, UMAP-10, SQLite & $N\in\{250, 500, 1000, 2000,$ $3500, 6416\}$, $K{=}5$ \\ \hline
-  E8a & Extractor $\times$ reducción $\times$ agrupamiento (KMeans-4, espectral-4, aglomerativo-4, HDBSCAN \texttt{mcs}$\in\{5,10,20\}$) sobre etiquetas de estilo & SQLite, identidad, sin límite & 294 recortes, 4 clases, $K{=}3$ \\ \hline
-  E8b & Extractor $\times$ reducción $\times$ agrupamiento (aglomerativo $k\in\{30, 87\}$, HDBSCAN \texttt{mcs}$\in\{2,3,5,10\}$) sobre etiquetas de autoría & SQLite, identidad, sin límite & 185 recortes, 87 autores, $K{=}3$ \\ \hline
-  E9 & Parámetros HNSW ($m$, \texttt{ef\_construction}, \texttt{ef\_search}) & \textit{Pipeline} base, PostgreSQL & $N{=}6416$, $K{=}5$ \\ \hline
+  E1 & Extractor & UMAP-10, HDBSCAN \texttt{mcs}=5, identidad, SQLite & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
+  E2 & Reducción & Extractor base, HDBSCAN \texttt{mcs}=5 & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
+  E3 & Agrupamiento & Extractor base, UMAP-10 & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
+  E4 & HDBSCAN \texttt{min\_cluster\_size} & Extractor base, UMAP-10 & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
+  E5 & Segmentador & \textit{Pipeline} base & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
+  E6 & Almacenamiento & \textit{Pipeline} base, búsqueda activa & $N\in\{500, 1000, 2500, 6416\}$, $K{=}5$ \\ \hline
+  E7 & $N$ $\times$ agrupamiento & Extractor base, UMAP-10, SQLite & $N\in\{250, 500, 1000, 2000,$ $3500, 6416\}$, $K{=}5$ \\ \hline
+  E8a & Extractor $\times$ reducción $\times$ agrupamiento sobre etiquetas de estilo & SQLite, identidad, sin límite & 294 recortes, 4 clases, $K{=}3$ \\ \hline
+  E8b & Extractor $\times$ reducción $\times$ agrupamiento sobre etiquetas de autoría & SQLite, identidad, sin límite & 185 recortes, 87 autores, $K{=}3$ \\ \hline
+  E9 & Parámetros HNSW & \textit{Pipeline} base, PostgreSQL & $N{=}6416$, $K{=}5$ \\ \hline
   \caption{Catálogo de barridos experimentales. El detalle metodológico común
   (métricas, cronometría, repeticiones) se describe en \ref{sec:metodologia}.}
   \label{tab:catalogo-experimentos}
@@ -81,13 +66,16 @@ emite siempre sobre el criterio conjunto, no sobre la métrica.
 \label{subsubsec:res-extractor}
 % E1. Pregunta: qué backbone produce clústeres más coherentes. Pares
 % mobilenet<->head y dinov2<->head responden fine-tuning vs preentrenamiento.
-El barrido E1 compara doce extractores: cuatro CNN preentrenadas en ImageNet
-(\texttt{resnet50}, \texttt{vgg16}, \texttt{inception\_v3},
-\texttt{mobilenet\_v3}), \texttt{dinov2\_vits14}, \texttt{clip\_vit\_b32}, dos
-\textit{backbones} YOLO (\texttt{yolon}, \texttt{yolom}) y la matriz completa
-2$\times$2 de cabezas \textit{fine-tuned} (autor y estilo $\times$ DINOv2 y
-MobileNetV3). La tabla~\ref{tab:e1-quality-6416} recoge la calidad intrínseca
-a $N=6416$.
+Ninguna métrica intrínseca aislada ordena el panel de extractores: la cabeza
+estilística de DINOv2 invierte silueta y Calinski–Harabasz frente a su
+\textit{backbone}, y las CNN ImageNet encabezan la silueta por razones
+indistinguibles de coherencia textural genérica. El barrido (E1) cubre doce
+extractores: cuatro CNN preentrenadas en ImageNet (\texttt{resnet50},
+\texttt{vgg16}, \texttt{inception\_v3}, \texttt{mobilenet\_v3}),
+\texttt{dinov2\_vits14}, \texttt{clip\_vit\_b32}, dos \textit{backbones} YOLO
+(\texttt{yolon}, \texttt{yolom}) y la matriz completa 2$\times$2 de cabezas
+\textit{fine-tuned} (autor y estilo $\times$ DINOv2 y MobileNetV3); la
+tabla~\ref{tab:e1-quality-6416} recoge la calidad intrínseca a $N=6416$.
 
 {\footnotesize
 \begin{longtable}{|p{5.4cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|} \hline
@@ -194,10 +182,14 @@ basado en una sola métrica intrínseca.
 \subsubsection{Reducción de dimensionalidad}
 \label{subsubsec:res-reduccion}
 % E2. Cuánto aporta reducir (fila identidad) y qué familia ayuda más.
-Fijado el extractor en \texttt{dinov2\_graffiti\_style\_head} (vectores
-L2-normalizados de 384 dimensiones), E2 compara seis configuraciones de
-reducción: identidad (sin reducción), PCA-10 y PCA-50, UMAP-10 y UMAP-50, e
-Isomap-10. La tabla~\ref{tab:e2-quality-6416} resume el resultado al tamaño
+Reducir la dimensionalidad no es un ajuste fino sobre el extractor base: es la
+condición que vuelve operativo el agrupamiento por densidad. Sobre los
+vectores de 384 dimensiones L2-normalizados de
+\texttt{dinov2\_graffiti\_style\_head}, el barrido (E2) compara seis
+configuraciones —identidad (sin reducción), PCA-10 y PCA-50, UMAP-10 y
+UMAP-50, e Isomap-10— y revela a UMAP como la única familia que produce
+simultáneamente un número de clústeres no trivial, ruido moderado y tamaños
+balanceados. La tabla~\ref{tab:e2-quality-6416} resume el resultado al tamaño
 de corpus completo.
 
 {\footnotesize
@@ -263,12 +255,15 @@ UMAP-10 y UMAP-50 son indistinguibles en calidad (silueta 0.151 vs 0.142, csCV
 \label{subsubsec:res-agrupamiento}
 % E3. Jerarquía de best_cluster.md frente a los datos; ablación del HDBSCAN
 % por defecto, con n_clusters fijado donde aplica para quitar el confound de k.
-Sobre el extractor base y UMAP-10, E3 compara 14 configuraciones de
-agrupamiento: HDBSCAN, KMeans (codo), GMM diagonal (BIC con tres techos),
-DBSCAN (auto-$\varepsilon$ y tres $\varepsilon$ fijos), OPTICS coseno,
-aglomerativo (\textit{average linkage}, $k\in\{10, 20\}$) y espectral
-($k\in\{10, 20\}$). La tabla~\ref{tab:e3-summary-6416} resume la fila clave
-del experimento.
+HDBSCAN es el único agrupador del panel que combina silueta competitiva,
+escalado sensato del número de clústeres con $N$, ruido moderado, tamaños
+balanceados y coste despreciable bajo el criterio conjunto. El barrido (E3)
+cubre 14 configuraciones sobre el extractor base y UMAP-10: HDBSCAN, KMeans
+(codo), GMM diagonal (BIC con tres techos), DBSCAN (auto-$\varepsilon$ y tres
+$\varepsilon$ fijos), OPTICS coseno, aglomerativo (\textit{average linkage},
+$k\in\{10, 20\}$) y espectral ($k\in\{10, 20\}$); la
+tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada
+familia.
 
 {\footnotesize
 \begin{longtable}{|p{2.4cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{0.9cm}|p{0.9cm}|p{1.0cm}|p{1.1cm}|} \hline
@@ -339,9 +334,12 @@ describen una mezcla de tres particiones distintas, no una sola.
 \label{subsubsec:res-mincluster}
 % E4. min_cluster_size como fracción del corpus; curva de ruido como cota
 % superior de granularidad soportada.
-Fijado HDBSCAN como agrupador, E4 barre su único hiperparámetro relevante,
-\texttt{min\_cluster\_size}, sobre $\{5, 10, 25, 50, 100, 200\}$, fracciones
-de entre el 0.1\% y el 3.1\% del corpus completo. La tabla~\ref{tab:e4-mcs-6416}
+El óptimo de granularidad de HDBSCAN se sitúa en el suelo del rango barrido y
+no se desplaza con $N$: \texttt{min\_cluster\_size}=5 gana a las tres escalas
+bajo el criterio conjunto, mientras que silueta y CH alcanzan sus máximos en
+celdas degeneradas con $k=2$. El barrido (E4) sobre el único hiperparámetro
+relevante de HDBSCAN cubre $\{5, 10, 25, 50, 100, 200\}$, fracciones de entre
+el 0.1\% y el 3.1\% del corpus completo; la tabla~\ref{tab:e4-mcs-6416}
 muestra el barrido a $N=6416$.
 
 {\footnotesize
@@ -385,13 +383,16 @@ seguridad, no como recomendación de retoque.
 \label{subsubsec:res-segmentador}
 % E5. ¿Compensa el recortado YOLO frente a la imagen completa? Coste como
 % efecto colateral del cambio de unidad de análisis (imagen vs. recorte).
-Por último, E5 compara cuatro segmentadores —identidad (imagen completa),
-YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}— manteniendo fijo el resto
-del \textit{pipeline}. El experimento mezcla dos pillares (calidad y coste),
-con la peculiaridad de que el segmentador altera el \emph{número de unidades}
-agrupadas: los recortes YOLO no son comparables uno a uno con las imágenes
-completas, y la lectura conjunta exige incluir el multiplicador de recortes
-por imagen.
+A escala completa, recortar con YOLO no compensa frente a agrupar la imagen
+completa: la identidad gana en silueta, ruido y coste de ingesta, y el único
+detector competitivo (YOLO11m \textit{fine-tuned}) pierde su ventaja al pasar
+de $N=1000$ a $N=6416$ por su multiplicador $\times$2.4 sobre el número de
+recortes. El barrido (E5) compara cuatro segmentadores —identidad (imagen
+completa), YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}— manteniendo fijo
+el resto del \textit{pipeline}, con la cautela de que el segmentador altera
+el \emph{número de unidades} agrupadas: los recortes YOLO no son comparables
+uno a uno con las imágenes completas, y la lectura conjunta exige incluir el
+multiplicador de recortes por imagen.
 
 {\footnotesize
 \begin{longtable}{|p{2.5cm}|p{1.5cm}|p{1.0cm}|p{1.0cm}|p{1.1cm}|p{1.0cm}|p{1.0cm}|p{1.4cm}|} \hline
@@ -444,12 +445,17 @@ asintóticos.
 % E7. Figura cabecera: tiempo vs N en log-log, pendiente empírica por etapa y
 % por algoritmo de agrupamiento, junto a la complejidad teórica esperada
 % (tabla de clases en infos/experiments.md §7).
-E7 mide ingesta, reducción, agrupamiento (cinco algoritmos) y búsqueda por
-similitud sobre seis tamaños de banco. La tabla~\ref{tab:e7-cost} consolida
-los tiempos por etapa a las tres escalas extremas y el agrupamiento HDBSCAN
-de referencia (los cinco algoritmos con su columna completa figuran en el
-informe del experimento), mientras que la tabla~\ref{tab:e7-slopes} contrasta
-las pendientes log-log observadas con la complejidad teórica de referencia.
+La búsqueda por similitud sobre SQLite domina absolutamente el coste a
+$N=6416$ con una pendiente log-log empírica de $\approx 2.10$, consistente
+con la exploración lineal todos-contra-todos y motivación cuantitativa
+directa de los barridos de almacenamiento e índice ANN. El barrido de
+escalabilidad (E7) mide ingesta, reducción, agrupamiento (cinco algoritmos)
+y búsqueda por similitud sobre seis tamaños de banco; la
+tabla~\ref{tab:e7-cost} consolida los tiempos por etapa a las tres escalas
+extremas con HDBSCAN como agrupador de referencia (los cinco algoritmos con
+su columna completa figuran en el informe del experimento), y la
+tabla~\ref{tab:e7-slopes} contrasta las pendientes log-log observadas con la
+complejidad teórica de referencia.
 
 {\footnotesize
 \begin{longtable}{|p{1.0cm}|p{1.6cm}|p{1.2cm}|p{2.0cm}|p{2.0cm}|p{1.4cm}|p{2.0cm}|} \hline
@@ -560,12 +566,14 @@ de los puntos pequeños sobreestima el coste futuro.
 \label{subsubsec:res-storage}
 % E6. Separa el efecto "ops vectoriales nativas vs. Python" (sqlite->pg-exacto)
 % del efecto "aproximado vs. exacto" (pg-exacto->pg-hnsw). Búsqueda activa.
-E6 aísla el coste de la búsqueda por similitud sobre tres
-\textit{backends}: SQLite (exploración lineal en Python), pgvector exacto
-(escaneo secuencial dentro del SGBD con el \textit{kernel} de coseno en C) y
-pgvector con índice HNSW (\texttt{m}=16, \texttt{ef\_construction}=64). La
-construcción del índice HNSW se cronometra una sola vez entre la ingesta y el
-bucle de búsqueda, así que su coste no se imputa al tiempo de consulta.
+Por encima de $N\approx 2500$, pgvector con índice HNSW domina la búsqueda
+por similitud sin pérdida de \textit{recall}, y SQLite queda relegado a
+desarrollo de muy pequeña escala. El barrido (E6) aísla este coste sobre
+tres \textit{backends}: SQLite (exploración lineal en Python), pgvector
+exacto (escaneo secuencial dentro del SGBD con el \textit{kernel} de coseno
+en C) y pgvector con índice HNSW (\texttt{m}=16, \texttt{ef\_construction}=64).
+La construcción del índice HNSW se cronometra una sola vez entre la ingesta
+y el bucle de búsqueda, así que su coste no se imputa al tiempo de consulta.
 
 {\footnotesize
 \begin{longtable}{|p{1.0cm}|p{2.6cm}|p{1.6cm}|p{2.0cm}|p{1.6cm}|p{1.8cm}|} \hline
@@ -634,12 +642,16 @@ elección por defecto recomendada para la búsqueda; SQLite queda como
 \label{subsubsec:res-hnsw}
 % E9. m / ef_construction / ef_search: build-time x query-time x recall@k.
 % Justifica HNSW para el flujo ingesta-única -> muchas-consultas.
-Establecida la ventaja de HNSW en E6, E9 caracteriza el compromiso
-construcción--consulta--\textit{recall} barriendo los tres hiperparámetros
-del índice en torno al ancla $(\texttt{m}=16,
+A $N=6416$ los tres hiperparámetros del índice HNSW son perillas de
+velocidad-vs-\textit{recall}-1.000, no perillas de seguridad: ninguna
+configuración del barrido cae por debajo de \textit{recall} 0.990, y los
+tres ejes (\texttt{m}, \texttt{ef\_construction}, \texttt{ef\_search}) se
+separan limpiamente entre construcción y consulta. Establecida la ventaja
+de HNSW en \ref{subsubsec:res-storage}, el barrido (E9) cubre once
+configuraciones en torno al ancla $(\texttt{m}=16,
 \texttt{ef\_construction}=64, \texttt{ef\_search}=40)$ sobre el corpus
-completo. Diez de las once configuraciones tienen éxito; la celda
-$(\texttt{m}=64, \texttt{ef\_construction}=64)$ falla por la restricción
+completo; diez tienen éxito y la celda $(\texttt{m}=64,
+\texttt{ef\_construction}=64)$ falla por la restricción
 \texttt{ef\_construction} $\ge 2\cdot$\texttt{m} que pgvector valida en
 tiempo de creación del índice.
 
@@ -735,11 +747,15 @@ Cuenca$\to$Salamanca.
 \label{subsubsec:res-estilo}
 % E8a. 4 clases balanceadas, held-out de la cabeza estilística.
 % Hipótesis: la cabeza fine-tuned supera al backbone preentrenado.
-La tabla~\ref{tab:e8a-best} recoge la mejor celda por extractor sobre la
-malla de $2$ reducciones $\times$ $6$ agrupadores. El criterio de
-selección es el ARI por defecto (sin descartar puntos de ruido),
-\emph{chance-corrected} y por tanto comparable entre configuraciones con
-distinto número de clústeres.
+La cabeza estilística de DINOv2 dobla aproximadamente el ARI de cualquier
+codificador alternativo sobre la evaluación por estilo, y la cabeza de
+autoría cae \emph{por debajo} de su propio \textit{backbone}: el
+\textit{fine-tuning} concentra el eje para el que fue entrenado y suprime al
+otro. La tabla~\ref{tab:e8a-best} recoge la mejor celda por extractor (E8a)
+sobre la malla de $2$ reducciones $\times$ $6$ agrupadores, seleccionada por
+el ARI por defecto (sin descartar puntos de ruido), \emph{chance-corrected}
+y por tanto comparable entre configuraciones con distinto número de
+clústeres.
 
 {\footnotesize
 \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
@@ -822,13 +838,17 @@ por un agrupador particional cuando $k$ es conocido a priori.
 \subsubsection{Evaluación por autor}
 \label{subsubsec:res-autor}
 % E8b. 87 autores, cola larga, cambio de dominio Cuenca->Salamanca.
-La tabla~\ref{tab:e8b-best} reproduce el mismo formato sobre la evaluación
-de autoría. Antes de leerla conviene fijar el contexto: 53 de los 87
-autores aparecen con un solo recorte, el autor más frecuente tiene 19
-recortes y la NMI está inflada por construcción cuando ambas particiones
-están fragmentadas en muchos grupos pequeños; ARI (\textit{chance-corrected})
-es por tanto el único número leíble como recuperación real, y todos los
-valores deben compararse con la base aleatoria.
+La simetría esperada con la evaluación por estilo no se materializa en la de
+autoría: los ocho codificadores caben en una banda de 0.035 puntos de ARI
+cercana al suelo aleatorio, y la cabeza de autoría de DINOv2 queda por
+debajo de su propio \textit{backbone}. La tabla~\ref{tab:e8b-best} reproduce
+el formato de \ref{subsubsec:res-estilo} sobre la evaluación de autoría
+(E8b); antes de leerla conviene fijar el contexto: 53 de los 87 autores
+aparecen con un solo recorte, el autor más frecuente tiene 19 recortes y la
+NMI está inflada por construcción cuando ambas particiones están
+fragmentadas en muchos grupos pequeños, así que ARI
+(\textit{chance-corrected}) es el único número leíble como recuperación real
+y todos los valores deben compararse con la base aleatoria.
 
 {\footnotesize
 \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
@@ -914,9 +934,10 @@ dominio.
 % Análisis derivado: ARI vs. silueta sobre E8a y, por separado, sobre E8b.
 % Correlación positiva fuerte => las métricas no supervisadas son un proxy
 % defendible; divergencia entre E8a y E8b acota qué eje rastrea la silueta.
-Tomadas conjuntamente, E8a y E8b permiten preguntar si las métricas
-intrínsecas son un \textit{proxy} defensible para las externas. La respuesta
-no es uniforme. Sobre E8a (etiquetas gruesas, cuatro estilos), la correlación
+Las métricas intrínsecas son un \textit{proxy} defensible de las externas
+cuando la verdad de referencia es de grano grueso y el agrupador opera con
+$k$ fijo, pero anti-correlan con ARI cuando la verdad es de grano fino y el
+algoritmo elige $k$. Sobre E8a (etiquetas gruesas, cuatro estilos), la correlación
 de Pearson entre silueta y ARI vale $r = +0.66$ restringida a los 48 puntos
 con $k$ oráculo fija (KMeans, aglomerativo, espectral), y $r = +0.40$ sobre
 los 83 puntos con ARI válido si se incluyen las celdas HDBSCAN, en las que el
@@ -928,11 +949,7 @@ particiones HDBSCAN $k=2$ o $k=3$ con ARI cercano a cero (la silueta premia
 particiones aglomerativas con $k=87$ y silueta cercana a cero (la
 recuperación exige \emph{muchos clústeres pequeños}).
 
-La conclusión, importante para todo el trabajo, es que la silueta es un
-\textit{proxy} defensible \emph{cuando se compara con $k$ fijo y la verdad
-de referencia es de grano grueso}, pero anti-correlada con la
-recuperación cuando la verdad de referencia es de grano fino y el algoritmo
-elige $k$. Las decisiones tomadas en \ref{subsec:res-calibracion} sobre
+Las decisiones tomadas en \ref{subsec:res-calibracion} sobre
 extractor, reducción, agrupador, \texttt{min\_cluster\_size} y segmentador
 quedan respaldadas por el resultado positivo de E8a (estilo, grano grueso) y
 por la coherencia interna de E8a$\to$E1$\to$E2$\to$E3$\to$E4 sobre la base
