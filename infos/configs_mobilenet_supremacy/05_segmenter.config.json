@@ -1,0 +1,469 @@
+{
+  "runs": [
+    {
+      "name": "segmenter_identity-l250",
+      "limit": 250,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_identity_l250.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "segmenter_identity-l1000",
+      "limit": 1000,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_identity_l1000.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "segmenter_identity-l6416",
+      "limit": 6416,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_identity_l6416.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "segmenter_yolo11s-l250",
+      "limit": 250,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_yolo11s_l250.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "yolo",
+        "params": {
+          "model_path": "models/yolo11s.pt",
+          "threshold": 0.5,
+          "merge_threshold": 0.8,
+          "padding": 0.05
+        }
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "segmenter_yolo11s-l1000",
+      "limit": 1000,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_yolo11s_l1000.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "yolo",
+        "params": {
+          "model_path": "models/yolo11s.pt",
+          "threshold": 0.5,
+          "merge_threshold": 0.8,
+          "padding": 0.05
+        }
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "segmenter_yolo11s-l6416",
+      "limit": 6416,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_yolo11s_l6416.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "yolo",
+        "params": {
+          "model_path": "models/yolo11s.pt",
+          "threshold": 0.5,
+          "merge_threshold": 0.8,
+          "padding": 0.05
+        }
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "segmenter_yolo11m-l250",
+      "limit": 250,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_yolo11m_l250.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "yolo",
+        "params": {
+          "model_path": "models/yolo11m.pt",
+          "threshold": 0.5,
+          "merge_threshold": 0.8,
+          "padding": 0.05
+        }
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "segmenter_yolo11m-l1000",
+      "limit": 1000,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_yolo11m_l1000.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "yolo",
+        "params": {
+          "model_path": "models/yolo11m.pt",
+          "threshold": 0.5,
+          "merge_threshold": 0.8,
+          "padding": 0.05
+        }
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "segmenter_yolo11m-l6416",
+      "limit": 6416,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_yolo11m_l6416.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "yolo",
+        "params": {
+          "model_path": "models/yolo11m.pt",
+          "threshold": 0.5,
+          "merge_threshold": 0.8,
+          "padding": 0.05
+        }
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "segmenter_yolo11m_finetuned-l250",
+      "limit": 250,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_yolo11m_ft_l250.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "yolo",
+        "params": {
+          "model_path": "models/yolo11m-train-10.pt",
+          "threshold": 0.5,
+          "merge_threshold": 0.8,
+          "padding": 0.05
+        }
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "segmenter_yolo11m_finetuned-l1000",
+      "limit": 1000,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_yolo11m_ft_l1000.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "yolo",
+        "params": {
+          "model_path": "models/yolo11m-train-10.pt",
+          "threshold": 0.5,
+          "merge_threshold": 0.8,
+          "padding": 0.05
+        }
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "segmenter_yolo11m_finetuned-l6416",
+      "limit": 6416,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_seg_yolo11m_ft_l6416.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "yolo",
+        "params": {
+          "model_path": "models/yolo11m-train-10.pt",
+          "threshold": 0.5,
+          "merge_threshold": 0.8,
+          "padding": 0.05
+        }
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    }
+  ]
+}

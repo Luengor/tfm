@@ -1,0 +1,24 @@
+{
+  "limit": [250, 1000, 6416],
+  "repeats": 3,
+  "storage": [
+    {"type": "sqlite", "params": {"db_path": "exp/.common_db/{run_id}.sqlite"}}
+  ],
+  "segmenter": [
+    {"type": "identity", "params": {}}
+  ],
+  "embedding": [
+    {"type": "mobilenet_v3", "params": {}}
+  ],
+  "clustering": [
+    {"type": "hdbscan", "params": {"min_cluster_size": 5}}
+  ],
+  "reduction": [
+    {"type": "identity", "params": {}},
+    {"type": "pca", "params": {"n_components": 10}},
+    {"type": "pca", "params": {"n_components": 50}},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+    {"type": "umap", "params": {"n_components": 50, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}},
+    {"type": "isomap", "params": {"n_components": 10, "n_neighbors": 10}}
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "repeats": 3,
+  "similarity_search": {"enabled": true, "top_k": 5, "sample_seed": 42},
+  "storage": [
+    {"type": "sqlite", "params": {"db_path": "exp/.common_db/08b_author_{run_id}.sqlite"}}
+  ],
+  "segmenter": [
+    {"type": "identity", "params": {}}
+  ],
+  "embedding": [
+    {"type": "dinov2_vits14", "params": {}},
+    {"type": "dinov2_graffiti_author_head", "params": {}},
+    {"type": "dinov2_graffiti_style_head", "params": {}},
+    {"type": "mobilenet_v3", "params": {}},
+    {"type": "mobilenet_v3_graffiti_author_head", "params": {}},
+    {"type": "mobilenet_v3_graffiti_style_head", "params": {}},
+    {"type": "clip_vit_b32", "params": {}},
+    {"type": "resnet50", "params": {}}
+  ],
+  "reduction": [
+    {"type": "identity"},
+    {"type": "umap", "params": {"n_components": 10, "n_neighbors": 15, "min_dist": 0.0, "metric": "cosine"}}
+  ],
+  "clustering": [
+    {"type": "agglomerative", "params": {"n_clusters": 30, "linkage": "average"}},
+    {"type": "agglomerative", "params": {"n_clusters": 87, "linkage": "average"}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 2}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 3}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 5}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 10}}
+  ]
+}
