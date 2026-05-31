@@ -209,12 +209,10 @@ es gratuita como podría parecer, sino que empuja el coste hacia la etapa de
 agrupamiento. Con $N=6416$ imágenes, HDBSCAN tarda 24.1~s sobre la
 representación identidad frente a 0.34~s sobre UMAP-10, $\sim 70$ veces más.
 Isomap-10 fracasa en la misma vía: 23.6~s y 1.2~GB de RSS pico, lo más caro del
-experimento, para colapsar también a $k=2$ a $N=6416$.
-UMAP-10 y UMAP-50 son indistinguibles en calidad, pero UMAP-50 cuesta el doble
-en tiempo de reducción (11.2~s vs 6.2~s a $N=6416$). La recomendación es por
-tanto específicamente UMAP con \texttt{n\_components=10}, no UMAP en general.
-
-% TODO: cost table here?
+experimento, para colapsar también a $k=2$ a $N=6416$. UMAP-10 y UMAP-50 son
+indistinguibles en calidad, pero UMAP-50 cuesta el doble en tiempo de reducción
+(11.2~s vs 6.2~s a $N=6416$). Por esto, la recomendación es específicamente
+UMAP con \texttt{n\_components=10}, no UMAP en general.
 
 \begin{figure}[h]
   \centering
