@@ -38,9 +38,6 @@ identificador.
 % =====================================================================
 \subsection{Calibración del pipeline}
 \label{subsec:res-calibracion}
-% Hilo narrativo único: "qué componentes ganan", de extractor a segmentador,
-% que culmina fijando la configuración base usada por el resto del trabajo.
-% Funde E1-E5. Métricas: tríada intrínseca (silueta, CH, DB) + ruido/CV.
 En esta sección se recorren las decisiones tomadas para el diseño de lo que se
 considera el \textit{pipeline} base del proyecto, la configuración sobre la que
 se asientan los estudios de coste y calidad supervisada en las secciones
@@ -61,8 +58,6 @@ criterio conjunto, no sobre la métrica.
 
 \subsubsection{Extractor de características}
 \label{subsubsec:res-extractor}
-% E1. Pregunta: qué backbone produce clústeres más coherentes. Pares
-% mobilenet<->head y dinov2<->head responden fine-tuning vs preentrenamiento.
 El primer paso del pipeline es la extracción de características. Para esto se
 prueban doce extractores: cuatro CNN preentrenadas en ImageNet
 (\texttt{resnet50}, \texttt{vgg16}, \texttt{inception\_v3},
@@ -216,12 +211,6 @@ UMAP con \texttt{n\_components=10}, no UMAP en general.
 
 \begin{figure}[h]
   \centering
-  % FIGURE: gráfico de dispersión con dos paneles (calidad y coste).
-  % Panel A: barras agrupadas, por reducción (x), silueta (y) y, encima de
-  % cada barra, el número de clústeres y el ruido como anotación.
-  % Panel B: barras horizontales del tiempo de reducción y del tiempo de
-  % clustering inducido (apiladas o lado a lado) a N=6416 — muestra la
-  % traslación de coste identidad -> reducción.
   \includegraphics[width=\linewidth]{figures/e2_reduction_quality_cost.pdf}
   \caption{E2: calidad intrínseca (panel izquierdo) y coste por etapa (panel
   derecho) por familia de reducción a $N=6416$. La fila identidad colapsa el
@@ -415,8 +404,6 @@ este régimen} y no como exponentes asintóticos.
 
 \subsubsection{Escalabilidad por etapa}
 \label{subsubsec:res-escalabilidad}
-% E7. Figura cabecera: tiempo vs N en log-log, pendiente empírica por etapa y
-% por algoritmo de agrupamiento, junto a la complejidad teórica esperada.
 El barrido de escalabilidad (E7) mide ingesta, reducción, agrupamiento (cinco
 algoritmos) y búsqueda por similitud sobre seis tamaños de banco; la
 tabla~\ref{tab:e7-cost} consolida los tiempos por etapa a las tres escalas
@@ -493,12 +480,6 @@ que se reportan dos pendientes distintas en la tabla~\ref{tab:e7-slopes}.
 
 \begin{figure}[h]
   \centering
-  % FIGURE: gráfico log-log con N (eje x) y tiempo de pared (eje y), una línea
-  % por etapa (ingesta, UMAP, búsqueda por similitud) y, en gráfico aparte o
-  % en el mismo panel con tipo de línea distinto, una línea por algoritmo de
-  % agrupamiento (HDBSCAN, KMeans, DBSCAN, OPTICS, aglomerativo). Anotar la
-  % pendiente ajustada en la ventana N>=500. Marcar el punto N=6416 de UMAP
-  % como anomalía (cambio de régimen pynndescent).
   \includegraphics[width=\linewidth]{figures/e7_scalability_loglog.pdf}
   \caption{E7 (figura titular): tiempo de pared vs $N$ por etapa del
   \textit{pipeline}, escala log-log. La pendiente de la búsqueda por
@@ -509,10 +490,6 @@ que se reportan dos pendientes distintas en la tabla~\ref{tab:e7-slopes}.
 
 \begin{figure}[h]
   \centering
-  % FIGURE: dos paneles. Panel A: RSS pico de la etapa aglomerativa vs N
-  % (línea con marcadores), comparado con la línea plana de
-  % HDBSCAN/DBSCAN/OPTICS. Panel B: RSS pico de la búsqueda por similitud vs
-  % N (lineal).
   \includegraphics[width=\linewidth]{figures/e7_memory.pdf}
   \caption{E7: memoria pico por etapa. El aglomerativo materializa la matriz
   $O(n^2)$ de distancias y crece cuadráticamente con $N$; HDBSCAN, DBSCAN y
@@ -522,9 +499,6 @@ que se reportan dos pendientes distintas en la tabla~\ref{tab:e7-slopes}.
 
 \subsubsection{Búsqueda por similitud: \textit{backend} e índice ANN}
 \label{subsubsec:res-similaritysearch}
-% E6 + E9 fusionados. E6 establece que pgvector+HNSW elimina el cuello O(n^2)
-% de SQLite sin perder recall; E9 condensado justifica brevemente el ancla
-% de hiperparámetros HNSW.
 El cuello $O(n^2)$ de la búsqueda SQLite identificado en E7 motiva el barrido
 E6 sobre tres \textit{backends}: SQLite (exploración lineal en Python),
 pgvector exacto (escaneo secuencial dentro del SGBD con el \textit{kernel} de
@@ -608,9 +582,6 @@ botella $O(n^2)$ de SQLite.
 % =====================================================================
 \subsection{Validación supervisada}
 \label{subsec:res-supervisada}
-% E8a/E8b. ARI/NMI/F1 sobre estilo (4 clases) y autor (87 clases, cola larga).
-% Cierra con la correlación interna-externa, que es lo que legitima usar
-% silueta/CH/DB como proxy en la subsección de calibración.
 Cuando se dispone de etiquetas, las métricas extrínsecas miden directamente la
 concordancia entre los clústeres y la verdad de referencia. Esta subsección
 hace uso de los dos conjuntos etiquetados manualmente por autor y estilo para
@@ -630,8 +601,6 @@ Cuenca$\to$Salamanca.
 
 \subsubsection{Evaluación por estilo}
 \label{subsubsec:res-estilo}
-% E8a. 4 clases balanceadas, held-out de la cabeza estilística.
-% Hipótesis: la cabeza fine-tuned supera al backbone preentrenado.
 El barrido E8a evalúa la capacidad de los distintos extractores para separar
 los cuatro estilos de grafiti escogidos. La tabla~\ref{tab:e8a-best} recoge la
 mejor celda por extractor (E8a) sobre la malla de $2$ reducciones $\times$ $6$
@@ -737,7 +706,7 @@ gran mayoría de los \textit{pieces}. El tercero está formado por los
 % (\textit{chance-corrected}) es el único número leíble como recuperación real
 % y todos los valores deben compararse con la base aleatoria.
 
-\textbf{TODO: hmmm}
+\textbf{TODO}
 
 {\footnotesize
 \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
@@ -819,14 +788,14 @@ gran mayoría de los \textit{pieces}. El tercero está formado por los
 % disponible no permite separar fallo por novedad de autor de fallo por
 % dominio.
 
-% \subsubsection{Correlación interna-externa}
-% \label{subsubsec:res-correlacion}
-% \textbf{
-%     TODO: aquí me gustaría hablar un poco de como las métricas intrínsecas
-%     se ponen o no de acuerdo con las extrínsecas, en particular el por qué he
-%     escogido el dinov2 finetunneado con graffiti como base en vez de hacerle
-%     caso a las métricas intrínsecas del exp1
-% }
+\subsubsection{Correlación interna-externa}
+\label{subsubsec:res-correlacion}
+\textbf{
+    TODO: aquí me gustaría hablar un poco de como las métricas intrínsecas
+    se ponen o no de acuerdo con las extrínsecas, en particular el por qué he
+    escogido el dinov2 finetunneado con graffiti como base en vez de hacerle
+    caso a las métricas intrínsecas del exp1
+}
 % % Análisis derivado: ARI vs. silueta sobre E8a y, por separado, sobre E8b.
 % % Correlación positiva fuerte => las métricas no supervisadas son un proxy
 % % defendible; divergencia entre E8a y E8b acota qué eje rastrea la silueta.
