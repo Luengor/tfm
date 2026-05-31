@@ -117,8 +117,9 @@ los mejores extractores para el agrupamiento de grafiti: es muy probable que
 estos modelos estén realizando un buen agrupamiento de apariencia (tectura,
 color, composición) sin que este agrupamiento codifique información relevante
 para el ámbito del grafiti. YOLO, por el contrario, pierde en todas las
-categorías a la vez, confirmando que sus características de detección no
-transfieren a un agrupamiento basado en apariencia.
+categorías a la vez (a excepción del índice CH, que presenta dos de los más
+altos), confirmando que sus características de detección no transfieren a un
+agrupamiento basado en apariencia.
 
 % Add here an image of some grafiti images clustered together by DINOv2 and
 % resnet50 to ilustrate the point of inversion and not clustering by grafiti
@@ -286,9 +287,9 @@ se ve completamente dominado en coste, con un tiempo de ejecución $\sim$25
 veces mayor y un uso de memoria $\sim$2500 veces mayor que HDBSCAN a $N=6416$.
 
 Por otro lado, entre los métodos particionales, GMM con selección de $k$ por
-BIC (GMM·300) es la mejor alternativa si es necesario una agrupación sin ruido. 
-El resto de métodos quedan dominados por baja calidad (DBSCAN es inestable,
-espectral presenta la peor silueta del panel) o por el escalado de memoria.
+BIC es la mejor alternativa si es necesario una agrupación sin ruido. El resto
+de métodos quedan dominados por baja calidad (DBSCAN es inestable, espectral
+presenta la peor silueta del panel) o por el escalado de memoria.
 
 \begin{figure}[h]
   \centering
@@ -306,15 +307,13 @@ espectral presenta la peor silueta del panel) o por el escalado de memoria.
 
 \subsubsection{Granularidad de HDBSCAN}
 \label{subsubsec:res-mincluster}
-% E4. min_cluster_size como fracción del corpus; curva de ruido como cota
-% superior de granularidad soportada.
-El óptimo de granularidad de HDBSCAN se sitúa en el suelo del rango barrido y
-no se desplaza con $N$: \texttt{min\_cluster\_size}=5 gana a las tres escalas
-bajo el criterio conjunto, mientras que silueta y CH alcanzan sus máximos en
-celdas degeneradas con $k=2$. El barrido (E4) sobre el único hiperparámetro
-relevante de HDBSCAN cubre $\{5, 10, 25, 50, 100, 200\}$, fracciones de entre
-el 0.1\% y el 3.1\% del corpus completo; la tabla~\ref{tab:e4-mcs-6416}
-muestra el barrido a $N=6416$.
+Una vez escogido HDBSCAN como algoritmo de agrupamiento, el siguiente paso es
+calibrar su hiperparámetro de granularidad \texttt{min\_cluster\_size} (mcs).
+Este parámetro controla el número mínimo de puntos que debe tener un clúster
+para ser considerado como tal, y por tanto afecta directamente al número de
+clústeres, la fracción de ruido y el balance de tamaños. El barrido (E4) cubre
+seis valores de \texttt{mcs} entre 5 y 200, como se puede ver en la
+tabla~\ref{tab:e4-mcs-6416} a $N=6416$.
 
 {\footnotesize
 \begin{longtable}{|p{1.4cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|} \hline
@@ -333,97 +332,96 @@ muestra el barrido a $N=6416$.
 \end{longtable}
 }
 
-Una lectura ingenua basada únicamente en silueta elegiría \texttt{mcs}=100 o
-200 ($\sim$0.27), valores que producen \emph{una única división binaria del
-corpus}. La inversión es general: la silueta y el CH están maximizados por las
-celdas degeneradas a las tres escalas. La fracción de ruido tampoco es una
-cota válida por sí sola: es \emph{no monótona} en \texttt{mcs}, sube hasta el
-27.7\% en valores intermedios y vuelve a bajar a 0.8\% en \texttt{mcs}=100, no
-porque la partición mejore sino porque dos clústeres masivos absorben casi
-todos los puntos. Una vez más, sólo el criterio conjunto (número no trivial de
-clústeres + ruido moderado + tamaños balanceados) es defendible, y bajo ese
-criterio \texttt{mcs}=5 gana a las tres escalas.
+Los valores más altos de \texttt{mcs} (100 y 200), aunque presentan las
+métricas intrínsecas más altas ocn tasas de ruido y variación de tamaños bajas,
+son claramente degenerados, puesto que solo producen dos clústeres masivos que
+absorben casi todos los puntos. El caso de 50 es, aunque muy similar, algo más
+defendible. El modelo utilizado para la generación de los \textit{embeddings}
+(\texttt{dinov2\_graffiti\_style\_head}) fue entrenado con cuatro categorías de
+estilo, por lo que esta segmentación a cuatro clústeres podría ser interpretada
+como un resultado razonable.
 
-El óptimo no se desplaza con $N$. El número de clústeres a \texttt{mcs}=5
-escala de forma natural (23~$\to$~96~$\to$~563), el ruido se mantiene moderado
-(0.06~$\to$~0.11~$\to$~0.20) y los tamaños siguen siendo los más balanceados
-del barrido. Lo que sí depende de $N$ es el \emph{techo de colapso}: a
-$N=250$ el clúster degenerado aparece ya en \texttt{mcs}=25, a $N=1000$ en
-\texttt{mcs}=50 y a $N=6416$ se aguantan 26 clústeres en \texttt{mcs}=25.
-Como el óptimo está en el suelo, este margen sólo importa como zona de
-seguridad, no como recomendación de retoque.
+Los siguientes dos valores, 25 y 10 respectivamente, presentan un número de
+clústeres mayor, más segmentado, pero a costa de una caída considerable en
+todas las métricas intrínsecas y un aumento de ruido y variación de tamaños. El
+caso de \texttt{mcs}=5, presenta un número de clústeres aún mayor, pero con
+menor ruido y métricas superiores a los dos casos anteriores (aunque no mejores
+que los valores degenerados). Se escoge \texttt{mcs}=5 como valor base para el
+resto del proyecto por una preferencia por un número de clústeres más alto y la
+sospecha de que el caso para \texttt{mcs}=50 es un caso de agrupamiento
+demasiado grueso. Esta decisión se ve reforzada en el expermiento E8a, donde
+las métricas supervisadas favorecen a la configuración escogida frente a la
+otra.
 
 \subsubsection{Impacto del segmentador}
 \label{subsubsec:res-segmentador}
-% E5. ¿Compensa el recortado YOLO frente a la imagen completa? Coste como
-% efecto colateral del cambio de unidad de análisis (imagen vs. recorte).
-A escala completa, recortar con YOLO no compensa frente a agrupar la imagen
-completa: la identidad gana en silueta, ruido y coste de ingesta, y el único
-detector competitivo (YOLO11m \textit{fine-tuned}) pierde su ventaja al pasar
-de $N=1000$ a $N=6416$ por su multiplicador $\times$2.4 sobre el número de
-recortes. El barrido (E5) compara cuatro segmentadores —identidad (imagen
-completa), YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}— manteniendo fijo
-el resto del \textit{pipeline}, con la cautela de que el segmentador altera
-el \emph{número de unidades} agrupadas: los recortes YOLO no son comparables
-uno a uno con las imágenes completas, y la lectura conjunta exige incluir el
-multiplicador de recortes por imagen.
+En principio, el recorte de la imagen completa en unidades más pequeñas que
+contengan únicamente un grafiti debería facilitar el agrupamiento, al eliminar
+ruido de fondo y permitir que el extractor de características se centre en la
+información relevante. Este cambio debería ser especialmente beneficioso para
+los extractores entrenados con recortes (las cabezas de DINOv2 y MobileNetV3).
 
-{\footnotesize
-\begin{longtable}{|p{2.5cm}|p{1.5cm}|p{1.0cm}|p{1.0cm}|p{1.1cm}|p{1.0cm}|p{1.0cm}|p{1.4cm}|} \hline
-  \textbf{Segmentador} & \textbf{recortes} & \textbf{r/img} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{ingesta (s)} \\ \hline
-  \endhead
-  identidad           & 6416  & 1.00 &  563 & 0.199 & 0.151 & 33.1 & 1235.5 \\ \hline
-  YOLO11s             & 6590  & 1.03 &  502 & 0.225 & 0.127 & 30.4 & 1777.0 \\ \hline
-  YOLO11m             & 6603  & 1.03 &  506 & 0.230 & 0.131 & 29.5 & 1811.6 \\ \hline
-  YOLO11m \textit{ft} & 15362 & 2.39 & 1049 & 0.298 & 0.122 & 36.2 & 2152.3 \\ \hline
-  \caption{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
-  ``recortes'' son los puntos efectivamente agrupados, no las imágenes leídas).
-  Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.}
-  \label{tab:e5-segmenter-6416}
-\end{longtable}
-}
-
-A escala completa, la identidad gana en todos los ejes que importan: silueta
-más alta (0.151), ruido más bajo (0.199), DB competitivo y mejor coste de
-ingesta (1235~s vs 1777--2152~s). Los detectores base (YOLO11s y YOLO11m)
-recortan $\sim$1.03 cajas por imagen, prácticamente reproduciendo el conjunto
-original con una ganancia marginal o negativa en calidad y un sobrecoste de
-ingesta del 44\%. El detector \textit{fine-tuned} es la excepción
-interesante: a $N=1000$ obtiene la mejor silueta, mejor CH y mejor DB del
-panel, pero el liderazgo se evapora a $N=6416$, donde su multiplicador
-$\times$2.4 sobre el número de recortes degenera la partición (ruido 29.8\%,
-csCV 1.06, mil cuarenta y nueve clústeres con cola larga). El compromiso no
-compensa para el agrupamiento del corpus completo.
-
-Esta conclusión cierra la configuración base del trabajo y la fija como:
-\texttt{dinov2\_graffiti\_style\_head}~+~UMAP-10~+~HDBSCAN
-\texttt{mcs}=5~+~segmentador identidad~+~SQLite. Es la configuración sobre la
-que se asientan las subsecciones siguientes.
+\textbf{TODO: aun estoy acabando de toquetear el segmentador. Por ahora, y aun siendo 
+    bastante competente recortando imágenes, no compensa frente a agrupar la imagen completa.}
+% A escala completa, recortar con YOLO no compensa frente a agrupar la imagen
+% completa: la identidad gana en silueta, ruido y coste de ingesta, y el único
+% detector competitivo (YOLO11m \textit{fine-tuned}) pierde su ventaja al pasar
+% de $N=1000$ a $N=6416$ por su multiplicador $\times$2.4 sobre el número de
+% recortes. El barrido (E5) compara cuatro segmentadores —identidad (imagen
+% completa), YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}— manteniendo fijo
+% el resto del \textit{pipeline}, con la cautela de que el segmentador altera
+% el \emph{número de unidades} agrupadas: los recortes YOLO no son comparables
+% uno a uno con las imágenes completas, y la lectura conjunta exige incluir el
+% multiplicador de recortes por imagen.
+% 
+% {\footnotesize
+% \begin{longtable}{|p{2.5cm}|p{1.5cm}|p{1.0cm}|p{1.0cm}|p{1.1cm}|p{1.0cm}|p{1.0cm}|p{1.4cm}|} \hline
+%   \textbf{Segmentador} & \textbf{recortes} & \textbf{r/img} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{ingesta (s)} \\ \hline
+%   \endhead
+%   identidad           & 6416  & 1.00 &  563 & 0.199 & 0.151 & 33.1 & 1235.5 \\ \hline
+%   YOLO11s             & 6590  & 1.03 &  502 & 0.225 & 0.127 & 30.4 & 1777.0 \\ \hline
+%   YOLO11m             & 6603  & 1.03 &  506 & 0.230 & 0.131 & 29.5 & 1811.6 \\ \hline
+%   YOLO11m \textit{ft} & 15362 & 2.39 & 1049 & 0.298 & 0.122 & 36.2 & 2152.3 \\ \hline
+%   \caption{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
+%   ``recortes'' son los puntos efectivamente agrupados, no las imágenes leídas).
+%   Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.}
+%   \label{tab:e5-segmenter-6416}
+% \end{longtable}
+% }
+% 
+% A escala completa, la identidad gana en todos los ejes que importan: silueta
+% más alta (0.151), ruido más bajo (0.199), DB competitivo y mejor coste de
+% ingesta (1235~s vs 1777--2152~s). Los detectores base (YOLO11s y YOLO11m)
+% recortan $\sim$1.03 cajas por imagen, prácticamente reproduciendo el conjunto
+% original con una ganancia marginal o negativa en calidad y un sobrecoste de
+% ingesta del 44\%. El detector \textit{fine-tuned} es la excepción
+% interesante: a $N=1000$ obtiene la mejor silueta, mejor CH y mejor DB del
+% panel, pero el liderazgo se evapora a $N=6416$, donde su multiplicador
+% $\times$2.4 sobre el número de recortes degenera la partición (ruido 29.8\%,
+% csCV 1.06, mil cuarenta y nueve clústeres con cola larga). El compromiso no
+% compensa para el agrupamiento del corpus completo.
+% 
+% Esta conclusión cierra la configuración base del trabajo y la fija como:
+% \texttt{dinov2\_graffiti\_style\_head}~+~UMAP-10~+~HDBSCAN
+% \texttt{mcs}=5~+~segmentador identidad~+~SQLite. Es la configuración sobre la
+% que se asientan las subsecciones siguientes.
 
 % =====================================================================
 \subsection{Coste computacional}
 \label{subsec:res-coste}
-% HEADLINE del trabajo (enunciado: coste en función del tamaño del conjunto).
-% Funde E7 (escalabilidad, principal), E6 (backends de almacenamiento) y E9
-% (frontera HNSW). Va con el mayor peso visual.
-Este es el eje central del trabajo: caracterizar empíricamente cómo crece el
-coste de cada etapa con el tamaño del banco y contrastar las pendientes
-observadas con las clases de complejidad teóricas. El rango disponible
-($N\le 6416$, $\sim$1.8 décadas logarítmicas) es estrecho para separar
-asintóticamente $O(n\log n)$ de $O(n^2)$, por lo que las pendientes se
-reportan como \emph{observadas en este régimen} y no como exponentes
-asintóticos.
+Este es uno de los ejes centrales del trabajo: caracterizar empíricamente cómo
+crece el coste de cada etapa con el tamaño del banco y contrastar las
+pendientes observadas con las clases de complejidad teóricas. El rango
+disponible ($N\le 6416$) es estrecho para separar asintóticamente $O(n\log n)$
+de $O(n^2)$, por lo que las pendientes se reportan como \emph{observadas en
+este régimen} y no como exponentes asintóticos.
 
 \subsubsection{Escalabilidad por etapa}
 \label{subsubsec:res-escalabilidad}
 % E7. Figura cabecera: tiempo vs N en log-log, pendiente empírica por etapa y
 % por algoritmo de agrupamiento, junto a la complejidad teórica esperada.
-La búsqueda por similitud sobre SQLite domina absolutamente el coste a
-$N=6416$ con una pendiente log-log empírica de $\approx 2.10$, consistente
-con la exploración lineal todos-contra-todos y motivación cuantitativa
-directa de los barridos de almacenamiento e índice ANN. El barrido de
-escalabilidad (E7) mide ingesta, reducción, agrupamiento (cinco algoritmos)
-y búsqueda por similitud sobre seis tamaños de banco; la
+El barrido de escalabilidad (E7) mide ingesta, reducción, agrupamiento (cinco
+algoritmos) y búsqueda por similitud sobre seis tamaños de banco; la
 tabla~\ref{tab:e7-cost} consolida los tiempos por etapa a las tres escalas
 extremas con HDBSCAN como agrupador de referencia, y la
 tabla~\ref{tab:e7-slopes} contrasta las pendientes log-log observadas con la
@@ -439,10 +437,9 @@ complejidad teórica de referencia.
   2000 &  455.9 &  4.542 & 0.1106 & 0.0047 & 0.0427 & 306.81 \\ \hline
   3500 &  776.0 & 11.870 & 0.1863 & 0.0066 & 0.1405 & 995.52 \\ \hline
   6416 & 1294.9 &  6.237 & 0.3580 & 0.0098 & 0.5988 & 3266.60 \\ \hline
-  \caption{E7, tiempo de pared por etapa frente a $N$ (extracto). A $N=6416$
-  la búsqueda por similitud SQLite domina absolutamente, con la ingesta como
-  segundo coste. La caída de UMAP a $N=6416$ (anomalía pynndescent) se discute
-  en el texto.}
+  \caption{E7, tiempo por etapa frente a $N$ (extracto). A $N=6416$ la búsqueda
+  por similitud SQLite domina absolutamente, con la ingesta como segundo coste.
+La caída de UMAP a $N=6416$ se discute en el texto.}
   \label{tab:e7-cost}
 \end{longtable}
 }
@@ -466,43 +463,36 @@ complejidad teórica de referencia.
 \end{longtable}
 }
 
-El titular del experimento es la pendiente observada de la búsqueda por
-similitud SQLite: $\approx 2.10$ sobre el rango completo y 2.13 en la ventana
-limpia, en la banda esperada para una exploración lineal todos-contra-todos.
-A $N=6416$ una sola pasada todos-contra-todos (6416 consultas) sobre el
-corpus tarda 54.4 minutos, más que la propia ingesta (21.6 min) y unas
-$9000\times$ más que el agrupamiento ($3266.6 / 0.358$~s). El \textit{throughput} cae de 68 consultas por segundo a
-$N=250$ a 2 consultas por segundo a $N=6416$: una caída de 35$\times$ sobre
-un factor 26$\times$ en $N$. Este resultado es la motivación cuantitativa
-directa para los barridos de almacenamiento y de índice ANN
-(\ref{subsubsec:res-storage} y \ref{subsubsec:res-hnsw}).
+Como se puede ver en la segunda tabla, el rango reducido de $N$ provoca que
+varias de las etapas tengan pendientes observadas menores que la complejidad
+teórica de referencia, como puede ser el caso de DBSCAN o OPTICS. Algortimos
+como HDBSCAN o el algomerativo, con complejidades más altas, sí que presentan
+pendientes superiores a 1, dejando claro su naturaleza super-lineal. El tiempo
+de ejecución de estos algoritmos fue prácticamente despreciable al compararlo
+con la ingesta o la búsqueda por similitud, no llegando a superar los 5~s en
+ningún caso. El único cuello de botella para el agrupamiento a esta escala es
+el aglomerativo, que a $N 6416$ consume $314.1$~MB de RAM, creciendo como
+$O(n^2)$ y descartándolo operativamente mucho antes de que su tiempo de pared
+lo haga.
 
-La ingesta escala linealmente, como cabe esperar de una inferencia por
-imagen. Las pendientes de agrupamiento dentro de la ventana segura reproducen
-la jerarquía teórica: KMeans sub-lineal (codo con $k$ fijo y pocas
-iteraciones), DBSCAN y OPTICS cerca de lineal, HDBSCAN y aglomerativo
-super-lineales. Los valores absolutos importan más que las pendientes para el
-diseño \textit{downstream}: a $N=6416$ ningún agrupador supera los 5~s, lo
-que confirma que el agrupamiento no es un cuello de botella de tiempo en
-este régimen. La memoria, sin embargo, sí lo es para el aglomerativo: su
-RSS pico crece como $0.13~\to~3.18~\to~93.5~\to~314.1$~MB para
-$N\in\{1000, 2000, 3500, 6416\}$, la matriz condensada de distancias
-$O(n^2)$ hecha explícita. Una proyección a $N=50$k coloca al aglomerativo en
-$\sim$19~GB de RAM, lo que lo descarta operativamente mucho antes de que su
-tiempo de pared lo haga. HDBSCAN, DBSCAN y OPTICS se mantienen por debajo de
-1~MB de RSS pico a la escala completa.
+La pendiente observada de la búsqueda por similitud SQLite es prácticamente la
+esperada: $\approx 2.10$ sobre el rango completo y 2.13 en la ventana limpia. A
+$N=6416$ una sola pasada de 6416 consultas sobre el corpus tarda 54.4 minutos,
+más que la propia ingesta (21.6 min) y unas $9000\times$ más que el
+agrupamiento ($3266.6 / 0.358$~s). El \textit{throughput} cae de 68 consultas
+por segundo a $N=250$ a 2 consultas por segundo a $N=6416$: una caída de
+35$\times$. Este resultado es la motivación cuantitativa directa para el
+barrido de \textit{backend} y de índice ANN
+(\ref{subsubsec:res-similaritysearch}).
 
-La anomalía importante del barrido vive en la fila de reducción: UMAP crece
-monótonamente hasta $N=3500$ (11.87~s) y \emph{cae} a 6.24~s a $N=6416$, un
-47\% más rápido sobre un 83\% más de datos. La caída es reproducible
-($\sigma=0.017$~s sobre cuatro muestras, $0.3\%$). La causa es que UMAP
-conmuta a su \textit{backend} aproximado de vecinos basado en pynndescent al
-superar el umbral interno para el cálculo exacto del grafo kNN, situado en
-unos pocos miles de puntos en esta versión. En consecuencia, la pendiente
-completa (1.15) no describe un único régimen: la ventana $500\ldots3500$ (1.53)
-corresponde al régimen exacto, y $N=6416$ es el primer punto del régimen
-aproximado. Cualquier extrapolación lineal del coste de reducción a partir
-de los puntos pequeños sobreestima el coste futuro.
+La anomalía más importante del barrido se encuentra en la ingesta para el
+algoritmo de reducción UMAP. Este, crece hasta $N=3500$ con una pendiente de
+1.15, pero a $N=6416$ cae a 6.24~s, un 47\% más rápido sobre un 83\% más de
+datos. Esta caída es reproducible y se debe a que UMAP utiliza un umbral
+interno para cambiar a un cálculo aproximado de vecinos basado en
+\texttt{pynndescent} al superar unos pocos miles de puntos. Esto provoca que la
+pendiente completa no describa un único régimen, sino dos, y es la razón por la
+que se reportan dos pendientes distintas en la tabla~\ref{tab:e7-slopes}.
 
 \begin{figure}[h]
   \centering
@@ -533,18 +523,18 @@ de los puntos pequeños sobreestima el coste futuro.
   \label{fig:e7-memory}
 \end{figure}
 
-\subsubsection{Coste del \textit{backend} de almacenamiento}
-\label{subsubsec:res-storage}
-% E6. Separa el efecto "ops vectoriales nativas vs. Python" (sqlite->pg-exacto)
-% del efecto "aproximado vs. exacto" (pg-exacto->pg-hnsw). Búsqueda activa.
-Por encima de $N\approx 2500$, pgvector con índice HNSW domina la búsqueda
-por similitud sin pérdida de \textit{recall}, y SQLite queda relegado a
-desarrollo de muy pequeña escala. El barrido (E6) aísla este coste sobre
-tres \textit{backends}: SQLite (exploración lineal en Python), pgvector
-exacto (escaneo secuencial dentro del SGBD con el \textit{kernel} de coseno
-en C) y pgvector con índice HNSW (\texttt{m}=16, \texttt{ef\_construction}=64).
-La construcción del índice HNSW se cronometra una sola vez entre la ingesta
-y el bucle de búsqueda, así que su coste no se imputa al tiempo de consulta.
+\subsubsection{Búsqueda por similitud: \textit{backend} e índice ANN}
+\label{subsubsec:res-similaritysearch}
+% E6 + E9 fusionados. E6 establece que pgvector+HNSW elimina el cuello O(n^2)
+% de SQLite sin perder recall; E9 condensado justifica brevemente el ancla
+% de hiperparámetros HNSW.
+El cuello $O(n^2)$ de la búsqueda SQLite identificado en E7 motiva el barrido
+E6 sobre tres \textit{backends}: SQLite (exploración lineal en Python),
+pgvector exacto (escaneo secuencial dentro del SGBD con el \textit{kernel} de
+coseno en C) y pgvector con índice HNSW (\texttt{m}=16,
+\texttt{ef\_construction}=64). La construcción del índice HNSW se cronometra
+una sola vez entre la ingesta y el bucle de búsqueda, así que su coste no se
+acumula sobre el tiempo de consulta.
 
 {\footnotesize
 \begin{longtable}{|p{1.0cm}|p{2.6cm}|p{1.6cm}|p{2.0cm}|p{1.6cm}|p{1.8cm}|} \hline
@@ -571,124 +561,51 @@ y el bucle de búsqueda, así que su coste no se imputa al tiempo de consulta.
 \end{longtable}
 }
 
-Tres lecturas distintas conviven en la tabla. SQLite tiene
-\textit{throughput} aproximadamente plano ($\sim$150~ips) pero tiempo de
-pared lineal en $N$: a $N=6416$ una pasada de 100 consultas tarda 43~s, el
-resultado consistente con el coste $O(n^2)$ por pasada de E7. PostgreSQL
-exacto eleva el \textit{throughput} en dos órdenes de magnitud porque el
-\textit{kernel} de coseno corre en C dentro del SGBD; por debajo de
-$N=1000$ la latencia está dominada por el \textit{round-trip} de la
-conexión y la pendiente es sub-lineal. PostgreSQL con HNSW es el único
-\textit{backend} cuyo \textit{throughput} \emph{crece} con el tamaño del
-banco con respecto al exacto: a $N=500$ va parejo con el exacto, a $N=2500$
-es 100$\times$ más rápido que SQLite y a $N=6416$ es 3.2$\times$ más rápido
-que el exacto y 240$\times$ más rápido que SQLite, con \texttt{recall@5} =
-1.000 a las cuatro escalas. La construcción del índice cuesta 0.47~s a
-$N=6416$, se amortiza en una sola consulta frente a SQLite y en varias
-docenas frente al exacto.
+SQLite mantiene un \textit{throughput} aproximadamente plano ($\sim$150~ips)
+con tiempo de ejecución lineal en $N$. PostgreSQL exacto eleva el
+\textit{throughput} en dos órdenes de magnitud porque el \textit{kernel} de
+coseno corre en C dentro del SGBD; por debajo de $N=1000$ la latencia está
+dominada por el \textit{round-trip} de la conexión. PostgreSQL con HNSW es el
+único \textit{backend} cuyo \textit{throughput} \emph{crece} con el tamaño del
+banco con respecto al exacto: a $N=2500$ es 100 veces más rápido que SQLite y a
+$N=6416$ es 3.2 veces más rápido que el exacto y 240 veces más rápido que
+SQLite, con \texttt{recall@5} = 1.000 a las cuatro escalas. La construcción del
+índice cuesta 0.47~s a $N=6416$, se amortiza en una sola consulta frente a
+SQLite y en varias docenas frente al exacto.
 
-El cruce operativo se sitúa en torno a $N=2500$. Por debajo, las tres
-opciones que usan PostgreSQL son indistinguibles en latencia (el
-\textit{round-trip} domina) y HNSW sólo añade complejidad sin ganancia. Por
-encima, HNSW pasa al frente y exacto sigue creciendo linealmente. El corpus
-objetivo del trabajo se sitúa por encima de ese cruce, por lo que HNSW es la
-elección por defecto recomendada para la búsqueda; SQLite queda como
-\textit{backend} de desarrollo de muy pequeña escala.
+El punto en el que HNSW parece separarse del resto es en $N=2500$. Por debajo,
+las tres opciones sobre PostgreSQL son indistinguibles en latencia y HNSW sólo
+añade complejidad sin ganancia. Por encima, HNSW pasa al frente y el exacto
+sigue creciendo linealmente. El corpus objetivo del trabajo está por encima de
+ese cruce, por lo que HNSW es la elección por defecto recomendada para la
+búsqueda; SQLite queda como \textit{backend} de desarrollo de muy pequeña
+escala.
 
-\begin{figure}[h]
-  \centering
-  % FIGURE: gráfico log-log de latencia por consulta (eje y) vs N (eje x),
-  % una línea por backend (SQLite, pgvector exacto, pgvector+HNSW).
-  % Resaltar el cruce a N~2500. Añadir como
-  % segundo panel pequeño la curva idx_s vs N (build HNSW).
-  % \includegraphics[width=\linewidth]{figures/e6_storage_latency.pdf}
-  \caption{E6: latencia de búsqueda por consulta frente a tamaño del banco
-  para los tres \textit{backends}. El cruce HNSW/exacto cae en torno a
-  $N=2500$; SQLite mantiene una pendiente $\sim 1$ en el tiempo total por
-  pasada.}
-  \label{fig:e6-storage}
-\end{figure}
-
-\subsubsection{Frontera de Pareto del índice HNSW}
-\label{subsubsec:res-hnsw}
-% E9. m / ef_construction / ef_search: build-time x query-time x recall@k.
-% Justifica HNSW para el flujo ingesta-única -> muchas-consultas.
-A $N=6416$ los tres hiperparámetros del índice HNSW son perillas de
-velocidad-vs-\textit{recall}-1.000, no perillas de seguridad: ninguna
-configuración del barrido cae por debajo de \textit{recall} 0.990, y los
-tres ejes (\texttt{m}, \texttt{ef\_construction}, \texttt{ef\_search}) se
-separan limpiamente entre construcción y consulta. Establecida la ventaja
-de HNSW en \ref{subsubsec:res-storage}, el barrido (E9) cubre once
-configuraciones en torno al ancla $(\texttt{m}=16,
-\texttt{ef\_construction}=64, \texttt{ef\_search}=40)$ sobre el corpus
-completo; diez tienen éxito y la celda $(\texttt{m}=64,
-\texttt{ef\_construction}=64)$ falla por la restricción
-\texttt{ef\_construction} $\ge 2\cdot$\texttt{m} que pgvector valida en
-tiempo de creación del índice.
-
-{\footnotesize
-\begin{longtable}{|p{4.0cm}|p{0.7cm}|p{0.9cm}|p{0.9cm}|p{1.2cm}|p{1.2cm}|p{1.4cm}|p{1.3cm}|} \hline
-  \textbf{Configuración} & \textbf{m} & \textbf{ef\_c} & \textbf{ef\_s} & \textbf{idx (s)} & \textbf{ss (s)} & \textbf{ips} & \textbf{rec@5} \\ \hline
-  \endhead
-  exacto (línea base)       & -- & --  & --  & --    & 1.072 &  5 987 & --    \\ \hline
-  m8\_efc64\_efs40          &  8 &  64 &  40 & 0.270 & 0.309 & 20 753 & 0.995 \\ \hline
-  m16\_efc64\_efs40 (ancla) & 16 &  64 &  40 & 0.446 & 0.321 & 19 980 & 0.995 \\ \hline
-  m32\_efc64\_efs40         & 32 &  64 &  40 & 0.981 & 0.345 & 18 618 & 1.000 \\ \hline
-  m16\_efc32\_efs40         & 16 &  32 &  40 & 0.329 & 0.364 & 17 638 & 0.990 \\ \hline
-  m16\_efc128\_efs40        & 16 & 128 &  40 & 0.567 & 0.346 & 18 520 & 0.995 \\ \hline
-  m16\_efc256\_efs40        & 16 & 256 &  40 & 0.769 & 0.350 & 18 351 & 1.000 \\ \hline
-  m16\_efc64\_efs10         & 16 &  64 &  10 & 0.449 & 0.319 & 20 116 & 0.993 \\ \hline
-  m16\_efc64\_efs100        & 16 &  64 & 100 & 0.424 & 0.374 & 17 160 & 0.996 \\ \hline
-  m16\_efc64\_efs200        & 16 &  64 & 200 & 0.444 & 0.450 & 14 261 & 1.000 \\ \hline
-  \caption{E9, barrido HNSW a $N=6416$. La celda $m{=}64, \texttt{ef\_c}{=}64$
-  falla por la restricción pgvector $\texttt{ef\_c}\ge 2m$ y no se tabula.}
-  \label{tab:e9-hnsw}
-\end{longtable}
-}
-
-El barrido separa de forma limpia los tres ejes. Tanto \texttt{m} como
-\texttt{ef\_construction} son perillas de construcción: el tiempo de
-\textit{build} crece aproximadamente lineal con cada una (0.27~$\to$~0.45~$\to$~0.98~s
-al doblar \texttt{m}; 0.33~$\to$~0.77~s al subir
-\texttt{ef\_construction} de 32 a 256), mientras que la latencia de consulta
-sólo varía levemente y el \textit{recall} sube progresivamente del 0.990 al
-1.000. \texttt{ef\_search}, en cambio, es una perilla puramente de consulta:
-no afecta al \textit{build} pero alarga la latencia linealmente
-(0.32~$\to$~0.45~s al subir de 10 a 200) y es el único eje monótono en
-\textit{recall} en todo el rango.
-
-El frente de Pareto a $N=6416$ se reduce a tres puntos útiles más la línea
-base exacta. El ancla
-$(\texttt{m}=16, \texttt{ef\_construction}=64, \texttt{ef\_search}=40)$
-proporciona 0.321~s por consulta a \textit{recall} 0.995 con un coste de
-construcción de 0.45~s, un 3.4$\times$ más rápida que el exacto pgvector y
-elegida también por E6. Para alcanzar \textit{recall} 1.000 sin penalizar la
-latencia hay dos opciones equivalentes: subir \texttt{m} a 32 (0.345~s,
-\textit{build} 0.98~s) o subir \texttt{ef\_construction} a 256 (0.350~s,
-\textit{build} 0.77~s). Subir \texttt{ef\_search} a 200 también alcanza
-\textit{recall} 1.000 pero penaliza la latencia a 0.45~s y queda dominado por
-los dos anteriores. En un flujo realista \textit{ingesta única, muchas
-consultas} las perillas de construcción son preferibles a la perilla de
-consulta porque el sobrecoste se amortiza sólo una vez.
-
-Ninguna configuración del barrido cae por debajo de \textit{recall} 0.990 a
-$N=6416$. A esta escala los hiperparámetros HNSW son perillas de
-velocidad-vs-\textit{recall}-1.000, no perillas de seguridad: HNSW puede
-sustituir al exacto sin pérdida significativa de calidad.
+Para validar que la configuración por defecto del índice no es una decisión
+arbitraria, un barrido complementario E9 recorre once configuraciones en torno
+al ancla $(\texttt{m}=16, \texttt{ef\_construction}=64,
+\texttt{ef\_search}=40)$ sobre el corpus completo. Ninguna cae por debajo de
+\textit{recall} 0.990, y el ancla proporciona 0.321~s por consulta a
+\textit{recall} 0.995, 3.4 veces más rápida que el método exacto. Alcanzar
+\textit{recall} 1.000 sin penalizar la latencia es posible subiendo \texttt{m}
+a 32 o \texttt{ef\_construction} a 256; ambas son parámetros para la
+construcción, preferibles a \texttt{ef\_search} en un flujo de <<ingesta única,
+muchas consultas>> porque su sobrecoste se amortiza una sola vez. A esta
+escala, parece que el uso de HNSW proporciona una mejora de latencia muy
+considerable sin una pérdida apreciable de calidad, eliminando el cuello de botella
+$O(n^2)$ de SQLite.
 
 \begin{figure}[h]
   \centering
-  % FIGURE: nube de puntos en el plano (latencia por consulta s, eje x;
-  % recall@5, eje y) con un punto por configuración HNSW de E9 y otro para el
-  % baseline exacto. Etiquetar cada punto con su (m, ef_c, ef_s) y conectar
-  % el frente de Pareto con una línea.
-  % \includegraphics[width=\linewidth]{figures/e9_hnsw_pareto.pdf}
-  \caption{E9: frente de Pareto recall–latencia del índice HNSW a $N=6416$.
-  El ancla (\texttt{m}=16, \texttt{ef\_c}=64, \texttt{ef\_s}=40) ocupa el
-  vértice operativo; \texttt{m}=32 y \texttt{ef\_c}=256 alcanzan
-  \textit{recall} 1.000 sin penalizar la consulta; \texttt{ef\_s}=200 queda
-  dominado.}
-  \label{fig:e9-hnsw}
+  % FIGURE: plano (latencia por consulta, eje x; recall@5, eje y) con un
+  % punto por backend de E6 y por configuración HNSW de E9 a N=6416.
+  % Resaltar el cruce HNSW/exacto y el ancla operativa.
+  % \includegraphics[width=\linewidth]{figures/e6_e9_pareto.pdf}
+  \caption{E6+E9: frente de Pareto recall--latencia de la búsqueda por
+  similitud a $N=6416$. SQLite queda fuera de escala; pgvector exacto fija
+  la línea base; el ancla HNSW $(\texttt{m}=16, \texttt{ef\_c}=64,
+  \texttt{ef\_s}=40)$ es 3.4$\times$ más rápida con \textit{recall} 0.995.}
+  \label{fig:similaritysearch-pareto}
 \end{figure}
 
 % =====================================================================
@@ -947,12 +864,8 @@ futuro: véase \ref{sec:conclusion}).
   \label{fig:e8-correlation}
 \end{figure}
 
-% TODO (autor): figuras E1, E2, E3, E5, E6, E7, E8, E9 — generar y guardar
+% TODO (autor): figuras E1, E2, E3, E5, E6+E9, E7, E8 — generar y guardar
 % como PDF bajo doc/figures/ con los nombres sugeridos en cada
 % \includegraphics comentado. La prosa y las tablas son autosuficientes sin
 % las figuras, pero las figuras incrementan claramente la legibilidad del
-% coste-vs-N y de la frontera HNSW.
-%
-% TODO (autor): si se reejecuta E9 con la celda (m=64, ef_c=128, ef_s=40)
-% para completar el barrido de m, actualizar la tabla \ref{tab:e9-hnsw}
-% y el texto correspondiente.
+% coste-vs-N y del frente de Pareto recall--latencia.
