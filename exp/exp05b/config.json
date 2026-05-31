@@ -85,6 +85,85 @@
       },
       "clear_storage": true,
       "repeats": 3
+    },
+    {
+      "name": "tiebreaker_dinov2_vits14_identity-l6416",
+      "limit": 6416,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_tiebreaker_dinov2_vits14_identity_l6416.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
+    },
+    {
+      "name": "tiebreaker_dinov2_vits14_touchmerge-l6416",
+      "limit": 6416,
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/v2_tiebreaker_dinov2_vits14_touchmerge_l6416.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "yolo",
+        "params": {
+          "model_path": "models/yolo11m-train-10.pt",
+          "threshold": 0.25,
+          "merge_threshold": 0.50,
+          "padding": 0.05,
+          "max_boxes_per_image": 3,
+          "allow_full_image_fallback": false,
+          "touch_merge_gap": 0.05,
+          "max_merged_area": 0.85
+        }
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 5
+        }
+      },
+      "clear_storage": true,
+      "repeats": 3
     }
   ]
 }
