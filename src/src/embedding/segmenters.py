@@ -3,34 +3,50 @@ from src.abstractions import SegmenterBase, BoundingBox
 from PIL.Image import Image as PILImage
 
 class YoloSegmenter(SegmenterBase):
-    def __init__(self, model_path: str, threshold: float = 0.5, merge_threshold: float = 0.8, padding: float = 0.0, max_boxes_per_image: int | None = None):
+    def __init__(self, model_path: str, threshold: float = 0.5, merge_threshold: float = 0.8, padding: float = 0.0, max_boxes_per_image: int | None = None, allow_full_image_fallback: bool = True, batch_size: int = 1, touch_merge_gap: float = 0.0, max_merged_area: float = 1.0):
         self.model = YOLO(model_path)
         self.model.eval()
         self.threshold = threshold
         self.merge_threshold = merge_threshold
         self._padding = padding
         self.max_boxes_per_image = max_boxes_per_image
+        self.allow_full_image_fallback = allow_full_image_fallback
+        self._batch_size = max(1, int(batch_size))
+        self.touch_merge_gap = touch_merge_gap
+        self.max_merged_area = max_merged_area
 
     @property
     def padding(self) -> float:
         return self._padding
 
+    @property
+    def batch_size(self) -> int:
+        return self._batch_size
+
     def segment(self, image: PILImage) -> list[BoundingBox]:
-        width, height = image.size
         results = self.model(image, conf=self.threshold)
-        boxes = []
-        for r in results:
-            for box in r.boxes:
-                # box.xyxy returns [x1, y1, x2, y2]
-                coords = box.xyxy[0].tolist()
-                conf = float(box.conf[0])
-                boxes.append(BoundingBox(
-                    x1=coords[0] / width,
-                    y1=coords[1] / height,
-                    x2=coords[2] / width,
-                    y2=coords[3] / height,
-                    confidence=conf
-                ))
+        return self._postprocess(image, results[0])
+
+    def segment_batch(self, images: list[PILImage]) -> list[list[BoundingBox]]:
+        if not images:
+            return []
+        results = self.model(images, conf=self.threshold, verbose=False)
+        return [self._postprocess(img, r) for img, r in zip(images, results)]
+
+    def _postprocess(self, image: PILImage, result) -> list[BoundingBox]:
+        width, height = image.size
+        boxes: list[BoundingBox] = []
+        for box in result.boxes:
+            # box.xyxy returns [x1, y1, x2, y2]
+            coords = box.xyxy[0].tolist()
+            conf = float(box.conf[0])
+            boxes.append(BoundingBox(
+                x1=coords[0] / width,
+                y1=coords[1] / height,
+                x2=coords[2] / width,
+                y2=coords[3] / height,
+                confidence=conf
+            ))
 
         if self.merge_threshold < 1.0:
             boxes = self._merge_boxes(boxes)
@@ -40,6 +56,9 @@ class YoloSegmenter(SegmenterBase):
 
         if self._padding > 0:
             boxes = [self._apply_padding(box) for box in boxes]
+
+        if not boxes and self.allow_full_image_fallback:
+            boxes = [BoundingBox(x1=0.0, y1=0.0, x2=1.0, y2=1.0, confidence=1.0)]
 
         return boxes
 
@@ -91,21 +110,36 @@ class YoloSegmenter(SegmenterBase):
         return merged
 
     def _should_merge(self, box1: BoundingBox, box2: BoundingBox) -> bool:
-        # Calculate intersection
         ix1 = max(box1.x1, box2.x1)
         iy1 = max(box1.y1, box2.y1)
         ix2 = min(box1.x2, box2.x2)
         iy2 = min(box1.y2, box2.y2)
 
-        if ix1 >= ix2 or iy1 >= iy2:
+        contain_merge = False
+        if ix1 < ix2 and iy1 < iy2:
+            intersection_area = (ix2 - ix1) * (iy2 - iy1)
+            area1 = (box1.x2 - box1.x1) * (box1.y2 - box1.y1)
+            area2 = (box2.x2 - box2.x1) * (box2.y2 - box2.y1)
+            contain_merge = (intersection_area / area1 > self.merge_threshold) or (intersection_area / area2 > self.merge_threshold)
+
+        touch_merge = False
+        if self.touch_merge_gap > 0:
+            gap_x = max(0.0, max(box1.x1, box2.x1) - min(box1.x2, box2.x2))
+            gap_y = max(0.0, max(box1.y1, box2.y1) - min(box1.y2, box2.y2))
+            touch_merge = max(gap_x, gap_y) <= self.touch_merge_gap
+
+        if not (contain_merge or touch_merge):
             return False
 
-        intersection_area = (ix2 - ix1) * (iy2 - iy1)
-        area1 = (box1.x2 - box1.x1) * (box1.y2 - box1.y1)
-        area2 = (box2.x2 - box2.x1) * (box2.y2 - box2.y1)
+        if self.max_merged_area < 1.0:
+            union_x1 = min(box1.x1, box2.x1)
+            union_y1 = min(box1.y1, box2.y1)
+            union_x2 = max(box1.x2, box2.x2)
+            union_y2 = max(box1.y2, box2.y2)
+            if (union_x2 - union_x1) * (union_y2 - union_y1) > self.max_merged_area:
+                return False
 
-        # Merge if intersection is more than merge_threshold of EITHER box
-        return (intersection_area / area1 > self.merge_threshold) or (intersection_area / area2 > self.merge_threshold)
+        return True
 
 class IdentitySegmenter(SegmenterBase):
     # `padding` is accepted and exposed only to satisfy the abstract

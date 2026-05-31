@@ -279,9 +279,19 @@ def _run_single(
 
         with profile_stage() as ingest_stage:
             total_instances = 0
-            for image_path in tqdm(image_paths, desc="Ingesting", unit="image", position=1, leave=False):
-                saved_data = config.save_image(image_path)
-                total_instances += len(saved_data)
+            ingest_bs = max(1, int(getattr(segmenter, "batch_size", 1)))
+            if ingest_bs == 1:
+                for image_path in tqdm(image_paths, desc="Ingesting", unit="image", position=1, leave=False):
+                    saved_data = config.save_image(image_path)
+                    total_instances += len(saved_data)
+            else:
+                pbar = tqdm(total=len(image_paths), desc="Ingesting", unit="image", position=1, leave=False)
+                for start in range(0, len(image_paths), ingest_bs):
+                    chunk = image_paths[start:start + ingest_bs]
+                    saved_list = config.save_images_batch(chunk)
+                    total_instances += sum(len(s) for s in saved_list)
+                    pbar.update(len(chunk))
+                pbar.close()
         ingest_metrics = ingest_stage.metrics
         assert ingest_metrics is not None  # for type checker
 
@@ -729,7 +739,13 @@ def _build_segmenter(run_spec: BenchmarkRunSpec):
         merge_threshold = params.get("merge_threshold", 0.8)
         padding = params.get("padding", 0.0)
         max_boxes_per_image = params.get("max_boxes_per_image")
-        return YoloSegmenter(model_path, threshold=threshold, merge_threshold=merge_threshold, padding=padding, max_boxes_per_image=max_boxes_per_image)
+        allow_full_image_fallback = params.get("allow_full_image_fallback", True)
+        batch_size = params.get("batch_size", 1)
+        if not isinstance(batch_size, int) or batch_size < 1:
+            raise ValueError(f"Run {run_spec.name}: segmenter.params.batch_size must be a positive integer.")
+        touch_merge_gap = params.get("touch_merge_gap", 0.0)
+        max_merged_area = params.get("max_merged_area", 1.0)
+        return YoloSegmenter(model_path, threshold=threshold, merge_threshold=merge_threshold, padding=padding, max_boxes_per_image=max_boxes_per_image, allow_full_image_fallback=allow_full_image_fallback, batch_size=batch_size, touch_merge_gap=touch_merge_gap, max_merged_area=max_merged_area)
     
     if name == "identity":
         padding = params.get("padding", 0.0)

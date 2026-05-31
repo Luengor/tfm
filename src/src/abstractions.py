@@ -72,6 +72,13 @@ class SegmenterBase(ABC):
     def segment(self, image: PILImage) -> list[BoundingBox]:
         ...
 
+    @property
+    def batch_size(self) -> int:
+        return 1
+
+    def segment_batch(self, images: list[PILImage]) -> list[list[BoundingBox]]:
+        return [self.segment(image) for image in images]
+
 class ClusteringBase(ABC):
     @abstractmethod
     def cluster(self, images: list[ImageData], **kwargs) -> list[int]:

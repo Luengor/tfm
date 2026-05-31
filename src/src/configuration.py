@@ -1,4 +1,4 @@
-from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData, ReductionBase, SegmenterBase, BoundingBox
+from src.abstractions import StorageBase, EmbeddingBase, ClusteringBase, ImageData, ReductionBase, SegmenterBase
 from PIL import Image as PILImage, ImageFile
 from enum import Enum
 
@@ -25,15 +25,15 @@ class Configuration:
 
         # Get the image embedding
         image = PILImage.open(filename).convert("RGB")
-        
-        # Segment the image to find the graffiti
-        boxes = self.segmenter.segment(image)
-        
-        # If no boxes are detected, use the full image
-        if not boxes:
-            boxes = [BoundingBox(x1=0.0, y1=0.0, x2=1.0, y2=1.0, confidence=1.0)]
 
-        # Generate embeddings for each box and save them
+        # Segment the image to find the graffiti. Fallback policy on empty
+        # detection lives in the segmenter (see YoloSegmenter.allow_full_image_fallback);
+        # an empty return here means the image is intentionally skipped.
+        boxes = self.segmenter.segment(image)
+
+        return self._embed_and_save(filename, image, boxes)
+
+    def _embed_and_save(self, filename: str, image, boxes) -> list[ImageData]:
         images = []
         for box in boxes:
             # Scale normalized coordinates back to image dimensions for cropping
@@ -41,7 +41,7 @@ class Configuration:
             top = box.y1 * image.height
             right = box.x2 * image.width
             bottom = box.y2 * image.height
-            
+
             crop = image.crop((left, top, right, bottom))
             emb = self.embedding.gen_embedding(crop)
 
@@ -49,7 +49,34 @@ class Configuration:
             self.storage.save(data)
             images.append(data)
 
-        return images 
+        return images
+
+    def save_images_batch(self, filenames: list[str]) -> list[list[ImageData]]:
+        """Single-batch ingest. The segmenter runs once on the whole batch when
+        it supports it. Filenames already in storage are returned from cache
+        without re-opening the image. Order preserved. Caller controls batch
+        size (typically via ``segmenter.batch_size``)."""
+        results: list[list[ImageData] | None] = [None] * len(filenames)
+
+        pending_idx: list[int] = []
+        pending_images = []
+        for i, fn in enumerate(filenames):
+            if self.storage.has(fn):
+                results[i] = self.storage.load(fn)
+                continue
+            try:
+                pending_images.append(PILImage.open(fn).convert("RGB"))
+                pending_idx.append(i)
+            except Exception as e:
+                print(f"Error opening {fn}: {e}")
+                results[i] = []
+
+        if pending_images:
+            batched_boxes = self.segmenter.segment_batch(pending_images)
+            for idx, image, boxes in zip(pending_idx, pending_images, batched_boxes):
+                results[idx] = self._embed_and_save(filenames[idx], image, boxes)
+
+        return [r if r is not None else [] for r in results]
 
     def get_by_distance(self, image: ImageData|str, max_images: int = 10, cos_distance: bool = True) -> list[ImageData]:
         # If the image is given as a filename, load it and take the first embedding 
