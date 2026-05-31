@@ -188,7 +188,7 @@ salida y pre entrenamiento.
   MobileNetV3~\cite{howard_searching_2019} & CNN ligera & $1280$ & ImageNet \\ \hline
   DINOv2 ViT-S/14~\cite{oquab_dinov2_2024} & \textit{Transformer}~\cite{dosovitskiy_image_2021} & $384$ & Autosupervisado (LVD-142M) \\ \hline
   CLIP ViT-B/32~\cite{radford_learning_2021} & \textit{Transformer} & $512$ & Imagen-texto (WIT) \\ \hline
-  YOLO11 (n/m)~\cite{noauthor_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO \\ \hline
+  YOLO11 (n/m)~\cite{ultralytics_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO \\ \hline
   \caption{Modelos de extracción de características integrados.}
   \label{tab:embedding-models}
 \end{longtable}
@@ -284,7 +284,7 @@ el extractor de características opere sobre los recortes correspondientes en
 lugar de la escena completa. Se han implementado dos variantes. La primera
 de ellas no aplica ningún tipo de segmentación, de modo que el extractor de
 características se aplica sobre la fotografía completa. La segunda, utiliza
-un modelo de YOLO~\cite{noauthor_ultralytics_2024} en su versión oficial o
+un modelo de YOLO~\cite{ultralytics_ultralytics_2024} en su versión oficial o
 ajustado sobre el conjunto de grafiti para detectar las cajas que encierran
 cada pintada, y recorta la imagen en consecuencia. Además, este proceso de
 recorte fusiona las cajas de detección solapadas para evitar duplicados y
