@@ -34,6 +34,19 @@ La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
         delimitadoras de las pintadas presentes en la imagen. En el caso en el
         que no se encuentren pintadas o no se utilice segmentador, se devuelve
         una caja que abarca toda la imagen.
+        % TODO: actualizar la descripción del paso 2. Tras los cambios de
+        % exp/exp05b la política de respaldo (devolver la imagen completa
+        % cuando no hay detecciones) deja de aplicarse de forma incondicional
+        % en Configuration y pasa a ser una decisión del propio segmentador,
+        % controlada por el nuevo parámetro `allow_full_image_fallback`
+        % (valor por defecto `true`, equivalente al comportamiento anterior).
+        % Con `false` las imágenes sin detección se descartan en lugar de
+        % emitir un \textit{embedding} de escena completa. Mencionar que en
+        % exp05 ~25\% de las imágenes (n=250, detector ajustado) cayeron al
+        % respaldo, mezclando dos distribuciones de entrada (escena completa
+        % frente a recorte ajustado) que la cabeza de estilo no vio durante
+        % el entrenamiento; exp/exp05b mide el efecto de desactivar dicho
+        % respaldo en combinación con umbrales de detección más permisivos.
     \item Estas cajas se fusionan si se solapan por encima de cierto umbral y,
         cuando se configura un margen (\textit{padding}) no nulo, se expanden
         para incluir contexto visual alrededor de la pintada. Por defecto el
@@ -44,6 +57,16 @@ La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
         % las K de mayor confianza, evitando que imágenes con detecciones
         % dispersas de baja calidad emitan muchos recortes fragmentados que
         % degradan la geometría de clústeres.
+        % TODO: incorporar los parámetros `touch_merge_gap` y `max_merged_area`
+        % (añadidos en la segunda iteración de exp/exp05b). El primero amplía
+        % el criterio de fusión para unir cajas adyacentes (no solapadas) cuya
+        % separación de Chebyshev sea menor o igual al valor indicado, lo que
+        % consolida pintadas contiguas en una misma pared como un único
+        % recorte y reduce la presión sobre `max_boxes_per_image`. El segundo
+        % actúa como salvaguarda anti-cadena: rechaza la fusión cuando la
+        % unión resultante superaría la fracción de área indicada, impidiendo
+        % que cadenas de fusiones por contacto generen una mega-caja
+        % equivalente a la imagen completa.
     \item Cada pintada se recorta sobre la imagen original y el recorte se
         entrega al modelo de extracción de características, que produce un
         vector de características de dimensión fija.

@@ -297,6 +297,32 @@ y que pueden producir varios \textit{embeddings} por fotografía original.
 % cajas emitidas por imagen tras el merge, conservando las de mayor confianza.
 % Mitiga la fragmentación en imágenes con muchas detecciones de baja calidad
 % que inflan la tasa de ruido en HDBSCAN.
+%
+% TODO: documentar el nuevo parámetro `allow_full_image_fallback` del segmentador
+% YOLO (añadido tras exp05, ver exp/exp05b). Controla la política de respaldo
+% cuando el detector no emite ninguna caja para una imagen: con `true` (valor por
+% defecto, comportamiento previo) se emite la imagen completa como única caja;
+% con `false` la imagen se descarta. Mover esta lógica desde Configuration al
+% propio segmentador unifica la política en un solo lugar. Mencionar también
+% que en exp05 ~25\% de imágenes de entrada (n=250, detector ajustado) cayeron
+% al respaldo, mezclando dos distribuciones de entrada (escena completa frente
+% a recorte ajustado) que la cabeza de estilo no vio durante el entrenamiento,
+% lo que degrada las métricas de clustering. El experimento exp/exp05b mide
+% el efecto de desactivar este respaldo junto con umbrales más permisivos.
+%
+% TODO: documentar los nuevos parámetros `touch_merge_gap` y `max_merged_area`
+% del segmentador YOLO (añadidos tras la primera iteración de exp/exp05b).
+% `touch_merge_gap` (fracción de la imagen, 0 = desactivado) extiende el
+% criterio de fusión para unir cajas adyacentes que no se solapan: se fusionan
+% si la separación de Chebyshev (max(gap_x, gap_y)) es menor o igual al valor.
+% Pensado para consolidar pintadas contiguas en una misma pared en lugar de
+% truncarlas con `max_boxes_per_image`. `max_merged_area` (fracción del área
+% de imagen, 1.0 = desactivado) actúa como salvaguarda anti-cadena: rechaza
+% una fusión cuya unión resultante supere la fracción indicada, evitando que
+% cadenas de fusiones por contacto generen una mega-caja que cubra casi toda
+% la imagen. Mencionar que la segunda fila de exp/exp05b mide su efecto sobre
+% la tasa de ruido y la fragmentación de clústeres frente al recorte ajustado
+% sin estos parámetros.
 
 El detector se ajusta sobre el subconjunto anotado de ambos bancos descrito en
 \ref{subsec:dataset}, disjunto del banco de evaluación, lo que evita que las
