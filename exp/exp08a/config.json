@@ -3471,6 +3471,318 @@
       },
       "name": "resnet50-umap-hdbscan",
       "clear_storage": false
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_6cdc3be0ab6d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_vits14",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 50
+        }
+      },
+      "name": "dinov2_vits14-hdbscan-mcs50",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dd04f4d2520d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 50
+        }
+      },
+      "name": "dinov2_graffiti_author_head-hdbscan-mcs50",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_fe6f7f5069e0.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "dinov2_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 50
+        }
+      },
+      "name": "dinov2_graffiti_style_head-hdbscan-mcs50",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_dcbd3843e653.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 50
+        }
+      },
+      "name": "mobilenet_v3-hdbscan-mcs50",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_4f5e4e1c540b.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_author_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 50
+        }
+      },
+      "name": "mobilenet_v3_graffiti_author_head-hdbscan-mcs50",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_1a074b1082d9.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "mobilenet_v3_graffiti_style_head",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 50
+        }
+      },
+      "name": "mobilenet_v3_graffiti_style_head-hdbscan-mcs50",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_36a8a007bc0d.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "clip_vit_b32",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 50
+        }
+      },
+      "name": "clip_vit_b32-hdbscan-mcs50",
+      "clear_storage": true
+    },
+    {
+      "repeats": 3,
+      "similarity_search": {
+        "enabled": true,
+        "top_k": 5,
+        "sample_seed": 42
+      },
+      "storage": {
+        "type": "sqlite",
+        "params": {
+          "db_path": "exp/.common_db/08a_style_storage_abdbd8506e63.sqlite"
+        }
+      },
+      "segmenter": {
+        "type": "identity",
+        "params": {}
+      },
+      "embedding": {
+        "type": "resnet50",
+        "params": {}
+      },
+      "reduction": {
+        "type": "umap",
+        "params": {
+          "n_components": 10,
+          "n_neighbors": 15,
+          "min_dist": 0.0,
+          "metric": "cosine"
+        }
+      },
+      "clustering": {
+        "type": "hdbscan",
+        "params": {
+          "min_cluster_size": 50
+        }
+      },
+      "name": "resnet50-hdbscan-mcs50",
+      "clear_storage": true
     }
   ]
 }

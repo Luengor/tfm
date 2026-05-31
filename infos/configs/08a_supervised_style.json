@@ -27,6 +27,7 @@
     {"type": "spectral", "params": {"n_clusters": 4}},
     {"type": "hdbscan", "params": {"min_cluster_size": 5}},
     {"type": "hdbscan", "params": {"min_cluster_size": 10}},
-    {"type": "hdbscan", "params": {"min_cluster_size": 20}}
+    {"type": "hdbscan", "params": {"min_cluster_size": 20}},
+    {"type": "hdbscan", "params": {"min_cluster_size": 50}}
   ]
 }

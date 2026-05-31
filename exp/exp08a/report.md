@@ -1,8 +1,10 @@
 # §8a — Supervised Validation on Style Crops: Report
 
-**Source:** `exp/exp08a/output/benchmark_20260529T125933Z.json`
-**Date:** 2026-05-29 · **Host:** FullCreamMilk (Linux, 16 logical CPU, Python 3.14)
-**Status:** 96/96 runs `success`.
+**Source:** `exp/exp08a/output/benchmark_20260529T125933Z.json` (96 base runs +
+8 follow-up runs merged on 2026-05-31 for the `umap × hdbscan mcs=50` cell).
+**Date:** 2026-05-29 (base) · 2026-05-31 (mcs=50 follow-up)
+**Host:** FullCreamMilk (Linux, 16 logical CPU, Python 3.14)
+**Status:** 104/104 runs `success`.
 
 ## Setup
 
@@ -22,11 +24,15 @@ Fixed / varied axes:
 |---|---|
 | Embedding (8) | `dinov2_vits14`, `dinov2_graffiti_style_head`, `dinov2_graffiti_author_head`, `mobilenet_v3`, `mobilenet_v3_graffiti_style_head`, `mobilenet_v3_graffiti_author_head`, `clip_vit_b32`, `resnet50` |
 | Reduction (2) | `identity` (raw space), UMAP 10-d (cosine, n_neighbors=15, min_dist=0) |
-| Clustering (6) | `kmeans` k=4, `agglomerative` (avg) k=4, `spectral` k=4, `hdbscan` mcs∈{5,10,20} |
+| Clustering (7) | `kmeans` k=4, `agglomerative` (avg) k=4, `spectral` k=4, `hdbscan` mcs∈{5,10,20,50} |
 | Storage | SQLite · Segmenter | `identity` · Repeats | `K=3` |
 
-8 × 2 × 6 = 96 runs. ARI is the headline (chance-corrected, comparable across
-k); NMI flags the many-tiny-clusters inflation mode; pairwise F1 is the most
+96 base runs (8 × 2 × 6) + 8 follow-up runs (`umap × hdbscan mcs=50` only,
+identity reduction not retested) = **104 runs**. The follow-up cell tests the
+hypothesis that a larger `mcs` could push HDBSCAN towards the supervised k=4
+basin (motivated by the §4 collapse pattern at `mcs=50`/n=6416 → k=4 on the
+full corpus). ARI is the headline (chance-corrected, comparable across k); NMI
+flags the many-tiny-clusters inflation mode; pairwise F1 is the most
 interpretable.
 
 > **Reading note — the `*_no_noise` extrinsic variants inflate exactly when
@@ -92,6 +98,7 @@ section).
 | dino-style | umap | agglo | 4 | 0.00 | 0.313 | 169.6 | 1.24 | 0.658 | 0.644 | 0.765 |
 | dino-style | umap | kmeans4 | 4 | 0.00 | 0.287 | 161.0 | 1.38 | 0.599 | 0.631 | 0.726 |
 | dino-style | umap | hdb{5,10,20} | 3 | 0.00 | 0.406 | 193.2 | 1.00 | 0.632 | 0.647 | 0.764 |
+| dino-style | umap | hdb50 | 2 | 0.00 | 0.391 | 247.4 | 1.00 | 0.525 | 0.563 | 0.707 |
 | mob-style | identity | spectral | 4 | 0.00 | 0.166 | 57.5 | 1.98 | **0.560** | 0.474 | 0.693 |
 | mob-style | umap | agglo | 4 | 0.00 | 0.114 | 51.9 | 2.55 | 0.556 | 0.491 | 0.689 |
 | mob-style | identity | kmeans4 | 4 | 0.00 | 0.161 | 58.6 | 2.01 | 0.514 | 0.454 | 0.655 |
@@ -103,14 +110,52 @@ fine-tuned head. **It does not.** On `dinov2_graffiti_style_head`:
 
 - **identity space:** every `mcs` collapses to **k=2** — a single binary split
   (mcs5/10) or a 2-cluster high-noise partition (mcs20, noise 0.35), never 4.
-- **UMAP space:** all three `mcs` values produce the **identical k=3 partition**
-  (ARI 0.632, sil 0.406, noise 0) — the sweep is degenerate; the knob has no
-  effect because UMAP has already fused the 4 styles into 3 density basins.
+- **UMAP space:** all three small-`mcs` values produce the **identical k=3
+  partition** (ARI 0.632, sil 0.406, noise 0) — the sweep is degenerate; the
+  knob has no effect because UMAP has already fused the 4 styles into 3 density
+  basins.
+- **UMAP + `mcs=50` (follow-up):** drops one further to **k=2** (ARI 0.525,
+  sil 0.391, noise 0). Raising `mcs` past the §4 collapse ceiling does not
+  push HDBSCAN towards k=4 — it pushes it *away*, towards a cleaner binary
+  split with higher silhouette but lower supervised agreement. This is the
+  controlled test of the §4 hypothesis on a labelled subset: the `mcs=50`/k=4
+  cell observed on the full corpus (§4, n=6416) is **not** a recovery of the
+  supervised style basins but a coincidence of cardinality at the collapse
+  boundary.
 
 So on the embedding where the true k=4 is most linearly recoverable (KMeans-4
-hits 0.698), density-based auto-k still under-segments. The oracle-k partitional
-methods are the right tool when k is known; HDBSCAN's value is elsewhere (the
-unsupervised pipeline, §§1–4, where k is unknown).
+hits 0.698), density-based auto-k still under-segments at every `mcs` swept
+({5, 10, 20, 50}). The oracle-k partitional methods are the right tool when k
+is known; HDBSCAN's value is elsewhere (the unsupervised pipeline, §§1–4,
+where k is unknown).
+
+### `mcs=50` across the whole panel
+
+The follow-up cell also clarifies the wider behaviour of large `mcs` on a
+small (n=294) labelled set. Per-embedding results under `umap × hdbscan mcs=50`:
+
+| Embedding | k | sil | noise | ARI |
+|---|--:|--:|--:|--:|
+| `dinov2_graffiti_style_head` | 2 | 0.391 | 0.000 | 0.525 |
+| `mobilenet_v3_graffiti_style_head` | 2 | 0.258 | 0.119 | 0.509 |
+| `dinov2_vits14` | 2 | 0.149 | 0.156 | 0.324 |
+| `mobilenet_v3` | 2 | 0.055 | 0.059 | 0.284 |
+| `resnet50` | 2 | 0.109 | 0.448 | 0.185 |
+| `dinov2_graffiti_author_head` | 2 | 0.153 | 0.278 | 0.122 |
+| `clip_vit_b32` | 0 | — | 1.000 | — |
+| `mobilenet_v3_graffiti_author_head` | 0 | — | 1.000 | — |
+
+Three regimes. (i) Fine-tuned **style** heads keep their ranking: they survive
+the larger `mcs` with low noise (DINOv2-style noise=0; MobileNet-style 0.12)
+and the highest ARI under this cell. (ii) Off-the-shelf encoders collapse to
+k=2 but with noticeable noise (15–45 %), so their default-ARI / no-noise-ARI
+split widens — the no-noise reading must be paired with the noise column to
+avoid the §8a `silhouette without noise` trap. (iii) `clip_vit_b32` and
+`mobilenet_v3_graffiti_author_head` join the all-noise list at `mcs=50` in
+UMAP space, mirroring their identity-HDBSCAN collapses. Across the panel,
+`mcs=50` never recovers the k=4 supervised basin and never beats the
+per-embedding best cell; it is uniformly dominated by oracle-k partitional
+clustering.
 
 ## Repeat instability at small `mcs` under UMAP
 
@@ -187,9 +232,13 @@ of the storage backend, not the head; §6/§9 quantify it properly.
    base (0.356) ✅; but ResNet50 (0.334) is **not** clearly the weakest
    off-the-shelf encoder — it sits with the DINOv2/MobileNet base tier. Refuted
    for ResNet50.
-4. **HDBSCAN recovers k≈4 on the fine-tuned head.** ❌ Refuted. Identity space
-   collapses to k=2; UMAP space gives an `mcs`-invariant k=3. Oracle-k
-   partitional methods, not density auto-k, recover the 4 styles.
+4. **HDBSCAN recovers k≈4 on the fine-tuned head.** ❌ Refuted at every `mcs`
+   swept. Identity space collapses to k=2; UMAP space gives an `mcs`-invariant
+   k=3 for `mcs∈{5,10,20}` and drops to k=2 at `mcs=50` (ARI 0.525). The
+   `mcs=50` follow-up specifically rules out the §4 hypothesis that a larger
+   `mcs` could land on the supervised k=4 basin: it lands on k=2 with lower
+   ARI than the smaller-`mcs` k=3 partition. Oracle-k partitional methods, not
+   density auto-k, recover the 4 styles.
 5. **identity ≥ UMAP on the fine-tuned head.** ✅ Confirmed. DINOv2-style
    identity-kmeans 0.698 > umap-kmeans 0.599; the head has already concentrated
    the discriminative axes, so further reduction is information loss.
@@ -214,4 +263,8 @@ of the storage backend, not the head; §6/§9 quantify it properly.
 `mobilenet_v3_graffiti_author_head` (all three identity-HDBSCAN), and
 `dinov2_graffiti_author_head` / `clip_vit_b32` / `resnet50` (identity HDBSCAN
 mcs10/20) collapse to 0 clusters (noise 1.0) — HDBSCAN finds no density
-structure in those raw spaces. Listed here once; excluded from all tables above.
+structure in those raw spaces. The `mcs=50` follow-up adds two more cells to
+this list: `clip_vit_b32` and `mobilenet_v3_graffiti_author_head` under UMAP
+also collapse to all-noise at `mcs=50` (now too restrictive once those
+embeddings' UMAP density basins are smaller than 50 points). Listed here once;
+excluded from all tables above.

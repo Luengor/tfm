@@ -24,9 +24,11 @@ structured document.
 | §9 | `exp/exp09/report.md` | `exp/exp09/output/benchmark_20260529T180633Z.json` |
 
 All runs executed on the same host: **FullCreamMilk (Linux, 16 logical CPU,
-Python 3.14)**. Aggregate execution status: **370/371 runs `success`** (1
+Python 3.14)**. Aggregate execution status: **378/379 runs `success`** (1
 failure in §9, `hnsw_m64_efc64_efs40`, due to pgvector constraint
-`ef_construction ≥ 2·m`).
+`ef_construction ≥ 2·m`). §8a includes an 8-run `umap × hdbscan mcs=50`
+follow-up merged into the §8a JSON on 2026-05-31 (full-panel control of the
+§4 collapse hypothesis on a labelled subset).
 
 ---
 
@@ -528,6 +530,13 @@ Ingest shared per limit: 56.1 / 226.2 / 1257.2 s. `mcs` is free in cost.
    Larger corpora tolerate larger absolute mcs as a safety margin.
 6. **Repeat instability sits at the collapse boundary** (`mcs50@250` = [0, 0,
    2]); UMAP seed-jitter at usable settings stays ±~2 %.
+7. **The `mcs=50`/k=4 cell at n=6416 is a coincidence of cardinality, not a
+   recovery of the supervised 4-style basin.** §8a's follow-up retests this
+   `mcs` on the 294-crop labelled subset under the same UMAP-10 reduction and
+   the fine-tuned style head: HDBSCAN lands on **k=2** (ARI 0.525), not k=4.
+   The k=4 in the n=6416 row is the collapse boundary catching the binary
+   split slightly later than at smaller n; the four resulting blobs do not
+   align with the supervised style labels.
 
 ---
 
@@ -819,7 +828,10 @@ slope fits well above noise floor.
 **Question.** Which embedding × reduction × clustering pipeline best recovers
 4 hand-labelled styles? Does the graffiti style head beat the pretrained
 backbone? Is the lift task-specific (style head vs author head)?
-**Runs.** 96/96 success. 8 embeddings × 2 reductions × 6 clusterers.
+**Runs.** 104/104 success. 96 base runs (8 embeddings × 2 reductions × 6
+clusterers) + 8 follow-up runs (`umap × hdbscan mcs=50` only, one per
+embedding) added 2026-05-31 to control the §4 collapse hypothesis on the
+labelled subset.
 **Ground truth.** `data/style/eval_crop/` — 294 crops, held out from disjoint
 style-head training set (385 crops, supervised contrastive loss).
 
@@ -857,6 +869,7 @@ each head concentrates its trained axis and suppresses the other.
 | dino-style | umap | agglo | 4 | 0.00 | 0.313 | 169.6 | 1.24 | 0.658 | 0.644 | 0.765 |
 | dino-style | umap | kmeans4 | 4 | 0.00 | 0.287 | 161.0 | 1.38 | 0.599 | 0.631 | 0.726 |
 | dino-style | umap | hdb{5,10,20} | 3 | 0.00 | 0.406 | 193.2 | 1.00 | 0.632 | 0.647 | 0.764 |
+| dino-style | umap | hdb50 | 2 | 0.00 | 0.391 | 247.4 | 1.00 | 0.525 | 0.563 | 0.707 |
 | mob-style | identity | spectral | 4 | 0.00 | 0.166 | 57.5 | 1.98 | **0.560** | 0.474 | 0.693 |
 | mob-style | umap | agglo | 4 | 0.00 | 0.114 | 51.9 | 2.55 | 0.556 | 0.491 | 0.689 |
 | mob-style | identity | kmeans4 | 4 | 0.00 | 0.161 | 58.6 | 2.01 | 0.514 | 0.454 | 0.655 |
@@ -900,7 +913,11 @@ UMAP ~0.35 s; clustering sub-0.02 s on 294 points. Sim-search wall scales with
    base (0.356) ✅; ResNet50 (0.334) sits with the base tier, not clearly the
    weakest ❌.
 4. **HDBSCAN recovers k≈4 on the fine-tuned head.** ❌ identity space
-   collapses to k=2; UMAP space gives `mcs`-invariant k=3 ([5, 10, 20]).
+   collapses to k=2; UMAP space gives `mcs`-invariant k=3 for `mcs∈{5,10,20}`
+   and drops to k=2 at `mcs=50` (ARI 0.525). The `mcs=50` follow-up
+   specifically rules out the §4 hypothesis that raising `mcs` could land on
+   the supervised k=4 basin: it lands on k=2 with lower ARI than the smaller-
+   `mcs` k=3 partition.
 5. **identity ≥ UMAP on fine-tuned head.** ✅ DINOv2 identity-kmeans 0.698 >
    umap-kmeans 0.599.
 
@@ -918,7 +935,9 @@ is pinned.
 
 All-noise (0 clusters): `mobilenet_v3`, `mobilenet_v3_graffiti_author_head`
 (all 3 identity-HDBSCAN); `dinov2_graffiti_author_head`, `clip_vit_b32`,
-`resnet50` (identity HDBSCAN mcs10/20). Excluded from tables.
+`resnet50` (identity HDBSCAN mcs10/20). The `mcs=50` follow-up adds two more
+under UMAP: `clip_vit_b32` and `mobilenet_v3_graffiti_author_head` (their
+UMAP density basins are smaller than 50 points). Excluded from tables.
 
 Repeat instability at HDBSCAN collapse boundary under UMAP:
 - `dinov2_graffiti_author_head` umap hdb5 → [5, 11, 4]
