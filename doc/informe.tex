@@ -23,7 +23,7 @@
 % Forzamos página impar
 \ifodd\thepage
 \else
-  .
+  \mbox{} % Si la página es par, añadimos una página en blanco
   \thispagestyle{empty} %Sin encabezado ni pie de página en esta página solamente
   \newpage 
 \fi
