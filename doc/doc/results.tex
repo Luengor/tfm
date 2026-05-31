@@ -360,51 +360,53 @@ contengan únicamente un grafiti debería facilitar el agrupamiento, al eliminar
 ruido de fondo y permitir que el extractor de características se centre en la
 información relevante. Este cambio debería ser especialmente beneficioso para
 los extractores entrenados con recortes (las cabezas de DINOv2 y MobileNetV3).
+El barrido E5 compara cuatro opciones de segmentación (imagen completa,
+YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}) manteniendo fijo el resto del
+\textit{pipeline}.
 
-\textbf{TODO: aun estoy acabando de toquetear el segmentador. Por ahora, y aun siendo 
-    bastante competente recortando imágenes, no compensa frente a agrupar la imagen completa.}
-% A escala completa, recortar con YOLO no compensa frente a agrupar la imagen
-% completa: la identidad gana en silueta, ruido y coste de ingesta, y el único
-% detector competitivo (YOLO11m \textit{fine-tuned}) pierde su ventaja al pasar
-% de $N=1000$ a $N=6416$ por su multiplicador $\times$2.4 sobre el número de
-% recortes. El barrido (E5) compara cuatro segmentadores —identidad (imagen
-% completa), YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}— manteniendo fijo
-% el resto del \textit{pipeline}, con la cautela de que el segmentador altera
-% el \emph{número de unidades} agrupadas: los recortes YOLO no son comparables
-% uno a uno con las imágenes completas, y la lectura conjunta exige incluir el
-% multiplicador de recortes por imagen.
-% 
-% {\footnotesize
-% \begin{longtable}{|p{2.5cm}|p{1.5cm}|p{1.0cm}|p{1.0cm}|p{1.1cm}|p{1.0cm}|p{1.0cm}|p{1.4cm}|} \hline
-%   \textbf{Segmentador} & \textbf{recortes} & \textbf{r/img} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{ingesta (s)} \\ \hline
-%   \endhead
-%   identidad           & 6416  & 1.00 &  563 & 0.199 & 0.151 & 33.1 & 1235.5 \\ \hline
-%   YOLO11s             & 6590  & 1.03 &  502 & 0.225 & 0.127 & 30.4 & 1777.0 \\ \hline
-%   YOLO11m             & 6603  & 1.03 &  506 & 0.230 & 0.131 & 29.5 & 1811.6 \\ \hline
-%   YOLO11m \textit{ft} & 15362 & 2.39 & 1049 & 0.298 & 0.122 & 36.2 & 2152.3 \\ \hline
-%   \caption{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
-%   ``recortes'' son los puntos efectivamente agrupados, no las imágenes leídas).
-%   Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.}
-%   \label{tab:e5-segmenter-6416}
-% \end{longtable}
-% }
-% 
-% A escala completa, la identidad gana en todos los ejes que importan: silueta
-% más alta (0.151), ruido más bajo (0.199), DB competitivo y mejor coste de
-% ingesta (1235~s vs 1777--2152~s). Los detectores base (YOLO11s y YOLO11m)
-% recortan $\sim$1.03 cajas por imagen, prácticamente reproduciendo el conjunto
-% original con una ganancia marginal o negativa en calidad y un sobrecoste de
-% ingesta del 44\%. El detector \textit{fine-tuned} es la excepción
-% interesante: a $N=1000$ obtiene la mejor silueta, mejor CH y mejor DB del
-% panel, pero el liderazgo se evapora a $N=6416$, donde su multiplicador
-% $\times$2.4 sobre el número de recortes degenera la partición (ruido 29.8\%,
-% csCV 1.06, mil cuarenta y nueve clústeres con cola larga). El compromiso no
-% compensa para el agrupamiento del corpus completo.
-% 
-% Esta conclusión cierra la configuración base del trabajo y la fija como:
-% \texttt{dinov2\_graffiti\_style\_head}~+~UMAP-10~+~HDBSCAN
-% \texttt{mcs}=5~+~segmentador identidad~+~SQLite. Es la configuración sobre la
-% que se asientan las subsecciones siguientes.
+ 
+{\footnotesize
+\begin{longtable}{|p{2.5cm}|p{1.5cm}|p{1.0cm}|p{1.0cm}|p{1.1cm}|p{1.0cm}|p{1.0cm}|p{1.4cm}|} \hline
+  \textbf{Segmentador} & \textbf{recortes} & \textbf{r/img} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{ingesta (s)} \\ \hline
+  \endhead
+  identidad           & 6416  & 1.00 &  563 & 0.199 & 0.151 & 33.1 & 1235.5 \\ \hline
+  YOLO11s             & 6590  & 1.03 &  502 & 0.225 & 0.127 & 30.4 & 1777.0 \\ \hline
+  YOLO11m             & 6603  & 1.03 &  506 & 0.230 & 0.131 & 29.5 & 1811.6 \\ \hline
+  YOLO11m \textit{ft} & 15362 & 2.39 & 1049 & 0.298 & 0.122 & 36.2 & 2152.3 \\ \hline
+  \caption{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
+  <<recortes>> son los puntos efectivamente agrupados, no las imágenes leídas).
+  Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.}
+  \label{tab:e5-segmenter-6416}
+\end{longtable}
+}
+
+A escala completa, la identidad gana en todos los ejes que importan: silueta
+más alta (0.151), ruido más bajo (0.199) y mejor coste de ingesta (1235~s vs
+1777--2152~s). Los detectores base (YOLO11s y YOLO11m) recortan $\sim$1.03
+cajas por imagen, prácticamente reproduciendo el conjunto original con una
+ganancia marginal o negativa en calidad y un sobrecoste de ingesta del 44\%.
+
+El detector \textit{fine-tuned} es un caso interesante: a $N=1000$ obtiene la
+mejor silueta, mejor CH y mejor DB del panel, pero este liderazgo desaparece
+con $N=6416$, donde obtiene casi 2.4 imágenes sobre cada imágen original y
+degenera el agrupamiento, con un 29.8\% de ruido, una silueta de 0.122 y un
+coeficiente de variación de tamaños de 1.06, con mil cuarenta y nueve clústeres
+y una cola larga de clústeres pequeños. El coste de ingesta también se dispara
+a 2152~s, un 74\% más que la identidad. La explicación más plausible es que el
+detector \textit{fine-tuned} produce unos recortes de calidad muy variable,
+muchas veces llegando a no recortar la imagen y devolverla completa o
+recortando un área muy pequeña o que no contiene un grafiti. Esta variabilidad
+en los datos de entrada, junto con el hecho de que el extractor base no fue
+entrenado con recortes de este tipo, podría ser la causa de la caída de calidad
+y el aumento de coste a medida que el tamaño del banco crece.
+
+% TODO: figure with some yolo detecctions to illustrate that they are actually not
+% that bad, but that the problem is the variability in the quality of the detections
+
+Esta conclusión cierra la configuración base del trabajo y la fija como:
+\texttt{dinov2\_graffiti\_style\_head}~+~UMAP-10~+~HDBSCAN
+\texttt{mcs}=5~+~segmentador identidad~+~SQLite. Es la configuración sobre la
+que se asientan las subsecciones siguientes.
 
 % =====================================================================
 \subsection{Coste computacional}
@@ -616,18 +618,18 @@ $O(n^2)$ de SQLite.
 % silueta/CH/DB como proxy en la subsección de calibración.
 Cuando se dispone de etiquetas, las métricas extrínsecas miden directamente la
 concordancia entre los clústeres y la verdad de referencia. Esta subsección
-explota los dos conjuntos etiquetados disjuntos —estilo y autor— para
-responder a la pregunta del \textit{fine-tuning} y, finalmente, para
-validar las métricas intrínsecas empleadas en el resto del trabajo. La
+hace uso de los dos conjuntos etiquetados manualmente por autor y estilo para
+evaluar la capacidad de los extractores de características para separar ambos
+ejes y validar las métricas intrínsecas empleadas en el resto del trabajo. La
 unidad de análisis es el recorte (recortes pre-segmentados, segmentador
 identidad): 294 recortes sobre 4 estilos para E8a y 185 recortes sobre 87
 autores para E8b. Los dos diseños no son simétricos en su exposición al
 desplazamiento de dominio. La cabeza estilística se entrenó sobre un conjunto
-\emph{mixto} de 385 recortes (110 Salamanca + 275 Cuenca) y se evalúa sobre
-294 recortes de Salamanca disjuntos del entrenamiento, así que E8a es un
+\emph{mixto} de 385 recortes (110 Salamanca + 275 Cuenca) y se evalúa sobre 294
+recortes de Salamanca disjuntos del entrenamiento, así que E8a es un
 \textit{held-out} dentro del propio dominio de entrenamiento. Las cabezas de
-autoría, en cambio, se entrenaron sobre 169 recortes \emph{exclusivamente}
-de Cuenca y se evalúan sobre 185 recortes de Salamanca, así que E8b mezcla
+autoría, en cambio, se entrenaron sobre 169 recortes \emph{exclusivamente} de
+Cuenca y se evalúan sobre 185 recortes de Salamanca, así que E8b mezcla
 generalización a autores no vistos con un desplazamiento de dominio
 Cuenca$\to$Salamanca.
 
@@ -635,15 +637,12 @@ Cuenca$\to$Salamanca.
 \label{subsubsec:res-estilo}
 % E8a. 4 clases balanceadas, held-out de la cabeza estilística.
 % Hipótesis: la cabeza fine-tuned supera al backbone preentrenado.
-La cabeza estilística de DINOv2 dobla aproximadamente el ARI de cualquier
-codificador alternativo sobre la evaluación por estilo, y la cabeza de
-autoría cae \emph{por debajo} de su propio \textit{backbone}: el
-\textit{fine-tuning} concentra el eje para el que fue entrenado y suprime al
-otro. La tabla~\ref{tab:e8a-best} recoge la mejor celda por extractor (E8a)
-sobre la malla de $2$ reducciones $\times$ $6$ agrupadores, seleccionada por
-el ARI por defecto (sin descartar puntos de ruido), \emph{chance-corrected}
-y por tanto comparable entre configuraciones con distinto número de
-clústeres.
+El barrido E8a evalúa la capacidad de los distintos extractores para separar
+los cuatro estilos de grafiti escogidos. La tabla~\ref{tab:e8a-best} recoge la
+mejor celda por extractor (E8a) sobre la malla de $2$ reducciones $\times$ $6$
+agrupadores, seleccionada por el ARI por defecto (sin descartar puntos de
+ruido), \emph{chance-corrected} y, por tanto, comparable entre configuraciones
+con distinto número de clústeres.
 
 {\footnotesize
 \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
@@ -664,16 +663,21 @@ clústeres.
 \end{longtable}
 }
 
-El resultado es inequívoco: la cabeza estilística de DINOv2 +
-identidad + KMeans-4 obtiene ARI = 0.698 y F1 = 0.790, aproximadamente el
-doble del ARI del \textit{backbone} y de cualquier codificador disponible. Y
-no sólo eso: la cabeza \emph{de autor} cae \emph{por debajo} de su propio
-\textit{backbone} en la tarea de estilo (DINOv2: 0.356 $\to$ 0.234,
-MobileNetV3: 0.356 $\to$ 0.267). El \textit{fine-tuning} no produce una
-representación genérica ``grafiti-aware'' sobre la que añadir tareas; cada
-cabeza concentra el eje para el que fue entrenada y suprime al otro. Esta
-matriz de transferencia fuertemente diagonal es la evidencia más limpia de que
-las dos cabezas codifican información genuinamente distinta.
+El resultado es inequívoco: la cabeza estilística de DINOv2 + identidad +
+KMeans-4 obtiene ARI = 0.698 y F1 = 0.790, aproximadamente el doble del ARI del
+\textit{backbone} y de cualquier otro extractor sin entrenar. Va segudido por
+la cabeza estilística de MobileNetV3, que no llega a doblar el ARI del
+siguiente extrator, pero sí que lo mejora sustancialmente (0.560 vs 0.368).
+El resto de extractores sin entrenar (CLIP, DINOv2 y MobileNetV3) se agrupan en
+un segundo bloque con ARI entre 0.33 y 0.37.
+
+Sorprendentemente, las cabezas de autoría no solo mejoran el ARI respecto a su
+propio \textit{backbone} sino que lo empeoran, convirtiendo ambas cabezas en
+los peores extractores del panel. Parece que el \textit{fine-tuning} no produce
+una representación genérica para el grafiti, sino que que concentra el eje para
+el que fue entrenada y suprime al otro. Esta matriz de transferencia
+fuertemente diagonal es la evidencia más limpia de que las dos cabezas
+codifican información genuinamente distinta.
 
 La señal secundaria de recuperación supervisada (búsqueda por similitud con
 $k=5$, evaluada frente a la etiqueta de la consulta) confirma el ordenamiento
@@ -705,38 +709,36 @@ panel ($0.568$), consistente con su caída de ARI por debajo del propio
 \end{longtable}
 }
 
-La hipótesis previa de que HDBSCAN auto-descubriría $k\approx 4$ sobre la
-cabeza estilística queda refutada: bajo identidad colapsa a $k=2$ a todos los
-\texttt{mcs} probados, y bajo UMAP produce un $k=3$ idéntico para los tres
-valores de \texttt{mcs}, una particion degenerada que no se modifica con el
-hiperparámetro. La recuperación de las cuatro clases requiere por tanto un
-método particional con $k$ oráculo (KMeans, aglomerativo o espectral), no un
-auto-$k$ basado en densidad.
+HDBSCAN no parece llegar a distinguir las cuatro categorías de estilo posibles
+como clústeres separados, sino que las agrupa en tres grupos más grandes. Tras
+una revisión manual de los clústeres generados, parece que HDBSCAN agrupa los
+grafitis en <<sencillos>>, <<elaborados>> y <<characters>>. El primero de estos
+grupos está principalmente formado por \textit{tags} y algunos
+\textit{throw-ups} más simples. El segundo está formado por \textit{throw-ups}
+más elaborados y la gran mayoría de los \textit{pieces}. El tercero está
+formado por los \textit{characters} de estilo cómic, manga o graffiti de
+personajes.
 
-Esto separa la cifra ganadora de E8a del rendimiento del pipeline base. La
-celda óptima (identidad + KMeans-4, ARI~$=0.698$) usa un agrupador particional
-con $k$ oráculo; el pipeline base fijado en \ref{subsec:res-calibracion}
-(\texttt{dinov2\_graffiti\_style\_head} + UMAP-10 + HDBSCAN \texttt{mcs}=5)
-alcanza únicamente ARI~$=0.632$ porque HDBSCAN se queda en $k=3$ (silueta
-$0.406$, sin ruido). La cabeza estilística \emph{sigue} doblando holgadamente
-el ARI de cualquier codificador no \textit{fine-tuned} bajo el pipeline base,
-pero la recuperación exacta de las cuatro clases requiere reemplazar HDBSCAN
-por un agrupador particional cuando $k$ es conocido a priori.
+% TODO: figure of an altair plot of the clusters generated by HDBSCAN on the
+% DINOv2 style head, colored by the true labels. The plot should show that
+% HDBSCAN groups the 4 styles into 3 clusters: simple tags, elaborate throw-ups
+% and pieces, and characters.
 
 \subsubsection{Evaluación por autor}
 \label{subsubsec:res-autor}
-% E8b. 87 autores, cola larga, cambio de dominio Cuenca->Salamanca.
-La simetría esperada con la evaluación por estilo no se materializa en la de
-autoría: los ocho codificadores caben en una banda de 0.035 puntos de ARI
-cercana al suelo aleatorio, y la cabeza de autoría de DINOv2 queda por
-debajo de su propio \textit{backbone}. La tabla~\ref{tab:e8b-best} reproduce
-el formato de \ref{subsubsec:res-estilo} sobre la evaluación de autoría
-(E8b); antes de leerla conviene fijar el contexto: 53 de los 87 autores
-aparecen con un solo recorte, el autor más frecuente tiene 19 recortes y la
-NMI está inflada por construcción cuando ambas particiones están
-fragmentadas en muchos grupos pequeños, así que ARI
-(\textit{chance-corrected}) es el único número leíble como recuperación real
-y todos los valores deben compararse con la base aleatoria.
+% La simetría esperada con la evaluación por estilo no se materializa en la de
+% autoría: los ocho codificadores caben en una banda de 0.035 puntos de ARI
+% cercana al suelo aleatorio, y la cabeza de autoría de DINOv2 queda por
+% debajo de su propio \textit{backbone}. La tabla~\ref{tab:e8b-best} reproduce
+% el formato de \ref{subsubsec:res-estilo} sobre la evaluación de autoría
+% (E8b); antes de leerla conviene fijar el contexto: 53 de los 87 autores
+% aparecen con un solo recorte, el autor más frecuente tiene 19 recortes y la
+% NMI está inflada por construcción cuando ambas particiones están
+% fragmentadas en muchos grupos pequeños, así que ARI
+% (\textit{chance-corrected}) es el único número leíble como recuperación real
+% y todos los valores deben compararse con la base aleatoria.
+
+\textbf{TODO: hmmm}
 
 {\footnotesize
 \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
@@ -750,119 +752,126 @@ y todos los valores deben compararse con la base aleatoria.
   \texttt{resnet50}                           & 0.049 & 0.778 & 0.064 & 0.028 & UMAP + aglo-87 \\ \hline
   \texttt{mobilenet\_v3}                      & 0.046 & 0.780 & 0.060 & 0.023 & UMAP + aglo-87 \\ \hline
   \texttt{mob.\_graffiti\_style\_head}        & 0.041 & 0.777 & 0.055 & 0.001 & UMAP + aglo-87 \\ \hline
-  \caption{E8b, mejor celda por extractor sobre la evaluación de autoría
-  (185 recortes, 87 autores, evaluación entre ciudades Cuenca$\to$Salamanca).
-  Todos los ARI caen en una banda estrecha cercana al suelo; la simetría
-  esperada con E8a no se materializa.}
+  \caption{}
+  % \caption{E8b, mejor celda por extractor sobre la evaluación de autoría
+  % (185 recortes, 87 autores, evaluación entre ciudades Cuenca$\to$Salamanca).
+  % Todos los ARI caen en una banda estrecha cercana al suelo; la simetría
+  % esperada con E8a no se materializa.}
   \label{tab:e8b-best}
 \end{longtable}
 }
 
-E8b es un resultado negativo coherente. El mejor ARI de todo el barrido es
-0.076 (\texttt{clip\_vit\_b32}); los ocho codificadores caben en una banda de
-0.035 puntos, aproximadamente el 5\% del valor de la celda ganadora de E8a.
-La hipótesis simétrica de E8a —la cabeza de autoría debería ganar en autoría—
-queda refutada: la cabeza de DINOv2 (0.051) queda por debajo de su
-\textit{backbone} (0.055) y por debajo de la cabeza de estilo (0.060); la
-cabeza de autoría de MobileNetV3 (0.061) supera a su \textit{backbone} por
-+0.015 ARI, dentro del ruido. La NMI elevada (0.75--0.79) en las celdas
-ganadoras es exactamente el modo de inflación documentado: 87 clústeres
-diminutos comparten información marginal con 87 clases diminutas, no
-\emph{recuperación}.
-
-La recuperación supervisada \textit{top-5} (tabla~\ref{tab:e8b-retrieval},
-con $P@5$ aleatorio $\approx 0.024$) sirve como segundo eje independiente del
-agrupador y confirma la lectura de banda estrecha y dominada por ruido. El
-mejor recuperador es \texttt{clip\_vit\_b32} ($P@5=0.091$), seguido de cerca
-por la cabeza de autoría de DINOv2 (0.088), ResNet50 (0.085), MobileNetV3
-(0.083) y DINOv2 base (0.081): todos en el mismo rango, no en posiciones
-distinguibles estadísticamente. La señal más importante de esta tabla es
-una \emph{inversión entre ejes} dentro de la familia MobileNetV3: su cabeza
-de autoría es la \emph{mejor} por ARI (0.061, máximo de la familia) y la
-\emph{peor} por $P@5$ (0.059, mínimo absoluto del panel). Una representación
-genuinamente discriminativa de autor encabezaría ambos ejes a la vez; esta
-inversión es la firma de mediciones dominadas por ruido y refuerza la
-interpretación de E8b como un piso aleatorio, no como un orden interpretable.
-
-{\footnotesize
-\begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.6cm}|p{1.2cm}|p{1.2cm}|} \hline
-  \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} & \textbf{R@5} \\ \hline
-  \endhead
-  \texttt{clip\_vit\_b32}                    & \textbf{0.091} & 0.252 & 0.262 & 0.268 \\ \hline
-  \texttt{dinov2\_graffiti\_author\_head}    & 0.088 & 0.258 & 0.261 & 0.273 \\ \hline
-  \texttt{resnet50}                          & 0.085 & 0.246 & 0.256 & 0.236 \\ \hline
-  \texttt{mobilenet\_v3}                     & 0.083 & 0.240 & 0.245 & 0.251 \\ \hline
-  \texttt{dinov2\_vits14}                    & 0.081 & 0.248 & 0.251 & 0.268 \\ \hline
-  \texttt{dinov2\_graffiti\_style\_head}     & 0.067 & 0.240 & 0.243 & 0.192 \\ \hline
-  \texttt{mob.\_graffiti\_style\_head}       & 0.067 & 0.232 & 0.233 & 0.179 \\ \hline
-  \texttt{mob.\_graffiti\_author\_head}      & 0.059 & 0.180 & 0.187 & 0.171 \\ \hline
-  \caption{E8b, recuperación supervisada \textit{top-5} por extractor sobre
-  la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
-  campo cabe en una banda estrecha; la cabeza de autor de MobileNetV3, mejor
-  por ARI dentro de su familia, es a la vez la peor en recuperación,
-  inversión entre ejes característica de mediciones a piso aleatorio.}
-  \label{tab:e8b-retrieval}
-\end{longtable}
-}
-
-La interpretación honesta del experimento se apoya en la asimetría de los
-dos diseños ya descrita al abrir esta subsección: E8a es un \textit{held-out}
-\emph{dentro del dominio de entrenamiento} (mixto Salamanca+Cuenca para
-estilo), mientras que E8b combina \textit{held-out} de autores con un
-desplazamiento de dominio Cuenca$\to$Salamanca. La cabeza estilística
-generaliza dentro de su dominio mixto (E8a positivo); la cabeza de autoría
-no cruza la frontera de ciudades (E8b negativo). El resultado acota el
-alcance de la afirmación de especificidad: la transferencia entre tareas es
-demostrable para estilo (E8a), no para autoría (E8b), y la evaluación
-disponible no permite separar fallo por novedad de autor de fallo por
-dominio.
+% E8b es un resultado negativo coherente. El mejor ARI de todo el barrido es
+% 0.076 (\texttt{clip\_vit\_b32}); los ocho codificadores caben en una banda de
+% 0.035 puntos, aproximadamente el 5\% del valor de la celda ganadora de E8a.
+% La hipótesis simétrica de E8a —la cabeza de autoría debería ganar en autoría—
+% queda refutada: la cabeza de DINOv2 (0.051) queda por debajo de su
+% \textit{backbone} (0.055) y por debajo de la cabeza de estilo (0.060); la
+% cabeza de autoría de MobileNetV3 (0.061) supera a su \textit{backbone} por
+% +0.015 ARI, dentro del ruido. La NMI elevada (0.75--0.79) en las celdas
+% ganadoras es exactamente el modo de inflación documentado: 87 clústeres
+% diminutos comparten información marginal con 87 clases diminutas, no
+% \emph{recuperación}.
+% 
+% La recuperación supervisada \textit{top-5} (tabla~\ref{tab:e8b-retrieval},
+% con $P@5$ aleatorio $\approx 0.024$) sirve como segundo eje independiente del
+% agrupador y confirma la lectura de banda estrecha y dominada por ruido. El
+% mejor recuperador es \texttt{clip\_vit\_b32} ($P@5=0.091$), seguido de cerca
+% por la cabeza de autoría de DINOv2 (0.088), ResNet50 (0.085), MobileNetV3
+% (0.083) y DINOv2 base (0.081): todos en el mismo rango, no en posiciones
+% distinguibles estadísticamente. La señal más importante de esta tabla es
+% una \emph{inversión entre ejes} dentro de la familia MobileNetV3: su cabeza
+% de autoría es la \emph{mejor} por ARI (0.061, máximo de la familia) y la
+% \emph{peor} por $P@5$ (0.059, mínimo absoluto del panel). Una representación
+% genuinamente discriminativa de autor encabezaría ambos ejes a la vez; esta
+% inversión es la firma de mediciones dominadas por ruido y refuerza la
+% interpretación de E8b como un piso aleatorio, no como un orden interpretable.
+% 
+% {\footnotesize
+% \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.6cm}|p{1.2cm}|p{1.2cm}|} \hline
+%   \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} & \textbf{R@5} \\ \hline
+%   \endhead
+%   \texttt{clip\_vit\_b32}                    & \textbf{0.091} & 0.252 & 0.262 & 0.268 \\ \hline
+%   \texttt{dinov2\_graffiti\_author\_head}    & 0.088 & 0.258 & 0.261 & 0.273 \\ \hline
+%   \texttt{resnet50}                          & 0.085 & 0.246 & 0.256 & 0.236 \\ \hline
+%   \texttt{mobilenet\_v3}                     & 0.083 & 0.240 & 0.245 & 0.251 \\ \hline
+%   \texttt{dinov2\_vits14}                    & 0.081 & 0.248 & 0.251 & 0.268 \\ \hline
+%   \texttt{dinov2\_graffiti\_style\_head}     & 0.067 & 0.240 & 0.243 & 0.192 \\ \hline
+%   \texttt{mob.\_graffiti\_style\_head}       & 0.067 & 0.232 & 0.233 & 0.179 \\ \hline
+%   \texttt{mob.\_graffiti\_author\_head}      & 0.059 & 0.180 & 0.187 & 0.171 \\ \hline
+%   \caption{E8b, recuperación supervisada \textit{top-5} por extractor sobre
+%   la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
+%   campo cabe en una banda estrecha; la cabeza de autor de MobileNetV3, mejor
+%   por ARI dentro de su familia, es a la vez la peor en recuperación,
+%   inversión entre ejes característica de mediciones a piso aleatorio.}
+%   \label{tab:e8b-retrieval}
+% \end{longtable}
+% }
+% 
+% La interpretación honesta del experimento se apoya en la asimetría de los
+% dos diseños ya descrita al abrir esta subsección: E8a es un \textit{held-out}
+% \emph{dentro del dominio de entrenamiento} (mixto Salamanca+Cuenca para
+% estilo), mientras que E8b combina \textit{held-out} de autores con un
+% desplazamiento de dominio Cuenca$\to$Salamanca. La cabeza estilística
+% generaliza dentro de su dominio mixto (E8a positivo); la cabeza de autoría
+% no cruza la frontera de ciudades (E8b negativo). El resultado acota el
+% alcance de la afirmación de especificidad: la transferencia entre tareas es
+% demostrable para estilo (E8a), no para autoría (E8b), y la evaluación
+% disponible no permite separar fallo por novedad de autor de fallo por
+% dominio.
 
 \subsubsection{Correlación interna-externa}
 \label{subsubsec:res-correlacion}
-% Análisis derivado: ARI vs. silueta sobre E8a y, por separado, sobre E8b.
-% Correlación positiva fuerte => las métricas no supervisadas son un proxy
-% defendible; divergencia entre E8a y E8b acota qué eje rastrea la silueta.
-Las métricas intrínsecas son un \textit{proxy} defensible de las externas
-cuando la verdad de referencia es de grano grueso y el agrupador opera con
-$k$ fijo, pero anti-correlan con ARI cuando la verdad es de grano fino y el
-algoritmo elige $k$. Sobre E8a (etiquetas gruesas, cuatro estilos), la correlación
-de Pearson entre silueta y ARI vale $r = +0.66$ restringida a los 48 puntos
-con $k$ oráculo fija (KMeans, aglomerativo, espectral), y $r = +0.40$ sobre
-los 83 puntos con ARI válido si se incluyen las celdas HDBSCAN, en las que el
-$k$ varía libremente. Sobre E8b (etiquetas finas, 87 autores) la correlación
-\emph{cambia de signo}: $r = -0.52$ sobre 86 puntos, $r = -0.25$ restringida
-a las 32 celdas aglomerativas. Las celdas de mayor silueta en E8b son
-particiones HDBSCAN $k=2$ o $k=3$ con ARI cercano a cero (la silueta premia
-\emph{pocos bloques grandes}), mientras que las celdas de mayor ARI son
-particiones aglomerativas con $k=87$ y silueta cercana a cero (la
-recuperación exige \emph{muchos clústeres pequeños}).
-
-Las decisiones tomadas en \ref{subsec:res-calibracion} sobre
-extractor, reducción, agrupador, \texttt{min\_cluster\_size} y segmentador
-quedan respaldadas por el resultado positivo de E8a (estilo, grano grueso) y
-por la coherencia interna de E8a$\to$E1$\to$E2$\to$E3$\to$E4 sobre la base
-\texttt{dinov2\_graffiti\_style\_head} + UMAP-10 + HDBSCAN \texttt{mcs}=5;
-quedan acotadas, no respaldadas, sobre la granularidad de autoría en
-escenarios con desplazamiento de dominio como E8b. Las afirmaciones del
-trabajo sobre calidad intrínseca a esa granularidad fina son por tanto
-explícitamente deferidas a evaluaciones supervisadas dedicadas (trabajo
-futuro: véase \ref{sec:conclusion}).
-
-\begin{figure}[h]
-  \centering
-  % FIGURE: dos paneles lado a lado en formato scatter:
-  % Panel A: silueta (x) vs ARI (y) para los 96 runs de E8a, con marcador
-  % distinto por algoritmo y color por (k oráculo / k auto). Anotar Pearson
-  % r=+0.66 en el subconjunto k-oráculo.
-  % Panel B: lo mismo para los 96 runs de E8b. Anotar Pearson r=-0.52.
-  % El contraste visual entre los dos paneles es el mensaje principal.
-  % \includegraphics[width=\linewidth]{figures/e8_silhouette_vs_ari.pdf}
-  \caption{Correlación silueta--ARI sobre E8a (panel izquierdo, etiquetas de
-  estilo, $r=+0.66$ con $k$ fijo) y E8b (panel derecho, etiquetas de autoría,
-  $r=-0.52$). La silueta rastrea estructura de \textit{blob} grueso, no
-  identidad de grano fino.}
-  \label{fig:e8-correlation}
-\end{figure}
+\textbf{
+    TODO: aquí me gustaría hablar un poco de como las métricas intrínsecas
+    se ponen o no de acuerdo con las extrínsecas, en particular el por qué he
+    escogido el dinov2 finetunneado con graffiti como base en vez de hacerle
+    caso a las métricas intrínsecas del exp1
+}
+% % Análisis derivado: ARI vs. silueta sobre E8a y, por separado, sobre E8b.
+% % Correlación positiva fuerte => las métricas no supervisadas son un proxy
+% % defendible; divergencia entre E8a y E8b acota qué eje rastrea la silueta.
+% Las métricas intrínsecas son un \textit{proxy} defensible de las externas
+% cuando la verdad de referencia es de grano grueso y el agrupador opera con
+% $k$ fijo, pero anti-correlan con ARI cuando la verdad es de grano fino y el
+% algoritmo elige $k$. Sobre E8a (etiquetas gruesas, cuatro estilos), la correlación
+% de Pearson entre silueta y ARI vale $r = +0.66$ restringida a los 48 puntos
+% con $k$ oráculo fija (KMeans, aglomerativo, espectral), y $r = +0.40$ sobre
+% los 83 puntos con ARI válido si se incluyen las celdas HDBSCAN, en las que el
+% $k$ varía libremente. Sobre E8b (etiquetas finas, 87 autores) la correlación
+% \emph{cambia de signo}: $r = -0.52$ sobre 86 puntos, $r = -0.25$ restringida
+% a las 32 celdas aglomerativas. Las celdas de mayor silueta en E8b son
+% particiones HDBSCAN $k=2$ o $k=3$ con ARI cercano a cero (la silueta premia
+% \emph{pocos bloques grandes}), mientras que las celdas de mayor ARI son
+% particiones aglomerativas con $k=87$ y silueta cercana a cero (la
+% recuperación exige \emph{muchos clústeres pequeños}).
+% 
+% Las decisiones tomadas en \ref{subsec:res-calibracion} sobre
+% extractor, reducción, agrupador, \texttt{min\_cluster\_size} y segmentador
+% quedan respaldadas por el resultado positivo de E8a (estilo, grano grueso) y
+% por la coherencia interna de E8a$\to$E1$\to$E2$\to$E3$\to$E4 sobre la base
+% \texttt{dinov2\_graffiti\_style\_head} + UMAP-10 + HDBSCAN \texttt{mcs}=5;
+% quedan acotadas, no respaldadas, sobre la granularidad de autoría en
+% escenarios con desplazamiento de dominio como E8b. Las afirmaciones del
+% trabajo sobre calidad intrínseca a esa granularidad fina son por tanto
+% explícitamente deferidas a evaluaciones supervisadas dedicadas (trabajo
+% futuro: véase \ref{sec:conclusion}).
+% 
+% \begin{figure}[h]
+%   \centering
+%   % FIGURE: dos paneles lado a lado en formato scatter:
+%   % Panel A: silueta (x) vs ARI (y) para los 96 runs de E8a, con marcador
+%   % distinto por algoritmo y color por (k oráculo / k auto). Anotar Pearson
+%   % r=+0.66 en el subconjunto k-oráculo.
+%   % Panel B: lo mismo para los 96 runs de E8b. Anotar Pearson r=-0.52.
+%   % El contraste visual entre los dos paneles es el mensaje principal.
+%   % \includegraphics[width=\linewidth]{figures/e8_silhouette_vs_ari.pdf}
+%   \caption{Correlación silueta--ARI sobre E8a (panel izquierdo, etiquetas de
+%   estilo, $r=+0.66$ con $k$ fijo) y E8b (panel derecho, etiquetas de autoría,
+%   $r=-0.52$). La silueta rastrea estructura de \textit{blob} grueso, no
+%   identidad de grano fino.}
+%   \label{fig:e8-correlation}
+% \end{figure}
 
 % TODO (autor): figuras E1, E2, E3, E5, E6+E9, E7, E8 — generar y guardar
 % como PDF bajo doc/figures/ con los nombres sugeridos en cada
