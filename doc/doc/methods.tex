@@ -220,9 +220,9 @@ sobre este.
 De esta etapa también se reporta la distancia media a los $k$ vecinos
 recuperados, promediada sobre todas las consultas. Si el \textit{backend}
 dispone de índice ANN (como es el caso de \texttt{PostgreSQL} con
-\texttt{HNSW}), tambien se reporta el \textit{recall}@$k$ de sus vecinos frente
-a una búsqueda exacta por fuerza bruta, que cuantifica la pérdida de exactitud del índice
-aproximado y es nulo en los \textit{backends} exactos.
+\texttt{HNSW}), también se reporta el \textit{recall}@$k$ de sus vecinos frente
+a una búsqueda exacta por fuerza bruta, que cuantifica la pérdida de exactitud
+del índice aproximado y es nulo en los \textit{backends} exactos.
 
 \subsubsection{Evaluación intrínseca de los agrupamientos}
 \label{subsubsec:eval-intrinseca}
@@ -254,7 +254,7 @@ y evaluación por autor. En ambos casos, se utilizan los recortes directamente
 como imágenes a evaluar en vez de aportar la imagen original y utilizar un
 segmentador para extraer los recortes de evaluación, porque el objetivo es
 medir la calidad del espacio de representación para agrupar pintadas, no la
-capacidad de un sistema completo. Tampoco se utilizan imágenes completas puesto
+capacidad de un sistema completo. Tampoco se utilizan imágenes completas, puesto
 que muchas de estas contienen varias pintadas de estilos y autores distintos,
 haciendo difícil atribuir una etiqueta de estilo o autor a la imagen completa y
 complicando la interpretación de las métricas.
@@ -324,11 +324,12 @@ distinguir diferencias dentro del ruido de medición.
 
 \subsubsection{Detector de grafiti}
 \label{subsubsec:entrenamiento-detector}
+% TODO: actually get the number of boxes annotated in the dataset
 El detector se entrena a partir del subconjunto anotado descrito en
-\ref{subsec:dataset}, cuyas $447$ fotografías de ambos bancos contienen un
-total de $\mathtt{NSEGS\_PLACEHOLDER}$ cajas anotadas. El entrenamiento parte
-de los pesos preentrenados sobre COCO y solo ajusta sus parámetros para la
-única clase de interés, ``grafiti''.
+\ref{subsec:dataset}, cuyas $447$ fotografías de ambos bancos contienen
+aproximadamente un total de $650$ cajas anotadas. El entrenamiento parte de los
+pesos preentrenados sobre COCO y solo ajusta sus parámetros para la única clase
+de interés, <<grafiti>>.
 
 Se utilizan los hiperparámetros por defecto de la implementación de referencia,
 salvo el número de épocas, el tamaño de \textit{batch} y la resolución de
