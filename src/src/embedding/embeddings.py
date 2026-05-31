@@ -128,9 +128,11 @@ class TorchEmbeddingModel(nn.Module, EmbeddingBase):
     def gen_embedding(self, image: ImageImage) -> list[float]:
         with torch.no_grad():
             input_tensor = self.preprocessor(image).unsqueeze(0).to(self.device)  # Add batch dimension and move to device
-            output = self.model(input_tensor)
+            output = self.model(input_tensor).squeeze()
+            if self.name == EmbeddingModelNames.MOBILENET_V3:
+                output = torch.nn.functional.normalize(output, p=2, dim=0)
 
-        return output.squeeze().cpu().tolist()  # Convert to list for storage, moving back to CPU
+        return output.cpu().tolist()
 
     def forward(self, x):
         return self.model(x)
