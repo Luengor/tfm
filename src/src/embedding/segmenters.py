@@ -3,12 +3,13 @@ from src.abstractions import SegmenterBase, BoundingBox
 from PIL.Image import Image as PILImage
 
 class YoloSegmenter(SegmenterBase):
-    def __init__(self, model_path: str, threshold: float = 0.5, merge_threshold: float = 0.8, padding: float = 0.0):
+    def __init__(self, model_path: str, threshold: float = 0.5, merge_threshold: float = 0.8, padding: float = 0.0, max_boxes_per_image: int | None = None):
         self.model = YOLO(model_path)
         self.model.eval()
         self.threshold = threshold
         self.merge_threshold = merge_threshold
         self._padding = padding
+        self.max_boxes_per_image = max_boxes_per_image
 
     @property
     def padding(self) -> float:
@@ -33,6 +34,9 @@ class YoloSegmenter(SegmenterBase):
 
         if self.merge_threshold < 1.0:
             boxes = self._merge_boxes(boxes)
+
+        if self.max_boxes_per_image is not None and len(boxes) > self.max_boxes_per_image:
+            boxes = sorted(boxes, key=lambda b: b.confidence, reverse=True)[:self.max_boxes_per_image]
 
         if self._padding > 0:
             boxes = [self._apply_padding(box) for box in boxes]

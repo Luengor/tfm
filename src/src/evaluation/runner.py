@@ -728,7 +728,8 @@ def _build_segmenter(run_spec: BenchmarkRunSpec):
         threshold = params.get("threshold", 0.5)
         merge_threshold = params.get("merge_threshold", 0.8)
         padding = params.get("padding", 0.0)
-        return YoloSegmenter(model_path, threshold=threshold, merge_threshold=merge_threshold, padding=padding)
+        max_boxes_per_image = params.get("max_boxes_per_image")
+        return YoloSegmenter(model_path, threshold=threshold, merge_threshold=merge_threshold, padding=padding, max_boxes_per_image=max_boxes_per_image)
     
     if name == "identity":
         padding = params.get("padding", 0.0)

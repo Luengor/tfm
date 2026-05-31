@@ -39,6 +39,11 @@ La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
         para incluir contexto visual alrededor de la pintada. Por defecto el
         margen es cero, de modo que la caja se recorta sin expansión salvo que
         la configuración del \textit{benchmark} indique lo contrario.
+        % TODO: incorporar el parámetro `max_boxes_per_image` (añadido tras
+        % exp05, ver exp/exp05b). Tras la fusión, trunca la lista de cajas a
+        % las K de mayor confianza, evitando que imágenes con detecciones
+        % dispersas de baja calidad emitan muchos recortes fragmentados que
+        % degradan la geometría de clústeres.
     \item Cada pintada se recorta sobre la imagen original y el recorte se
         entrega al modelo de extracción de características, que produce un
         vector de características de dimensión fija.

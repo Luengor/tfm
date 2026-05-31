@@ -292,6 +292,12 @@ aplica un margen configurable alrededor de cada caja antes del recorte. El
 resultado es un conjunto de sub-imágenes que se procesan de forma independiente
 y que pueden producir varios \textit{embeddings} por fotografía original.
 
+% TODO: documentar el nuevo parámetro `max_boxes_per_image` del segmentador YOLO
+% (añadido tras exp05, ver exp/exp05b). Permite limitar el número máximo de
+% cajas emitidas por imagen tras el merge, conservando las de mayor confianza.
+% Mitiga la fragmentación en imágenes con muchas detecciones de baja calidad
+% que inflan la tasa de ruido en HDBSCAN.
+
 El detector se ajusta sobre el subconjunto anotado de ambos bancos descrito en
 \ref{subsec:dataset}, disjunto del banco de evaluación, lo que evita que las
 métricas reportadas sobre las configuraciones con segmentador queden sesgadas
