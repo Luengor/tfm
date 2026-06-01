@@ -10,6 +10,8 @@ from PIL import Image
 from tqdm import tqdm
 from collections import defaultdict
 
+from src.train.losses import SupConLoss
+
 
 class StyleDataset(Dataset):
     """Reads images from dataset_cropped/{class_name}/ subdirectories.
@@ -73,47 +75,6 @@ class BalancedBatchSampler(Sampler):
 
     def __len__(self):
         return self.n_batches
-
-
-class SupConLoss(nn.Module):
-    """Supervised Contrastive Loss (Khosla et al., 2020).
-    Expects L2-normalised embeddings.
-    """
-
-    def __init__(self, temperature: float = 0.07):
-        super().__init__()
-        self.temperature = temperature
-
-    def forward(self, features: torch.Tensor, labels: torch.Tensor) -> torch.Tensor:
-        # features: (N, dim)  — must be unit-normalised before calling
-        # labels:   (N,)
-        device = features.device
-        N = features.shape[0]
-
-        sim = torch.mm(features, features.T) / self.temperature  # (N, N)
-
-        # Positive mask: same label, different index
-        labels_col = labels.view(-1, 1)
-        pos_mask = (labels_col == labels_col.T).float()
-        pos_mask.fill_diagonal_(0.0)
-
-        # Numerical stability
-        sim_max, _ = sim.max(dim=1, keepdim=True)
-        sim = sim - sim_max.detach()
-
-        # Zero out self-similarity in denominator
-        eye = torch.eye(N, device=device, dtype=torch.bool)
-        exp_sim = torch.exp(sim).masked_fill(eye, 0.0)
-
-        log_prob = sim - torch.log(exp_sim.sum(dim=1, keepdim=True) + 1e-8)
-
-        # Average over positive pairs; skip anchors with no in-batch positive
-        pos_count = pos_mask.sum(dim=1)
-        valid = pos_count > 0
-        per_sample = -(pos_mask * log_prob).sum(dim=1)
-        per_sample[valid] = per_sample[valid] / pos_count[valid]
-
-        return per_sample[valid].mean() if valid.any() else per_sample.mean()
 
 
 def _build_transform() -> transforms.Compose:

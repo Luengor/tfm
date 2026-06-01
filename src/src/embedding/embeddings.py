@@ -65,7 +65,7 @@ MODELS = {
         'embedding_size': 1280,
     },
     EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD: {
-        'embedding_size': 1280,
+        'embedding_size': 128,
         'weights_path': "models/mobilenet_graffiti_author_head.pth"
     },
     EmbeddingModelNames.MOBILENET_V3_GRAFFITI_STYLE_HEAD: {
@@ -76,7 +76,7 @@ MODELS = {
         'embedding_size': 384,
     },
     EmbeddingModelNames.DINOV2_GRAFFITI_AUTHOR_HEAD: {
-        'embedding_size': 384,
+        'embedding_size': 128,
         'weights_path': "models/dinov2_graffiti_author_head.pth"
     },
     EmbeddingModelNames.DINOV2_GRAFFITI_STYLE_HEAD: {
@@ -216,16 +216,18 @@ class YoloEmbeddingModel(EmbeddingBase):
         return MODELS[self.name]['embedding_size']
 
 class HeadEmbeddingModel(EmbeddingBase):
-    def __init__(self, name: EmbeddingModelNames, base_model, preprocessor, input_dim):
+    def __init__(self, name: EmbeddingModelNames, base_model, preprocessor, input_dim, output_dim=None):
         self.name = name
         self.device = get_device()
         self.base_model = base_model
         self.preprocessor = preprocessor
-        
+
+        if output_dim is None:
+            output_dim = input_dim
         self.projection_head = nn.Sequential(
             nn.Linear(input_dim, 512),
             nn.ReLU(),
-            nn.Linear(512, input_dim)
+            nn.Linear(512, output_dim)
         )
         
         m_data = MODELS[name]
@@ -264,16 +266,33 @@ def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
         case EmbeddingModelNames.YOLOm | EmbeddingModelNames.YOLOs | EmbeddingModelNames.YOLOn:
             return YoloEmbeddingModel(name)
 
-        case EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD | EmbeddingModelNames.MOBILENET_V3_GRAFFITI_STYLE_HEAD:
+        case EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD:
+            weights = models.MobileNet_V3_Large_Weights.DEFAULT
+            base = models.mobilenet_v3_large(weights=weights)
+            base.classifier[3] = nn.Identity()
+            return HeadEmbeddingModel(name, base, weights.transforms(), input_dim=1280, output_dim=128)
+
+        case EmbeddingModelNames.MOBILENET_V3_GRAFFITI_STYLE_HEAD:
             weights = models.MobileNet_V3_Large_Weights.DEFAULT
             base = models.mobilenet_v3_large(weights=weights)
             base.classifier[3] = nn.Identity()
             return HeadEmbeddingModel(name, base, weights.transforms(), input_dim=1280)
-        
+
         case EmbeddingModelNames.DINOV2_VITS14:
             return DinoEmbeddingModel(name)
-        
-        case EmbeddingModelNames.DINOV2_GRAFFITI_AUTHOR_HEAD | EmbeddingModelNames.DINOV2_GRAFFITI_STYLE_HEAD:
+
+        case EmbeddingModelNames.DINOV2_GRAFFITI_AUTHOR_HEAD:
+            base = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
+            from torchvision import transforms
+            preprocessor = transforms.Compose([
+                transforms.Resize(256, interpolation=transforms.InterpolationMode.BICUBIC),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+                transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
+            ])
+            return HeadEmbeddingModel(name, base, preprocessor, input_dim=384, output_dim=128)
+
+        case EmbeddingModelNames.DINOV2_GRAFFITI_STYLE_HEAD:
             base = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
             from torchvision import transforms
             preprocessor = transforms.Compose([

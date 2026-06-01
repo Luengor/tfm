@@ -12,16 +12,43 @@ from sklearn.neighbors import KNeighborsClassifier
 from src.embedding.embeddings import EmbeddingModelNames, get_model
 
 
-def evaluate_model(model_name: EmbeddingModelNames, crops_dir: str, min_samples: int = 2) -> dict:
-    model = get_model(model_name)
-
+def list_eligible_classes(crops_dir: str, min_samples: int = 2) -> tuple[list[str], int]:
     all_classes = sorted([d for d in os.listdir(crops_dir) if os.path.isdir(os.path.join(crops_dir, d))])
-    # Only evaluate classes with enough samples for LOO-KNN and silhouette
     classes = [
         cls for cls in all_classes
         if len(os.listdir(os.path.join(crops_dir, cls))) >= min_samples
     ]
-    skipped = len(all_classes) - len(classes)
+    return classes, len(all_classes) - len(classes)
+
+
+def compute_metrics(embeddings: np.ndarray, labels: np.ndarray, n_classes: int) -> dict:
+    embeddings_norm = F.normalize(torch.from_numpy(embeddings), p=2, dim=1).numpy()
+
+    s_score = silhouette_score(embeddings_norm, labels, metric='cosine')
+
+    knn = KNeighborsClassifier(n_neighbors=1, metric='cosine')
+    correct = 0
+    total = len(embeddings_norm)
+    for i in range(total):
+        mask = np.ones(total, dtype=bool)
+        mask[i] = False
+        knn.fit(embeddings_norm[mask], labels[mask])
+        if knn.predict(embeddings_norm[[i]])[0] == labels[i]:
+            correct += 1
+    accuracy = correct / total
+
+    kmeans = KMeans(n_clusters=n_classes, random_state=42, n_init=10)
+    cluster_labels = kmeans.fit_predict(embeddings_norm)
+    ari = adjusted_rand_score(labels, cluster_labels)
+    nmi = normalized_mutual_info_score(labels, cluster_labels)
+
+    return {"silhouette": s_score, "accuracy_1nn": accuracy, "ari": ari, "nmi": nmi}
+
+
+def evaluate_model(model_name: EmbeddingModelNames, crops_dir: str, min_samples: int = 2) -> dict:
+    model = get_model(model_name)
+
+    classes, skipped = list_eligible_classes(crops_dir, min_samples)
     print(f"  Classes: {len(classes)} with ≥{min_samples} samples ({skipped} singletons skipped)")
 
     embeddings = []
@@ -39,31 +66,7 @@ def evaluate_model(model_name: EmbeddingModelNames, crops_dir: str, min_samples:
             except Exception as e:
                 print(f"  Error {img_path}: {e}")
 
-    embeddings = np.array(embeddings)
-    labels = np.array(labels)
-
-    embeddings_norm = F.normalize(torch.from_numpy(embeddings), p=2, dim=1).numpy()
-
-    s_score = silhouette_score(embeddings_norm, labels, metric='cosine')
-
-    # Leave-One-Out 1-NN accuracy
-    knn = KNeighborsClassifier(n_neighbors=1, metric='cosine')
-    correct = 0
-    total = len(embeddings_norm)
-    for i in range(total):
-        mask = np.ones(total, dtype=bool)
-        mask[i] = False
-        knn.fit(embeddings_norm[mask], labels[mask])
-        if knn.predict(embeddings_norm[[i]])[0] == labels[i]:
-            correct += 1
-    accuracy = correct / total
-
-    kmeans = KMeans(n_clusters=len(classes), random_state=42, n_init=10)
-    cluster_labels = kmeans.fit_predict(embeddings_norm)
-    ari = adjusted_rand_score(labels, cluster_labels)
-    nmi = normalized_mutual_info_score(labels, cluster_labels)
-
-    return {"silhouette": s_score, "accuracy_1nn": accuracy, "ari": ari, "nmi": nmi}
+    return compute_metrics(np.array(embeddings), np.array(labels), len(classes))
 
 
 def main():
@@ -88,6 +91,7 @@ def main():
         EmbeddingModelNames.MOBILENET_V3,
         EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD,
         EmbeddingModelNames.MOBILENET_V3_GRAFFITI_STYLE_HEAD,
+        EmbeddingModelNames.CLIP_VIT_B32,
     ]
 
     results = {}
