@@ -74,10 +74,10 @@ $N=6416$.
   \texttt{mobilenet\_v3}                  & 820 & 0.078 & 0.260 & 13.1 & 1.48 & 0.52 \\ \hline
   \texttt{resnet50}                       & 794 & 0.086 & 0.257 & 15.6 & 1.46 & 0.71 \\ \hline
   \texttt{vgg16}                          & 773 & 0.095 & 0.228 & 13.4 & 1.55 & 0.54 \\ \hline
+  \texttt{mob.\_graffiti\_author\_head}   & 779 & 0.124 & 0.227 & 13.4 & 1.53 & 0.53 \\ \hline
   \texttt{inception\_v3}                  & 724 & 0.118 & 0.213 & 11.5 & 1.61 & 0.64 \\ \hline
-  \texttt{mob.\_graffiti\_author\_head}   & 798 & 0.130 & 0.190 & 10.1 & 1.68 & 0.54 \\ \hline
+  \texttt{dinov2\_graffiti\_author\_head} & 631 & 0.143 & 0.187 & 17.9 & 1.59 & 0.81 \\ \hline
   \texttt{dinov2\_vits14}                 & 632 & 0.123 & 0.185 & 19.2 & 1.58 & 0.92 \\ \hline
-  \texttt{dinov2\_graffiti\_author\_head} & 604 & 0.156 & 0.174 & 17.2 & 1.64 & 0.81 \\ \hline
   \texttt{clip\_vit\_b32}                 & 734 & 0.150 & 0.170 & 11.9 & 1.66 & 0.74 \\ \hline
   \texttt{dinov2\_graffiti\_style\_head}  & 563 & 0.199 & 0.151 & 33.1 & 1.70 & 0.75 \\ \hline
   \texttt{mob.\_graffiti\_style\_head}    & 631 & 0.202 & 0.144 & 13.7 & 1.89 & 0.63 \\ \hline
@@ -118,7 +118,7 @@ agrupamiento basado en apariencia.
 
 Por otro lado, el coste del barrido figura en la tabla~\ref{tab:e1-cost-6416}.
 \texttt{mobilenet\_v3} es el extractor más barato en todos los ejes (7.93~ips,
-32~MB de VRAM) y la cabeza añade un sobrecoste despreciable. Los
+32~MB de VRAM) y la cabeza añade un sobrecoste pequeño ($\sim$8\,\%, 7.30~ips). Los
 \textit{backbones} YOLO son los más caros (4.5--4.9~ips y $\sim$825~MB de RSS),
 y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
 
@@ -127,7 +127,7 @@ y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
   \textbf{Extractor} & \textbf{ingesta (s)} & \textbf{ips} & \textbf{RSS pico (MB)} & \textbf{VRAM (MB)} \\ \hline
   \endhead
   \texttt{mobilenet\_v3}                  & 808.8  & 7.93 & 366.0 & 31.8  \\ \hline
-  \texttt{mob.\_graffiti\_author\_head}   & 826.1  & 7.77 & 405.0 & 37.4  \\ \hline
+  \texttt{mob.\_graffiti\_author\_head}   & 879.1  & 7.30 & 406.4 & 34.5  \\ \hline
   \texttt{inception\_v3}                  & 973.7  & 6.59 & 337.2 & 116.1 \\ \hline
   \texttt{vgg16}                          & 980.8  & 6.54 & 315.0 & 551.7 \\ \hline
   \texttt{resnet50}                       & 1080.0 & 5.94 & 336.0 & 117.8 \\ \hline
@@ -618,11 +618,12 @@ con distinto número de clústeres.
   \texttt{dinov2\_vits14}                     & 0.356 & 0.374 & 0.558 & 0.135 & identidad + KMeans-4   \\ \hline
   \texttt{mobilenet\_v3}                      & 0.356 & 0.336 & 0.550 & 0.038 & UMAP + aglomerativo    \\ \hline
   \texttt{resnet50}                           & 0.334 & 0.277 & 0.548 & 0.058 & identidad + espectral  \\ \hline
-  \texttt{mob.\_graffiti\_author\_head}       & 0.267 & 0.256 & 0.513 & 0.079 & UMAP + HDBSCAN mcs=10  \\ \hline
-  \texttt{dinov2\_graffiti\_author\_head}     & 0.234 & 0.207 & 0.453 & 0.101 & UMAP + aglomerativo    \\ \hline
+  \texttt{mob.\_graffiti\_author\_head}       & 0.318 & 0.295 & 0.517 & 0.046 & UMAP + aglomerativo    \\ \hline
+  \texttt{dinov2\_graffiti\_author\_head}     & 0.302 & 0.273 & 0.519 & 0.094 & UMAP + aglomerativo    \\ \hline
   \caption{E8a, mejor celda por extractor sobre la evaluación de estilo (294
-  recortes, 4 clases). El ranking se invierte para las cabezas de autoría: su
-  ARI cae \emph{por debajo} del de su \textit{backbone}.}
+  recortes, 4 clases). El ranking sitúa las cabezas de autoría por debajo del
+  \textit{backbone} en ambas familias, aunque con un margen modesto
+  ($-0.054$ DINOv2, $-0.038$ MobileNetV3).}
   \label{tab:e8a-best}
 \end{longtable}
 }
@@ -635,23 +636,25 @@ siguiente extrator, pero sí que lo mejora sustancialmente (0.560 vs 0.368).
 El resto de extractores sin entrenar (CLIP, DINOv2 y MobileNetV3) se agrupan en
 un segundo bloque con ARI entre 0.33 y 0.37.
 
-Sorprendentemente, las cabezas de autoría no solo mejoran el ARI respecto a su
-propio \textit{backbone} sino que lo empeoran, convirtiendo ambas cabezas en
-los peores extractores del panel. Parece que el \textit{fine-tuning} no produce
-una representación genérica para el grafiti, sino que que concentra el eje para
-el que fue entrenada y suprime al otro. Esta matriz de transferencia
-fuertemente diagonal es la evidencia más limpia de que las dos cabezas
-codifican información genuinamente distinta.
+Las cabezas de autoría no sólo no mejoran el ARI de estilo respecto a su
+propio \textit{backbone} sino que lo empeoran (DINOv2 $0.356\to 0.302$, MobileNetV3
+$0.356\to 0.318$), aunque con un margen modesto que las sitúa en los puestos
+finales del panel. El \textit{fine-tuning} no produce una representación
+genérica para el grafiti: concentra el eje para el que fue entrenada y deja al
+otro en clara desventaja. Esta matriz de transferencia diagonal-dominante es la
+evidencia más limpia de que las dos cabezas codifican información genuinamente
+distinta.
 
 La señal secundaria de recuperación supervisada (búsqueda por similitud con
 $k=5$, evaluada frente a la etiqueta de la consulta) confirma el ordenamiento
 y prescinde de la elección de agrupador. La tabla~\ref{tab:e8a-retrieval}
 muestra que la cabeza estilística de DINOv2 ocupa la primera posición en los
 tres índices (P@5~$=0.820$, MAP@5~$=0.877$, MRR~$=0.895$) y que el orden por
-P@5 reproduce el ranking por ARI: cabezas de estilo arriba, cabezas de autoría
-en el fondo. La cabeza de autor de MobileNetV3 es el peor recuperador del
-panel ($0.568$), consistente con su caída de ARI por debajo del propio
-\textit{backbone}.
+P@5 reproduce, en grandes trazos, el ranking por ARI: cabezas de estilo
+arriba, \textit{backbones} sin entrenar en el bloque intermedio y cabezas de
+autoría en la parte baja. La cabeza de autor de MobileNetV3 es el peor
+recuperador del panel ($0.639$), consistente con su caída de ARI por debajo
+del propio \textit{backbone}.
 
 {\footnotesize
 \begin{longtable}{|p{5.4cm}|p{1.3cm}|p{1.6cm}|p{1.3cm}|} \hline
@@ -661,10 +664,10 @@ panel ($0.568$), consistente con su caída de ARI por debajo del propio
   \texttt{mob.\_graffiti\_style\_head}       & 0.737 & 0.821 & 0.843 \\ \hline
   \texttt{dinov2\_vits14}                    & 0.699 & 0.805 & 0.837 \\ \hline
   \texttt{mobilenet\_v3}                     & 0.687 & 0.806 & 0.830 \\ \hline
+  \texttt{dinov2\_graffiti\_author\_head}    & 0.674 & 0.804 & 0.832 \\ \hline
   \texttt{clip\_vit\_b32}                    & 0.669 & 0.792 & 0.825 \\ \hline
-  \texttt{dinov2\_graffiti\_author\_head}    & 0.669 & 0.776 & 0.802 \\ \hline
   \texttt{resnet50}                          & 0.654 & 0.789 & 0.829 \\ \hline
-  \texttt{mob.\_graffiti\_author\_head}      & 0.568 & 0.721 & 0.753 \\ \hline
+  \texttt{mob.\_graffiti\_author\_head}      & 0.639 & 0.775 & 0.799 \\ \hline
   \caption{E8a, recuperación supervisada \textit{top-5} por extractor sobre
   la evaluación de estilo. Reproduce el mismo ordenamiento que el ARI de la
   tabla~\ref{tab:e8a-best}, lo que descarta que el liderazgo de la cabeza
@@ -694,99 +697,81 @@ gran mayoría de los \textit{pieces}. El tercero está formado por los
 
 \subsubsection{Evaluación por autor}
 \label{subsubsec:res-autor}
-% La simetría esperada con la evaluación por estilo no se materializa en la de
-% autoría: los ocho codificadores caben en una banda de 0.035 puntos de ARI
-% cercana al suelo aleatorio, y la cabeza de autoría de DINOv2 queda por
-% debajo de su propio \textit{backbone}. La tabla~\ref{tab:e8b-best} reproduce
-% el formato de \ref{subsubsec:res-estilo} sobre la evaluación de autoría
-% (E8b); antes de leerla conviene fijar el contexto: 53 de los 87 autores
-% aparecen con un solo recorte, el autor más frecuente tiene 19 recortes y la
-% NMI está inflada por construcción cuando ambas particiones están
-% fragmentadas en muchos grupos pequeños, así que ARI
-% (\textit{chance-corrected}) es el único número leíble como recuperación real
-% y todos los valores deben compararse con la base aleatoria.
-
-\textbf{TODO}
+El barrido E8b evalúa la capacidad de los extractores para separar un conjunto
+de imágenes por autoría. Se parta de una hipótesis simétrica a la de E8a: una
+cabeza entrenada para autoría podría superar a su propio \textit{backbone} por
+bastante margen, y superar a los extractores sin entrenar. La
+tabla~\ref{tab:e8b-best} muestra que esta hipótesis no es correcta. El mejor
+ARI global lo obtiene CLIP ViT-B/32 (0.076), y los ocho extractores caben en
+una banda 0.041--0.076 cercano al agrupamiento aleatorio (la celda ganadora de
+E8a vale 0.698, $\sim$10 veces más). Dentro de la familia DINOv2 la cabeza de
+autoría sí supera a su \textit{backbone} (0.065 vs.\ 0.055) y a la cabeza de
+estilo (0.060), aunque a escala dominada por ruido; en la familia MobileNetV3
+la cabeza apenas iguala a su \textit{backbone} (0.048 vs.\ 0.046, +0.002 ARI).
 
 {\footnotesize
 \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
   \textbf{Extractor} & \textbf{ARI} & \textbf{NMI} & \textbf{F1} & \textbf{sil} & \textbf{Celda} \\ \hline
   \endhead
   \texttt{clip\_vit\_b32}                     & \textbf{0.076} & 0.789 & 0.090 & 0.003 & UMAP + aglo-87 \\ \hline
-  \texttt{mob.\_graffiti\_author\_head}       & 0.061 & 0.787 & 0.074 & 0.011 & UMAP + aglo-87 \\ \hline
+  \texttt{dinov2\_graffiti\_author\_head}     & 0.065 & 0.647 & 0.093 & 0.052 & UMAP + aglo-30 \\ \hline
   \texttt{dinov2\_graffiti\_style\_head}      & 0.060 & 0.633 & 0.090 & 0.026 & UMAP + aglo-30 \\ \hline
   \texttt{dinov2\_vits14}                     & 0.055 & 0.754 & 0.079 & 0.096 & identidad + aglo-87 \\ \hline
-  \texttt{dinov2\_graffiti\_author\_head}     & 0.051 & 0.636 & 0.081 & 0.027 & UMAP + aglo-30 \\ \hline
   \texttt{resnet50}                           & 0.049 & 0.778 & 0.064 & 0.028 & UMAP + aglo-87 \\ \hline
+  \texttt{mob.\_graffiti\_author\_head}       & 0.048 & 0.627 & 0.077 & 0.021 & UMAP + aglo-30 \\ \hline
   \texttt{mobilenet\_v3}                      & 0.046 & 0.780 & 0.060 & 0.023 & UMAP + aglo-87 \\ \hline
   \texttt{mob.\_graffiti\_style\_head}        & 0.041 & 0.777 & 0.055 & 0.001 & UMAP + aglo-87 \\ \hline
-  \caption{}
-  % \caption{E8b, mejor celda por extractor sobre la evaluación de autoría
-  % (185 recortes, 87 autores, evaluación entre ciudades Cuenca$\to$Salamanca).
-  % Todos los ARI caen en una banda estrecha cercana al suelo; la simetría
-  % esperada con E8a no se materializa.}
+  \caption{E8b, mejor celda por extractor sobre la evaluación de autoría
+  (185 recortes, 87 autores, evaluación entre ciudades Cuenca$\to$Salamanca).
+  Todos los ARI caen en una banda estrecha cercana al suelo; la simetría
+  esperada con E8a no se materializa.}
   \label{tab:e8b-best}
 \end{longtable}
 }
 
-% E8b es un resultado negativo coherente. El mejor ARI de todo el barrido es
-% 0.076 (\texttt{clip\_vit\_b32}); los ocho codificadores caben en una banda de
-% 0.035 puntos, aproximadamente el 5\% del valor de la celda ganadora de E8a.
-% La hipótesis simétrica de E8a —la cabeza de autoría debería ganar en autoría—
-% queda refutada: la cabeza de DINOv2 (0.051) queda por debajo de su
-% \textit{backbone} (0.055) y por debajo de la cabeza de estilo (0.060); la
-% cabeza de autoría de MobileNetV3 (0.061) supera a su \textit{backbone} por
-% +0.015 ARI, dentro del ruido. La NMI elevada (0.75--0.79) en las celdas
-% ganadoras es exactamente el modo de inflación documentado: 87 clústeres
-% diminutos comparten información marginal con 87 clases diminutas, no
-% \emph{recuperación}.
-% 
-% La recuperación supervisada \textit{top-5} (tabla~\ref{tab:e8b-retrieval},
-% con $P@5$ aleatorio $\approx 0.024$) sirve como segundo eje independiente del
-% agrupador y confirma la lectura de banda estrecha y dominada por ruido. El
-% mejor recuperador es \texttt{clip\_vit\_b32} ($P@5=0.091$), seguido de cerca
-% por la cabeza de autoría de DINOv2 (0.088), ResNet50 (0.085), MobileNetV3
-% (0.083) y DINOv2 base (0.081): todos en el mismo rango, no en posiciones
-% distinguibles estadísticamente. La señal más importante de esta tabla es
-% una \emph{inversión entre ejes} dentro de la familia MobileNetV3: su cabeza
-% de autoría es la \emph{mejor} por ARI (0.061, máximo de la familia) y la
-% \emph{peor} por $P@5$ (0.059, mínimo absoluto del panel). Una representación
-% genuinamente discriminativa de autor encabezaría ambos ejes a la vez; esta
-% inversión es la firma de mediciones dominadas por ruido y refuerza la
-% interpretación de E8b como un piso aleatorio, no como un orden interpretable.
-% 
-% {\footnotesize
-% \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.6cm}|p{1.2cm}|p{1.2cm}|} \hline
-%   \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} & \textbf{R@5} \\ \hline
-%   \endhead
-%   \texttt{clip\_vit\_b32}                    & \textbf{0.091} & 0.252 & 0.262 & 0.268 \\ \hline
-%   \texttt{dinov2\_graffiti\_author\_head}    & 0.088 & 0.258 & 0.261 & 0.273 \\ \hline
-%   \texttt{resnet50}                          & 0.085 & 0.246 & 0.256 & 0.236 \\ \hline
-%   \texttt{mobilenet\_v3}                     & 0.083 & 0.240 & 0.245 & 0.251 \\ \hline
-%   \texttt{dinov2\_vits14}                    & 0.081 & 0.248 & 0.251 & 0.268 \\ \hline
-%   \texttt{dinov2\_graffiti\_style\_head}     & 0.067 & 0.240 & 0.243 & 0.192 \\ \hline
-%   \texttt{mob.\_graffiti\_style\_head}       & 0.067 & 0.232 & 0.233 & 0.179 \\ \hline
-%   \texttt{mob.\_graffiti\_author\_head}      & 0.059 & 0.180 & 0.187 & 0.171 \\ \hline
-%   \caption{E8b, recuperación supervisada \textit{top-5} por extractor sobre
-%   la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
-%   campo cabe en una banda estrecha; la cabeza de autor de MobileNetV3, mejor
-%   por ARI dentro de su familia, es a la vez la peor en recuperación,
-%   inversión entre ejes característica de mediciones a piso aleatorio.}
-%   \label{tab:e8b-retrieval}
-% \end{longtable}
-% }
-% 
-% La interpretación honesta del experimento se apoya en la asimetría de los
-% dos diseños ya descrita al abrir esta subsección: E8a es un \textit{held-out}
-% \emph{dentro del dominio de entrenamiento} (mixto Salamanca+Cuenca para
-% estilo), mientras que E8b combina \textit{held-out} de autores con un
-% desplazamiento de dominio Cuenca$\to$Salamanca. La cabeza estilística
-% generaliza dentro de su dominio mixto (E8a positivo); la cabeza de autoría
-% no cruza la frontera de ciudades (E8b negativo). El resultado acota el
-% alcance de la afirmación de especificidad: la transferencia entre tareas es
-% demostrable para estilo (E8a), no para autoría (E8b), y la evaluación
-% disponible no permite separar fallo por novedad de autor de fallo por
-% dominio.
+E8b es un resultado negativo, pero esperado. La tarea de clasificación por
+estilo es considerablemente más sencilla que la de agrupamiento por autoría,
+que además se ve afectada por un desplazamiento de dominio más severo y un
+conjunto de datos de peor calidad. Sería necesario anotar muchos más recortes y
+de más autores (probablemente más de los que hay en el corpus completo) para
+obtener resultados de agrupamiento por autoría aceptables. Otra posibilidad
+sería pre-entrenar los modelos de autoría sobre un corpus de grafiti de manera
+no supervisada, y luego hacer el \textit{fine-tuning} supervisado sobre el
+conjunto de autoría anotado. Esto último requeriría una gran cantidad de
+imágenes de grafiti y el uso del corpus completo podría ser un buen punto de
+partida, pero su uso provocaría un sesgo de selección importante al evaluar
+sobre el mismo conjunto utilizado para pre-entrenar la red.
+
+El problema de recuperación sigue la misma tendencia que el anterior,
+empeorando aun más la posición de las cabezas de autoría. CLIP sigue siendo el
+mejor recuperador (P@5~$=0.091$), seguido de cerca por ResNet50 (0.085),
+MobileNetV3 (0.083), DINOv2 base (0.081) y las dos cabezas de autoría
+(MobileNetV3 0.078, DINOv2 0.077): todos dentro de un rango estrecho. En este
+caso, las cabezas entrenadas para esta tarea específica se sitúan por debajo de
+los extractores sin entrenar, lo que es consistente con la caída de ARI y con
+la hipótesis de que el \textit{fine-tuning} para autoría no consigue una
+representación útil para esta tarea.
+
+{\footnotesize
+\begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.6cm}|p{1.2cm}|p{1.2cm}|} \hline
+  \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} & \textbf{R@5} \\ \hline
+  \endhead
+  \texttt{clip\_vit\_b32}                    & \textbf{0.091} & 0.252 & 0.262 & 0.268 \\ \hline
+  \texttt{resnet50}                          & 0.085 & 0.246 & 0.256 & 0.236 \\ \hline
+  \texttt{mobilenet\_v3}                     & 0.083 & 0.240 & 0.245 & 0.251 \\ \hline
+  \texttt{dinov2\_vits14}                    & 0.081 & 0.248 & 0.251 & 0.268 \\ \hline
+  \texttt{mob.\_graffiti\_author\_head}      & 0.078 & 0.217 & 0.222 & 0.233 \\ \hline
+  \texttt{dinov2\_graffiti\_author\_head}    & 0.077 & 0.228 & 0.232 & 0.254 \\ \hline
+  \texttt{dinov2\_graffiti\_style\_head}     & 0.067 & 0.240 & 0.243 & 0.192 \\ \hline
+  \texttt{mob.\_graffiti\_style\_head}       & 0.067 & 0.232 & 0.233 & 0.179 \\ \hline
+  \caption{E8b, recuperación supervisada \textit{top-5} por extractor sobre
+  la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
+  campo cabe en una banda estrecha; las cabezas de autoría quedan en la
+  zona media en ambos ejes (ARI y $P@5$), coherentemente con un soporte
+  parcial a piso aleatorio.}
+  \label{tab:e8b-retrieval}
+\end{longtable}
+}
 
 \subsubsection{Correlación interna-externa}
 \label{subsubsec:res-correlacion}
