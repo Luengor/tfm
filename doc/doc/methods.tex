@@ -31,27 +31,18 @@ La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
 \begin{enumerate}
     \item La imagen se carga desde disco y se proporciona al segmentador.
     \item El segmentador consume la imagen y devuelve una lista con cajas
-        delimitadoras de las pintadas presentes en la imagen. En el caso en el
-        que no se encuentren pintadas o no se utilice segmentador, se devuelve
-        una caja que abarca toda la imagen.
-        % TODO: actualizar la descripción del paso 2. Tras los cambios de
-        % exp/exp05b la política de respaldo (devolver la imagen completa
-        % cuando no hay detecciones) deja de aplicarse de forma incondicional
-        % en Configuration y pasa a ser una decisión del propio segmentador,
-        % controlada por el nuevo parámetro `allow_full_image_fallback`
-        % (valor por defecto `true`, equivalente al comportamiento anterior).
-        % Con `false` las imágenes sin detección se descartan en lugar de
-        % emitir un \textit{embedding} de escena completa. Mencionar que en
-        % exp05 ~25\% de las imágenes (n=250, detector ajustado) cayeron al
-        % respaldo, mezclando dos distribuciones de entrada (escena completa
-        % frente a recorte ajustado) que la cabeza de estilo no vio durante
-        % el entrenamiento; exp/exp05b mide el efecto de desactivar dicho
-        % respaldo en combinación con umbrales de detección más permisivos.
-    \item Estas cajas se fusionan si se solapan por encima de cierto umbral y,
-        cuando se configura un margen (\textit{padding}) no nulo, se expanden
-        para incluir contexto visual alrededor de la pintada. Por defecto el
-        margen es cero, de modo que la caja se recorta sin expansión salvo que
-        la configuración del \textit{benchmark} indique lo contrario.
+        delimitadoras de las pintadas presentes en la imagen. En el caso de que
+        no se utilice segmentador, se devuelve una única caja que abarca toda
+        la imagen, de modo que el sistema se comporta como un agrupamiento de
+        imágenes completas. Este comportamiento de respaldo también se puede
+        habilitar o deshabilitar para los modelos de detección de pintadas,
+        de modo que las imágenes sin detección se emitan como recortes de
+        escena completa o se descarten, respectivamente.
+    \item Las cajas detectadas se fusionan si se solapan por encima de cierto
+        umbral y, cuando se configura un margen (\textit{padding}) no nulo, se
+        expanden para incluir contexto visual alrededor de la pintada. Por
+        defecto el margen es cero, de modo que la caja se recorta sin expansión
+        salvo que la configuración del \textit{benchmark} indique lo contrario.
         % TODO: incorporar el parámetro `max_boxes_per_image` (añadido tras
         % exp05, ver exp/exp05b). Tras la fusión, trunca la lista de cajas a
         % las K de mayor confianza, evitando que imágenes con detecciones
@@ -342,6 +333,8 @@ validación no mejora durante un número fijo de épocas.
 
 \subsubsection{Cabezas de proyección}
 \label{subsubsec:entrenamiento-cabezas}
+% TODO: revisar toda esta subsección cuando se actualice el entrenamiento de
+% las cabezas de estilo (actualmente sólo se han actualizado las de autoría).
 Las cuatro cabezas (autoría y estilo sobre MobileNetV3 y DINOv2) se entrenan
 sobre la totalidad del subconjunto anotado, sin reservar una partición de
 validación. Los \textit{backbones} se mantienen estrictamente congelados
@@ -360,6 +353,9 @@ se eligen de forma uniforme: con probabilidad fija se extraen del conjunto de
 autores con un único recorte (negativos difíciles) y el resto de las veces se
 muestrean del banco completo de autores.
 
+% TODO: actualizar este párrafo si se migra el entrenamiento de las cabezas de
+% estilo al esquema PK + batch-hard + aumentación reforzada usado ahora en las
+% de autoría (ver src/train/trainer.py, dataset.py y author_head.py).
 Las cabezas de estilo se entrenan con la pérdida \textit{Supervised
 Contrastive}~\cite{khosla_supervised_2021} y temperatura $T = 0.07$,
 optimizador Adam con \textit{learning rate} $10^{-4}$ y un \textit{scheduler}

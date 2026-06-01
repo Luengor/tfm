@@ -30,7 +30,7 @@ Salamanca, lo que permite evitar el sesgo de solapamiento entre entrenamiento y
 evaluación que se produciría si se empleara el banco principal para ajustar
 todos los modelos.
 
-Ninguno de los dos bancos de datos cuenta con anotaciones de ningún estilo, lo
+Ninguno de los dos bancos de datos cuenta con anotaciones de ningún tipo, lo
 que impide la evaluación supervisada directa de los modelos. Además, la
 existencia de varios grafitis por imagen hace que la anotación a nivel de
 imagen no sea suficiente para evaluar la calidad de los clústeres. Por tanto,
@@ -343,6 +343,9 @@ los \textit{embeddings} base a un espacio adaptado al dominio; en inferencia su
 salida se normaliza a norma unitaria ($L_2$), de modo que el \textit{embedding}
 producido sea directamente comparable mediante distancia coseno.
 
+% TODO: revisar este párrafo cuando se actualice el entrenamiento de las
+% cabezas de estilo para alinearlo con el nuevo esquema de las de autoría
+% (PK + batch-hard + dimensionalidad reducida).
 Se han entrenado dos tipos de cabezas (de autoría y de estilo) sobre dos
 arquitecturas base (MobileNetV3 y DINOv2). Las cabezas de autoría buscan
 acercar en el espacio latente las pintadas de un mismo autor y separar las de
