@@ -1,8 +1,10 @@
 # §1 — Embedding Model Comparison: Report
 
-**Source:** `exp/exp01/output/benchmark_20260528T231810Z.json`
-**Date:** 2026-05-28 · **Host:** FullCreamMilk (Linux, 16 logical CPU, Python 3.14)
-**Status:** 36/36 runs `success`.
+**Source:** `exp/exp01/output/benchmark_20260528T231810Z.json` (10 backbones + style heads)
+and `exp/exp01/output/benchmark_20260601T144625Z.json` (author heads, re-run; supersedes
+the 28-May author-head rows below).
+**Date:** 2026-05-28 (main sweep), 2026-06-01 (author-head re-run) · **Host:** FullCreamMilk (Linux, 16 logical CPU, Python 3.14)
+**Status:** 36/36 + 6/6 runs `success`.
 
 ## Setup
 
@@ -57,23 +59,23 @@ Within each corpus size, **bold** = best silhouette, *italic* = best CH.
 | 250 | resnet50 | 23 | 0.063 | **0.258** | 13.2 | 1.43 | 0.51 |
 | 250 | vgg16 | 26 | 0.084 | 0.250 | 10.9 | 1.46 | 0.55 |
 | 250 | mobilenet_v3 | 26 | 0.055 | 0.245 | 10.4 | 1.58 | 0.48 |
+| 250 | dinov2_graffiti_author_head | 25 | 0.077 | 0.226 | 12.1 | 1.48 | 0.49 |
 | 250 | inception_v3 | 27 | 0.069 | 0.225 | 9.1 | 1.61 | 0.47 |
 | 250 | dinov2_vits14 | 26 | 0.052 | 0.216 | 12.7 | 1.51 | 0.59 |
-| 250 | dinov2_graffiti_author_head | 24 | 0.055 | 0.213 | 12.0 | 1.56 | 0.53 |
+| 250 | mobilenet_v3_graffiti_author_head | 25 | 0.073 | 0.212 | 11.0 | 1.58 | 0.68 |
 | 250 | yolom | 18 | 0.049 | 0.204 | *27.4* | 1.42 | 0.83 |
 | 250 | dinov2_graffiti_style_head | 23 | 0.063 | 0.199 | 18.1 | 1.51 | 0.53 |
-| 250 | mobilenet_v3_graffiti_author_head | 25 | 0.184 | 0.198 | 9.0 | 1.66 | 0.51 |
 | 250 | clip_vit_b32 | 23 | 0.120 | 0.194 | 9.8 | 1.58 | 0.57 |
 | 250 | yolon | 16 | 0.053 | 0.181 | 30.4 | 1.43 | 1.09 |
 | 250 | mobilenet_v3_graffiti_style_head | 22 | 0.068 | 0.134 | 13.0 | 1.89 | 0.64 |
 | 1000 | resnet50 | 127 | 0.028 | **0.272** | 13.7 | 1.39 | 0.53 |
 | 1000 | mobilenet_v3 | 131 | 0.040 | 0.269 | 11.4 | 1.46 | 0.49 |
+| 1000 | mobilenet_v3_graffiti_author_head | 127 | 0.075 | 0.236 | 11.6 | 1.50 | 0.42 |
 | 1000 | vgg16 | 113 | 0.094 | 0.234 | 11.6 | 1.53 | 0.55 |
 | 1000 | dinov2_vits14 | 114 | 0.085 | 0.219 | 13.7 | 1.45 | 0.47 |
 | 1000 | inception_v3 | 127 | 0.058 | 0.217 | 9.5 | 1.60 | 0.47 |
-| 1000 | mobilenet_v3_graffiti_author_head | 134 | 0.081 | 0.198 | 9.2 | 1.60 | 0.48 |
+| 1000 | dinov2_graffiti_author_head | 111 | 0.083 | 0.206 | 13.5 | 1.52 | 0.50 |
 | 1000 | clip_vit_b32 | 125 | 0.105 | 0.193 | 10.6 | 1.55 | 0.54 |
-| 1000 | dinov2_graffiti_author_head | 96 | 0.126 | 0.192 | 13.3 | 1.58 | 0.62 |
 | 1000 | mobilenet_v3_graffiti_style_head | 111 | 0.130 | 0.169 | 12.4 | 1.71 | 0.60 |
 | 1000 | dinov2_graffiti_style_head | 96 | 0.106 | 0.159 | 18.9 | 1.68 | 0.60 |
 | 1000 | yolom | 76 | 0.173 | 0.144 | *28.9* | 1.70 | 0.61 |
@@ -81,10 +83,10 @@ Within each corpus size, **bold** = best silhouette, *italic* = best CH.
 | 6416 | mobilenet_v3 | 820 | 0.078 | **0.260** | 13.1 | 1.48 | 0.52 |
 | 6416 | resnet50 | 794 | 0.086 | 0.257 | 15.6 | 1.46 | 0.71 |
 | 6416 | vgg16 | 773 | 0.095 | 0.228 | 13.4 | 1.55 | 0.54 |
+| 6416 | mobilenet_v3_graffiti_author_head | 779 | 0.124 | 0.227 | 13.4 | 1.53 | 0.53 |
 | 6416 | inception_v3 | 724 | 0.118 | 0.213 | 11.5 | 1.61 | 0.64 |
-| 6416 | mobilenet_v3_graffiti_author_head | 798 | 0.130 | 0.190 | 10.1 | 1.68 | 0.54 |
+| 6416 | dinov2_graffiti_author_head | 631 | 0.143 | 0.187 | 17.9 | 1.59 | 0.81 |
 | 6416 | dinov2_vits14 | 632 | 0.123 | 0.185 | 19.2 | 1.58 | 0.92 |
-| 6416 | dinov2_graffiti_author_head | 604 | 0.156 | 0.174 | 17.2 | 1.64 | 0.81 |
 | 6416 | clip_vit_b32 | 734 | 0.150 | 0.170 | 11.9 | 1.66 | 0.74 |
 | 6416 | dinov2_graffiti_style_head | 563 | 0.199 | 0.151 | *33.1* | 1.70 | 0.75 |
 | 6416 | mobilenet_v3_graffiti_style_head | 631 | 0.202 | 0.144 | 13.7 | 1.89 | 0.63 |
@@ -100,7 +102,7 @@ effectively free relative to embedding generation.
 | n | embedding | ingest_s | ips | ing_pkRSS MB | vram MB | red_s |
 |--:|---|--:|--:|--:|--:|--:|
 | 6416 | mobilenet_v3 | 808.8 | 7.93 | 366.0 | **31.8** | 6.06 |
-| 6416 | mobilenet_v3_graffiti_author_head | 826.1 | 7.77 | 405.0 | 37.4 | 6.43 |
+| 6416 | mobilenet_v3_graffiti_author_head | 879.1 | 7.30 | 406.4 | 34.5 | 5.86 |
 | 6416 | inception_v3 | 973.7 | 6.59 | 337.2 | 116.1 | 6.71 |
 | 6416 | vgg16 | 980.8 | 6.54 | 315.0 | 551.7 | 7.88 |
 | 6416 | resnet50 | 1080.0 | 5.94 | 336.0 | 117.8 | 6.57 |
@@ -114,9 +116,9 @@ effectively free relative to embedding generation.
 constant in `n` per model.) Key cost facts:
 
 - **MobileNetV3 is the cheapest encoder on every axis** — fastest ingest
-  (~7.9 ips), lowest VRAM (32 MB), and the head adds negligible overhead
-  (\~7.8 ips). YOLO backbones are the most expensive: slowest ingest (4.5–4.9
-  ips) *and* highest RSS (\~825–855 MB, ~2.5× the CNNs).
+  (~7.9 ips), lowest VRAM (32 MB), and the author head adds modest overhead
+  (\~7.3 ips, ~8 % slower). YOLO backbones are the most expensive: slowest
+  ingest (4.5–4.9 ips) *and* highest RSS (\~825–855 MB, ~2.5× the CNNs).
 - **VRAM splits the field:** VGG16 (552 MB) and CLIP (592 MB) are the heavy
   consumers; MobileNetV3 (32 MB) is two decimal orders lighter.
 - **Reduction tracks input dimensionality, weakly.** UMAP on 4096-d VGG16
@@ -127,15 +129,18 @@ constant in `n` per model.) Key cost facts:
 ## The central reading hazard: fine-tuning *lowers* silhouette while CH disagrees
 
 The single most important result in §1 is also its sharpest reading trap. On
-the fine-tuning pairs, the head **underperforms** its pretrained backbone on
-silhouette at every size:
+the **style** pairs the head clearly **underperforms** its pretrained backbone
+on silhouette at every size; on the **author** pairs the picture is mixed
+(MobileNet author head is consistently below its backbone; DINOv2 author head
+lands essentially tied with — and at n=250 and n=6416 marginally above — its
+backbone after the 2026-06-01 re-run):
 
 | pair (n=6416) | backbone sil | head sil | backbone CH | head CH |
 |---|--:|--:|--:|--:|
 | dinov2_vits14 → style head | 0.185 | 0.151 | 19.2 | **33.1** |
-| dinov2_vits14 → author head | 0.185 | 0.174 | 19.2 | 17.2 |
+| dinov2_vits14 → author head | 0.185 | 0.187 | 19.2 | 17.9 |
 | mobilenet_v3 → style head | 0.260 | 0.144 | 13.1 | 13.7 |
-| mobilenet_v3 → author head | 0.260 | 0.190 | 13.1 | 10.1 |
+| mobilenet_v3 → author head | 0.260 | 0.227 | 13.1 | 13.4 |
 
 A naive "highest silhouette wins" reading concludes fine-tuning *hurts* and
 picks raw MobileNetV3 / ResNet50. But the **DINOv2 style head's CH jumps to 33.1
@@ -145,7 +150,12 @@ noise: it is the geometric signature of fine-tuning. The contrastive/triplet
 head reshapes the space toward a few **task-discriminative axes**, raising
 between-cluster vs. within-cluster dispersion (CH↑) while the per-point
 neighbourhood cohesion that silhouette averages goes down (more elongated,
-fewer, denser clusters — note cls drops 632→563 and csCV stays moderate).
+fewer, denser clusters — note cls drops 632→563 and csCV stays moderate). The
+author heads, trained on the same backbones with a different (author-identity)
+target, do not produce the same sharp split — both intrinsic scores move
+together in the same direction or sit essentially at backbone parity — which
+is itself consistent with the design: the author objective shapes a less
+concentrated geometry than the style head's tight per-style modes.
 
 **Neither intrinsic score is the right grade for a fine-tuned space.** The head
 was trained to separate *graffiti categories*, an objective invisible to
@@ -195,9 +205,11 @@ confirming HDBSCAN at `mcs=5` keeps finding finer structure as data grows rather
 than saturating — consistent with §4's `mcs=5` finding. Noise generally creeps
 upward with `n` (more boundary points), most steeply for the weak encoders
 (yolon 0.05 → 0.22 → 0.34) and mildly for the strong ones (mobilenet 0.055 →
-0.040 → 0.078). The fine-tuned heads carry the highest noise among the
-non-YOLO rows at n=6416 (style heads ~0.20) — the flip side of their tighter,
-fewer clusters: points outside the discriminative manifold are pushed to −1.
+0.040 → 0.078). The **style** heads carry the highest noise among the non-YOLO
+rows at n=6416 (~0.20) — the flip side of their tighter, fewer clusters: points
+outside the discriminative manifold are pushed to −1. The author heads sit in
+the middle band (mob_auth 0.124, dinov2_auth 0.143 at n=6416), comparable to
+their backbones.
 
 ## Repeat stability
 
@@ -212,7 +224,8 @@ small-`n` UMAP jitter. No row required exclusion.
 
 1. **§1 cannot adjudicate the baseline embedding on its own metrics, and that is
    the finding — not a limitation.** Intrinsic silhouette ranks the ImageNet
-   CNNs first and the fine-tuned heads below their backbones, but the
+   CNNs first and the fine-tuned **style** heads clearly below their backbones
+   (the author heads sit at or close to backbone parity), but the
    silhouette↓ / CH↑ split on the DINOv2 style head proves the two intrinsic
    scores disagree about the same fine-tuned space. Separability ≠ semantic
    correctness; the embedding choice binds in **§8**, not here.

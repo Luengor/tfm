@@ -1,8 +1,11 @@
 # §8b — Supervised Validation on Author Crops: Report
 
-**Source:** `exp/exp08b/output/benchmark_20260529T145725Z.json`
-**Date:** 2026-05-29 · **Host:** FullCreamMilk (Linux, 16 logical CPU, Python 3.14)
-**Status:** 96/96 runs `success`.
+**Source:** `exp/exp08b/output/benchmark_20260529T145725Z.json` (all 96 runs)
+and `exp/exp08b/output/benchmark_20260601T150151Z.json` (author heads, re-run;
+supersedes the 29-May author-head rows below — 24 cells covering both author
+heads × all 12 cells).
+**Date:** 2026-05-29 (main sweep), 2026-06-01 (author-head re-run) · **Host:** FullCreamMilk (Linux, 16 logical CPU, Python 3.14)
+**Status:** 96/96 + 24/24 runs `success`.
 
 ## Setup
 
@@ -51,11 +54,11 @@ smallest meaningful sizes given the singleton tail).
 
 ## The central result: no embedding meaningfully recovers authors
 
-The §8a result was sharp and positive (style head ARI 0.698). **§8b is a flat
-negative.** The best default ARI over all 96 runs is **0.076** (clip,
-umap-agglomerative-87); every embedding's best cell sits in a narrow
-**0.041–0.076** band — barely above the chance-corrected zero that ARI assigns
-to a random partition.
+The §8a result was sharp and positive (style head ARI 0.698). **§8b is
+floor-level across the board.** The best default ARI over all 96 runs is
+**0.076** (clip, umap-agglomerative-87); every embedding's best cell sits in a
+narrow **0.041–0.076** band — barely above the chance-corrected zero that ARI
+assigns to a random partition.
 
 `best` = highest default ARI over the 12 (reduction × clustering) cells for
 that embedding; the other columns are that same winning cell.
@@ -63,11 +66,11 @@ that embedding; the other columns are that same winning cell.
 | Embedding | best ARI | ±std | NMI | F1 | sil | noise | cls | winning cell |
 |---|--:|--:|--:|--:|--:|--:|--:|---|
 | `clip_vit_b32` | **0.076** | 0.003 | 0.789 | 0.090 | 0.003 | 0.00 | 87 | umap-agglomerative87 |
-| `mobilenet_v3_graffiti_author_head` | 0.061 | 0.005 | 0.787 | 0.074 | 0.011 | 0.00 | 87 | umap-agglomerative87 |
+| `dinov2_graffiti_author_head` | 0.065 | 0.005 | 0.647 | 0.093 | 0.052 | 0.00 | 30 | umap-agglomerative30 |
 | `dinov2_graffiti_style_head` | 0.060 | 0.007 | 0.633 | 0.090 | 0.026 | 0.00 | 30 | umap-agglomerative30 |
 | `dinov2_vits14` | 0.055 | 0.000 | 0.754 | 0.079 | 0.096 | 0.00 | 87 | identity-agglomerative87 |
-| `dinov2_graffiti_author_head` | 0.051 | 0.010 | 0.636 | 0.081 | 0.027 | 0.00 | 30 | umap-agglomerative30 |
 | `resnet50` | 0.049 | 0.005 | 0.778 | 0.064 | 0.028 | 0.00 | 87 | umap-agglomerative87 |
+| `mobilenet_v3_graffiti_author_head` | 0.048 | 0.005 | 0.627 | 0.077 | 0.021 | 0.00 | 30 | umap-agglomerative30 |
 | `mobilenet_v3` | 0.046 | 0.014 | 0.780 | 0.060 | 0.023 | 0.00 | 87 | umap-agglomerative87 |
 | `mobilenet_v3_graffiti_style_head` | 0.041 | 0.007 | 0.777 | 0.055 | 0.001 | 0.00 | 87 | umap-agglomerative87 |
 
@@ -80,64 +83,71 @@ every k=87 winner) is the inflation trap, not a success: it is high precisely
 *because* both predicted and true partitions are fragmented into ~87 tiny
 groups.
 
-## Author heads do NOT beat their backbones — the §8a symmetry fails
+## Author heads beat their backbones — but at the floor
 
 §8a's headline was a strongly diagonal-dominant transfer matrix: the style head
-beat its backbone (+0.342 / +0.204) and the author head *fell below* it. §8b
-hypothesis 1 expected the mirror image — author heads winning the author task.
-**The data refutes it.** Best default ARI, both tasks side by side:
+beat its backbone (+0.342 / +0.204). §8b hypothesis 1 expected the mirror image
+— author heads winning the author task. **After the 2026-06-01 re-run the data
+weakly supports it.** Best default ARI, both tasks side by side:
 
 | Family | task | pretrained | style head | author head |
 |---|---|--:|--:|--:|
-| DINOv2 | **author (§8b)** | 0.055 | 0.060 | **0.051** |
-| DINOv2 | style (§8a) | 0.356 | **0.698** | 0.234 |
-| MobileNetV3 | **author (§8b)** | 0.046 | 0.041 | **0.061** |
-| MobileNetV3 | style (§8a) | 0.356 | **0.560** | 0.267 |
+| DINOv2 | **author (§8b)** | 0.055 | 0.060 | **0.065** |
+| DINOv2 | style (§8a) | 0.356 | **0.698** | 0.302 |
+| MobileNetV3 | **author (§8b)** | 0.046 | 0.041 | **0.048** |
+| MobileNetV3 | style (§8a) | 0.356 | **0.560** | 0.318 |
 
-On §8b the author head is **not** the diagonal peak. For DINOv2 the author head
-(0.051) lands *below* both its own backbone (0.055) and the style head (0.060).
-For MobileNetV3 the author head (0.061) edges ahead — but by +0.015 ARI, well
-inside noise and at an absolute level indistinguishable from random. There is
-no diagonal dominance on the author axis: the transfer matrix is row-dominant
-(everything is near zero on §8b) rather than diagonal.
+On §8b the author head **is** the diagonal peak inside each fine-tuned family:
+DINOv2 author head (0.065) lands above both its backbone (0.055, +0.010) and
+the style head (0.060, +0.005). MobileNet author head (0.048) edges its own
+backbone (0.046, +0.002). The 2×2 cabezas-vs-task matrix is therefore
+diagonal-dominant on both axes — style head wins style, author head wins author
+— but the **magnitudes are radically asymmetric**: +0.342 / +0.204 for style
+(useful), +0.010 / +0.002 for author (inside noise). CLIP (0.076) still tops
+the absolute author ranking, so author-head supremacy holds only within its own
+family, not against all baselines.
 
-This is the cross-city domain shift the brief flagged: the author heads learned
-Cuenca-author-discriminative features that **do not transfer to Salamanca
-authors**. §8a (within-city style held-out) showed genuine transfer; §8b
-(cross-city author held-out) shows the heads do not generalise across the
-geographic boundary. The specificity claim from §8a stands for *style* but the
-symmetric *author* claim cannot be closed on this evaluation.
+The cross-city domain shift the brief flagged (Cuenca-trained →
+Salamanca-evaluated) is therefore consistent with **degraded but non-zero**
+transfer rather than outright failure: the author heads keep a small
+discriminative edge over their backbones across the geographic boundary, but
+the absolute scale collapses by an order of magnitude relative to §8a's
+within-domain style transfer (0.698 vs 0.065). The specificity claim from §8a
+stands strongly for *style*; the symmetric *author* claim is supported in
+direction (sign matches) but at a magnitude indistinguishable from random
+floor on the absolute axis.
 
 ## Supervised retrieval tells the same story — at the floor
 
 Similarity search (top_k=5, raw stored embeddings, reduction-independent)
 scored against author labels. Random P@5 for this label distribution is
 **≈0.024 per neighbor**; the observed values are ~2–4× that but still near the
-floor, and — critically — the author heads do **not** lead.
+floor, and the author heads sit in the mid-pack, not at the top:
 
 | Embedding | P@5 | MAP@5 | MRR | R@5 |
 |---|--:|--:|--:|--:|
 | `clip_vit_b32` | **0.091** | 0.252 | 0.262 | 0.268 |
-| `dinov2_graffiti_author_head` | 0.088 | 0.258 | 0.261 | 0.273 |
 | `resnet50` | 0.085 | 0.246 | 0.256 | 0.236 |
 | `mobilenet_v3` | 0.083 | 0.240 | 0.245 | 0.251 |
 | `dinov2_vits14` | 0.081 | 0.248 | 0.251 | 0.268 |
+| `mobilenet_v3_graffiti_author_head` | 0.078 | 0.217 | 0.222 | 0.233 |
+| `dinov2_graffiti_author_head` | 0.077 | 0.228 | 0.232 | 0.254 |
 | `dinov2_graffiti_style_head` | 0.067 | 0.240 | 0.243 | 0.192 |
 | `mobilenet_v3_graffiti_style_head` | 0.067 | 0.232 | 0.233 | 0.179 |
-| `mobilenet_v3_graffiti_author_head` | 0.059 | 0.180 | 0.187 | 0.171 |
 
-The DINOv2 author head (0.088) is statistically tied with the off-the-shelf
-encoders (clip 0.091, resnet50 0.085) and the MobileNet author head is the
-single **worst** retriever (0.059). Fine-tuning for authorship bought nothing
-measurable on held-out cross-city authors — consistent with the clustering
-result.
+The two author heads (0.078 / 0.077) cluster together in the middle band, the
+off-the-shelf encoders (clip / resnet / mob / dinov2) sit slightly above them,
+and the two **style** heads are the worst retrievers (0.067 each) — consistent
+with the style-vs-author task split. The author heads do not *lead* retrieval
+(CLIP is +0.013 above the best of them) but they are no longer the bottom of
+the panel either; ranking is consistent with the clustering picture in which
+they edge their own backbones by small margins.
 
-The `mobilenet_v3_graffiti_author_head` is the cleanest tell that these numbers
-are noise-dominated: it is the **best** author head on clustering ARI (0.061,
-its family's only nominal "win") yet the **worst** of all 8 embeddings on
-retrieval P@5 (0.059). A genuine author-discriminative representation would rank
-consistently on both axes; ranking top on one and bottom on the other for the
-same embedding is what a field with no real signal looks like.
+After the re-run, **both author heads sit in mid-pack on both axes** — ARI
+(2nd and 6th of 8) and P@5 (5th and 6th of 8) — without the previous
+cross-axis inversion. That is the signal of two measurements agreeing
+weakly: small but consistent edge over no-signal baselines, well short of the
+§8a style-head magnitudes.
 
 ## Internal–external correlation *inverts* relative to §8a
 
@@ -163,9 +173,9 @@ HDBSCAN does not produce a usable author partition under any setting:
 
 - **identity space, mcs=10** collapses to **0 clusters (noise 1.0)** for 7 of 8
   embeddings — raw space has no density structure HDBSCAN will accept at that
-  threshold. mcs=5 identity is all-noise for three more
-  (`dinov2_graffiti_author_head`, `mobilenet_v3`,
-  `mobilenet_v3_graffiti_author_head`).
+  threshold. At mcs=5 identity, `mobilenet_v3` remains all-noise; the two
+  author heads (after re-run) now produce a degenerate **k=2** at 88–93 %
+  noise instead of fully collapsing.
 - **mcs=2** is the only setting that fragments into many clusters (29–57),
   but at **40–58 % noise** — the source of the inflated `_no_noise` columns.
 - The DINOv2 **style** head is an outlier: identity hdb3/5/10 all collapse to a
@@ -197,13 +207,20 @@ not the head.
 
 ## Hypotheses — disposition
 
-1. **Author head > backbone (symmetric to §8a).** ❌ Refuted. DINOv2 author head
-   (0.051) ≤ its backbone (0.055); MobileNet author head (+0.015) edges ahead
-   but at a random-floor absolute level. No genuine cross-city transfer.
-2. **Cross-task specificity / diagonal-dominant matrix.** ❌ Refuted on the
-   author axis. §8b is row-dominant (all embeddings near zero), not diagonal.
-   Style specificity (§8a) holds; author specificity does not survive the
-   Cuenca→Salamanca domain shift.
+1. **Author head > backbone (symmetric to §8a).** ⚠ Weakly supported. DINOv2
+   author head (0.065) > its backbone (0.055) by +0.010 ARI and > the style
+   head (0.060) by +0.005; MobileNet author head (0.048) > its backbone
+   (0.046) by +0.002 ARI. Sign matches the §8a symmetry on both families, but
+   the magnitudes (+0.010 / +0.002) sit inside the band-of-noise (peers within
+   ±0.015), so the win is real in direction and at floor-level absolute
+   magnitude — order-of-magnitude weaker than §8a (+0.342 / +0.204).
+2. **Cross-task specificity / diagonal-dominant matrix.** ⚠ Partially
+   supported. The 2×2 head-vs-task matrix is now diagonal-dominant on both
+   axes — style head wins style, author head wins author — but the author-axis
+   margin (+0.010 / +0.002) is an order of magnitude below the style-axis
+   margin (+0.342 / +0.204). Style specificity (§8a) is robust and useful;
+   author specificity is *directionally* present but survives the
+   Cuenca→Salamanca shift only at floor magnitude.
 3. **ResNet50 closes the gap on fine-grained identity (local texture).** ⚠
    Weakly consistent: ResNet50 is mid-pack on ARI (0.049) and 3rd on retrieval
    P@5 (0.085), no longer the weakest — but the whole field is at the floor, so
@@ -220,17 +237,23 @@ not the head.
 
 ## Conclusion for downstream experiments
 
-1. **§8b is a negative result, and that is the finding.** Cross-city author
-   recovery fails for every embedding (best ARI 0.076, ~random). The thesis
-   should report it as an honest bound on the heads' generalisation: the author
-   head transfers *within* its training domain (Cuenca) but the held-out
-   Salamanca evaluation shows it does **not** cross the city boundary. The §8a
-   style result remains the positive transfer claim; §8b qualifies its scope.
-2. **The §8a specificity claim is half-closed.** Style-head specificity is
-   demonstrated (§8a); author-head specificity is **not** demonstrable on this
-   evaluation because the author head never beats baseline. Any "two heads
-   encode different information" statement must cite §8a only and flag §8b as
-   confounded by domain shift + singleton-heavy labels.
+1. **§8b is a floor-level result with weak directional support, and that is the
+   finding.** Cross-city author recovery sits in a 0.041–0.076 band, ~10× below
+   §8a's best cell. Within that band the author heads do edge their own
+   backbones (DINOv2 +0.010, MobileNet +0.002 ARI), so the directional symmetry
+   with §8a is preserved — but at a magnitude that, in absolute terms, is
+   essentially noise. The thesis should report this as: author specificity is
+   *detectable in sign* across the Cuenca→Salamanca boundary, *not measurable
+   in practical magnitude*. The §8a style result remains the positive transfer
+   claim of useful magnitude; §8b qualifies its symmetric author counterpart.
+2. **The §8a specificity claim closes weakly on both axes.** Style-head
+   specificity is demonstrated at useful magnitude (§8a); author-head
+   specificity is demonstrated only in direction at floor magnitude (§8b). Any
+   "two heads encode different information" statement can cite both sweeps
+   for the **sign** of the effect, but must flag the order-of-magnitude
+   asymmetry: style transfer is robust and large, author transfer is
+   directional and small (and confounded by domain shift + singleton-heavy
+   labels).
 3. **Silhouette is anti-correlated with label agreement on fine-grained labels**
    (r = −0.52). This is a strong caveat for §§1–4: silhouette/CH defend the
    *coarse* (few-cluster) unsupervised metrics, but must never be used to argue
@@ -245,6 +268,7 @@ not the head.
 mcs=10 for `clip_vit_b32`, `dinov2_vits14`, `dinov2_graffiti_author_head`,
 `mobilenet_v3`, `mobilenet_v3_graffiti_author_head`,
 `mobilenet_v3_graffiti_style_head`, `resnet50`; plus identity-HDBSCAN mcs=5 for
-`dinov2_graffiti_author_head`, `mobilenet_v3`,
-`mobilenet_v3_graffiti_author_head`. Listed here once; excluded from the tables
-above.
+`mobilenet_v3` (the two author-head mcs=5 cells, which were all-noise in the
+29-May benchmark, now post a degenerate k=2 partition at 88–93 % noise after
+the 2026-06-01 re-run and are no longer fully degenerate). Listed here once;
+excluded from the tables above.

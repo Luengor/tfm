@@ -1,10 +1,14 @@
 # §8a — Supervised Validation on Style Crops: Report
 
 **Source:** `exp/exp08a/output/benchmark_20260529T125933Z.json` (96 base runs +
-8 follow-up runs merged on 2026-05-31 for the `umap × hdbscan mcs=50` cell).
-**Date:** 2026-05-29 (base) · 2026-05-31 (mcs=50 follow-up)
+8 follow-up runs merged on 2026-05-31 for the `umap × hdbscan mcs=50` cell)
+and `exp/exp08a/output/benchmark_20260601T152849Z.json` (author heads, re-run
+on 2026-06-01; supersedes the 8 cells per author head that were rerun —
+agglomerative + HDBSCAN mcs∈{5,10,20} under identity and UMAP; kmeans /
+spectral / mcs=50 author-head cells kept from the 29-May benchmark).
+**Date:** 2026-05-29 (base) · 2026-05-31 (mcs=50 follow-up) · 2026-06-01 (author-head re-run)
 **Host:** FullCreamMilk (Linux, 16 logical CPU, Python 3.14)
-**Status:** 104/104 runs `success`.
+**Status:** 104/104 + 16/16 runs `success`.
 
 ## Setup
 
@@ -57,30 +61,32 @@ embedding; `sil`/`NMI`/`F1` are that same winning cell.
 | `dinov2_vits14` | 0.356 | 0.374 | 0.558 | 0.135 | identity-kmeans4 |
 | `mobilenet_v3` | 0.356 | 0.336 | 0.550 | 0.038 | umap-agglomerative |
 | `resnet50` | 0.334 | 0.277 | 0.548 | 0.058 | identity-spectral |
-| `mobilenet_v3_graffiti_author_head` | 0.267 | 0.256 | 0.513 | 0.079 | umap-hdbscan10 |
-| `dinov2_graffiti_author_head` | 0.234 | 0.207 | 0.453 | 0.101 | umap-agglomerative |
+| `mobilenet_v3_graffiti_author_head` | 0.318 | 0.295 | 0.517 | 0.046 | umap-agglomerative |
+| `dinov2_graffiti_author_head` | 0.302 | 0.273 | 0.519 | 0.094 | umap-agglomerative |
 
 The §8a answer is unambiguous: **`dinov2_graffiti_style_head` + identity +
 KMeans-4 wins decisively** (ARI 0.698, F1 0.790) — roughly 2× the ARI of the
 pretrained DINOv2 backbone (0.356) and of every off-the-shelf encoder.
 
-## The central result: author heads *damage* style structure
+## The central result: author heads underperform on style
 
-The expected finding was "fine-tuned head beats backbone." The data shows
-something sharper — the **style** head beats its backbone, but the **author**
-head falls *below* its own pretrained backbone on the style task:
+The expected finding was "fine-tuned head beats backbone." The data shows the
+sharper diagonal pattern — the **style** head beats its backbone substantially,
+while the **author** head falls *modestly* below its own pretrained backbone on
+the style task:
 
 | Family | pretrained | style head | author head |
 |---|--:|--:|--:|
-| DINOv2 | 0.356 | **0.698** (+0.342) | 0.234 (−0.122) |
-| MobileNetV3 | 0.356 | **0.560** (+0.204) | 0.267 (−0.089) |
+| DINOv2 | 0.356 | **0.698** (+0.342) | 0.302 (−0.054) |
+| MobileNetV3 | 0.356 | **0.560** (+0.204) | 0.318 (−0.038) |
 
-(best default ARI per embedding.) The author head is not merely *less useful*
-for style — it actively destroys style-discriminative geometry, dropping ARI
-below the untuned backbone on both families. This is a strongly
-diagonal-dominant transfer matrix: each head concentrates the axis it was
-trained on and suppresses the other. It is the cleanest possible evidence that
-the two heads encode genuinely different information rather than a shared
+(best default ARI per embedding.) After the 2026-06-01 re-run, the author head
+is *less useful* than its backbone for style on both families, but the gap is
+much smaller than the style head's lift in the other direction (~6× larger).
+This is a diagonal-dominant transfer matrix with **asymmetric magnitudes**:
+each head concentrates the axis it was trained on, and the style head's lift
+is large while the author head's drag is modest. It remains the cleanest
+evidence that the two heads encode different information rather than a shared
 "graffiti exists" representation (hypothesis 2).
 
 ## Fine-tuned style head: reduction × clustering detail
@@ -162,9 +168,10 @@ clustering.
 As in §4, the unstable cells sit at the HDBSCAN collapse boundary —
 `mcs=5` under UMAP flips cluster count across the K=3 seeds:
 
-- `dinov2_graffiti_author_head` umap hdb5 → `clusters_per_repeat = [5, 11, 4]`
 - `clip_vit_b32` umap hdb5 → `[2, 10, 13]`
 - `mobilenet_v3` umap hdb5 → `[7, 13, 13]`
+- (post re-run: `dinov2_graffiti_author_head` umap hdb5 now `[3, 4, 3]` —
+  no longer in the wildly-unstable bucket.)
 
 The aggregated row for these cells is a mean over qualitatively different
 partitions and should not be read as a single result. Oracle-k partitional rows
@@ -195,13 +202,15 @@ clustering ranking and is the highest-signal single number for the style head:
 | `mobilenet_v3_graffiti_style_head` | 0.737 | 0.821 | 0.843 |
 | `dinov2_vits14` | 0.699 | 0.805 | 0.837 |
 | `mobilenet_v3` | 0.687 | 0.806 | 0.830 |
+| `dinov2_graffiti_author_head` | 0.674 | 0.804 | 0.832 |
 | `clip_vit_b32` | 0.669 | 0.792 | 0.825 |
-| `dinov2_graffiti_author_head` | 0.669 | 0.776 | 0.802 |
 | `resnet50` | 0.654 | 0.789 | 0.829 |
-| `mobilenet_v3_graffiti_author_head` | 0.568 | 0.721 | 0.753 |
+| `mobilenet_v3_graffiti_author_head` | 0.639 | 0.775 | 0.799 |
 
 Same story: style heads on top, author heads at the bottom (the MobileNet
-author head is the single worst retriever at P@5 0.568).
+author head is the single worst retriever at P@5 0.639). DINOv2 author head
+edges past CLIP at P@5 after the re-run, so the retrieval ranking is now
+slightly more spread than the clustering one.
 
 ## Summary — cost
 
@@ -225,9 +234,13 @@ of the storage backend, not the head; §6/§9 quantify it properly.
 
 1. **Style head > backbone.** ✅ Confirmed on both families (DINOv2 +0.342 ARI,
    MobileNet +0.204). Held-out split ⇒ genuine transfer, not memorisation.
-2. **Cross-task specificity.** ✅ Confirmed *more strongly* than predicted: the
-   author head does not just under-help, it drops below the pretrained backbone
-   on style (DINOv2 −0.122, MobileNet −0.089). Diagonal-dominant transfer.
+2. **Cross-task specificity.** ✅ Confirmed: the author head drops below the
+   pretrained backbone on style (DINOv2 −0.054, MobileNet −0.038 after the
+   2026-06-01 re-run — smaller margins than the pre-re-run figures of
+   −0.122 / −0.089, but still consistently below the backbone on both
+   families). Diagonal-dominant transfer with **asymmetric magnitude**: the
+   style head's +0.342 / +0.204 lift on its trained axis far exceeds the
+   author head's −0.054 / −0.038 drag on the other.
 3. **CLIP competitive / ResNet50 weakest.** ⚠ Partial. CLIP (0.368) ≈ DINOv2
    base (0.356) ✅; but ResNet50 (0.334) is **not** clearly the weakest
    off-the-shelf encoder — it sits with the DINOv2/MobileNet base tier. Refuted
@@ -259,12 +272,15 @@ of the storage backend, not the head; §6/§9 quantify it properly.
    segments even the cleanly-separable fine-tuned head; its role is the
    unknown-k unsupervised setting, not label recovery.
 
-**Degenerate cells (all-noise, no metrics):** `mobilenet_v3`,
-`mobilenet_v3_graffiti_author_head` (all three identity-HDBSCAN), and
-`dinov2_graffiti_author_head` / `clip_vit_b32` / `resnet50` (identity HDBSCAN
-mcs10/20) collapse to 0 clusters (noise 1.0) — HDBSCAN finds no density
-structure in those raw spaces. The `mcs=50` follow-up adds two more cells to
-this list: `clip_vit_b32` and `mobilenet_v3_graffiti_author_head` under UMAP
-also collapse to all-noise at `mcs=50` (now too restrictive once those
-embeddings' UMAP density basins are smaller than 50 points). Listed here once;
-excluded from all tables above.
+**Degenerate cells (all-noise, no metrics):** `mobilenet_v3`
+(all three identity-HDBSCAN), `mobilenet_v3_graffiti_author_head`
+(identity-HDBSCAN mcs=20 — after the 2026-06-01 re-run mcs=5/10 produce
+high-noise partitions instead of full collapse), `clip_vit_b32` /
+`resnet50` (identity HDBSCAN mcs10/20). The two author-head identity-HDBSCAN
+mcs=5/10 cells, which were all-noise in the 29-May benchmark, now post
+high-noise (65–81 %) k=2–4 partitions after the re-run and are no longer
+fully degenerate. The `mcs=50` follow-up adds two more cells to this list:
+`clip_vit_b32` and `mobilenet_v3_graffiti_author_head` under UMAP also
+collapse to all-noise at `mcs=50` (now too restrictive once those embeddings'
+UMAP density basins are smaller than 50 points). Listed here once; excluded
+from all tables above.
