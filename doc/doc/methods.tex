@@ -38,26 +38,12 @@ La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
         habilitar o deshabilitar para los modelos de detección de pintadas,
         de modo que las imágenes sin detección se emitan como recortes de
         escena completa o se descarten, respectivamente.
-    \item Las cajas detectadas se fusionan si se solapan por encima de cierto
-        umbral y, cuando se configura un margen (\textit{padding}) no nulo, se
-        expanden para incluir contexto visual alrededor de la pintada. Por
-        defecto el margen es cero, de modo que la caja se recorta sin expansión
-        salvo que la configuración del \textit{benchmark} indique lo contrario.
-        % TODO: incorporar el parámetro `max_boxes_per_image` (añadido tras
-        % exp05, ver exp/exp05b). Tras la fusión, trunca la lista de cajas a
-        % las K de mayor confianza, evitando que imágenes con detecciones
-        % dispersas de baja calidad emitan muchos recortes fragmentados que
-        % degradan la geometría de clústeres.
-        % TODO: incorporar los parámetros `touch_merge_gap` y `max_merged_area`
-        % (añadidos en la segunda iteración de exp/exp05b). El primero amplía
-        % el criterio de fusión para unir cajas adyacentes (no solapadas) cuya
-        % separación de Chebyshev sea menor o igual al valor indicado, lo que
-        % consolida pintadas contiguas en una misma pared como un único
-        % recorte y reduce la presión sobre `max_boxes_per_image`. El segundo
-        % actúa como salvaguarda anti-cadena: rechaza la fusión cuando la
-        % unión resultante superaría la fracción de área indicada, impidiendo
-        % que cadenas de fusiones por contacto generen una mega-caja
-        % equivalente a la imagen completa.
+    \item Las cajas detectadas se fusionan según criterios de solapamiento y
+        proximidad configurables, con salvaguardas para evitar mega-cajas;
+        opcionalmente se trunca la lista a las $K$ de mayor confianza. Si se
+        configura un margen no nulo, las cajas supervivientes se expanden para
+        incluir contexto visual alrededor de la pintada. Los parámetros que
+        gobiernan este proceso se describen en \ref{subsubsec:segmentador}.
     \item Cada pintada se recorta sobre la imagen original y el recorte se
         entrega al modelo de extracción de características, que produce un
         vector de características de dimensión fija.

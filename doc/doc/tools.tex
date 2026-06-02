@@ -308,37 +308,16 @@ aplica un margen configurable alrededor de cada caja antes del recorte. El
 resultado es un conjunto de sub-imágenes que se procesan de forma independiente
 y que pueden producir varios \textit{embeddings} por fotografía original.
 
-% TODO: documentar el nuevo parámetro `max_boxes_per_image` del segmentador YOLO
-% (añadido tras exp05, ver exp/exp05b). Permite limitar el número máximo de
-% cajas emitidas por imagen tras el merge, conservando las de mayor confianza.
-% Mitiga la fragmentación en imágenes con muchas detecciones de baja calidad
-% que inflan la tasa de ruido en HDBSCAN.
-%
-% TODO: documentar el nuevo parámetro `allow_full_image_fallback` del segmentador
-% YOLO (añadido tras exp05, ver exp/exp05b). Controla la política de respaldo
-% cuando el detector no emite ninguna caja para una imagen: con `true` (valor por
-% defecto, comportamiento previo) se emite la imagen completa como única caja;
-% con `false` la imagen se descarta. Mover esta lógica desde Configuration al
-% propio segmentador unifica la política en un solo lugar. Mencionar también
-% que en exp05 ~25\% de imágenes de entrada (n=250, detector ajustado) cayeron
-% al respaldo, mezclando dos distribuciones de entrada (escena completa frente
-% a recorte ajustado) que la cabeza de estilo no vio durante el entrenamiento,
-% lo que degrada las métricas de clustering. El experimento exp/exp05b mide
-% el efecto de desactivar este respaldo junto con umbrales más permisivos.
-%
-% TODO: documentar los nuevos parámetros `touch_merge_gap` y `max_merged_area`
-% del segmentador YOLO (añadidos tras la primera iteración de exp/exp05b).
-% `touch_merge_gap` (fracción de la imagen, 0 = desactivado) extiende el
-% criterio de fusión para unir cajas adyacentes que no se solapan: se fusionan
-% si la separación de Chebyshev (max(gap_x, gap_y)) es menor o igual al valor.
-% Pensado para consolidar pintadas contiguas en una misma pared en lugar de
-% truncarlas con `max_boxes_per_image`. `max_merged_area` (fracción del área
-% de imagen, 1.0 = desactivado) actúa como salvaguarda anti-cadena: rechaza
-% una fusión cuya unión resultante supere la fracción indicada, evitando que
-% cadenas de fusiones por contacto generen una mega-caja que cubra casi toda
-% la imagen. Mencionar que la segunda fila de exp/exp05b mide su efecto sobre
-% la tasa de ruido y la fragmentación de clústeres frente al recorte ajustado
-% sin estos parámetros.
+Además de la fusión por solapamiento estándar, el segmentador incorpora un
+criterio de proximidad que une cajas adyacentes cuya separación no supera un
+umbral, consolidando pintadas contiguas en una misma pared. Una salvaguarda
+rechaza fusiones cuya caja unión supere una fracción del área de la imagen,
+evitando que cadenas de fusiones por contacto generen un recorte que cubra la
+escena completa. Tras la fusión, la lista de detecciones puede truncarse a las
+$K$ de mayor confianza, mitigando la fragmentación en imágenes con muchas
+detecciones dispersas de baja calidad. Por último, cuando el detector no emite
+ninguna detección, se puede optar por emitir la imagen completa como caja única
+o descartar la imagen del análisis.
 
 El detector se ajusta sobre el subconjunto anotado de ambos bancos descrito en
 \ref{subsec:dataset}, disjunto del banco de evaluación, lo que evita que las
