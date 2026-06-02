@@ -646,12 +646,12 @@ con distinto número de clústeres.
 }
 
 El resultado es inequívoco: la cabeza estilística de DINOv2 + identidad +
-KMeans-4 obtiene ARI = 0.722 y F1 = 0.806, aproximadamente el doble del ARI del
-\textit{backbone} y de cualquier otro extractor sin entrenar. Va seguido por
-la cabeza estilística de MobileNetV3, que aunque no llega a doblar el ARI del
-siguiente extractor, sí lo mejora sustancialmente (0.627 vs 0.368). El resto
-de extractores sin entrenar (CLIP, DINOv2 y MobileNetV3) se agrupan en un
-segundo bloque con ARI entre 0.33 y 0.37.
+KMeans-4 obtiene ARI = 0.722 y F1 = 0.806, presenta más del doble del ARI del
+\textit{backbone} y de cualquier otro extractor sin entrenar. Va seguido por la
+cabeza estilística de MobileNetV3, que aunque no llega a doblar el ARI del
+siguiente extractor, sí lo mejora sustancialmente (0.627 vs 0.368). El resto de
+extractores sin entrenar (CLIP, DINOv2 y MobileNetV3) se agrupan en un segundo
+bloque con ARI entre 0.33 y 0.37.
 
 Las cabezas de autoría no sólo no mejoran el ARI de estilo respecto a su
 propio \textit{backbone} sino que lo empeoran (DINOv2 $0.356\to 0.302$, MobileNetV3
@@ -694,14 +694,14 @@ del propio \textit{backbone}.
 }
 
 HDBSCAN no parece llegar a distinguir las cuatro categorías de estilo posibles
-como clústeres separados, sino que las agrupa en tres grupos más grandes. Tras
-una revisión manual de los clústeres generados, parece que HDBSCAN agrupa los
-grafitis en <<sencillos>>, <<elaborados>> y <<characters>> (color rojo, azul y
-verde en la figura~\ref{fig:e8a-hdbscan}). El primero de estos grupos está
-principalmente formado por \textit{tags} y algunos \textit{throw-ups} más
-simples. El segundo está formado por \textit{throw-ups} más elaborados y la
-gran mayoría de los \textit{pieces}. El tercero está formado por los
-\textit{characters} de estilo cómic, manga o graffiti de personajes.
+como clústeres separados, sino que las agrupa en tres grupos. Tras una revisión
+manual de los clústeres generados, parece que HDBSCAN agrupa los grafitis en
+<<sencillos>>, <<elaborados>> y <<characters>> (color azul, rojo y verde en la
+figura~\ref{fig:e8a-hdbscan}). El primero de estos grupos está principalmente
+formado por \textit{tags} y algunos \textit{throw-ups} más simples. El segundo
+está formado por \textit{throw-ups} más elaborados y la gran mayoría de los
+\textit{pieces}. El tercero está formado por los \textit{characters} de estilo
+cómic, manga o graffiti de personajes.
 
 \begin{figure}[h]
   \centering
@@ -723,8 +723,9 @@ ARI global lo obtiene CLIP ViT-B/32 (0.076), y los ocho extractores caben en
 una banda 0.041--0.076 cercano al agrupamiento aleatorio (la celda ganadora de
 E8a vale 0.722, $\sim$10 veces más). Dentro de la familia DINOv2 la cabeza de
 autoría sí supera a su \textit{backbone} (0.065 vs.\ 0.055) y a la cabeza de
-estilo (0.060), aunque a escala dominada por ruido; en la familia MobileNetV3
-la cabeza apenas iguala a su \textit{backbone} (0.048 vs.\ 0.046, +0.002 ARI).
+estilo (0.054), aunque a escala dominada por ruido; en la familia MobileNetV3
+la cabeza apenas iguala a su \textit{backbone} (0.048 vs.\ 0.046, +0.002 ARI)
+y supera a la cabeza de estilo (0.041).
 
 {\footnotesize
 \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
@@ -732,12 +733,12 @@ la cabeza apenas iguala a su \textit{backbone} (0.048 vs.\ 0.046, +0.002 ARI).
   \endhead
   \texttt{clip\_vit\_b32}                     & \textbf{0.076} & 0.789 & 0.090 & 0.003 & UMAP + aglo-87 \\ \hline
   \texttt{dinov2\_graffiti\_author\_head}     & 0.065 & 0.647 & 0.093 & 0.052 & UMAP + aglo-30 \\ \hline
-  \texttt{dinov2\_graffiti\_style\_head}      & 0.060 & 0.633 & 0.090 & 0.026 & UMAP + aglo-30 \\ \hline
   \texttt{dinov2\_vits14}                     & 0.055 & 0.754 & 0.079 & 0.096 & identidad + aglo-87 \\ \hline
+  \texttt{dinov2\_graffiti\_style\_head}      & 0.054 & 0.628 & 0.085 & 0.037 & UMAP + aglo-30 \\ \hline
   \texttt{resnet50}                           & 0.049 & 0.778 & 0.064 & 0.028 & UMAP + aglo-87 \\ \hline
   \texttt{mob.\_graffiti\_author\_head}       & 0.048 & 0.627 & 0.077 & 0.021 & UMAP + aglo-30 \\ \hline
   \texttt{mobilenet\_v3}                      & 0.046 & 0.780 & 0.060 & 0.023 & UMAP + aglo-87 \\ \hline
-  \texttt{mob.\_graffiti\_style\_head}        & 0.041 & 0.777 & 0.055 & 0.001 & UMAP + aglo-87 \\ \hline
+  \texttt{mob.\_graffiti\_style\_head}        & 0.041 & 0.629 & 0.070 & 0.020 & UMAP + aglo-30 \\ \hline
   \caption{E8b, mejor celda por extractor sobre la evaluación de autoría
   (185 recortes, 87 autores, evaluación entre ciudades Cuenca$\to$Salamanca).
   Todos los ARI caen en una banda estrecha cercana al suelo; la simetría
@@ -779,8 +780,8 @@ representación útil para esta tarea.
   \texttt{dinov2\_vits14}                    & 0.081 & 0.248 & 0.251 & 0.268 \\ \hline
   \texttt{mob.\_graffiti\_author\_head}      & 0.078 & 0.217 & 0.222 & 0.233 \\ \hline
   \texttt{dinov2\_graffiti\_author\_head}    & 0.077 & 0.228 & 0.232 & 0.254 \\ \hline
-  \texttt{dinov2\_graffiti\_style\_head}     & 0.067 & 0.240 & 0.243 & 0.192 \\ \hline
-  \texttt{mob.\_graffiti\_style\_head}       & 0.067 & 0.232 & 0.233 & 0.179 \\ \hline
+  \texttt{mob.\_graffiti\_style\_head}       & 0.071 & 0.196 & 0.200 & 0.176 \\ \hline
+  \texttt{dinov2\_graffiti\_style\_head}     & 0.065 & 0.226 & 0.229 & 0.192 \\ \hline
   \caption{E8b, recuperación supervisada \textit{top-5} por extractor sobre
   la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
   campo cabe en una banda estrecha; las cabezas de autoría quedan en la
@@ -805,7 +806,7 @@ fijo (KMeans, aglomerativo y espectral con $k=4$), y cae a $r = +0.55$ sobre
 los 89 puntos con ARI válido si se incluyen las celdas HDBSCAN, en las que el
 $k$ varía libremente. La señal es positiva pero claramente atenuada por la
 elección de granularidad. Sobre E8b (87 autores, etiquetas finas) la
-correlación \emph{cambia de signo}: $r = -0.52$ sobre 86 puntos y $r = -0.25$
+correlación \emph{cambia de signo}: $r = -0.54$ sobre 89 puntos y $r = -0.13$
 restringida a las 32 celdas aglomerativas. Las celdas de mayor silueta en E8b
 son particiones HDBSCAN $k=2$ o $k=3$ con ARI cercano a cero (la silueta
 premia \textit{pocos bloques grandes y bien separados}), mientras que las
