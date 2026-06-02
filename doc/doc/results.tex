@@ -229,21 +229,21 @@ $\varepsilon$ fijos), OPTICS coseno, aglomerativo (\textit{average linkage},
 $k\in\{10, 20\}$) y espectral ($k\in\{10, 20\}$); la
 tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
 
-% Add memory to this table?
 {\footnotesize
-\begin{longtable}{|p{2.4cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{0.9cm}|p{0.9cm}|p{1.0cm}|p{1.1cm}|} \hline
-  \textbf{Algoritmo} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} & \textbf{clu (s)} \\ \hline
+\begin{longtable}{|p{2.4cm}|p{0.9cm}|p{1.0cm}|p{1.1cm}|p{0.8cm}|p{0.8cm}|p{0.9cm}|p{1.0cm}|p{1.0cm}|} \hline
+  \textbf{Algoritmo} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} & \textbf{clu (s)} & \textbf{mem (MB)} \\ \hline
   \endhead
-  HDBSCAN (mcs=5)        & 563 & 0.199 &  0.151 &  33 & 1.70 & 0.75 & 0.348 \\ \hline
-  OPTICS (cos)           & 648 & 0.247 &  0.177 &  30 & 1.64 & 0.45 & 8.578 \\ \hline
-  GMM·300 (BIC)          & 297 & 0.000 &  0.054 &  50 & 2.52 & 0.58 & 1.839 \\ \hline
-  KMeans (codo, $k=8$)   &   8 & 0.000 &  0.057 & 805 & 3.23 & 0.37 & 0.009 \\ \hline
-  DBSCAN auto-$\varepsilon$ & 239 & 0.059 & -0.015 & 46 & 1.97 & 2.47 & 0.080 \\ \hline
-  Aglom. \textit{avg} $k=10$ &  10 & 0.000 & -0.015 & 506 & 3.11 & 1.36 & 0.408 \\ \hline
-  Espectral $k=10$       &  10 & 0.000 & -0.117 & 264 & 3.33 & 1.56 & 2.073 \\ \hline
-  \caption{E3, fila representativa de cada familia a $N=6416$. Sólo HDBSCAN
-  combina un número no trivial de clústeres, ruido moderado, tamaños
-  balanceados y coste despreciable.}
+  HDBSCAN (mcs=5)        & 563 & 0.199 &  0.151 &  33 & 1.70 & 0.75 & 0.348 & 0.3 \\ \hline
+  OPTICS (cos)           & 648 & 0.247 &  0.177 &  30 & 1.64 & 0.45 & 8.578 & 763.3 \\ \hline
+  GMM·300 (BIC)          & 297 & 0.000 &  0.054 &  50 & 2.52 & 0.58 & 1.839 & 49.7 \\ \hline
+  KMeans (codo, $k=8$)   &   8 & 0.000 &  0.057 & 805 & 3.23 & 0.37 & 0.009 & 0.2 \\ \hline
+  DBSCAN auto-$\varepsilon$ & 239 & 0.059 & -0.015 & 46 & 1.97 & 2.47 & 0.080 & 0.2 \\ \hline
+  Aglom. \textit{avg} $k=10$ &  10 & 0.000 & -0.015 & 506 & 3.11 & 1.36 & 0.408 & 314.2 \\ \hline
+  Espectral $k=10$       &  10 & 0.000 & -0.117 & 264 & 3.33 & 1.56 & 2.073 & 1.1 \\ \hline
+  \caption{E3, fila representativa de cada familia a $N=6416$. La columna
+  \textbf{mem} reporta el pico de RSS delta de la etapa de agrupamiento. Sólo
+  HDBSCAN combina un número no trivial de clústeres, ruido moderado, tamaños
+  balanceados, coste despreciable y huella de memoria mínima.}
   \label{tab:e3-summary-6416}
 \end{longtable}
 }
@@ -273,14 +273,28 @@ presenta la peor silueta del panel) o por el escalado de memoria.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e3_pareto_quality_cost.pdf}
-  \caption{E3: familias de agrupamiento a $N=6416$. Cada barra muestra la
-  silueta media sobre las variantes evaluadas dentro de cada familia, con
-  error igual a la desviación típica entre variantes; la anotación reporta el
-  tiempo medio de agrupamiento. La configuración base HDBSCAN \texttt{mcs}=5
-  aparece resaltada en rojo: silueta competitiva y coste despreciable. OPTICS
-  la iguala en silueta pero la domina en coste por más de un orden de
-  magnitud.}
+  \caption{E3: calidad frente a coste por familia de agrupamiento a $N=6416$.
+  Cada familia se representa por su mejor variante en silueta (marcador
+  grande etiquetado); los puntos pequeños del mismo color muestran el resto
+  de variantes evaluadas. El eje horizontal está en escala logarítmica para
+  abarcar los tres órdenes de magnitud que separan KMeans de OPTICS. La línea
+  discontinua marca el frente de Pareto: HDBSCAN (resaltado en rojo) domina a
+  todas las familias excepto a OPTICS, que paga $\sim$25 veces más coste por
+  $\sim$0.02 más de silueta.}
   \label{fig:e3-pareto}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{figures/e3_scaling_with_n.pdf}
+  \caption{E3: escalado con el tamaño del banco $N$ por familia. Para cada $N$
+  se selecciona la variante de mejor silueta dentro de la familia. El coste
+  (izquierda) y la huella de memoria (centro) crecen varios órdenes de
+  magnitud para OPTICS y aglomerativo mientras HDBSCAN se mantiene plano. El
+  número de clústeres (derecha) crece de forma sensata para HDBSCAN, OPTICS y
+  GMM, frente a los métodos con $k$ fijo (KMeans, aglomerativo, espectral) o
+  inestables (DBSCAN).}
+  \label{fig:e3-scaling}
 \end{figure}
 
 \subsubsection{Granularidad de HDBSCAN}

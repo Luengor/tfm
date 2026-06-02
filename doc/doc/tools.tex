@@ -56,6 +56,21 @@ banco principal del que nunca se extraen recortes de entrenamiento (compuesto
 por $6416$ imágenes), lo que garantiza que la evaluación sin supervisión se
 realice sobre un banco completamente disjunto.
 
+La figura~\ref{fig:dataset-style-distribution} muestra la distribución por
+clase de los recortes etiquetados por estilo. El reparto es desigual: las
+categorías \textit{tag}, \textit{piece} y \textit{throw-up} concentran la
+mayor parte de los recortes, mientras que \textit{character} resulta
+claramente minoritaria, lo que condiciona la interpretación posterior de las
+métricas extrínsecas por estilo.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{figures/dataset_style_distribution.pdf}
+  \caption{Distribución por clase de los recortes etiquetados por estilo,
+  separando los subconjuntos de entrenamiento y evaluación.}
+  \label{fig:dataset-style-distribution}
+\end{figure}
+
 Por último, se utilizan imágenes de ambos grupos para el ajuste fino del
 detector de pintadas, con un total de $447$ imágenes completamente anotadas con
 las cajas de las pintadas.
