@@ -191,7 +191,8 @@ de la última capa intermedia constituye el \textit{embedding} de la imagen. En
 las redes convolucionales de (ResNet50, VGG16, InceptionV3 y MobileNetV3) esto
 implica sustituir la cabeza de clasificación por una identidad; DINOv2, CLIP y
 YOLO se consultan directamente a través de su propia API de extracción de
-características, sin retirar capa alguna. La tabla~\ref{tab:embedding-models}
+características, sin retirar capa alguna. MobileNetV3 se normaliza a la norma L2
+para asegurar comparabilidad con CLIP y las cabezas entrenadas. La tabla~\ref{tab:embedding-models}
 resume las opciones disponibles, indicando arquitectura, dimensionalidad de
 salida y pre entrenamiento.
 
