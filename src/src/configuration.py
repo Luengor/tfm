@@ -153,7 +153,7 @@ if __name__ == "__main__":
     print("Creating configuration...")
     config = Configuration(
             storage,
-            get_model(EmbeddingModelNames.YOLOs),
+            get_model(EmbeddingModelNames.YOLOn),
             OPTICSClusterer(),
             IdentityReduction(),
             IdentitySegmenter()

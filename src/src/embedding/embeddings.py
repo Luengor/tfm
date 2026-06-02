@@ -38,7 +38,6 @@ class EmbeddingModelNames(str, Enum):
     DINOV2_GRAFFITI_STYLE_HEAD = "dinov2_graffiti_style_head"
     CLIP_VIT_B32 = "clip_vit_b32"
     YOLOn = "yolon"
-    YOLOs = "yolos"
     YOLOm = "yolom"
 
 MODELS = {
@@ -89,10 +88,6 @@ MODELS = {
     EmbeddingModelNames.YOLOn: {
         'model': 'models/yolo11n.pt',
         'embedding_size': 256,
-    },
-    EmbeddingModelNames.YOLOs: {
-        'model': 'models/yolo11s.pt',
-        'embedding_size': 512,
     },
     EmbeddingModelNames.YOLOm: {
         'model': 'models/yolo11m.pt',
@@ -266,7 +261,7 @@ class HeadEmbeddingModel(EmbeddingBase):
 
 def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
     match name:
-        case EmbeddingModelNames.YOLOm | EmbeddingModelNames.YOLOs | EmbeddingModelNames.YOLOn:
+        case EmbeddingModelNames.YOLOm | EmbeddingModelNames.YOLOn:
             return YoloEmbeddingModel(name)
 
         case EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD:
