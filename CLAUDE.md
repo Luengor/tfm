@@ -18,6 +18,9 @@ After updating an integral or important part of the project, consider updating t
 
 Before starting to work on a new feature or fixing a problem, check if there is a task on the Vikunja task lisk (with the `get_tasks_todo` MCP call). If there is, comunicate that to the user and mark the task as "completed" when done. 
 
+Never commit work unless the user has given explicit permission to do so. If the user allows you to commit once, DO
+ASK the next time you want to commit, even if it's a small change. Always ask before committing.
+
 ## Environment & Commands
 
 This project uses `uv` for dependency management (Python ≥ 3.14). All commands run from the `src/` directory.
@@ -73,7 +76,7 @@ The pipeline is assembled via `Configuration` (`src/src/configuration.py`), whic
 | Abstract class | Role | Implementations |
 |---|---|---|
 | `StorageBase` | Persist/query embeddings | `SQLiteStorage`, `PostgreSQLStorage` (with pgvector) |
-| `EmbeddingBase` | Generate float vectors from images | ResNet50, VGG16, InceptionV3, MobileNetV3, DINOv2, CLIP ViT-B/32, YOLO (n/s/m; `yolos` is implemented but not used by any benchmark config, which sweep only n/m), custom graffiti-finetuned heads (author + style) |
+| `EmbeddingBase` | Generate float vectors from images | ResNet50, VGG16, InceptionV3, MobileNetV3, DINOv2, CLIP ViT-B/32, YOLO (n/m), custom graffiti-finetuned heads (author + style) |
 | `SegmenterBase` | Detect graffiti bounding boxes | `YoloSegmenter` (YOLO detection + merge + padding), `IdentitySegmenter` (full image) |
 | `ReductionBase` | Dimensionality reduction before clustering | PCA, UMAP, Isomap, KernelPCA, Identity |
 | `ClusteringBase` | Cluster reduced embeddings | KMeans, DBSCAN, HDBSCAN, OPTICS, Agglomerative, Spectral, GMM, AffinityPropagation |
