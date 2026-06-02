@@ -12,8 +12,10 @@ from src.train.losses import SupConLoss, batch_hard_triplet_loss
 
 
 @torch.no_grad()
-def _extract_val_embeddings(model, val_dir: str, device, min_samples: int = 2):
-    classes, skipped = list_eligible_classes(val_dir, min_samples)
+def _extract_val_embeddings(
+    model, val_dir: str, device, min_samples: int = 2, skip: set[str] | None = None
+):
+    classes, skipped = list_eligible_classes(val_dir, min_samples, skip=skip)
     embeddings = []
     labels = []
     for label_idx, cls in enumerate(classes):
@@ -36,7 +38,7 @@ def run_training(
     save_path,
     dataset_dir: str = os.path.join("dataset", "crops"),
     num_epochs: int = 20,
-    classes_per_batch: int = 8,
+    classes_per_batch: int | None = 8,
     samples_per_class: int = 4,
     batches_per_epoch: int | None = None,
     learning_rate: float = 1e-4,
@@ -48,6 +50,8 @@ def run_training(
     val_min_samples: int = 2,
     val_metric: str = "accuracy_1nn",
     patience: int | None = None,
+    train_transform=None,
+    skip_classes: set[str] | None = None,
 ):
     if loss not in {"supcon", "triplet"}:
         raise ValueError(f"Unknown loss '{loss}'. Choose 'supcon' or 'triplet'.")
@@ -58,7 +62,11 @@ def run_training(
 
     two_views = loss == "supcon"
     dataset = GraffitiLabeledDataset(
-        root_dir=dataset_dir, min_samples=train_min_samples, two_views=two_views
+        root_dir=dataset_dir,
+        min_samples=train_min_samples,
+        two_views=two_views,
+        transform=train_transform,
+        skip=skip_classes,
     )
     print(
         f"Dataset: {len(dataset)} images across {len(dataset.classes)} classes "
@@ -67,6 +75,8 @@ def run_training(
     if len(dataset.classes) < 2:
         raise ValueError("Need at least 2 classes for metric-learning training")
 
+    if classes_per_batch is None:
+        classes_per_batch = len(dataset.classes)
     if batches_per_epoch is None:
         batches_per_epoch = max(1, len(dataset) // (classes_per_batch * samples_per_class))
     print(
@@ -76,10 +86,12 @@ def run_training(
     )
 
     sampler = PKSampler(dataset.label_to_indices, classes_per_batch, samples_per_class, batches_per_epoch)
-    dataloader = DataLoader(dataset, batch_sampler=sampler)
+    dataloader = DataLoader(dataset, batch_sampler=sampler, num_workers=2, pin_memory=True)
 
     if val_dataset_dir:
-        val_classes, val_skipped = list_eligible_classes(val_dataset_dir, val_min_samples)
+        val_classes, val_skipped = list_eligible_classes(
+            val_dataset_dir, val_min_samples, skip=skip_classes
+        )
         print(
             f"Validation: {val_dataset_dir} — {len(val_classes)} classes with "
             f"≥{val_min_samples} samples ({val_skipped} skipped)"
@@ -95,76 +107,84 @@ def run_training(
     best_epoch = -1
     saved_best = False
 
-    for epoch in range(num_epochs):
-        model.train()
-        running_loss = 0.0
-        pbar = tqdm(dataloader, desc=f"Epoch {epoch + 1}/{num_epochs}")
-        for batch in pbar:
-            optimizer.zero_grad()
+    interrupted = False
+    try:
+        for epoch in range(num_epochs):
+            model.train()
+            running_loss = 0.0
+            pbar = tqdm(dataloader, desc=f"Epoch {epoch + 1}/{num_epochs}")
+            for batch in pbar:
+                optimizer.zero_grad()
 
-            if two_views:
-                v1, v2, lbls = batch
-                imgs = torch.cat([v1, v2], dim=0).to(device)
-                lbls = torch.cat([lbls, lbls], dim=0).to(device)
-                emb = model(imgs)
-                emb = F.normalize(emb, p=2, dim=1)
-                step_loss = supcon(emb, lbls)
-            else:
-                imgs, lbls = batch
-                imgs = imgs.to(device)
-                lbls = lbls.to(device)
-                emb = model(imgs)
-                emb = F.normalize(emb, p=2, dim=1)
-                step_loss = batch_hard_triplet_loss(emb, lbls, margin)
-
-            step_loss.backward()
-            optimizer.step()
-
-            running_loss += step_loss.item()
-            pbar.set_postfix({"loss": running_loss / (pbar.n + 1)})
-
-        scheduler.step()
-
-        if val_dataset_dir:
-            model.eval()
-            embs, lbls_np, n_classes, _ = _extract_val_embeddings(
-                model, val_dataset_dir, device, min_samples=val_min_samples
-            )
-            if len(embs) > 0 and n_classes >= 2:
-                metrics = compute_metrics(embs, lbls_np, n_classes)
-                print(
-                    f"  Val epoch {epoch + 1}: silhouette={metrics['silhouette']:.4f} "
-                    f"acc_1nn={metrics['accuracy_1nn']:.4f} "
-                    f"ari={metrics['ari']:.4f} nmi={metrics['nmi']:.4f}"
-                )
-                if val_metric not in metrics:
-                    raise ValueError(f"Unknown val_metric '{val_metric}'. Available: {list(metrics)}")
-                score = metrics[val_metric]
-                if score > best_score:
-                    best_score = score
-                    best_epoch = epoch + 1
-                    patience_counter = 0
-                    os.makedirs(os.path.dirname(save_path), exist_ok=True)
-                    torch.save(model.state_dict(), save_path)
-                    saved_best = True
-                    print(f"  New best {val_metric}={score:.4f} — saved to {save_path}")
+                if two_views:
+                    v1, v2, lbls = batch
+                    imgs = torch.cat([v1, v2], dim=0).to(device)
+                    lbls = torch.cat([lbls, lbls], dim=0).to(device)
+                    emb = model(imgs)
+                    emb = F.normalize(emb, p=2, dim=1)
+                    step_loss = supcon(emb, lbls)
                 else:
-                    patience_counter += 1
-                    if patience is not None and patience_counter >= patience:
-                        print(
-                            f"Early stopping at epoch {epoch + 1} "
-                            f"(no improvement in {val_metric} for {patience} epochs)"
-                        )
-                        break
-            else:
-                print(f"  Val epoch {epoch + 1}: not enough samples/classes to compute metrics")
+                    imgs, lbls = batch
+                    imgs = imgs.to(device)
+                    lbls = lbls.to(device)
+                    emb = model(imgs)
+                    emb = F.normalize(emb, p=2, dim=1)
+                    step_loss = batch_hard_triplet_loss(emb, lbls, margin)
+
+                step_loss.backward()
+                optimizer.step()
+
+                running_loss += step_loss.item()
+                pbar.set_postfix({"loss": running_loss / (pbar.n + 1)})
+
+            scheduler.step()
+
+            if val_dataset_dir:
+                model.eval()
+                embs, lbls_np, n_classes, _ = _extract_val_embeddings(
+                    model, val_dataset_dir, device,
+                    min_samples=val_min_samples, skip=skip_classes,
+                )
+                if len(embs) > 0 and n_classes >= 2:
+                    metrics = compute_metrics(embs, lbls_np, n_classes)
+                    print(
+                        f"  Val epoch {epoch + 1}: silhouette={metrics['silhouette']:.4f} "
+                        f"acc_1nn={metrics['accuracy_1nn']:.4f} "
+                        f"ari={metrics['ari']:.4f} nmi={metrics['nmi']:.4f}"
+                    )
+                    if val_metric not in metrics:
+                        raise ValueError(f"Unknown val_metric '{val_metric}'. Available: {list(metrics)}")
+                    score = metrics[val_metric]
+                    if score > best_score:
+                        best_score = score
+                        best_epoch = epoch + 1
+                        patience_counter = 0
+                        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+                        torch.save(model.state_dict(), save_path)
+                        saved_best = True
+                        print(f"  New best {val_metric}={score:.4f} — saved to {save_path}")
+                    else:
+                        patience_counter += 1
+                        if patience is not None and patience_counter >= patience:
+                            print(
+                                f"Early stopping at epoch {epoch + 1} "
+                                f"(no improvement in {val_metric} for {patience} epochs)"
+                            )
+                            break
+                else:
+                    print(f"  Val epoch {epoch + 1}: not enough samples/classes to compute metrics")
+    except KeyboardInterrupt:
+        interrupted = True
+        print(f"\nInterrupted at epoch {epoch + 1}.")
 
     if val_dataset_dir and saved_best:
+        suffix = " (interrupted)" if interrupted else ""
         print(
-            f"Training complete. Best {val_metric}={best_score:.4f} at epoch {best_epoch}; "
+            f"Training complete{suffix}. Best {val_metric}={best_score:.4f} at epoch {best_epoch}; "
             f"best weights saved to {save_path}"
         )
     else:
         os.makedirs(os.path.dirname(save_path), exist_ok=True)
         torch.save(model.state_dict(), save_path)
-        print(f"Model saved to {save_path}")
+        reason = "Current weights saved on interrupt" if interrupted else "Model saved"
+        print(f"{reason} to {save_path}")

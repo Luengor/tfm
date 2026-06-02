@@ -69,7 +69,7 @@ MODELS = {
         'weights_path': "models/mobilenet_graffiti_author_head.pth"
     },
     EmbeddingModelNames.MOBILENET_V3_GRAFFITI_STYLE_HEAD: {
-        'embedding_size': 1280,
+        'embedding_size': 128,
         'weights_path': "models/mobilenet_graffiti_style_head.pth"
     },
     EmbeddingModelNames.DINOV2_VITS14: {
@@ -80,7 +80,7 @@ MODELS = {
         'weights_path': "models/dinov2_graffiti_author_head.pth"
     },
     EmbeddingModelNames.DINOV2_GRAFFITI_STYLE_HEAD: {
-        'embedding_size': 384,
+        'embedding_size': 128,
         'weights_path': "models/dinov2_graffiti_style_head.pth"
     },
     EmbeddingModelNames.CLIP_VIT_B32: {
@@ -216,20 +216,12 @@ class YoloEmbeddingModel(EmbeddingBase):
         return MODELS[self.name]['embedding_size']
 
 class HeadEmbeddingModel(EmbeddingBase):
-    def __init__(self, name: EmbeddingModelNames, base_model, preprocessor, input_dim, output_dim=None):
+    def __init__(self, name: EmbeddingModelNames, base_model, preprocessor):
         self.name = name
         self.device = get_device()
         self.base_model = base_model
         self.preprocessor = preprocessor
 
-        if output_dim is None:
-            output_dim = input_dim
-        self.projection_head = nn.Sequential(
-            nn.Linear(input_dim, 512),
-            nn.ReLU(),
-            nn.Linear(512, output_dim)
-        )
-        
         m_data = MODELS[name]
         if not os.path.exists(m_data['weights_path']):
             raise FileNotFoundError(f"Weights file not found for {name}: {m_data['weights_path']}")
@@ -238,6 +230,17 @@ class HeadEmbeddingModel(EmbeddingBase):
 
         base_state_dict = {k.replace('base_model.', ''): v for k, v in state_dict.items() if k.startswith('base_model.')}
         head_state_dict = {k.replace('projection_head.', ''): v for k, v in state_dict.items() if k.startswith('projection_head.')}
+
+        # Infer projection head dims from checkpoint shapes:
+        # head is Linear(input_dim → hidden_dim) → ReLU → Linear(hidden_dim → output_dim).
+        in_features = head_state_dict['0.weight'].shape[1]
+        hidden_dim = head_state_dict['0.weight'].shape[0]
+        out_features = head_state_dict['2.weight'].shape[0]
+        self.projection_head = nn.Sequential(
+            nn.Linear(in_features, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, out_features),
+        )
 
         self.base_model.load_state_dict(base_state_dict)
         self.projection_head.load_state_dict(head_state_dict)
@@ -259,7 +262,7 @@ class HeadEmbeddingModel(EmbeddingBase):
 
     @property
     def embedding_size(self) -> int:
-        return MODELS[self.name]['embedding_size']
+        return self.projection_head[-1].out_features
 
 def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
     match name:
@@ -270,13 +273,13 @@ def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
             weights = models.MobileNet_V3_Large_Weights.DEFAULT
             base = models.mobilenet_v3_large(weights=weights)
             base.classifier[3] = nn.Identity()
-            return HeadEmbeddingModel(name, base, weights.transforms(), input_dim=1280, output_dim=128)
+            return HeadEmbeddingModel(name, base, weights.transforms())
 
         case EmbeddingModelNames.MOBILENET_V3_GRAFFITI_STYLE_HEAD:
             weights = models.MobileNet_V3_Large_Weights.DEFAULT
             base = models.mobilenet_v3_large(weights=weights)
             base.classifier[3] = nn.Identity()
-            return HeadEmbeddingModel(name, base, weights.transforms(), input_dim=1280)
+            return HeadEmbeddingModel(name, base, weights.transforms())
 
         case EmbeddingModelNames.DINOV2_VITS14:
             return DinoEmbeddingModel(name)
@@ -290,7 +293,7 @@ def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
                 transforms.ToTensor(),
                 transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
             ])
-            return HeadEmbeddingModel(name, base, preprocessor, input_dim=384, output_dim=128)
+            return HeadEmbeddingModel(name, base, preprocessor)
 
         case EmbeddingModelNames.DINOV2_GRAFFITI_STYLE_HEAD:
             base = torch.hub.load('facebookresearch/dinov2', 'dinov2_vits14')
@@ -301,8 +304,8 @@ def get_model(name: EmbeddingModelNames) -> EmbeddingBase:
                 transforms.ToTensor(),
                 transforms.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
             ])
-            return HeadEmbeddingModel(name, base, preprocessor, input_dim=384)
-            
+            return HeadEmbeddingModel(name, base, preprocessor)
+
         case EmbeddingModelNames.CLIP_VIT_B32:
             return ClipEmbeddingModel(name)
 

@@ -12,8 +12,14 @@ from sklearn.neighbors import KNeighborsClassifier
 from src.embedding.embeddings import EmbeddingModelNames, get_model
 
 
-def list_eligible_classes(crops_dir: str, min_samples: int = 2) -> tuple[list[str], int]:
-    all_classes = sorted([d for d in os.listdir(crops_dir) if os.path.isdir(os.path.join(crops_dir, d))])
+def list_eligible_classes(
+    crops_dir: str, min_samples: int = 2, skip: set[str] | None = None
+) -> tuple[list[str], int]:
+    skip = skip or set()
+    all_classes = sorted(
+        d for d in os.listdir(crops_dir)
+        if os.path.isdir(os.path.join(crops_dir, d)) and d not in skip
+    )
     classes = [
         cls for cls in all_classes
         if len(os.listdir(os.path.join(crops_dir, cls))) >= min_samples
@@ -85,13 +91,13 @@ def main():
     args = parser.parse_args()
 
     models_to_compare = [
-        EmbeddingModelNames.DINOV2_VITS14,
-        EmbeddingModelNames.DINOV2_GRAFFITI_AUTHOR_HEAD,
+            # EmbeddingModelNames.DINOV2_VITS14,
+            # EmbeddingModelNames.DINOV2_GRAFFITI_AUTHOR_HEAD,
         EmbeddingModelNames.DINOV2_GRAFFITI_STYLE_HEAD,
-        EmbeddingModelNames.MOBILENET_V3,
-        EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD,
+        # EmbeddingModelNames.MOBILENET_V3,
+        # EmbeddingModelNames.MOBILENET_V3_GRAFFITI_AUTHOR_HEAD,
         EmbeddingModelNames.MOBILENET_V3_GRAFFITI_STYLE_HEAD,
-        EmbeddingModelNames.CLIP_VIT_B32,
+        # EmbeddingModelNames.CLIP_VIT_B32,
     ]
 
     results = {}

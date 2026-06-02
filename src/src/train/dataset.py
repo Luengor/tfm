@@ -25,6 +25,23 @@ _AUG_TRANSFORM = transforms.Compose([
     _NORMALIZE,
 ])
 
+# Style-oriented augmentation: keeps vertical flip and gaussian blur (style is
+# orientation- and sharpness-invariant for graffiti) on top of the same strong
+# augmentation policy used for author training.
+_STYLE_AUG_TRANSFORM = transforms.Compose([
+    transforms.RandomResizedCrop(224, scale=(0.5, 1.0)),
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomVerticalFlip(p=0.1),
+    transforms.RandomPerspective(distortion_scale=0.2, p=0.5),
+    transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1),
+    transforms.RandomGrayscale(p=0.2),
+    transforms.GaussianBlur(kernel_size=23, sigma=(0.1, 2.0)),
+    transforms.TrivialAugmentWide(),
+    transforms.ToTensor(),
+    transforms.RandomErasing(p=0.25, scale=(0.02, 0.2)),
+    _NORMALIZE,
+])
+
 _BASE_TRANSFORM = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -39,14 +56,22 @@ class GraffitiLabeledDataset(Dataset):
     form at least one positive pair after PK sampling.
     """
 
-    def __init__(self, root_dir, transform=None, min_samples: int = 1, two_views: bool = False):
+    def __init__(
+        self,
+        root_dir,
+        transform=None,
+        min_samples: int = 1,
+        two_views: bool = False,
+        skip: set[str] | None = None,
+    ):
         self.root_dir = root_dir
         self.transform = transform or _AUG_TRANSFORM
         self.two_views = two_views
+        skip = skip or set()
 
         all_dirs = sorted(
             d for d in os.listdir(root_dir)
-            if os.path.isdir(os.path.join(root_dir, d))
+            if os.path.isdir(os.path.join(root_dir, d)) and d not in skip
         )
         self.classes = [
             d for d in all_dirs

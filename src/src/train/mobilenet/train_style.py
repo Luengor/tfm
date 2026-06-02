@@ -1,46 +1,10 @@
-import argparse
 import torch.nn as nn
 from torchvision import models
 from src.train.models import ModelWithHead
-from src.train.style_trainer import run_style_training
+from src.train.style_head import build_arg_parser, train_style_head
 
 
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Fine-tune a MobileNetV3-Large projection head for graffiti style classification "
-                    "using Supervised Contrastive Loss on the dataset_cropped folder.",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-    )
-    parser.add_argument(
-        "--dataset", default="../dataset_cropped",
-        help="Path to dataset root with one subdirectory per style class.",
-    )
-    parser.add_argument(
-        "--save-path", default="models/mobilenet_graffiti_style_head.pth",
-        help="Where to save the best model weights.",
-    )
-    parser.add_argument("--epochs", type=int, default=60, help="Maximum training epochs.")
-    parser.add_argument(
-        "--samples-per-class", type=int, default=4,
-        help="Images per class per batch (batch size = classes × this value).",
-    )
-    parser.add_argument("--lr", type=float, default=1e-4, help="Adam learning rate.")
-    parser.add_argument(
-        "--temperature", type=float, default=0.07,
-        help="SupCon softmax temperature (lower = sharper contrast).",
-    )
-    parser.add_argument(
-        "--patience", type=int, default=15,
-        help="Early-stopping patience in epochs.",
-    )
-    parser.add_argument(
-        "--skip", default="",
-        help="Comma-separated list of class folder names to exclude from training (e.g. 'other,tag').",
-    )
-    return parser.parse_args()
-
-
-def train_mobilenet_style_head(args: argparse.Namespace) -> None:
+def train_mobilenet_style_head(args) -> None:
     print("Loading MobileNetV3-Large model and freezing backbone...")
     weights = models.MobileNet_V3_Large_Weights.DEFAULT
     base_model = models.mobilenet_v3_large(weights=weights)
@@ -51,20 +15,13 @@ def train_mobilenet_style_head(args: argparse.Namespace) -> None:
         param.requires_grad = False
 
     # MobileNetV3-Large feature size is 1280
-    model = ModelWithHead(base_model, input_dim=1280)
-
-    run_style_training(
-        model=model,
-        save_path=args.save_path,
-        dataset_root=args.dataset,
-        num_epochs=args.epochs,
-        samples_per_class=args.samples_per_class,
-        learning_rate=args.lr,
-        temperature=args.temperature,
-        patience=args.patience,
-        skip={s.strip() for s in args.skip.split(",") if s.strip()},
-    )
+    model = ModelWithHead(base_model, input_dim=1280, output_dim=args.output_dim)
+    train_style_head(model, args)
 
 
 if __name__ == "__main__":
-    train_mobilenet_style_head(parse_args())
+    parser = build_arg_parser(
+        description="Fine-tune a MobileNetV3-Large projection head for graffiti style similarity.",
+        default_save_path="models/mobilenet_graffiti_style_head.pth",
+    )
+    train_mobilenet_style_head(parser.parse_args())
