@@ -144,7 +144,7 @@ y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
   más caros simultáneamente en tiempo y RSS. Se muestran 10 de los 12
   extractores (las cabezas \texttt{mob.\_graffiti\_style\_head} y
   \texttt{dinov2\_graffiti\_author\_head} se omiten por brevedad; su coste cae
-  dentro del rango de la cabeza correspondiente ya presente.}
+  dentro del rango de la cabeza correspondiente ya presente.)}
   \label{tab:e1-cost-6416}
 \end{longtable}
 }
@@ -328,7 +328,7 @@ tabla~\ref{tab:e4-mcs-6416} a $N=6416$.
 }
 
 Los valores más altos de \texttt{mcs} (100 y 200), aunque presentan las
-métricas intrínsecas más altas ocn tasas de ruido y variación de tamaños bajas,
+métricas intrínsecas más altas con tasas de ruido y variación de tamaños bajas,
 son claramente degenerados, puesto que solo producen dos clústeres masivos que
 absorben casi todos los puntos. El caso de 50 es, aunque muy similar, algo más
 defendible. El modelo utilizado para la generación de los \textit{embeddings}
@@ -344,7 +344,7 @@ menor ruido y métricas superiores a los dos casos anteriores (aunque no mejores
 que los valores degenerados). Se escoge \texttt{mcs}=5 como valor base para el
 resto del proyecto por una preferencia por un número de clústeres más alto y la
 sospecha de que el caso para \texttt{mcs}=50 es un caso de agrupamiento
-demasiado grueso. Esta decisión se ve reforzada en el expermiento E8a, donde
+demasiado grueso. Esta decisión se ve reforzada en el experimento E8a, donde
 las métricas supervisadas favorecen a la configuración escogida frente a la
 otra.
 
@@ -466,8 +466,8 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
 
 Como se puede ver en la segunda tabla, el rango reducido de $N$ provoca que
 varias de las etapas tengan pendientes observadas menores que la complejidad
-teórica de referencia, como puede ser el caso de DBSCAN o OPTICS. Algortimos
-como HDBSCAN o el algomerativo, con complejidades más altas, sí que presentan
+teórica de referencia, como puede ser el caso de DBSCAN o OPTICS. Algoritmos
+como HDBSCAN o el aglomerativo, con complejidades más altas, sí que presentan
 pendientes superiores a 1, dejando claro su naturaleza super-lineal. El tiempo
 de ejecución de estos algoritmos fue prácticamente despreciable al compararlo
 con la ingesta o la búsqueda por similitud, no llegando a superar los 5~s en
