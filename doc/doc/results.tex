@@ -79,31 +79,34 @@ $N=6416$.
   \texttt{dinov2\_graffiti\_author\_head} & 631 & 0.143 & 0.187 & 17.9 & 1.59 & 0.81 \\ \hline
   \texttt{dinov2\_vits14}                 & 632 & 0.123 & 0.185 & 19.2 & 1.58 & 0.92 \\ \hline
   \texttt{clip\_vit\_b32}                 & 734 & 0.150 & 0.170 & 11.9 & 1.66 & 0.74 \\ \hline
-  \texttt{dinov2\_graffiti\_style\_head}  & 563 & 0.199 & 0.151 & 33.1 & 1.70 & 0.75 \\ \hline
-  \texttt{mob.\_graffiti\_style\_head}    & 631 & 0.202 & 0.144 & 13.7 & 1.89 & 0.63 \\ \hline
+  \texttt{mob.\_graffiti\_style\_head}    & 629 & 0.214 & 0.164 & 19.7 & 1.74 & 0.58 \\ \hline
+  \texttt{dinov2\_graffiti\_style\_head}  & 562 & 0.202 & 0.155 & 27.9 & 1.70 & 0.74 \\ \hline
   \texttt{yolom}                          & 480 & 0.253 & 0.131 & 32.2 & 1.75 & 0.74 \\ \hline
   \texttt{yolon}                          & 348 & 0.341 & 0.085 & 51.2 & 1.91 & 0.81 \\ \hline
   \caption{E1, calidad intrínseca a $N=6416$. Las CNN ImageNet encabezan la silueta; el extractor base
-  (\texttt{dinov2\_graffiti\_style\_head}) presenta el segundo CH más alto del
-  panel pese a una silueta inferior a la de su \textit{backbone} DINOv2.}
+  (\texttt{dinov2\_graffiti\_style\_head}) presenta un CH (27.9) sólo superado
+  por los \textit{backbones} YOLO, pese a una silueta inferior a la de su
+  \textit{backbone} DINOv2.}
   \label{tab:e1-quality-6416}
 \end{longtable}
 }
 
-% TODO: Ensure correctenss here
 Probablemente el resultado más llamativo del barrido es la inversión entre
-silueta y Calinski--Harabasz sobre la cabeza estilística de DINOv2. La silueta
-cae drásticamente mientras que el CH sube al segundo valor más alto de todo el
-barrido. Este fenómeno, aunque contraintuitivo a primera vista, puede
-explicarse por la naturaleza del entrenamiento contrastivo y los datos
-utilizados: el \textit{contrastive loss} optimiza la relación entre la
-compactación de los \textit{clusters} y su separación (CH), pero no la cohesión
-local de cada punto dentro de su clúster (silueta). En el caso de las cabezas
-estilísticas, estas fueron entrenadas con recortes de grafiti y no con imágenes
-completas como aquí se evalúan. Esta cambio de dominio, que provocaría que las
-características extraídas por la cabeza sean menos cohesivas por la elevada
-complejidad de las imágenes completas, junto con la naturaleza de la función
-de pérdida podrían ser la causa de la caída de la silueta.
+silueta y Calinski--Harabasz sobre ambas cabezas estilísticas. La silueta cae
+con respecto a su \textit{backbone} (DINOv2: 0.185 \(\to\) 0.155;
+MobileNetV3: 0.260 \(\to\) 0.164) mientras que el CH sube en los dos casos
+(DINOv2: 19.2 \(\to\) 27.9, sólo superado por los \textit{backbones} YOLO;
+MobileNetV3: 13.1 \(\to\) 19.7). Este fenómeno, aunque contraintuitivo a
+primera vista, puede explicarse por la naturaleza del entrenamiento
+contrastivo y los datos utilizados: el \textit{contrastive loss} optimiza la
+relación entre la compactación de los \textit{clusters} y su separación (CH),
+pero no la cohesión local de cada punto dentro de su clúster (silueta). En el
+caso de las cabezas estilísticas, estas fueron entrenadas con recortes de
+grafiti y no con imágenes completas como aquí se evalúan. Esta cambio de
+dominio, que provocaría que las características extraídas por la cabeza sean
+menos cohesivas por la elevada complejidad de las imágenes completas, junto
+con la naturaleza de la función de pérdida podrían ser la causa de la caída de
+la silueta.
 
 Las CNN ImageNet lideran la silueta (a $N=6416$: \texttt{mobilenet\_v3}=0.260,
 \texttt{resnet50}=0.257), con ruido bajo (0.078--0.118) y los clústeres más
@@ -132,7 +135,7 @@ y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
   \texttt{vgg16}                          & 980.8  & 6.54 & 315.0 & 551.7 \\ \hline
   \texttt{resnet50}                       & 1080.0 & 5.94 & 336.0 & 117.8 \\ \hline
   \texttt{dinov2\_vits14}                 & 1215.7 & 5.28 & 209.6 & 98.0  \\ \hline
-  \texttt{dinov2\_graffiti\_style\_head}  & 1231.9 & 5.21 & 287.3 & 100.2 \\ \hline
+  \texttt{dinov2\_graffiti\_style\_head}  & 1245.0 & 5.15 & 286.2 & 99.7  \\ \hline
   \texttt{clip\_vit\_b32}                 & 1247.0 & 5.15 & 193.1 & 591.9 \\ \hline
   \texttt{yolon}                          & 1301.0 & 4.93 & 853.8 & 65.4  \\ \hline
   \texttt{yolom}                          & 1407.4 & 4.56 & 824.9 & 192.9 \\ \hline
@@ -789,56 +792,67 @@ representación útil para esta tarea.
 
 \subsubsection{Correlación interna-externa}
 \label{subsubsec:res-correlacion}
-\textbf{
-    TODO: aquí me gustaría hablar un poco de como las métricas intrínsecas
-    se ponen o no de acuerdo con las extrínsecas, en particular el por qué he
-    escogido el dinov2 finetunneado con graffiti como base en vez de hacerle
-    caso a las métricas intrínsecas del exp1
-}
-% % Análisis derivado: ARI vs. silueta sobre E8a y, por separado, sobre E8b.
-% % Correlación positiva fuerte => las métricas no supervisadas son un proxy
-% % defendible; divergencia entre E8a y E8b acota qué eje rastrea la silueta.
-% Las métricas intrínsecas son un \textit{proxy} defensible de las externas
-% cuando la verdad de referencia es de grano grueso y el agrupador opera con
-% $k$ fijo, pero anti-correlan con ARI cuando la verdad es de grano fino y el
-% algoritmo elige $k$. Sobre E8a (etiquetas gruesas, cuatro estilos), la correlación
-% de Pearson entre silueta y ARI vale $r = +0.66$ restringida a los 48 puntos
-% con $k$ oráculo fija (KMeans, aglomerativo, espectral), y $r = +0.40$ sobre
-% los 83 puntos con ARI válido si se incluyen las celdas HDBSCAN, en las que el
-% $k$ varía libremente. Sobre E8b (etiquetas finas, 87 autores) la correlación
-% \emph{cambia de signo}: $r = -0.52$ sobre 86 puntos, $r = -0.25$ restringida
-% a las 32 celdas aglomerativas. Las celdas de mayor silueta en E8b son
-% particiones HDBSCAN $k=2$ o $k=3$ con ARI cercano a cero (la silueta premia
-% \emph{pocos bloques grandes}), mientras que las celdas de mayor ARI son
-% particiones aglomerativas con $k=87$ y silueta cercana a cero (la
-% recuperación exige \emph{muchos clústeres pequeños}).
-% 
-% Las decisiones tomadas en \ref{subsec:res-calibracion} sobre
-% extractor, reducción, agrupador, \texttt{min\_cluster\_size} y segmentador
-% quedan respaldadas por el resultado positivo de E8a (estilo, grano grueso) y
-% por la coherencia interna de E8a$\to$E1$\to$E2$\to$E3$\to$E4 sobre la base
-% \texttt{dinov2\_graffiti\_style\_head} + UMAP-10 + HDBSCAN \texttt{mcs}=5;
-% quedan acotadas, no respaldadas, sobre la granularidad de autoría en
-% escenarios con desplazamiento de dominio como E8b. Las afirmaciones del
-% trabajo sobre calidad intrínseca a esa granularidad fina son por tanto
-% explícitamente deferidas a evaluaciones supervisadas dedicadas (trabajo
-% futuro: véase \ref{sec:conclusion}).
-% 
-% \begin{figure}[h]
-%   \centering
-%   % FIGURE: dos paneles lado a lado en formato scatter:
-%   % Panel A: silueta (x) vs ARI (y) para los 96 runs de E8a, con marcador
-%   % distinto por algoritmo y color por (k oráculo / k auto). Anotar Pearson
-%   % r=+0.66 en el subconjunto k-oráculo.
-%   % Panel B: lo mismo para los 96 runs de E8b. Anotar Pearson r=-0.52.
-%   % El contraste visual entre los dos paneles es el mensaje principal.
-%   % \includegraphics[width=\linewidth]{figures/e8_silhouette_vs_ari.pdf}
-%   \caption{Correlación silueta--ARI sobre E8a (panel izquierdo, etiquetas de
-%   estilo, $r=+0.66$ con $k$ fijo) y E8b (panel derecho, etiquetas de autoría,
-%   $r=-0.52$). La silueta rastrea estructura de \textit{blob} grueso, no
-%   identidad de grano fino.}
-%   \label{fig:e8-correlation}
-% \end{figure}
+Esta última subsección cierra el hilo supervisado contrastando ambas familias
+de métricas. La pregunta de fondo es directa: ¿se puede confiar en las métricas
+intrínsecas para ordenar configuraciones cuando no hay etiquetas? La respuesta
+que emerge de E8a y E8b es matizada: sí, cuando la verdad de referencia es de
+grano grueso y el agrupador opera con $k$ fijo; no, cuando la verdad es de
+grano fino y el número de clústeres lo elige el propio algoritmo.
+
+Sobre E8a (cuatro estilos, etiquetas gruesas), la correlación de Pearson entre
+silueta y ARI vale $r = +0.66$ restringida a los 48 puntos con $k$ oráculo
+fijo (KMeans, aglomerativo y espectral con $k=4$), y cae a $r = +0.40$ sobre
+los 83 puntos con ARI válido si se incluyen las celdas HDBSCAN, en las que el
+$k$ varía libremente. La señal es positiva pero claramente atenuada por la
+elección de granularidad. Sobre E8b (87 autores, etiquetas finas) la
+correlación \emph{cambia de signo}: $r = -0.52$ sobre 86 puntos y $r = -0.25$
+restringida a las 32 celdas aglomerativas. Las celdas de mayor silueta en E8b
+son particiones HDBSCAN $k=2$ o $k=3$ con ARI cercano a cero (la silueta
+premia \textit{pocos bloques grandes y bien separados}), mientras que las
+celdas de mayor ARI son particiones aglomerativas con $k=87$ y silueta
+cercana a cero (la identificación de autoría exige \textit{muchos clústeres
+pequeños}). Las dos métricas miden, en este régimen, objetivos
+geométricamente incompatibles.
+
+Esta observación da el marco interpretativo para la elección de extractor base
+realizada en \ref{subsubsec:res-extractor}. El ranking intrínseco de E1 a
+$N=6416$ sitúa a las CNN ImageNet en cabeza por silueta
+(\texttt{mobilenet\_v3}=0.260, \texttt{resnet50}=0.257) y relega a la cabeza
+estilística de DINOv2 a la décima posición (0.155). Si se hubiese seguido este
+ranking, el pipeline base habría adoptado \texttt{mobilenet\_v3} como
+extractor. El ancla supervisada de E8a invierte por completo esta
+conclusión: la cabeza estilística de DINOv2 obtiene ARI~$=0.698$ frente a
+$0.356$ de \texttt{mobilenet\_v3}, una diferencia de un factor dos en favor
+del extractor peor clasificado por la silueta intrínseca. La misma inversión
+aparece en la recuperación supervisada (P@5: $0.820$ vs $0.687$). El extractor
+ganador por intrínseca a $N=6416$ es, por tanto, una de las peores
+configuraciones disponibles para la tarea que motiva el trabajo.
+
+Esta inversión es la justificación cuantitativa de la decisión adelantada en
+\ref{subsubsec:res-extractor}: el extractor base no se elige por el ranking
+intrínseco de E1, sino por el ancla supervisada de E8a. La interpretación es
+la ya anticipada en aquella sección: las CNN preentrenadas en ImageNet
+agrupan por apariencia genérica (textura, color, composición global) y esa
+estructura es lo que la silueta detecta como \textit{blobs} bien definidos,
+pero no codifica la información estilística relevante para el dominio. La
+cabeza estilística de DINOv2 sacrifica esa cohesión de apariencia para
+codificar la separación estilística que efectivamente queremos, y paga ese
+sacrificio en silueta intrínseca a la vez que lo recupera con creces en
+cualquier evaluación supervisada disponible.
+
+La conclusión operativa para el resto del trabajo es doble. Por un lado, las
+decisiones tomadas en \ref{subsec:res-calibracion} sobre extractor,
+reducción, agrupador, \texttt{min\_cluster\_size} y segmentador quedan
+respaldadas por el resultado positivo de E8a y por la coherencia interna del
+hilo E8a$\to$E1$\to$E2$\to$E3$\to$E4 sobre la base
+\texttt{dinov2\_graffiti\_style\_head}~+~UMAP-10~+~HDBSCAN~\texttt{mcs}=5.
+Por otro, esas mismas decisiones quedan \emph{acotadas, no respaldadas},
+sobre la granularidad de autoría: el resultado negativo de E8b y la
+anti-correlación silueta--ARI a esa escala impiden afirmar que la configuración
+base sea adecuada para tareas de identificación autoral, y las afirmaciones
+del trabajo sobre calidad intrínseca a granularidad fina se difieren
+explícitamente a evaluaciones supervisadas dedicadas (véase
+\ref{sec:conclusion}).
 
 % Figuras E1, E2, E3, E7 (×2) y E6+E9 generadas como PDF bajo doc/figures/.
 % Scripts independientes en doc/figures/scripts/ (uno por figura, estilo
