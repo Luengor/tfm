@@ -14,7 +14,7 @@ A set of 1106 images. Used for trainning the heads and fine tuning yolo.
  - 275 crops are hand labeled from this dataset for training the heads on the
    style classification task. Added up to the 110 from Salamanca, we have 385
    crops for training the style heads.
- - 169 crops are hand labeled for trainning of the author head. 
+ - 321 crops are hand labeled for trainning of the author head. 
 
 - 447 images are used for trainning/validation of the yolo model.
 
