@@ -24,6 +24,9 @@ from ultralytics import YOLO # pyright: ignore
 import open_clip
 from src.abstractions import EmbeddingBase
 
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
+
 def get_device() -> torch.device:
     return torch.accelerator.current_accelerator() or torch.device("cpu")
 class EmbeddingModelNames(str, Enum):

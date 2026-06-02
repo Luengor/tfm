@@ -15,6 +15,7 @@ class UMAPReduction(ReductionBase):
             min_dist=min_dist,
             metric=metric,
             random_state=random_state,
+            n_jobs=1,
         )
 
     def reduce(self, embeddings: list[list[float]]) -> list[list[float]]:
@@ -30,6 +31,7 @@ class UMAPReduction(ReductionBase):
                 min_dist=self.min_dist,
                 metric=self.metric,
                 random_state=self.random_state,
+                n_jobs=1,
             )
         else:
             reducer = self.reducer

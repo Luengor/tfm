@@ -373,14 +373,18 @@ seleccionada para los \textit{benchmarks} es la que minimiza dicha pérdida.
 \label{subsec:reproducibilidad}
 Más allá del entorno de ejecución y de las versiones de las dependencias ya
 recogidas en \ref{subsec:entorno}, la reproducibilidad de los resultados se
-apoya en dos elementos complementarios. En primer lugar, en el código se fijan
-de manera explícita las semillas aleatorias de las librerías estocásticas
-implicadas (\texttt{random} de la biblioteca estándar, \texttt{numpy.random},
-\texttt{torch}); los estimadores de \texttt{scikit-learn} con componente
-estocástica se instancian siempre con \texttt{random\_state} fijo, y la
+apoya en dos elementos complementarios. En primer lugar, todos los estimadores
+con componente estocástica se instancian con \texttt{random\_state} fijo; la
 inicialización de K-Means, GMM, UMAP y la selección automática de
 hiperparámetros descrita en \ref{subsubsec:hiperparam-auto} reutiliza la misma
-semilla. En segundo lugar, todos los ficheros de configuración utilizados para
-los \textit{benchmarks} reportados se publican junto con el código en el
+semilla. Para garantizar la determinación de los modelos de \textit{embedding}
+basados en PyTorch, se activan las opciones
+\texttt{torch.backends.cudnn.deterministic} y se desactiva
+\texttt{torch.backends.cudnn.benchmark}, lo que obliga a cuDNN a elegir siempre
+el mismo algoritmo de convolución en lugar de buscar el más rápido en cada
+ejecución. UMAP se instancia con \texttt{n\_jobs=1} para evitar que el orden de
+acumulación de operaciones en paralelo varíe entre máquinas con distinto número
+de núcleos. En segundo lugar, todos los ficheros de configuración utilizados
+para los experimentos realizados se publican junto con el código en el
 repositorio del trabajo, de modo que cualquier resultado descrito puede
 reproducirse.
