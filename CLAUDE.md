@@ -16,8 +16,6 @@ If an issue is found in the code or article or if you think that a certain part 
 
 After updating an integral or important part of the project, consider updating this document with the changes and the rationale behind them.
 
-Before starting to work on a new feature or fixing a problem, check if there is a task on the Vikunja task lisk (with the `get_tasks_todo` MCP call). If there is, comunicate that to the user and mark the task as "completed" when done. 
-
 Never commit work unless the user has given explicit permission to do so. If the user allows you to commit once, DO
 ASK the next time you want to commit, even if it's a small change. Always ask before committing.
 
