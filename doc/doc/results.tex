@@ -817,7 +817,24 @@ valor apenas tiene peso práctico ya que todo el rango de ARI en E8b vive en una
 banda cercana al azar de modo que la correlación, sea cual sea su $r$ o su $p$
 nominales, solo describe el orden de particiones que en el mayor de los casos
 es aleatorio. No indica que la silueta descarte una estructura de autoría
-recuperable, sino que tal estructura no existe a este nivel.
+recuperable, sino que tal estructura no existe a este nivel. La
+figura~\ref{fig:e8-correlacion} representa ambas relaciones.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{figures/e8_correlation.pdf}
+  \caption{Silueta frente a ARI por celda (extractor $\times$ reducción
+  $\times$ agrupador) en E8a (estilo) y E8b (autoría), con el eje ARI
+  compartido. En E8a la silueta crece con el ARI; en E8b todas las celdas se
+  aplastan contra el suelo aleatorio (ARI $\approx 0$) a lo largo de todo el
+  rango de silueta, de modo que la correlación negativa solo ordena particiones
+  casi aleatorias. Las celdas HDBSCAN de silueta alta y ARI nulo (extremo
+  derecho de E8b) son las particiones degeneradas de pocos clústeres. Las rectas,
+  solo en E8a, son ajustes por mínimos cuadrados sobre los agrupadores de $k$
+  fijo (azul, continua) y sobre todas las celdas (gris, discontinua); en E8b se
+  omiten porque el ARI no se despega del azar.}
+  \label{fig:e8-correlacion}
+\end{figure}
 
 El factor común en ambas métricas es la granularidad de la verdad de
 referencia. La silueta recompensa pocos clústeres grandes y cohesivos. Con
