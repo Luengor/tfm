@@ -327,17 +327,20 @@ validación. Los \textit{backbones} se mantienen estrictamente congelados
 durante todo el proceso y solo se actualizan los parámetros de la cabeza, según
 el esquema de \textit{transfer learning} descrito en \ref{subsubsec:cabezas}.
 
-Las cabezas de autoría se entrenan con la pérdida de tripletes (\textit{triplet
-loss}) con margen $1.0$, optimizador Adam con \textit{learning rate} $10^{-4}$,
-tamaño de \textit{batch} $8$ y $20$ épocas, sin parada temprana: se conservan
-los pesos de la última época. Los tripletes se forman dentro de cada
-\textit{batch} a partir de las anotaciones de autoría, eligiendo como ancla un
-recorte cualquiera, como positivo otro recorte con el mismo identificador de
-autor y como negativo un recorte con identificador distinto. Inspirados por la
-relevancia del muestreo de negativos~\cite{wu_sampling_2017}, los negativos no
-se eligen de forma uniforme: con probabilidad fija se extraen del conjunto de
-autores con un único recorte (negativos difíciles) y el resto de las veces se
-muestrean del banco completo de autores.
+Las cabezas de autoría se entrenan con la pérdida de tripletes en su variante
+\textit{batch-hard}~\cite{hermans_defense_2017} con margen $0.3$, optimizador
+Adam con \textit{learning rate} $10^{-4}$ y $20$ épocas, sin parada temprana: se
+conservan los pesos de la última época. Cada \textit{batch} se construye mediante
+un muestreador PK que selecciona $8$ autores y $4$ recortes por autor (tamaño de
+\textit{batch} $32$), de modo que cada ancla disponga de varios pares positivos
+dentro del mismo \textit{batch}. A continuación, y dada la relevancia del
+muestreo de negativos~\cite{wu_sampling_2017}, para cada ancla se forma el
+triplete con su positivo más difícil (el recorte del mismo autor más alejado en
+el espacio latente) y su negativo más difícil (el recorte de autor distinto más
+cercano), concentrando la pérdida en los tripletes más informativos del
+\textit{batch}. Los autores representados por un único recorte se conservan en el
+entrenamiento: la fuerte aumentación de datos hace que dos vistas aumentadas del
+mismo recorte actúen como par positivo.
 
 % TODO: actualizar este párrafo si se migra el entrenamiento de las cabezas de
 % estilo al esquema PK + batch-hard + aumentación reforzada usado ahora en las

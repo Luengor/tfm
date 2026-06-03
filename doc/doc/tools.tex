@@ -289,9 +289,9 @@ puede habilitarse un índice aproximado HNSW~\cite{malkov_efficient_2018} sobre
 los vectores, lo que permite contrastar el coste de la búsqueda exacta frente a
 la aproximada. El índice HNSW de \textit{pgvector} impone un límite de 2000
 dimensiones sobre el tipo \texttt{vector}, por lo que no es aplicable a los
-modelos cuya salida lo supera (ResNet50, con 2048, y VGG16, con 4096); para
-estos casos debe recurrirse a una reducción de dimensionalidad previa al
-almacenamiento o al \textit{backend} SQLite con búsqueda exacta. Ambos
+modelos cuya salida lo supera (ResNet50 e InceptionV3, con 2048, y VGG16, con
+4096); para estos casos debe recurrirse a una reducción de dimensionalidad
+previa al almacenamiento o al \textit{backend} SQLite con búsqueda exacta. Ambos
 \textit{backends} comparten el esquema lógico y la
 persistencia de metadatos, lo que permite cambiar de uno a otro sin modificar
 el resto del \textit{pipeline}.
@@ -383,6 +383,13 @@ con \texttt{uv}, con las siguientes dependencias principales:
     \item umap-learn 0.5.12
     \item SQLAlchemy 2.0.49
     \item pgvector 0.4.2
+    \item numpy 2.4.3
+    \item pandas 3.0.1
+    \item Pillow (incluida con torchvision)
+    \item matplotlib 3.10.8
+    \item seaborn 0.13.0
+    \item psutil 6.1.1
+    \item tqdm 4.67.3
 \end{itemize}
 Salvo PyTorch, fijado de forma exacta (\texttt{==2.10.0}), las versiones
 indicadas corresponden al requisito mínimo declarado en el gestor de
