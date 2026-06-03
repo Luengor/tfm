@@ -154,7 +154,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Fine-tune YOLO on graffiti dataset")
     parser.add_argument("--dataset", type=str, default="dataset", help="Input dataset directory")
     parser.add_argument("--output", type=str, default="processed_dataset", help="Output directory for processed dataset")
-    parser.add_argument("--model", type=str, default="yolov8n.pt", help="Base model to fine-tune")
+    parser.add_argument("--model", type=str, default="yolo11n.pt", help="Base model to fine-tune")
     parser.add_argument("--epochs", type=int, default=30, help="Number of training epochs")
     parser.add_argument("--batch", type=int, default=16, help="Batch size (default: 16). Reduce if OOM occurs.")
     parser.add_argument("--imgsz", type=int, default=640, help="Image size (default: 640)")
