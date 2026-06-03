@@ -696,12 +696,12 @@ del propio \textit{backbone}.
 HDBSCAN no parece llegar a distinguir las cuatro categorías de estilo posibles
 como clústeres separados, sino que las agrupa en tres grupos. Tras una revisión
 manual de los clústeres generados, parece que HDBSCAN agrupa los grafitis en
-<<sencillos>>, <<elaborados>> y <<characters>> (color azul, rojo y verde en la
-figura~\ref{fig:e8a-hdbscan}). El primero de estos grupos está principalmente
-formado por \textit{tags} y algunos \textit{throw-ups} más simples. El segundo
-está formado por \textit{throw-ups} más elaborados y la gran mayoría de los
-\textit{pieces}. El tercero está formado por los \textit{characters} de estilo
-cómic, manga o grafiti de personajes.
+<<sencillos>>, <<elaborados>> y <<characters>> (color naranja, verde y azul en
+la figura~\ref{fig:e8a-hdbscan}). El primero de estos grupos está
+principalmente formado por \textit{tags} y algunos \textit{throw-ups} más
+simples. El segundo está formado por \textit{throw-ups} más elaborados y la
+gran mayoría de los \textit{pieces}. El tercero está formado por los
+\textit{characters} de estilo cómic, manga o grafiti de personajes.
 
 \begin{figure}[h]
   \centering
@@ -793,64 +793,55 @@ representación útil para esta tarea.
 
 \subsubsection{Correlación interna-externa}
 \label{subsubsec:res-correlacion}
-Esta última subsección cierra el hilo supervisado contrastando ambas familias
-de métricas. La pregunta de fondo es directa: ¿se puede confiar en las métricas
-intrínsecas para ordenar configuraciones cuando no hay etiquetas? La respuesta
-que emerge de E8a y E8b es matizada: sí, cuando la verdad de referencia es de
-grano grueso y el agrupador opera con $k$ fijo; no, cuando la verdad es de
-grano fino y el número de clústeres lo elige el propio algoritmo.
+% VALORES VERIFICADOS (recomputados de exp/exp08{a,b}/output/*.json, fusión
+% newest-wins por run_id; coinciden con exp/exp08{a,b}/report.md):
+%   E8a oracle-k partitional (kmeans/agglo/spectral): r=+0.781  n=48  p~6e-11
+%   E8a todas las celdas con ARI válido (+HDBSCAN):    r=+0.545  n=89  p~3e-8
+%   E8b todas con ARI válido y >1 clúster:             r=-0.542  n=89  p~4e-8
+%   E8b solo aglomerativo:                             r=-0.126  n=32  p~0.49 (NO sig.)
+% Clave de fusión = run_id (hash de config con params); run_name NO es único
+% (variantes mcs de HDBSCAN y k de aglomerativo comparten nombre). n es 48-89,
+% NO 8: la correlación es sobre celdas, no sobre el mejor-por-extractor.
+Esta última subsección responde a si las métricas intrínsecas guardan alguna
+relación clara con las extrínsecas. Sobre los resultados de E8a y E8b se calcula
+la correlación de Pearson entre la silueta y el ARI a nivel de celda (cada celda
+es una combinación de extractor, reducción y agrupador, agregada sobre sus
+repeticiones).
 
-Sobre E8a (cuatro estilos, etiquetas gruesas), la correlación de Pearson entre
-silueta y ARI vale $r = +0.78$ restringida a los 48 puntos con $k$ oráculo
-fijo (KMeans, aglomerativo y espectral con $k=4$), y cae a $r = +0.55$ sobre
-los 89 puntos con ARI válido si se incluyen las celdas HDBSCAN, en las que el
-$k$ varía libremente. La señal es positiva pero claramente atenuada por la
-elección de granularidad. Sobre E8b (87 autores, etiquetas finas) la
-correlación \emph{cambia de signo}: $r = -0.54$ sobre 89 puntos y $r = -0.13$
-restringida a las 32 celdas aglomerativas. Las celdas de mayor silueta en E8b
-son particiones HDBSCAN $k=2$ o $k=3$ con ARI cercano a cero (la silueta
-premia \textit{pocos bloques grandes y bien separados}), mientras que las
-celdas de mayor ARI son particiones aglomerativas con $k=87$ y silueta
-cercana a cero (la identificación de autoría exige \textit{muchos clústeres
-pequeños}). Las dos métricas miden, en este régimen, objetivos
-geométricamente incompatibles.
+En E8a (estilos, 4 clases) la correlación es positiva y significativa: $r =
++0.78$ ($n = 48$, $p < 10^{-7}$) sobre los agrupadores de $k$ fijo (KMeans,
+aglomerativo y espectral con $k=4$), y $r = +0.55$ ($n = 89$, $p < 10^{-7}$) al
+incluir las celdas HDBSCAN, de $k$ libre. En E8b (autoría, 87 clases) el signo
+se invierte ($r = -0.54$ sobre las celdas con más de un clúster), pero este
+valor apenas tiene peso práctico ya que todo el rango de ARI en E8b vive en una
+banda cercana al azar de modo que la correlación, sea cual sea su $r$ o su $p$
+nominales, solo describe el orden de particiones que en el mayor de los casos
+es aleatorio. No indica que la silueta descarte una estructura de autoría
+recuperable, sino que tal estructura no existe a este nivel.
 
-Esta observación da el marco interpretativo para la elección de extractor base
-realizada en \ref{subsubsec:res-extractor}. El ranking intrínseco de E1 a
-$N=6416$ sitúa a las CNN ImageNet en cabeza por silueta
-(\texttt{mobilenet\_v3}=0.260, \texttt{resnet50}=0.257) y relega a la cabeza
-estilística de DINOv2 a la décima posición (0.155). Si se hubiese seguido este
-ranking, el pipeline base habría adoptado \texttt{mobilenet\_v3} como
-extractor. El ancla supervisada de E8a invierte por completo esta
-conclusión: la cabeza estilística de DINOv2 obtiene ARI~$=0.722$ frente a
-$0.356$ de \texttt{mobilenet\_v3}, una diferencia de un factor dos en favor
-del extractor peor clasificado por la silueta intrínseca. La misma inversión
-aparece en la recuperación supervisada (P@5: $0.851$ vs $0.687$). El extractor
-ganador por intrínseca a $N=6416$ es, por tanto, una de las peores
-configuraciones disponibles para la tarea que motiva el trabajo.
+El factor común en ambas métricas es la granularidad de la verdad de
+referencia. La silueta recompensa pocos clústeres grandes y cohesivos. Con
+verdad de grano grueso (4 estilos) eso coincide con lo que el ARI reconoce como
+correcto, y el valor de la silueta suele ser defendible cuando $k$ está fijado.
+Con verdad de grano fino (87 autores) ocurre lo contrario: las celdas de mayor
+ARI son agrupamientos con $k=87$, que por fuerza obtienen una silueta casi nula
+(87 clústeres diminutos no pueden ser cohesivos), mientras que las de mayor
+silueta son las particiones degeneradas de HDBSCAN ($k=2$ o $k=3$) con un ARI
+nulo.
 
-Esta inversión es la justificación cuantitativa de la decisión adelantada en
-\ref{subsubsec:res-extractor}: el extractor base no se elige por el ranking
-intrínseco de E1, sino por el ancla supervisada de E8a. La interpretación es
-la ya anticipada en aquella sección: las CNN preentrenadas en ImageNet
-agrupan por apariencia genérica (textura, color, composición global) y esa
-estructura es lo que la silueta detecta como \textit{blobs} bien definidos,
-pero no codifica la información estilística relevante para el dominio. La
-cabeza estilística de DINOv2 sacrifica esa cohesión de apariencia para
-codificar la separación estilística que efectivamente queremos, y paga ese
-sacrificio en silueta intrínseca a la vez que lo recupera con creces en
-cualquier evaluación supervisada disponible.
+En resumen, la silueta es una métrica intrínseca adecuada para ordenar
+configuraciones a granularidad de estilo, pero no de autoría. La interpretación
+es la ya anticipada en calibración: las CNN entrenadas en ImageNet agrupan por
+apariencia genérica (textura, color, composición), y esa estructura es lo que la
+silueta detecta como conjuntos bien definidos, sin codificar la información
+estilística del dominio. Por eso su liderazgo intrínseco en E1 a $N=6416$ no se
+traduce en ventaja supervisada en E8a: la silueta mide cohesión de apariencia,
+no identidad estilística.
 
-La conclusión operativa para el resto del trabajo es doble. Por un lado, las
-decisiones tomadas en \ref{subsec:res-calibracion} sobre extractor,
-reducción, agrupador, \texttt{min\_cluster\_size} y segmentador quedan
-respaldadas por el resultado positivo de E8a y por la coherencia interna del
-hilo E8a$\to$E1$\to$E2$\to$E3$\to$E4 sobre la base
-\texttt{dinov2\_graffiti\_style\_head}~+~UMAP-10~+~HDBSCAN~\texttt{mcs}=5.
-Por otro, esas mismas decisiones quedan \emph{acotadas, no respaldadas},
-sobre la granularidad de autoría: el resultado negativo de E8b y la
-anti-correlación silueta--ARI a esa escala impiden afirmar que la configuración
-base sea adecuada para tareas de identificación autoral, y las afirmaciones
-del trabajo sobre calidad intrínseca a granularidad fina se difieren
-explícitamente a evaluaciones supervisadas dedicadas (véase
-\ref{sec:conclusion}).
+La consecuencia práctica es la elección del extractor base: la cabeza
+estilística de DINOv2, uno de los peores modelos por métricas intrínsecas en el
+experimento inicial, se escoge por su liderazgo en E8a y no por el ranking
+intrínseco de E1. Esta decisión es importante, puesto que haber escogido el
+extractor con mejores métricas intrínsecas a $N=6416$ habría llevado a una
+configuración de peor rendimiento en la tarea que motiva el propio trabajo.
+
