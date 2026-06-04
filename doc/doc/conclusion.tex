@@ -2,16 +2,84 @@
 \section{Conclusiones}
 \label{sec:conclusion}
 
-% TODO future work: extrapolated cost-vs-n via embedding resampling.
-% The §7 scalability sweep is bounded above by the available graffiti corpus
-% (n=6416), which limits the log-range to ~1.8 decades — too narrow to
-% empirically separate O(n log n) from O(n²) clusterers. A natural follow-up
-% is to bootstrap embeddings (sample-with-replacement from the 6416 real
-% DINOv2 vectors) up to n ∈ {10k, 25k, 50k, 100k} and re-measure
-% reduction + clustering + similarity-search cost. This stays on-thesis
-% (the enunciado motivates the work by future graffiti-DB growth:
-% "su dificultad aumenta con el crecimiento de las bases de datos") while
-% extending the empirical slope estimates to a range where asymptotic
-% classes can be distinguished. Ingest is excluded (real-image-bound) and
-% quality metrics are skipped (resampled labels are meaningless) — the
-% extrapolation is cost-only and labelled as a projection, not a measurement.
+Este trabajo plantaba como objetivo general diseñar y evaluar un sistema
+modular para el agrupamiento de imágenes de grafiti, con un enfoque específico
+en la evaluación del coste computacional y la calidad del agrupamiento en
+función del tamaño del conjunto de datos. Los resultados obtenidos permiten
+extraer conclusiones concretas sobre la escalabilidad y calidad de diferentes
+combinaciones de componentes, así como identificar áreas clave para trabajo
+futuro.
+
+\subsection{Resultados principales}
+\label{sec:main-results}
+
+% TODO: fact check this
+En cuanto al coste computacional, el barrido de escalabilidad (E7) confirma que
+la etapa de ingesta es la más costosa en tiempo y memoria, pero también la que
+mejor escala, de manera completamente predecible. Por otro lado, la etapa de
+reducción de dimensionalidad con UMAP muestra un comportamiento más complejo,
+puesto que presenta dos regímenes de ejecución distintos dependiendo del tamaño
+de la muestra y de la activación de \texttt{pynndescent}. El agrupamiento con
+HDBSCAN es despreciable en coste a esta escala, mientras que otros agrupadores
+como el algomerativo u OPTICS empiezan a encontrarse con limitaciones de
+memoria o tiempo respectivamente. Finalmente, la búsqueda exacta sobre SQLite
+confirma su coste cuadrático. Frente a esto, la búsqueda con PostgreSQL
+haciendo uso de un índice HNSW elimina este cuello de botella, ofreciendo un
+aumento de rendimiento de dos órdenes de magnitud a esta escala.
+
+En cuanto a la calidad del agrupamiento, los barridos iniciales (de E1 a E5) se
+centraron en identificar combinaciones de componentes que ofrecieran un buen
+rendimiento en métricas intrínsecas de calidad de clústeres. La cabeza de
+estilo de DINOv2 obtuno una silueta inferior a las CNN preentrenadas en
+ImageNet, pero su desempeño en la evaluación supervisada de estilo (E8a) fue
+significativamente superior, lo que valida su elección a pesar de las mediocres
+métricas intrínsecas. La reducción de dimensionalidad probó ser un elemento
+indispensable para obtener agrupamientos de mejor calidad y para reducir el
+coste de ejecución posterior. Finalmente, el agrupamiento con HDBSCAN mostró un
+comportamiento robusto y consistente, con una configuración de \texttt{mcs}=5
+que ofrecía un buen compromiso entre calidad y número de clústeres obtenidos.
+
+Por último, la evaluación supervisada (E8a--E8b) revela una fuerte asimetría
+entre los dos ejes de similitud evaluados. Sobre estilo (4 clases, 294
+recortes), la cabeza específica de DINOv2 alcanza ARI~=~0.722 y F1~=~0.806,
+mientras que los mejores extractores sin entrenar no superan ARI~=~0.368. Sobre
+autoría (87 autores, 185 recortes), todos los extractores caen en una banda
+ARI~=~0.041--0.076, cercana al azar. La causa más probable del fracaso en E8b
+es la combinación de un cambio de dominio Cuenca$\to$Salamanca, un número
+insuficiente de recortes por autor y la escasa variabilidad intraautor en el
+subconjunto disponible. No es un resultado que invalide las cabezas de autoría,
+sino que indica que el conjunto de datos anotado es insuficiente para entrenar
+representaciones útiles para esta tarea.
+
+\subsection{Trabajo futuro}
+\label{sec:future-work}
+
+Tres limitaciones del trabajo dejan abiertas extensiones directas. La primera y
+más evidente es estrecho rango de $N$ evaluado en el barrido de escalabilidad.
+Con solo 6416 imágenes reales, el barrido abarca $\approx 1.8$ décadas en
+escala logarítmica, insuficiente para distinguir con seguridad $O(n \log n)$ de
+$O(n^2)$ en las etapas intermedias. Esto sería relativamente sencillo de
+solucionar remuestreando con reemplazo los vectores DINOv2 ya calculados para
+aumentar el rango de $N$ lo que fuese necesario, pero afectaría a los
+resultados de calidad obtenidos, puesto que los valores remuestreados no tienen
+significado real. Esta solución sería exclusivamente de coste y se etiquetaría
+como proyección, no como medición.
+
+Tanto esta limitación como a la siguiente, la escasez de datos anotados por
+autoría, también podrían ser abordadas mediante una gran extensión del conjunto
+de datos. Este aumento no solo extendería el rango de $N$ para el barrido de
+escalabilidad, sino que también permitiría obtener un conjunto más apropiado
+para entrenar las cabezas de autoría. Además, un conjunto de datos más grande
+también permitiría distintos enfoques para el \textit{fine-tuning} de ambas
+cabezas, como por ejemplo el pre-entrenamiento no supervisado sobre el corpus
+completo y el uso de la supervisión de estilo y autoría solo en la fase final,
+lo que reduciría la dependencia de un conjunto anotado pequeño.
+
+Por último, el sistema actual opera en modo <<\textit{batch}>>: la ingesta es
+completa antes de que el agrupamiento comience. En escenarios reales las bases
+de datos de grafiti crecen de forma continua, y tanto HDBSCAN como UMAP carecen
+de una implementación incremental estable. Extender el sistema para soportar
+actualizaciones incrementales del índice y del espacio reducido puede ser una
+mejora importante para aplicar algunos de los resultados obtenidos a un sistema
+real.
+
