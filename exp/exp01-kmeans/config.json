@@ -1,0 +1,68 @@
+{
+    "runs": [
+        {
+            "repeats": 3,
+            "limit": 6416,
+            "storage": {
+              "type": "sqlite",
+              "params": {
+                "db_path": "exp/.common_db/storage_8ee4871cff20.sqlite"
+              }
+            },
+            "segmenter": {
+              "type": "identity",
+              "params": {}
+            },
+            "reduction": {
+              "type": "identity"
+            },
+            "clustering": {
+              "type": "kmeans",
+              "params": {
+                  "n_clusters": 4
+              }
+            },
+            "embedding": {
+              "type": "dinov2_graffiti_style_head",
+              "params": {}
+            },
+            "name": "l6416-dinov2_graffiti_style_head-identity-kmeans",
+            "clear_storage": true
+        },
+        {
+            "repeats": 3,
+            "limit": 6416,
+            "storage": {
+              "type": "sqlite",
+              "params": {
+                "db_path": "exp/.common_db/storage_8ee4871cff20.sqlite"
+              }
+            },
+            "segmenter": {
+              "type": "identity",
+              "params": {}
+            },
+            "reduction": {
+              "type": "umap",
+              "params": {
+                "n_components": 10,
+                "n_neighbors": 15,
+                "min_dist": 0.0,
+                "metric": "cosine"
+              }
+            },
+            "clustering": {
+              "type": "kmeans",
+              "params": {
+                  "n_clusters": 4
+              }
+            },
+            "embedding": {
+              "type": "dinov2_graffiti_style_head",
+              "params": {}
+            },
+            "name": "l6416-dinov2_graffiti_style_head-umap-kmeans",
+            "clear_storage": true
+        }
+    ]
+}
