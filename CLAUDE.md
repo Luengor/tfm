@@ -167,5 +167,5 @@ Produces the custom `.pth` head weights. Contains triplet-loss trainer (`trainer
 See `doc/CLUSTERING_CONFIG.md` for clustering algorithm parameters and `doc/REDUCTION_CONFIG.md` for reduction algorithm parameters.
 
 ## Documentation
-The document for the Master's thesis lives in `doc/`. It's written in Latex and information about the format used can be checked on `infos/LATEX_GUIDE.md`.
+The document for the Master's thesis lives in `doc/`. It's written in Latex, built with tectonicinto the `build` subfolder, and information about the format used can be checked on `infos/LATEX_GUIDE.md` and `doc/enunciado.md`
 
