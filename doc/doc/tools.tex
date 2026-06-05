@@ -40,7 +40,8 @@ etiquetados.
 
 $385$ recortes ($275$ de StopGrafiti y $110$ de Salamanca) se etiquetan por
 estilo, asignándoles una de las cuatro categorías estilísticas (\textit{tag},
-\textit{throw-up}, \textit{piece} y \textit{character}). Este entrenamiento se
+\textit{throw-up}, \textit{piece} y \textit{character}), ilustradas en la
+figura~\ref{fig:estilos-ejemplos}. Este entrenamiento se
 evalua con otros $294$ recortes del banco completo. Por otro lado, $321$
 recortes de StopGrafiti se etiquetan por autoría para el entrenamiento de las
 cabezas de autoría, y se evalúan con $185$ recortes de Salamanca. En el primero
@@ -55,6 +56,21 @@ evaluación del sistema completo, solo se utiliza un subconjunto de imágenes de
 banco principal del que nunca se extraen recortes de entrenamiento (compuesto
 por $6416$ imágenes), lo que garantiza que la evaluación sin supervisión se
 realice sobre un banco completamente disjunto.
+
+\begin{figure}[h]
+  \centering
+  \setlength{\tabcolsep}{4pt}%
+  \begin{tabular}{cccc}
+    \includegraphics[height=1.5cm,width=2.8cm,keepaspectratio]{figures/style_tag.jpg} &
+    \includegraphics[height=1.5cm,width=2.8cm,keepaspectratio]{figures/style_throwup.jpg} &
+    \includegraphics[height=1.5cm,width=2.8cm,keepaspectratio]{figures/style_piece.jpg} &
+    \includegraphics[height=1.5cm,width=2.8cm,keepaspectratio]{figures/style_character.jpg} \\
+    \textit{tag} & \textit{throw-up} & \textit{piece} & \textit{character} \\
+  \end{tabular}
+  \caption{Ejemplo de un recorte de cada una de las cuatro categorías
+  estilísticas etiquetadas.}
+  \label{fig:estilos-ejemplos}
+\end{figure}
 
 La figura~\ref{fig:dataset-style-distribution} muestra la distribución por
 clase de los recortes etiquetados por estilo. El reparto es desigual: las
