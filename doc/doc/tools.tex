@@ -342,13 +342,44 @@ learning}~\cite{pan_survey_2010} en el que la representación base se mantiene
 congelada y solo se entrena una cabeza ligera, siguiendo la metodología de
 \textit{fine-tuning} de ULMFiT~\cite{howard_universal_2018}. La cabeza consiste
 en una secuencia Lineal $\rightarrow$ ReLU $\rightarrow$ Lineal que proyecta
-los \textit{embeddings} base a un espacio adaptado al dominio; en inferencia su
+los \textit{embeddings} base a un espacio adaptado al dominio. Además, su
 salida se normaliza a norma unitaria ($L_2$), de modo que el \textit{embedding}
-producido sea directamente comparable mediante distancia coseno.
+producido sea directamente comparable mediante distancia coseno
+(Figura~\ref{fig:cabeza-proyeccion}).
 
-% TODO: revisar este párrafo cuando se actualice el entrenamiento de las
-% cabezas de estilo para alinearlo con el nuevo esquema de las de autoría
-% (PK + batch-hard + dimensionalidad reducida).
+\begin{figure}[h]
+  \centering
+  \shorthandoff{<>}%
+  \begin{tikzpicture}[
+    >=Stealth, node distance=6mm and 6mm,
+    block/.style={draw, rounded corners, minimum height=9mm, minimum width=14mm, inner sep=3pt, align=center, font=\small},
+    frozen/.style={block, fill=gray!20, dashed},
+    trained/.style={block, fill=blue!12},
+    vec/.style={font=\footnotesize, align=center},
+  ]
+    \node[font=\small] (img) {imagen};
+    \node[frozen, right=of img] (bb) {Backbone\\congelado};
+    \node[trained, right=of bb] (l1) {Lineal};
+    \node[trained, right=of l1] (relu) {ReLU};
+    \node[trained, right=of relu] (l2) {Lineal};
+    \node[block, fill=green!12, right=of l2] (norm) {$L_2$};
+    \node[vec, right=of norm] (e) {embedding};
+
+    \draw[->] (img)--(bb); \draw[->] (bb)--(l1);
+    \draw[->] (l1)--(relu); \draw[->] (relu)--(l2); \draw[->] (l2)--(norm);
+    \draw[->] (norm)--(e);
+
+    % caja "cabeza" alrededor de la parte entrenada
+    \node[draw, dotted, fit=(l1)(relu)(l2), inner sep=2mm,
+          label=below:{\scriptsize Cabeza entrenada}] {};
+  \end{tikzpicture}%
+  \shorthandon{<>}%
+  \caption{Cabeza de proyección ajustada a grafiti. El \textit{backbone} permanece
+    congelado y solo se entrena una secuencia ligera de capas para luego normalizar
+    la salida a norma unitaria.}
+  \label{fig:cabeza-proyeccion}
+\end{figure}
+
 Se han entrenado dos tipos de cabezas (de autoría y de estilo) sobre dos
 arquitecturas base (MobileNetV3 y DINOv2). Las cabezas de autoría buscan
 acercar en el espacio latente las pintadas de un mismo autor y separar las de
