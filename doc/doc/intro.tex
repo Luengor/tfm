@@ -20,13 +20,13 @@ extensión a bancos de imágenes crecientes no es viable sin apoyo automatizado.
 
 En esta línea, trabajos recientes han abordado la detección y cuantificación
 automática de grafiti sobre imágenes captadas en condiciones no
-controladas~\cite{fogaca_deep_2023,tokuda_quantifying_2019}, pero la
-caracterización por similitud entre las pintadas detectadas queda ampliamente
-abierta. Disponer de una agrupación automática por similitud visual habilita
-una gran cantidad de procedimientos de análisis que van desde el estilístico
-hasta el documental, incluyendo, la priorización de la retirada o la
-trazabilidad de autores recurrentes sobre conjuntos de imágenes en los que la
-inspección manual es inviable.
+controladas~\cite{fogaca_deep_2023,tokuda_quantifying_2019}, centrados en
+localizar pintadas y estimar su presencia geográfica pero sin abordar su
+agrupación por similitud visual. Disponer de una agrupación automática por
+similitud visual habilita una gran cantidad de procedimientos de análisis que
+van desde el estilístico hasta el documental, incluyendo la priorización de la
+retirada o la trazabilidad de autores recurrentes sobre conjuntos de imágenes
+en los que la inspección manual es inviable.
 
 \subsection{Planteamiento del problema}
 \label{subsec:intro-problema}
@@ -35,21 +35,23 @@ El problema técnico abordado en este trabajo es el siguiente: dado un conjunto
 mayoritariamente no etiquetado de fotografías de grafiti captadas en
 condiciones reales, agruparlas automáticamente de modo que las pintadas
 visualmente similares queden en el mismo grupo. Este enunciado, aparentemente
-directo, encierra tres dificultades centrales que condicionan tanto el diseño
-como la evaluación de la solución.
+directo, encierra tres dificultades que condicionan tanto el diseño como la
+evaluación de la solución.
 
 En primer lugar, no existe verdad fundamental canónica para la similitud entre
 grafitis: no hay un conjunto de etiquetas establecido sobre el que comparar los
-resultados. Para habilitar una evaluación supervisada se ha etiquetado
-a mano un subconjunto reducido, que se utiliza como método de evaluación
-complementaria y no como referencia absoluta. En segundo lugar, el espacio de
-combinaciones de modelos de representación, técnicas de reducción de
-dimensionalidad y algoritmos de agrupamiento es amplio, y la literatura no
-ofrece una guía clara sobre qué componentes funcionan mejor en este dominio. En
-tercer lugar, el coste computacional de cada combinación escala con el tamaño
-del conjunto de imágenes, sin que exista una caracterización experimental
-previa específica para grafiti que permita anticipar dónde se sitúan los
-cuellos de botella.
+resultados. Además, el significado de <<visualmente similar>> no es del todo claro;
+no es evidente a priori si la similitud debe centrarse en el estilo, la autoría,
+el contenido o una combinación de estos factores. Para habilitar una evaluación
+supervisada se ha etiquetado a mano un subconjunto reducido, que se utiliza
+como método de evaluación complementaria y no como referencia absoluta. En
+segundo lugar, el espacio de combinaciones de modelos de representación,
+técnicas de reducción de dimensionalidad y algoritmos de agrupamiento es
+amplio, y la literatura no ofrece una guía clara sobre qué componentes
+funcionan mejor en este dominio. En tercer lugar, el coste computacional de
+cada combinación escala con el tamaño del conjunto de imágenes, sin que exista
+una caracterización experimental previa específica para grafiti que permita
+anticipar dónde se sitúan los cuellos de botella.
 
 \subsection{Objetivos}
 \label{subsec:intro-objetivos}
