@@ -319,8 +319,6 @@ validación no mejora durante un número fijo de épocas.
 
 \subsubsection{Cabezas de proyección}
 \label{subsubsec:entrenamiento-cabezas}
-% TODO: revisar toda esta subsección cuando se actualice el entrenamiento de
-% las cabezas de estilo (actualmente sólo se han actualizado las de autoría).
 Las cuatro cabezas (autoría y estilo sobre MobileNetV3 y DINOv2) se entrenan
 sobre la totalidad del subconjunto anotado, sin reservar una partición de
 validación. Los \textit{backbones} se mantienen estrictamente congelados
@@ -329,22 +327,20 @@ el esquema de \textit{transfer learning} descrito en \ref{subsubsec:cabezas}.
 
 Las cabezas de autoría se entrenan con la pérdida de tripletes en su variante
 \textit{batch-hard}~\cite{hermans_defense_2017} con margen $0.3$, optimizador
-Adam con \textit{learning rate} $10^{-4}$ y $20$ épocas, sin parada temprana: se
-conservan los pesos de la última época. Cada \textit{batch} se construye mediante
-un muestreador PK que selecciona $8$ autores y $4$ recortes por autor (tamaño de
-\textit{batch} $32$), de modo que cada ancla disponga de varios pares positivos
-dentro del mismo \textit{batch}. A continuación, y dada la relevancia del
-muestreo de negativos~\cite{wu_sampling_2017}, para cada ancla se forma el
-triplete con su positivo más difícil (el recorte del mismo autor más alejado en
-el espacio latente) y su negativo más difícil (el recorte de autor distinto más
-cercano), concentrando la pérdida en los tripletes más informativos del
-\textit{batch}. Los autores representados por un único recorte se conservan en el
-entrenamiento: la fuerte aumentación de datos hace que dos vistas aumentadas del
-mismo recorte actúen como par positivo.
+Adam con \textit{learning rate} $10^{-4}$ y $20$ épocas, sin parada temprana:
+se conservan los pesos de la última época. Cada \textit{batch} se construye
+mediante un muestreador PK que selecciona $8$ autores y $4$ recortes por autor
+(tamaño de \textit{batch} $32$), de modo que cada ancla disponga de varios
+pares positivos dentro del mismo \textit{batch}. A continuación, y dada la
+relevancia del muestreo de negativos~\cite{wu_sampling_2017}, para cada ancla
+se forma el triplete con su positivo más difícil (el recorte del mismo autor
+más alejado en el espacio latente) y su negativo más difícil (el recorte de
+autor distinto más cercano), concentrando la pérdida en los tripletes más
+informativos del \textit{batch}. Los autores representados por un único recorte
+se conservan en el entrenamiento, ya que gracias a la fuerte aumentación de los
+datos, a partir de un solo recorte se generan múltiples ejemplos distintos que
+pueden actuar como par positivo entre sí.
 
-% TODO: actualizar este párrafo si se migra el entrenamiento de las cabezas de
-% estilo al esquema PK + batch-hard + aumentación reforzada usado ahora en las
-% de autoría (ver src/train/trainer.py, dataset.py y author_head.py).
 Las cabezas de estilo se entrenan con la pérdida \textit{Supervised
 Contrastive}~\cite{khosla_supervised_2021} y temperatura $T = 0.07$,
 optimizador Adam con \textit{learning rate} $10^{-4}$ y un \textit{scheduler}
