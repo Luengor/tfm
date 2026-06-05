@@ -231,15 +231,14 @@ distancia perpendicular al segmento que une los extremos. Para los modelos de
 mezcla gaussiana se sigue el mismo barrido sobre $k \in \{2, \ldots,
 k_{\max}\}$ (se excluye $k=1$, que colapsa el agrupamiento en un único grupo y
 deja indefinidas las métricas internas) y se elige el modelo que minimiza el
-criterio bayesiano de información (BIC); este criterio penaliza de manera explícita la complejidad del
-modelo, lo que mitiga la tendencia del ajuste por máxima verosimilitud a
-favorecer el mayor número de componentes. Para DBSCAN se estima el radio
-$\epsilon$ a partir de la curva de $k$-distancias: para cada punto se calcula la
-distancia a su $(\texttt{min\_samples}-1)$-ésimo vecino más próximo (excluyendo
-el propio punto, que sklearn devuelve como vecino más cercano de sí mismo), las
-distancias se ordenan de menor a mayor y se aplica el mismo criterio de codo que
-en K-Means para seleccionar el valor de $\epsilon$ a partir del cual la densidad
-cae abruptamente.
+criterio bayesiano de información (BIC); este criterio penaliza de manera
+explícita la complejidad del modelo, lo que mitiga la tendencia del ajuste por
+máxima verosimilitud a favorecer el mayor número de componentes. Para DBSCAN se
+estima el radio $\epsilon$ a partir de la curva de $k$-distancias: para cada
+punto se calcula la distancia a su $(\texttt{min\_samples}-1)$-ésimo vecino más
+próximo, las distancias se ordenan de menor a mayor y se aplica el mismo
+criterio de codo que en K-Means para seleccionar el valor de $\epsilon$ a
+partir del cual la densidad cae abruptamente.
 
 \begin{longtable}{|l|l|c|} \hline
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
@@ -356,15 +355,13 @@ acercar en el espacio latente las pintadas de un mismo autor y separar las de
 autores distintos; las de estilo organizan el espacio según las cuatro
 categorías estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
 \textit{character}). Las cuatro cabezas resultantes se entrenan exclusivamente
-sobre el subconjunto anotado descrito en \ref{subsec:dataset} (detalles sobre
-el entrenamiento en  \ref{subsubsec:entrenamiento-cabezas}) y se añaden al
-catálogo de modelos de \textit{embedding}, conservando la dimensionalidad del
-modelo base.
+sobre los subconjuntos anotados descritos en \ref{subsec:dataset} (detalles
+sobre el entrenamiento en  \ref{subsubsec:entrenamiento-cabezas}) y se añaden
+al catálogo de modelos de \textit{embedding}, conservando la dimensionalidad
+del modelo base.
 
 \subsection{Entorno de ejecución}
 \label{subsec:entorno}
-% TODO: Ensure this stays true. If at any moment another environment is used,
-% update this section accordingly.
 El entorno de ejecución de los experimentos es el ordenador personal del autor,
 con las siguientes características:
 \begin{itemize}
