@@ -167,7 +167,7 @@ cualquier ranking basado en una sola métrica intrínseca.
 \subsubsection{Reducción de dimensionalidad}
 \label{subsubsec:res-reduccion}
 Reducir la dimensionalidad de los vectores de características es un paso común
-en los pipelines de agrupamiento. Sobre los vectores de 384 dimensiones de
+en los pipelines de agrupamiento. Sobre los vectores de 128 dimensiones de
 \texttt{dinov2\_graffiti\_style\_head}, el barrido (E2) compara seis
 configuraciones y revela a UMAP como la única familia que produce
 simultáneamente un número de clústeres no trivial, ruido moderado y tamaños
@@ -178,12 +178,12 @@ de corpus completo.
 \begin{longtable}{|p{2.0cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|} \hline
   \textbf{Reducción} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} \\ \hline
   \endhead
-  identidad   & 2   & 0.003 &  0.073 &  8.3 & 1.76 & 1.00 \\ \hline
-  PCA-10      & 2   & 0.039 & -0.028 &  3.6 & 1.48 & 1.00 \\ \hline
-  PCA-50      & 188 & 0.627 &  0.118 & 43.0 & 1.32 & 5.61 \\ \hline
-  UMAP-10     & 563 & 0.199 &  0.151 & 33.1 & 1.70 & 0.75 \\ \hline
-  UMAP-50     & 537 & 0.195 &  0.142 & 32.4 & 1.73 & 0.82 \\ \hline
-  Isomap-10   & 2   & 0.019 &  0.068 & 16.3 & 1.29 & 1.00 \\ \hline
+  identidad   & 301 & 0.684 &  0.307 & 37.5 & 1.16 & 0.55 \\ \hline
+  PCA-10      & 2   & 0.010 &  0.000 &  4.2 & 1.39 & 1.00 \\ \hline
+  PCA-50      & 238 & 0.698 &  0.238 & 36.6 & 1.29 & 2.29 \\ \hline
+  UMAP-10     & 562 & 0.202 &  0.155 & 27.9 & 1.70 & 0.74 \\ \hline
+  UMAP-50     & 558 & 0.195 &  0.154 & 27.8 & 1.71 & 0.70 \\ \hline
+  Isomap-10   & 125 & 0.624 &  0.044 & 38.4 & 1.80 & 3.40 \\ \hline
   \caption{E2, calidad intrínseca a $N=6416$. UMAP es la única reducción que
   produce simultáneamente un número de clústeres no trivial, ruido moderado y
   tamaños balanceados.}
@@ -192,32 +192,42 @@ de corpus completo.
 }
 
 La fila \emph{identidad} responde directamente a la pregunta de cuánto aporta
-reducir: agrupando los 384-d crudos, HDBSCAN sólo produce entre 2 y 4 clústeres
-a las tres escalas (2 a $N=250$, 4 a $N=1000$, 2 a $N=6416$). La estimación de
-densidad se degrada en alta dimensionalidad y las distancias se concentran.
-UMAP-10 sobre los mismos datos escala a 23, 96 y 563 clústeres respectivamente.
+reducir: agrupando los 128-d crudos, HDBSCAN produce particiones muy distintas
+según la escala. Colapsa a $k=2$ a $N=250$, pero a $N=1000$ y $N=6416$ explota a
+52 y 301 clústeres respectivamente. Esos clústeres, sin embargo, se obtienen a
+costa de un ruido altísimo (0.605 y 0.684): HDBSCAN agrupa únicamente un núcleo
+denso y descarta entre el 60 y el 68\% de los puntos. La identidad no produce,
+por tanto, un colapso trivial, pero tampoco una partición utilizable bajo el
+criterio conjunto, sino una segmentación de cobertura muy baja. UMAP-10 sobre
+los mismos datos escala a 18, 106 y 562 clústeres manteniendo el ruido moderado
+(0.06, 0.11, 0.20) y los tamaños balanceados.
 PCA-10 y PCA-50 ilustran otra inestabilidad: PCA-10 colapsa a $k=2$ con silueta
-negativa ($-0.028$), mientras que PCA-50 explota a $k=188$ con un 62.7\% de
-ruido y un coeficiente de variación de 5.61, ambos lecturas degeneradas que las
-métricas individuales premian engañosamente (PCA-50 obtiene el CH más alto de
-la tabla, $43.0$, por delante de UMAP-10).
+nula ($0.000$) a $N=6416$ y desciende a silueta negativa ($-0.020$) a $N=1000$,
+mientras que PCA-50 explota a $k=238$ con un 69.8\% de ruido y un coeficiente de
+variación de 2.29. Ambas son lecturas degeneradas que las métricas individuales
+premian engañosamente: tanto la identidad (silueta $0.307$, DB $1.16$) como
+PCA-50 (silueta $0.238$) encabezan la tabla en silueta pese a descartar dos
+tercios del corpus.
 
-Las métricas de coste empeoran la posición de la identidad. Esta reducción no
-es gratuita como podría parecer, sino que empuja el coste hacia la etapa de
-agrupamiento. Con $N=6416$ imágenes, HDBSCAN tarda 24.1~s sobre la
-representación identidad frente a 0.34~s sobre UMAP-10, $\sim 70$ veces más.
-Isomap-10 fracasa en la misma vía: 23.6~s y 1.2~GB de RSS pico, lo más caro del
-experimento, para colapsar también a $k=2$ a $N=6416$. UMAP-10 y UMAP-50 son
-indistinguibles en calidad, pero UMAP-50 cuesta el doble en tiempo de reducción
-(11.2~s vs 6.2~s a $N=6416$). Por esto, la recomendación es específicamente
-UMAP con \texttt{n\_components=10}, no UMAP en general.
+Las métricas de coste refuerzan la posición de la identidad como opción
+inferior. Esta reducción no es gratuita como podría parecer, sino que empuja el
+coste hacia la etapa de agrupamiento. Con $N=6416$ imágenes, HDBSCAN tarda
+6.83~s sobre la representación identidad frente a 0.34~s sobre UMAP-10, unas
+20 veces más. Isomap-10 fracasa en la misma vía, pero de forma más grave:
+23.9~s y 1.25~GB de RSS pico, lo más caro del experimento, para una partición
+igualmente degenerada (ruido 0.624 y csCV 3.40 a $N=6416$, con colapso a $k=2$ a
+$N=1000$). UMAP-10 y UMAP-50 son indistinguibles en calidad, pero UMAP-50 cuesta
+casi el doble en tiempo de reducción (11.0~s vs 5.9~s a $N=6416$). Por esto, la
+recomendación es específicamente UMAP con \texttt{n\_components=10}, no UMAP en
+general.
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e2_reduction_quality_cost.pdf}
   \caption{E2: calidad intrínseca (panel izquierdo) y coste por etapa (panel
-  derecho) por familia de reducción a $N=6416$. La fila identidad colapsa el
-  agrupamiento y traslada el coste a la etapa de \textit{clustering}.}
+  derecho) por familia de reducción a $N=6416$. La fila identidad produce una
+  partición de cobertura muy baja (ruido $\sim$0.68) y traslada el coste a la
+  etapa de \textit{clustering}.}
   \label{fig:e2-reduction}
 \end{figure}
 
