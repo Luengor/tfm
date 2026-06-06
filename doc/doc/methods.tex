@@ -97,6 +97,22 @@ La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
         y las coordenadas del recorte se almacenan en el sistema elegido.
 \end{enumerate}
 
+La figura~\ref{fig:segmentation-stages} ilustra el recorrido completo sobre una
+fotografía real: las cajas que emite el detector, su fusión por solapamiento, la
+expansión por el margen configurado y los recortes finales que se entregan al
+extractor.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=\linewidth]{figures/segmentation_stages.pdf}
+  \caption{Etapas de la segmentación sobre una fotografía del banco, siguiendo
+  el flujo de las flechas: la fotografía original; las detecciones del modelo
+  YOLO ajustado; las cajas resultantes tras fusionar las solapadas; las cajas
+  expandidas con el margen de contexto; y los recortes finales que se entregan
+  al extractor.}
+  \label{fig:segmentation-stages}
+\end{figure}
+
 \subsubsection{Recuperación, reducción y agrupamiento}
 Una vez completada la ingesta, la fase de agrupamiento opera sobre el contenido
 completo del almacenamiento. En primer lugar, se recuperan todos los
