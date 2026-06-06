@@ -16,8 +16,9 @@ la pintada en la escena mediante un detector \textit{fine-tuned} por ellos
 mismos. En esta misma línea, \citea[etali]{Tokuda}{tokuda_quantifying_2019}
 desarrollan un sistema para cuantificar la densidad de pintadas en la ciudad de
 São Paulo, Brasil. Las imágenes se obtienen a través de la plataforma de Street
-View de Google, y el modelo de detección utilizado (Mask-RCNN) se entrena a
-partir de un conjunto de datos anotado manualmente por los autores.
+View de Google, y el modelo de detección utilizado (Mask-RCNN, un modelo capaz
+de segmentar instancias de objetos en una imagen) se entrena a partir de un
+conjunto de datos anotado manualmente por los autores.
 
 Estos trabajos, aunque no están alineados del todo con el planteamiento de
 este, establecen que el uso de aprendizaje profundo es viable sobre imágenes de
@@ -47,7 +48,7 @@ ni acompaña la evaluación de una caracterización del coste.
 \begin{longtable}{|p{1.9cm}|p{2.1cm}|p{2.0cm}|p{2.2cm}|p{2.2cm}|p{1.9cm}|} \hline
   \textbf{Trabajo} & \textbf{Tarea} & \textbf{Datos} & \textbf{Características} & \textbf{Técnica} & \textbf{Métrica} \\ \hline
   \endhead
-  Fogaça etal (2023) & Clasificación y detección de grafiti & Imágenes de calle (Lisboa) & CNN \textit{fine-tuned} & Clasificación supervisada + detector & Exactitud / mAP (supervisada) \\ \hline
+  Fogaça etal (2023) & Clasificación y detección de grafiti & Imágenes de calle (Lisboa) & CNN \textit{fine-tuned} & Clasificación supervisada + detector & Exactitud / mAP (precisión media promedio, supervisada) \\ \hline
   Tokuda etal (2019) & Cuantificación de densidad de pintadas & Google Street View (São Paulo) & Mask-RCNN & Segmentación supervisada & Precisión / \textit{recall} \\ \hline
   Taylor etal (2010) & Categorización por contenido & Fotografías de grafiti & Inspección visual & Categorización manual & --- (cualitativa) \\ \hline
   García-García etal (2025) & Agrupamiento de pintadas & Imágenes de grafiti & Colores dominantes (RGB / Lab) & K-Means & Interna (no supervisada) \\ \hline
@@ -63,6 +64,45 @@ profundos con técnicas estándar de agrupamiento para esta aplicación, ni que
 evalúen sistemáticamente qué componentes funcionan mejor sobre fotografías de
 pintadas. Esta carencia en la literatura es la que delimita el espacio en el
 que se sitúa el presente trabajo y motiva su planteamiento combinatorio.
+
+% ---------------------------------------------------------------------
+\subsection{Identificación de autoría a partir de firmas y escritura}
+\label{subsec:art-author-id}
+
+La identificación de los grafiteros a partir de las fotografías de sus firmas
+encuentra su análogo más directo en la literatura forense de identificación de
+la escritura y de verificación de firmas manuscritas. En ambos casos el
+objetivo es recuperar la identidad de un productor a partir de los patrones
+motores difíciles de falsificar que quedan impresos en sus marcas. Este es un
+problema que Schomaker define formalmente como uno de
+biometría~\cite{schomaker_writer_2008}, distinguiendo dos tareas que se
+transladan de manera muy directa al grafiti: la identificación, que busca al
+autor de una muestra entre un conjunto de escritores conocidos, y la
+verificación, que decide si dos muestras proceden de la misma mano.
+
+Fiel y Sablatnig~\cite{fiel_writer_2015} abordan la identificación y
+recuperación de escritura entrenando una red convolucional como clasificador
+sobre un conjunto de escritores conocidos para, una vez entrenada, descartar la
+capa de clasificación y utilizar las activaciones de la penúltima capa como
+vector de características. Estos vectores de características se almacenan y la
+consulta se resuelve por vecindad más cercana sobre los vectores guardados.
+Este patrón de \enquote{codificar una vez y recuperar por similitud} es
+precisamente el que aplica este trabajo, trasladando los descriptores profundos
+descritos en la sección anterior al dominio específico de la autoría.
+
+La identificación de autoría comparte estructura con el reconocimiento facial
+moderno, del que FaceNet~\cite{schroff_facenet_2015} es el más representativo.
+Se trata de un problema de aprendizaje métrico de conjunto abierto, en el que
+el número de identidades no se conoce \textit{a priori}, las muestras por clase
+son escasas y la evaluación se realiza por verificación o recuperación antes
+que por clasificación directa. Esta caracterización justifica el recurso a
+cabezas de proyección entrenadas con aprendizaje métrico para inducir un
+espacio en el que las pintadas de un mismo autor queden próximas, en lugar de
+un clasificador cerrado sobre un catálogo fijo de grafiteros. Este enfoque se
+adapta mejor al caso particular de este trabajo, puesto que resulta más
+sencillo el etiquetado de un subconjunto reducido de imágenes con un par de
+entradas por autor que la construcción de un catálogo exhaustivo de grafiteros
+necesariamente cerrado.
 
 % ---------------------------------------------------------------------
 \subsection{Representación vectorial de imágenes}
@@ -106,64 +146,27 @@ propósito general, como las familias YOLO~\cite{ultralytics_ultralytics_2024},
 ofrecen además sus propios mapas de características como vectores de partida.
 
 % ---------------------------------------------------------------------
-\subsection{Identificación de autoría a partir de firmas y escritura}
-\label{subsec:art-author-id}
-
-La identificación de los grafiteros a partir de las fotografías de sus firmas
-(\textit{tags}) encuentra su análogo más directo en la literatura forense de
-identificación de la escritura (\textit{writer identification}) y de
-verificación de firmas manuscritas. En ambos casos el objetivo es recuperar la
-identidad de un productor a partir de los patrones motores difíciles de
-falsificar que quedan impresos en sus marcas. Este es un problema que Schomaker
-define formalmente como uno de biometría~\cite{schomaker_writer_2008},
-distinguiendo dos tareas que se transladan de manera muy directa al grafiti: la
-identificación, que busca al autor de una muestra entre un conjunto de
-escritores conocidos, y la verificación, que decide si dos muestras proceden de
-la misma mano.
-
-Fiel y Sablatnig~\cite{fiel_writer_2015} abordan la identificación y
-recuperación de escritura entrenando una red convolucional como clasificador
-sobre un conjunto de escritores conocidos para, una vez entrenada, descartar la
-capa de clasificación y utilizar las activaciones de la penúltima capa como
-vector de características. Estos vectores de características se almacenan y la
-consulta se resuelve por vecindad más cercana sobre los vectores guardados.
-Este patrón de \enquote{codificar una vez y recuperar por similitud} es precisamente
-el que aplica este trabajo, trasladando los descriptores profundos descritos en
-la sección anterior al dominio específico de la autoría.
-
-La identificación de autoría comparte estructura con el reconocimiento facial
-moderno, del que FaceNet~\cite{schroff_facenet_2015} es el más representativo.
-Se trata de un problema de aprendizaje métrico de conjunto abierto, en el que
-el número de identidades no se conoce \textit{a priori}, las muestras por clase
-son escasas y la evaluación se realiza por verificación o recuperación antes
-que por clasificación directa. Esta caracterización justifica el recurso a
-cabezas de proyección entrenadas con aprendizaje métrico para inducir un
-espacio en el que las pintadas de un mismo autor queden próximas, en lugar de
-un clasificador cerrado sobre un catálogo fijo de grafiteros. Este enfoque se
-adapta mejor al caso particular de este trabajo, puesto que resulta más
-sencillo el etiquetado de un subconjunto reducido de imágenes con un par de
-entradas por autor que la construcción de un catálogo exhaustivo de grafiteros
-necesariamente cerrado.
-
-% ---------------------------------------------------------------------
 \subsection{Búsqueda por similitud e indexación en bancos de imágenes}
 \label{subsec:art-similarity-search}
 
-Una vez obtenida la representación vectorial de cada imagen, la recuperación
-por similitud sobre el banco de imágenes se reduce a un problema de vecinos más
-cercanos en un espacio de varios cientos de dimensiones. El cálculo exacto por
-fuerza bruta tiene un coste lineal en el tamaño del banco y por imagen
-consultada, lo que resulta asumible en escalas modestas, pero deja de serlo a
-medida que el banco crece. La literatura ha respondido a esto con dos grandes
-familias de índices aproximados de vecinos más cercanos (\textit{Approximate
-Nearest Neighbor}, ANN). Por un lado, los basados en cuantificación y
-particionado del espacio (FAISS~\cite{johnson_billion-scale_2017}), que combina
-listas invertidas con cuantificación de productos para escalar la búsqueda a
-miles de millones de vectores con uso intensivo de GPU. Por otro, los basados
-en grafos de proximidad, encabezados por HNSW~\cite{malkov_efficient_2018}, que
-construye una jerarquía de grafos navegables de mundo pequeño con coste de
-consulta logarítmico y que se ha convertido en el estándar de facto de las
-bases de datos vectoriales modernas (pgvector, Qdrant, Milvus).
+Una vez obtenida la representación vectorial de cada imagen, la tarea se vuelve
+una de recuperación de imágenes basada en contenido. A diferencia de los
+sistemas tradicionales de recuperación de texto, aquí la propia representación
+de cada imagen se utiliza como consulta. Por esto, la recuperación por
+similitud se aleja de la búsqueda clásica y se vuelve un problema geométrico de
+vecinos más cercanos. El cálculo exacto por fuerza bruta tiene un coste lineal
+en el tamaño del banco y por imagen consultada, lo que resulta asumible en
+escalas modestas, pero deja de serlo a medida que el banco crece. La literatura
+ha respondido a esto con dos grandes familias de índices aproximados de vecinos
+más cercanos (\textit{Approximate Nearest Neighbor}, ANN). Por un lado, los
+basados en cuantificación y particionado del espacio
+(FAISS~\cite{johnson_billion-scale_2017}), que combina listas invertidas con
+cuantificación de productos para escalar la búsqueda a miles de millones de
+vectores con uso intensivo de GPU. Por otro, los basados en grafos de
+proximidad, encabezados por HNSW~\cite{malkov_efficient_2018}, que construye
+una jerarquía de grafos navegables de mundo pequeño con coste de consulta
+logarítmico y que se ha convertido en el estándar de facto de las bases de
+datos vectoriales modernas (pgvector, Qdrant, Milvus).
 
 El presente trabajo no aporta novedad en este eje y se apoya en estas
 soluciones ya existentes; su integración concreta en el sistema, sobre
