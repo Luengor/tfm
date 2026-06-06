@@ -49,7 +49,7 @@ evaluación de la solución.
 
 En primer lugar, no existe verdad fundamental canónica para la similitud entre
 grafitis: no hay un conjunto de etiquetas establecido sobre el que comparar los
-resultados. Además, el significado de <<visualmente similar>> no es del todo
+resultados. Además, el significado de \enquote{visualmente similar} no es del todo
 claro; no es evidente a priori si la similitud debe centrarse en el estilo, la
 autoría, el contenido o una combinación de estos factores. Para habilitar una
 evaluación supervisada se ha etiquetado a mano un subconjunto reducido, que se
@@ -70,8 +70,8 @@ anticipar dónde se sitúan los cuellos de botella.
 Diseñar, implementar y evaluar experimentalmente un sistema modular de
 agrupamiento de imágenes de grafiti que permita caracterizar el coste
 computacional y la calidad del agrupamiento de combinaciones de segmentación,
-generación de \textit{embeddings}, reducción de dimensionalidad y
-\textit{clustering} en función del tamaño del conjunto.
+generación de representaciones vectoriales (\textit{embeddings}), reducción de
+dimensionalidad y \textit{clustering} en función del tamaño del conjunto.
 
 \subsubsection{Objetivos específicos}
 
@@ -113,9 +113,16 @@ trabajo, sobre un subconjunto reducido y por un solo anotador, sin ningún tipo
 de validación externa o consenso entre anotadores. Así, las métricas
 extrínsecas obtenidas son indicativas y no concluyentes. Segundo, la evaluación
 extrínseca solo es directamente aplicable a las configuraciones que no hacen
-uso de segmentación automática. Esto se debe a que no es posible evaluar la
-calidad del agrupamiento de recortes que no corresponden exactamente con las
-etiquetas manuales.
+uso de segmentación automática. Esto se debe a que la segmentación atuomática
+extrae y genera nuevos recortes de las imágenes originiales, que no
+corresponderán exactamente con los recortes etiquetados manualmente, lo que
+impide una comparación directa.
+
+Por último, cabe destacar que este trabajo se centra exclusivamente en aspectos
+técnicos. El grafiti se aborda como un fenómeno visual neutro, sin entrar en
+consideraciones sociales, culturales o legales. El objetivo es desarrollar un
+sistema de agrupamiento de imágenes de grafiti, sin abordar cuestiones
+relacionadas con la legalidad, la ética o el impacto social del grafiti.
 
 \subsection{Estructura del documento}
 \label{subsec:intro-estructura}
