@@ -379,7 +379,7 @@ YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}) manteniendo fijo el resto del
   YOLO11m             & 6603  & 1.03 &  506 & 0.230 & 0.131 & 29.5 & 1811.6 \\ \hline
   YOLO11m \textit{ft} & 15362 & 2.39 & 1049 & 0.298 & 0.122 & 36.2 & 2152.3 \\ \hline
   \caption{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
-  <<recortes>> son los puntos efectivamente agrupados, no las imágenes leídas).
+  \enquote{recortes} son los puntos efectivamente agrupados, no las imágenes leídas).
   Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.}
   \label{tab:e5-segmenter-6416}
 \end{longtable}
@@ -588,8 +588,8 @@ en la figura~\ref{fig:similaritysearch-pareto}. Ninguna cae por debajo de
 \textit{recall} 0.995, 3.4 veces más rápida que el método exacto. Alcanzar
 \textit{recall} 1.000 sin penalizar la latencia es posible subiendo \texttt{m}
 a 32 o \texttt{ef\_construction} a 256; ambas son parámetros para la
-construcción, preferibles a \texttt{ef\_search} en un flujo de <<ingesta única,
-muchas consultas>> porque su sobrecoste se amortiza una sola vez. A esta
+construcción, preferibles a \texttt{ef\_search} en un flujo de \enquote{ingesta única,
+muchas consultas} porque su sobrecoste se amortiza una sola vez. A esta
 escala, parece que el uso de HNSW proporciona una mejora de latencia muy
 considerable sin una pérdida apreciable de calidad, eliminando el cuello de
 botella $O(n^2)$ de SQLite.
@@ -706,7 +706,7 @@ del propio \textit{backbone}.
 HDBSCAN no parece llegar a distinguir las cuatro categorías de estilo posibles
 como clústeres separados, sino que las agrupa en tres grupos. Tras una revisión
 manual de los clústeres generados, parece que HDBSCAN agrupa los grafitis en
-<<sencillos>>, <<elaborados>> y <<characters>> (color naranja, verde y azul en
+\enquote{sencillos}, \enquote{elaborados} y \enquote{characters} (color naranja, verde y azul en
 la figura~\ref{fig:e8a-hdbscan}). El primero de estos grupos está
 principalmente formado por \textit{tags} y algunos \textit{throw-ups} más
 simples. El segundo está formado por \textit{throw-ups} más elaborados y la
