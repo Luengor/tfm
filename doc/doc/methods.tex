@@ -12,7 +12,54 @@ del conjunto almacenado para reducirlo y agruparlo. La separación explícita
 entre la fase de ingesta y la fase de agrupamiento es intencionada. Por un
 lado, refleja el escenario de uso previsto (un banco que crece de forma
 incremental sobre el que se ejecutan sesiones de análisis puntuales), y por
-otro permite aislar el coste computacional de cada etapa al medir.
+otro permite aislar el coste computacional de cada etapa al medir
+(figura~\ref{fig:pipeline}).
+
+\begin{figure}[h]
+  \centering
+  \shorthandoff{<>}%
+  \begin{tikzpicture}[
+    >=Stealth, node distance=13mm and 17mm,
+    block/.style={draw, rounded corners, minimum height=9mm, minimum width=22mm,
+                  inner sep=5pt, align=center, font=\small},
+    store/.style={block, fill=green!12},
+    io/.style={font=\footnotesize, align=center},
+    lbl/.style={font=\scriptsize, midway, fill=white, inner sep=2pt},
+  ]
+    % --- Fase de ingesta (fila superior) ---
+    \node[io] (img) {fotografía};
+    \node[block, right=of img] (seg) {Segmentador};
+    \node[block, right=of seg] (ext) {Extractor};
+    \node[store, right=of ext] (sto) {Almacenamiento};
+
+    \draw[->] (img)--(seg);
+    \draw[->] (seg)--(ext) node[lbl, above]{recortes};
+    \draw[->] (ext)--(sto) node[lbl, above]{\textit{embeddings}};
+
+    % --- Fase de agrupamiento (fila inferior) ---
+    \node[block, below=of sto] (red) {Reducción};
+    \node[block, left=of red] (clu) {Agrupamiento};
+    \node[io, left=of clu] (out) {clústeres\\y métricas};
+
+    \draw[->] (sto)--(red) node[lbl, right]{carga masiva};
+    \draw[->] (red)--(clu);
+    \draw[->] (clu)--(out);
+
+    % --- Recuadros de fase ---
+    \node[draw, dotted, fit=(img)(seg)(ext), inner sep=3mm,
+          label=above:{\scriptsize Fase de ingesta (incremental)}] {};
+    \node[draw, dotted, fit=(red)(clu)(out), inner sep=3mm,
+          label=below:{\scriptsize Fase de agrupamiento (puntual)}] {};
+  \end{tikzpicture}%
+  \shorthandon{<>}%
+  \caption{Flujo de trabajo en dos fases. La ingesta procesa cada fotografía
+    (segmentación, extracción de \textit{embeddings} y persistencia) y alimenta
+    de forma incremental el almacenamiento; la fase de agrupamiento recupera
+    todo el banco y lo reduce y agrupa en sesiones puntuales. El almacenamiento
+    es el punto de acoplamiento entre ambas.}
+  \label{fig:pipeline}
+\end{figure}
+
 
 Las etapas se han implementado de manera modular, como componentes
 intercambiables que cumplen una interfaz común. Así, las configuraciones
@@ -93,7 +140,7 @@ versionable.
 Para barrer sistemáticamente el espacio combinatorio se utiliza un fichero
 auxiliar en el que cada componente se sustituye por una lista de alternativas.
 Un \textit{script} expande este fichero mediante producto cartesiano,
-materializando una experimento en el archivo final por cada combinación válida.
+materializando un experimento en el archivo final por cada combinación válida.
 
 \subsubsection{Protocolo de escalabilidad}
 \label{subsubsec:escalabilidad}
@@ -173,10 +220,9 @@ DBSCAN y los modelos de mezcla gaussiana, descrita en
 \ref{subsubsec:algoritmos-agrupamiento}. En los tres casos las semillas
 aleatorias se fijan para que el resultado sea reproducible.
 
-% TODO: maybe extend/develop 
 \subsubsection{Protocolo de búsqueda por similitud}
 \label{subsubsec:similarity-search}
-La medición del coste de busca por similitud se realiza sobre los
+La medición del coste de búsqueda por similitud se realiza sobre los
 \textit{backends} de almacenamiento descritos anteriormente. Tras realizarse la
 ingesta, se seleccionan $n$ embeddings de manera aleatoria (pero reproducible)
 y se buscan los $k$ vecinos más próximos a cada uno de ellos, midiendo el
@@ -353,7 +399,6 @@ dentro del \textit{batch} hasta completar la cuota. Se aplica parada temprana
 con paciencia de $15$ épocas sobre la pérdida de entrenamiento, y la cabeza
 seleccionada para los \textit{benchmarks} es la que minimiza dicha pérdida.
 
-% Remove this?
 \subsection{Reproducibilidad}
 \label{subsec:reproducibilidad}
 Más allá del entorno de ejecución y de las versiones de las dependencias ya
