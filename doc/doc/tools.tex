@@ -41,14 +41,13 @@ etiquetados.
 Se etiquetan manualmente recortes por estilo, asignándoles una de las cuatro
 categorías estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
 \textit{character}) ilustradas en la figura~\ref{fig:estilos-ejemplos}, y otros
-recortes por autoría. Su procedencia responde al riesgo de solapamiento entre
-entrenamiento y evaluación: como las etiquetas de estilo son más generales, se
-permitió que los recortes de entrenamiento de estilo procedieran del banco
-principal, mientras que las cabezas de autoría se entrenaron exclusivamente con
-recortes de StopGrafiti para evitar cualquier solapamiento. En todo caso, la
-evaluación sin supervisión del sistema completo se realiza sobre un subconjunto
-del banco principal del que nunca se extraen recortes de entrenamiento,
-completamente disjunto.
+recortes por autoría. La procedencia de cada subconjunto difiere: el
+entrenamiento de estilo contiene recortes del banco principal, mientras que el
+de autoría se restringe a StopGrafiti; el reparto y su justificación se
+detallan al describir la evaluación extrínseca
+(\ref{subsubsec:eval-extrinseca}). En todo caso, la evaluación sin supervisión
+del sistema completo se realiza sobre un subconjunto del banco principal del
+que nunca se extraen recortes de entrenamiento, completamente disjunto.
 
 \begin{figure}[h]
   \centering

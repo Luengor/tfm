@@ -19,14 +19,14 @@ otro permite aislar el coste computacional de cada etapa al medir
   \centering
   \shorthandoff{<>}%
   \begin{tikzpicture}[
-    >=Stealth, node distance=13mm and 17mm,
+    >=Stealth, node distance=11mm and 17mm,
     block/.style={draw, rounded corners, minimum height=9mm, minimum width=22mm,
                   inner sep=5pt, align=center, font=\small},
     store/.style={block, fill=green!12},
     io/.style={font=\footnotesize, align=center},
     lbl/.style={font=\scriptsize, midway, fill=white, inner sep=2pt},
   ]
-    % --- Fase de ingesta (fila superior) ---
+    % --- Fase de ingesta (fila superior, izquierda a derecha) ---
     \node[io] (img) {fotografía};
     \node[block, right=of img] (seg) {Segmentador};
     \node[block, right=of seg] (ext) {Extractor};
@@ -36,14 +36,17 @@ otro permite aislar el coste computacional de cada etapa al medir
     \draw[->] (seg)--(ext) node[lbl, above]{recortes};
     \draw[->] (ext)--(sto) node[lbl, above]{\textit{embeddings}};
 
-    % --- Fase de agrupamiento (fila inferior) ---
-    \node[block, below=of sto] (red) {Reducción};
-    \node[block, left=of red] (clu) {Agrupamiento};
-    \node[io, left=of clu] (out) {clústeres\\y métricas};
+    % --- Fase de agrupamiento (fila inferior, izquierda a derecha) ---
+    \node[block, below=14mm of seg] (red) {Reducción};
+    \node[block, right=of red] (clu) {Agrupamiento};
+    \node[io, right=of clu] (out) {clústeres\\y métricas};
 
-    \draw[->] (sto)--(red) node[lbl, right]{carga masiva};
     \draw[->] (red)--(clu);
     \draw[->] (clu)--(out);
+
+    % carga masiva: del almacenamiento baja y enlaza con la reducción
+    \draw[->] (sto.south) -- ++(0,-7mm) -| (red.north)
+        node[lbl, pos=0.25, above]{carga masiva};
 
     % --- Recuadros de fase ---
     \node[draw, dotted, fit=(img)(seg)(ext), inner sep=3mm,
@@ -52,23 +55,19 @@ otro permite aislar el coste computacional de cada etapa al medir
           label=below:{\scriptsize Fase de agrupamiento (puntual)}] {};
   \end{tikzpicture}%
   \shorthandon{<>}%
-  \caption{Flujo de trabajo en dos fases. La ingesta procesa cada fotografía
-    (segmentación, extracción de \textit{embeddings} y persistencia) y alimenta
-    de forma incremental el almacenamiento; la fase de agrupamiento recupera
-    todo el banco y lo reduce y agrupa en sesiones puntuales. El almacenamiento
-    es el punto de acoplamiento entre ambas.}
+  \caption{Flujo de trabajo en dos fases. La ingesta procesa cada fotografía y
+  alimenta de forma incremental el almacenamiento; la fase de agrupamiento
+recupera todo el banco y lo reduce y agrupa en sesiones puntuales. El
+almacenamiento es el punto de acoplamiento entre ambas.}
   \label{fig:pipeline}
 \end{figure}
 
 
-Las etapas se han implementado de manera modular, como componentes
-intercambiables que cumplen una interfaz común. Así, las configuraciones
-evaluadas se construyen como combinaciones de implementaciones concretas de
-extracción, segmentación, reducción, almacenamiento y agrupamiento descritas en
-\ref{subsec:configuraciones}. Este desacoplamiento es el que habilita la
-evaluación combinatoria que forma el trabajo: cada combinación define una
-configuración independiente y reproducible cuyo coste y calidad pueden
-compararse con cualquier otra.
+Cada una de las cinco etapas es un componente intercambiable tras una interfaz
+común, catalogados en \ref{subsec:configuraciones}. Este desacoplamiento es el
+que habilita la evaluación combinatoria que forma el trabajo: cada combinación
+define una configuración independiente y reproducible cuyo coste y calidad
+pueden compararse con cualquier otra.
 
 \subsection{Pipeline operativo}
 \label{subsec:pipeline}
@@ -219,6 +218,14 @@ por defecto la estimación automática del hiperparámetro principal de K-Means,
 DBSCAN y los modelos de mezcla gaussiana, descrita en
 \ref{subsubsec:algoritmos-agrupamiento}. En los tres casos las semillas
 aleatorias se fijan para que el resultado sea reproducible.
+
+Cuando una configuración no fija \texttt{n\_clusters} y emplea varias
+repeticiones, el número de clústeres autodetectado en la primera repetición se
+propaga al resto, de modo que las repeticiones varían únicamente por la semilla
+y las métricas agregadas describen una sola familia de particiones en lugar de
+mezclar particiones con distinto número de clústeres. El número de clústeres
+obtenido en cada repetición se registra para poder verificar que la propagación
+se mantiene.
 
 \subsubsection{Protocolo de búsqueda por similitud}
 \label{subsubsec:similarity-search}
