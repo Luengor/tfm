@@ -106,75 +106,62 @@ su propósito, procedencia y tamaño.
 \label{subsec:conceptos}
 % Conceptos teóricos necesarios para interpretar la evaluación.
 
-\subsubsection{Representación vectorial de imágenes}
-Un \textit{embedding} es una proyección de una imagen en un vector de un
-espacio vectorial de dimensión fija, en el que las relaciones de similitud
-entre imágenes se traducen en relaciones geométricas entre vectores. La
-proximidad en el espacio latente debe reflejar la similitud perceptual: dos
-fotografías de la misma pintada, de pintadas estilísticamente próximas o del
-mismo autor por ejemplo, deben quedar a menor distancia que dos imágenes no
-relacionadas. El cálculo directo de distancias sobre los píxeles de la imagen
-no captura esta noción de similitud, ya que pequeñas transformaciones
-espaciales o de iluminación producen variaciones grandes en el espacio de
-píxeles~\cite{wang_euclidean_2005}, y por ello se recurre a representaciones
-aprendidas mediante redes profundas (véase \ref{subsec:art-embeddings}).
+\subsubsection{Representación vectorial y búsqueda por similitud}
+\label{subsec:fundamentos}
+
+Como se mencionó en la sección del estado del arte, el sistema de agrupamiento
+de grafiti se basa en la representación vectorial de las imágenes de grafiti,
+la reducción de dimensionalidad de estas representaciones y el agrupamiento no
+supervisado y búsqueda por similitud de los vectores resultantes. Para esta
+búsqueda por similitud se emplean métricas de distancia sobre los vectores, que
+cuantifican la similitud entre imágenes a través de la proximidad de sus
+representaciones en el espacio latente.
 
 Las métricas de distancia utilizadas habitualmente en este contexto son la
 distancia euclidiana y la distancia coseno. Esta última depende exclusivamente
 de la dirección de los vectores y resulta equivalente a la distancia euclidiana
 cuando los \textit{embeddings} están normalizados a norma unitaria
 (normalización $L_2$), práctica frecuente para evitar que la magnitud del
-vector domine la comparación. La disponibilidad de salida normalizada depende de
-la arquitectura: CLIP, MobileNetV3 y las cabezas de proyección ajustadas al
-dominio normalizan su salida, mientras que el resto de \textit{backbones} se
-emplean sin normalización. No obstante, las métricas internas que dependen de
-distancias normalizan los \textit{embeddings} antes del cálculo, de modo que las
-puntuaciones resulten comparables entre familias de modelos.
+vector domine la comparación. En este trabajo, ciertos modelos de extracción de
+características como CLIP, y las cabezas de proyección ajustadas al dominio,
+producen \textit{embeddings} normalizados a norma unitaria, lo que hace que la
+distancia coseno sea la métrica de similitud natural para estos casos. El resto
+de modelos no aplican esta normalización, por lo que la distancia euclidiana es
+la métrica de referencia para ellos. No obstante, las métricas internas que
+dependen de distancias normalizan los \textit{embeddings} antes del cálculo, de
+modo que las puntuaciones resulten comparables entre familias de modelos.
+
+Las técnicas de reducción de dimensionalidad aplicadas en este trabajo se
+pueden agrupar entre lineales y no lineales. Las técnicas lineales, como el
+análisis de componentes principales (PCA), proyectan los datos sobre ejes de
+máxima varianza y suponen que la estructura de datos subyacente es lineal. Por
+otro lado, las técnicas no lineales relajan esta hipótesis y buscan preservar
+relaciones de vecindad, distancias o estructura en el espacio original. Las
+opciones concretas integradas en el sistema y sus referencias canónicas se
+recogen en la tabla~\ref{tab:reduction}.
+
 
 \subsubsection{Agrupamiento no supervisado}
-El agrupamiento (\textit{clustering}) consiste en particionar un conjunto de
-observaciones en grupos de forma que los elementos dentro de cada grupo sean
-más similares entre sí que con los del resto, sin disponer de etiquetas
-previas. Los principales algoritmos de agrupamiento se diferencian por la
-hipótesis estructural que asumen sobre los datos. Los métodos basados en
-centroides, como K-Means, modelan cada clúster por su media y buscan minimizar
-la varianza intracluster, siendo eficientes pero sensibles a la forma y al
-solapamiento de los grupos. Los basados en densidad, como DBSCAN, OPTICS y
-HDBSCAN, definen un clúster como una región conectada de alta densidad y
-permiten descartar puntos como ruido. Los métodos jerárquicos construyen un
-dendrograma de fusiones o divisiones sucesivas del que pueden extraerse
-particiones a distintos niveles de granularidad. Por último, los enfoques
-probabilísticos (mezclas gaussianas resueltas con el algoritmo
-EM~\cite{dempster_maximum_1977}) modelan los datos como una superposición de
-distribuciones y asignan cada punto al componente más probable.
+Los principales algoritmos de agrupamiento se diferencian por la manera en la
+que agrupan los datos. Los métodos basados en centroides, como K-Means, modelan
+cada clúster por su media y buscan minimizar la varianza intracluster, siendo
+eficientes pero sensibles a la forma y al solapamiento de los grupos. Los
+basados en densidad, como DBSCAN, OPTICS y HDBSCAN, definen un clúster como una
+región conectada de alta densidad y permiten descartar puntos como ruido. Los
+métodos jerárquicos construyen un dendrograma de fusiones o divisiones
+sucesivas del que pueden extraerse particiones a distintos niveles de
+granularidad. Por último, los enfoques probabilísticos (mezclas gaussianas
+resueltas con el algoritmo EM~\cite{dempster_maximum_1977}) modelan los datos
+como una superposición de distribuciones y asignan cada punto al componente más
+probable.
 
-La principal dificultad operativa en un escenario sin etiquetas es la selección
-del número de clústeres. K-Means y los modelos de mezcla requieren fijarlo a
+La principal dificultad en un escenario sin etiquetas es la selección del
+número de clústeres. K-Means y los modelos de mezcla requieren fijarlo a
 priori, y se recurre a heurísticas como el método del codo sobre la inercia o
 el criterio bayesiano de información (BIC). Los algoritmos basados en densidad
 y los jerárquicos lo evitan en su formulación, pero a cambio introducen otros
 hiperparámetros (umbrales de densidad, criterios de corte) cuyo ajuste también
 carece de un óptimo evidente sin verdad fundamental.
-
-\subsubsection{Reducción de dimensionalidad}
-Los \textit{embeddings} producidos por las redes utilizadas en este trabajo
-contienen entre $256$ y $4096$ dimensiones. A medida que la dimensionalidad
-crece, las distancias entre puntos tienden a normalizarse y a perder su poder
-discriminativo, fenómeno conocido como maldición de la
-dimensionalidad~\cite{aggarwal_surprising_2001}. Esto degrada el comportamiento
-de los algoritmos de agrupamiento que dependen de distancias, en particular los
-basados en densidad, y motiva aplicar una etapa previa de reducción que
-proyecte los vectores a un espacio de menor dimensión preservando la estructura
-relevante.
-
-Las técnicas se dividen en lineales y no lineales. Las primeras, como el
-análisis de componentes principales (PCA), proyectan sobre ejes de máxima
-varianza y suponen que la estructura de datos subyacente es lineal, lo que
-limita su efectividad cuando los datos viven en una variedad curva. Las
-técnicas no lineales relajan esta hipótesis preservando relaciones de vecindad,
-distancias o estructura. Las opciones concretas integradas en el sistema y las
-referencias canónicas se recogen en la sección~\ref{subsec:art-clustering} y en
-la tabla~\ref{tab:reduction}.
 
 \subsubsection{Métricas de evaluación}
 \label{subsubsec:metricas}
@@ -201,8 +188,11 @@ los $185$ etiquetados por autoría, ambos descritos en \ref{subsec:dataset}, se
 calculan métricas extrínsecas que sí utilizan la verdad fundamental disponible:
 el índice de Rand ajustado (ARI), la información mutua normalizada (NMI) y la
 F1 por pares, que constituyen el complemento más sólido a las métricas internas
-en el plano de calidad. Las condiciones bajo las que se reportan se detallan en
-\ref{subsubsec:eval-extrinseca}.
+en el plano de calidad. Por otro lado, se reportan también métricas relativas a
+la calidad de la búsqueda por similitud, como son la precisión a $k$ (P@$k$),
+la media del inverso del rango del primer venico del mismo estilo (MRR) o la
+fracción media de vecinos del mismo estilo recuperados frente al máximo posible
+(R@k).
 
 \subsection{Componentes implementados}
 \label{subsec:configuraciones}
@@ -210,16 +200,12 @@ en el plano de calidad. Las condiciones bajo las que se reportan se detallan en
 % sistema modular. Tabla resumen de opciones por componente.
 
 \subsubsection{Modelos de extracción de características}
-Se han integrado siete familias de modelos de extracción de características,
-cubriendo redes convolucionales clásicas, modelos de fundación basados en
-\textit{transformers} y detectores específicos reutilizados como extractores.
-Todos los modelos se utilizan congelados, sin reentrenar sus pesos: la salida
-de la última capa intermedia constituye el \textit{embedding} de la imagen. En
-las redes convolucionales (ResNet50, VGG16, InceptionV3 y MobileNetV3) esto
-implica sustituir la cabeza de clasificación por una identidad; DINOv2, CLIP y
-YOLO se consultan directamente a través de su propia API de extracción de
-características, sin retirar capa alguna. MobileNetV3 se normaliza a la norma
-L2 para asegurar comparabilidad con CLIP y las cabezas entrenadas. La
+Todos los modelos se utilizan congelados, sin reentrenar sus pesos. En algunos
+casos se retiran las últimas capas que corresponden a la tarea de clasificación
+para acceder a la representación latente previa (ResNet50, VGG16 e InceptionV3
+por ejemplo). Para el resto de modelos se utiliza la propia API de extracción
+de características, que ya devuelve la representación latente sin necesidad de
+modificar la arquitectura (DINOv2, CLIP y YOLO). La
 tabla~\ref{tab:embedding-models} resume las opciones disponibles, indicando
 arquitectura, dimensionalidad de salida y preentrenamiento.
 
@@ -244,24 +230,12 @@ común y se configuran por hiperparámetros declarados en la configuración
 del \textit{benchmark}. La tabla~\ref{tab:clustering-algos} recoge las opciones
 implementadas con sus hiperparámetros clave.
 
-Tres de los algoritmos (K-Means, DBSCAN y mezclas gaussianas) admiten la
-selección automática de su hiperparámetro principal cuando este no se declara.
-Para K-Means se aplica el método del codo sobre la curva de inercia: se ajusta
-el algoritmo para $k \in \{2, 3, \ldots, k_{\max}\}$ con $k_{\max} = \min(n,
-20)$, donde $n$ es el número de \textit{embeddings} disponibles, y se selecciona
-el valor de $k$ correspondiente al codo de la curva mediante el criterio de la
-distancia perpendicular al segmento que une los extremos. Para los modelos de
-mezcla gaussiana se sigue el mismo barrido sobre $k \in \{2, \ldots,
-k_{\max}\}$ (se excluye $k=1$, que colapsa el agrupamiento en un único grupo y
-deja indefinidas las métricas internas) y se elige el modelo que minimiza el
-criterio bayesiano de información (BIC); este criterio penaliza de manera
-explícita la complejidad del modelo, lo que mitiga la tendencia del ajuste por
-máxima verosimilitud a favorecer el mayor número de componentes. Para DBSCAN se
-estima el radio $\epsilon$ a partir de la curva de $k$-distancias: para cada
-punto se calcula la distancia a su $(\texttt{min\_samples}-1)$-ésimo vecino más
-próximo, las distancias se ordenan de menor a mayor y se aplica el mismo
-criterio de codo que en K-Means para seleccionar el valor de $\epsilon$ a
-partir del cual la densidad cae abruptamente.
+Tres de los algoritmos admiten la selección automática de su hiperparámetro
+principal cuando este no se declara. Este es el caso de K-Means, los modelos de
+mezcla gaussiana y DBSCAN, que hacen uso del método del codo, el criterio
+bayesiano de información y la curva de $k$-distancias respectivamente para
+seleccionar el número de clústeres o el radio de densidad cuando no se
+especifica un valor concreto en la configuración.
 
 \begin{longtable}{|l|l|c|} \hline
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
@@ -412,33 +386,13 @@ del modelo base.
 
 \subsection{Entorno de ejecución}
 \label{subsec:entorno}
-El entorno de ejecución de los experimentos es el ordenador personal del autor,
-con las siguientes características:
-\begin{itemize}
-    \item CPU: AMD Ryzen 7 5800H (8 núcleos, 16 hilos, 3.2 GHz base, 4.4 GHz turbo).
-    \item GPU: NVIDIA GeForce GTX 1650 Mobile / Max-Q 
-    \item RAM: 16 GB DDR4.
-\end{itemize}
-
-Los experimentos se ejecutan en un entorno virtual de Python 3.14 gestionado
-con \texttt{uv}, con las siguientes dependencias principales:
-\begin{itemize}
-    \item PyTorch 2.10.0
-    \item open-clip-torch 3.3.0
-    \item Ultralytics 8.4.26
-    \item scikit-learn 1.8.0
-    \item umap-learn 0.5.12
-    \item SQLAlchemy 2.0.49
-    \item pgvector 0.4.2
-    \item numpy 2.4.3
-    \item pandas 3.0.1
-    \item Pillow (incluida con torchvision)
-    \item matplotlib 3.10.8
-    \item seaborn 0.13.0
-    \item psutil 6.1.1
-    \item tqdm 4.67.3
-\end{itemize}
-Salvo PyTorch, fijado de forma exacta (\texttt{==2.10.0}), las versiones
-indicadas corresponden al requisito mínimo declarado en el gestor de
-dependencias.
+Los experimentos se realizaron en el ordenador personal del autor: Un portátil
+con CPU AMD Ryzen 7 5800H, GPU NVIDIA GeForce GTX 1650 y 16 GB de RAM DDR4. El
+entorno de ejecución se basa en Python 3.14 gestionado con \texttt{uv},
+empleando como dependencias nucleares PyTorch (2.10.0),
+\textit{open-clip-torch}, \textit{ultralytics}, \textit{scikit-learn},
+\textit{umap-learn}, \textit{SQLAlchemy} con \textit{pgvector}, \textit{numpy},
+\textit{pandas}, \textit{matplotlib}, \textit{seaborn}, \textit{psutil} y
+\textit{tqdm}. Salvo PyTorch, fijado de forma exacta, las versiones
+corresponden al requisito mínimo declarado en el gestor de dependencias.
 
