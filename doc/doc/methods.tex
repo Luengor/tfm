@@ -55,10 +55,8 @@ otro permite aislar el coste computacional de cada etapa al medir
           label=below:{\scriptsize Fase de agrupamiento (puntual)}] {};
   \end{tikzpicture}%
   \shorthandon{<>}%
-  \caption{Flujo de trabajo en dos fases. La ingesta procesa cada fotografía y
-  alimenta de forma incremental el almacenamiento; la fase de agrupamiento
-recupera todo el banco y lo reduce y agrupa en sesiones puntuales. El
-almacenamiento es el punto de acoplamiento entre ambas.}
+  \caption{Flujo de trabajo en dos fases. El almacenamiento es el punto de
+  acoplamiento entre la ingesta incremental y la fase de agrupamiento puntual.}
   \label{fig:pipeline}
 \end{figure}
 
@@ -135,9 +133,8 @@ rendimiento computacional, cuantificado mediante los tiempos absolutos de cada
 etapa del \textit{pipeline} (preparación, ingesta, reducción, agrupamiento y
 búsqueda por similitud), el \textit{throughput} de ingesta en imágenes por
 segundo, la latencia de búsqueda por consulta y la escalabilidad de estas
-magnitudes con el tamaño del banco; son métricas objetivas, no dependen de la
-existencia de etiquetas y son las que verdaderamente permiten la comparación
-entre configuraciones. El segundo eje, secundario, es la calidad de los
+magnitudes con el tamaño del banco; son métricas objetivas e independientes de
+la existencia de etiquetas. El segundo eje, secundario, es la calidad de los
 clústeres resultantes, evaluada con las métricas internas y extrínsecas
 definidas en \ref{subsubsec:metricas}.
 
@@ -259,9 +256,7 @@ similitud es determinista una vez fijada la semilla que determina las entradas
 que buscar, así que no se repite varias veces como la reducción y el
 agrupamiento. El coste de esta etapa se espera que crezca como $O(n^2)$ para el
 recorrido lineal de \texttt{SQLiteStorage} y como $O(n \log n)$ para el índice
-HNSW de \texttt{PostgreSQLStorage}. Repetir la búsqueda varias veces solo
-conseguiría aumentar el coste del experimento sin aportar información relevante
-sobre este.
+HNSW de \texttt{PostgreSQLStorage}.
 
 De esta etapa también se reporta la distancia media a los $k$ vecinos
 recuperados, promediada sobre todas las consultas. Si el \textit{backend}
@@ -283,13 +278,12 @@ separados.
 Los algoritmos basados en densidad (DBSCAN, OPTICS y HDBSCAN) pueden asignar la
 etiqueta $-1$ a puntos considerados ruido. Estos puntos se excluyen del cálculo
 del coeficiente de silueta y de los índices de Calinski--Harabász y
-Davies--Bouldin. Esto implica que estas métricas no presentan la imagen completa
-de la calidad del agrupamiento, haciendo necesario complementarlas con datos
-como la cantidad de puntos etiquetados como ruido o la variedad de tamaños de
-los clústeres resultantes. Por otro lado, este sistema permite que los
-algoritmos que identifican y reportan ruido no puedan ser penalizados por ello,
-o que agrupamientos que rechacen una gran fracción de los puntos como ruido no
-queden artificialmente premiados por solo agrupar puntos muy cercanos entre sí.
+Davies--Bouldin, lo que evita penalizar a los algoritmos que identifican y
+reportan ruido. Por otro lado, un agrupamiento que rechace una gran fracción de
+puntos como ruido podría quedar artificialmente premiado por agrupar solo los
+puntos muy cercanos entre sí; por ello estas métricas se complementan con la
+proporción de puntos etiquetados como ruido y la variedad de tamaños de los
+clústeres resultantes.
 
 \subsubsection{Evaluación extrínseca sobre subconjunto etiquetado}
 \label{subsubsec:eval-extrinseca}
@@ -354,14 +348,11 @@ agrupa. Esta doble lectura es asimétrica respecto al tratamiento del ruido en
 las métricas intrínsecas, donde el ruido siempre se excluye y se complementan
 con valores como el porcentaje de ruido.
 
-Para evaluar la calidad de la búsqueda por similitud, también se hace uso de
-las etiquetas de estilo. Para cada consulta, se calculan: la fracción de
-vecinos recuperados que comparten estilo con la consulta (P@k), el promedio de
-las precisiones en cada posición de vecino recuperado (MAP@k), el ranking medio
-de los vecinos que comparten estilo (MRR) y si por lo menos uno de los vecinos
-recuperados comparte estilo (R@5). Estas métricas se promedian sobre todas las
-consultas realizadas para obtener una media global de la calidad de la búsqueda
-for similitud.
+Para evaluar la calidad de la búsqueda por similitud se emplean también las
+etiquetas de estilo: las métricas P@$k$, MAP@$k$, MRR y R@$k$ definidas en
+\ref{subsubsec:metricas} se calculan por consulta y se promedian sobre todas
+las consultas realizadas para obtener una media global de la calidad de la
+búsqueda por similitud.
 
 \subsubsection{Salida y agregación de resultados}
 \label{subsubsec:salida}
@@ -391,9 +382,10 @@ salvo el número de épocas, el tamaño de \textit{batch} y la resolución de
 entrada, que se fijan para encajar en la memoria de la GPU descrita en
 \ref{subsec:entorno}. El optimizador, las \textit{augmentations} (jitter HSV,
 escalado, volteo horizontal y \textit{mosaic}) y la \textit{learning rate} con
-\textit{warm-up} y descenso coseno se mantienen en sus valores por defecto. El
-entrenamiento incorpora parada temprana cuando la métrica mAP@$0.5$ sobre
-validación no mejora durante un número fijo de épocas.
+\textit{warm-up} y el descenso por defecto del \textit{framework} (lineal) se
+mantienen en sus valores por defecto. El entrenamiento incorpora parada
+temprana cuando la métrica mAP@$0.5$ sobre validación no mejora durante un
+número fijo de épocas.
 
 \subsubsection{Cabezas de proyección}
 \label{subsubsec:entrenamiento-cabezas}
@@ -440,13 +432,11 @@ con componente estocástica se instancian con \texttt{random\_state} fijo; la
 inicialización de K-Means, GMM, UMAP y la selección automática de
 hiperparámetros descrita en \ref{subsubsec:hiperparam-auto} reutiliza la misma
 semilla. Para garantizar la determinación de los modelos de \textit{embedding}
-basados en PyTorch, se activan las opciones
-\texttt{torch.backends.cudnn.deterministic} y se desactiva
-\texttt{torch.backends.cudnn.benchmark}, lo que obliga a cuDNN a elegir siempre
-el mismo algoritmo de convolución en lugar de buscar el más rápido en cada
-ejecución. UMAP se instancia con \texttt{n\_jobs=1} para evitar que el orden de
-acumulación de operaciones en paralelo varíe entre máquinas con distinto número
-de núcleos. En segundo lugar, todos los ficheros de configuración utilizados
-para los experimentos realizados se publican junto con el código en el
-repositorio del trabajo, de modo que cualquier resultado descrito puede
-reproducirse.
+basados en PyTorch, se activa \texttt{torch.backends.cudnn.deterministic} y se
+desactiva \texttt{torch.backends.cudnn.benchmark}, forzando a cuDNN a usar
+siempre el mismo algoritmo de convolución. UMAP se instancia con
+\texttt{n\_jobs=1} para evitar que el orden de acumulación de operaciones en
+paralelo varíe entre máquinas con distinto número de núcleos. En segundo lugar,
+todos los ficheros de configuración utilizados para los experimentos realizados
+se publican junto con el código en el repositorio del trabajo, de modo que
+cualquier resultado descrito puede reproducirse.

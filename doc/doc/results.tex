@@ -91,24 +91,21 @@ $N=6416$.
 \end{longtable}
 }
 
-Probablemente el resultado más llamativo del barrido es la inversión entre
+Probablemente, el resultado más llamativo del barrido es la inversión entre
 silueta y Calinski--Harabasz sobre ambas cabezas estilísticas. La silueta cae
-con respecto a su \textit{backbone} (DINOv2: 0.185 \(\to\) 0.155;
-MobileNetV3: 0.260 \(\to\) 0.164) mientras que el CH sube en los dos casos
-(DINOv2: 19.2 \(\to\) 27.9, sólo superado por los \textit{backbones} YOLO;
-MobileNetV3: 13.1 \(\to\) 19.7). Este fenómeno, aunque contraintuitivo a
-primera vista, puede explicarse por la naturaleza del entrenamiento
-contrastivo y los datos utilizados: el \textit{contrastive loss} optimiza la
-relación entre la compactación de los \textit{clusters} y su separación (CH),
-pero no la cohesión local de cada punto dentro de su clúster (silueta). En el
-caso de las cabezas estilísticas, estas fueron entrenadas con recortes de
-grafiti y no con imágenes completas como aquí se evalúan. Esta cambio de
-dominio, que provocaría que las características extraídas por la cabeza sean
-menos cohesivas por la elevada complejidad de las imágenes completas, junto
-con la naturaleza de la función de pérdida podrían ser la causa de la caída de
-la silueta.
+con respecto a su \textit{backbone} (DINOv2: 0.185 \(\to\) 0.155; MobileNetV3:
+0.260 \(\to\) 0.164) mientras que el CH sube en los dos casos (DINOv2: 19.2
+\(\to\) 27.9, solo superado por los \textit{backbones} YOLO; MobileNetV3: 13.1
+\(\to\) 19.7). Este fenómeno, aunque contra intuitivo a primera vista, puede
+explicarse por la naturaleza del entrenamiento contrastivo y los datos
+utilizados: el \textit{contrastive loss} optimiza la relación entre la
+compactación de los \textit{clusters} y su separación (CH), pero no la cohesión
+local de cada punto dentro de su clúster (silueta). En el caso de las cabezas
+estilísticas, entrenadas con recortes y no con imágenes completas como aquí se
+evalúan, este cambio de dominio  junto con la función de pérdida explicaría la
+caída de la silueta.
 
-Las CNN ImageNet lideran la silueta (a $N=6416$: \texttt{mobilenet\_v3}=0.260,
+Las CNN ImageNet lideran la silueta (a $N=6416$: \texttt{mobilenet\_v3}=0,260,
 \texttt{resnet50}=0.257), con ruido bajo (0.078--0.118) y los clústeres más
 balanceados (csCV~$\approx$~0.5--0.7). Sin embargo, esto no significa que sean
 los mejores extractores para el agrupamiento de grafiti: es muy probable que
@@ -255,14 +252,14 @@ tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
 \end{longtable}
 }
 
-En este barrido es especialmente importante recordar como se leen las métricas
-intrínsecas: no de manera aislada, sino en conjunto con el número de clústeres,
-la fracción de ruido y el coeficiente de variación de los tamaños de clúster.
-Los algoritmos basados en densidad (HDBSCAN, DBSCAN, OPTICS) son juzgados sólo
-sobre el subconjunto que agrupan, mientras que los métodos particionales
-(KMeans, GMM, aglomerativo, espectral) son juzgados sobre el corpus completo.
-La silueta penaliza menos a un método que se abstiene de los puntos difíciles y
-CH premia la compactación, sin importar la estructura.
+Como se anticipó en \ref{subsec:res-calibracion}, es necesario leer las
+métricas intrínsecas  en conjunto con el número de clústeres, el ruido y el
+csCV; nunca de manera aislada. Esto es especialmente importante aquí puesto que
+los algoritmos basados en densidad (HDBSCAN, DBSCAN, OPTICS) son juzgados solo
+sobre el subconjunto que agrupan, mientras que los particionales (KMeans, GMM,
+aglomerativo, espectral) lo son sobre el corpus completo. La silueta penaliza
+menos a un método que se abstiene de los puntos difíciles y CH premia la
+compactación, sin importar la estructura.
 
 Bajo este criterio, HDBSCAN parece ser el único algoritmo que produce
 resultados defendibles en el rango de escalas evaluado: obtiene un ruido
@@ -280,14 +277,11 @@ presenta la peor silueta del panel) o por el escalado de memoria.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e3_pareto_quality_cost.pdf}
-  \caption{E3: calidad frente a coste por familia de agrupamiento a $N=6416$.
-  Cada familia se representa por su mejor variante en silueta (marcador
-  grande etiquetado); los puntos pequeños del mismo color muestran el resto
-  de variantes evaluadas. El eje horizontal está en escala logarítmica para
-  abarcar los tres órdenes de magnitud que separan KMeans de OPTICS. La línea
-  discontinua marca el frente de Pareto: HDBSCAN (resaltado en rojo) domina a
-  todas las familias excepto a OPTICS, que paga $\sim$25 veces más coste por
-  $\sim$0.02 más de silueta.}
+  \caption{E3: calidad frente a coste por familia a $N=6416$ (eje horizontal
+  logarítmico). Cada familia se representa por su mejor variante en silueta
+  (marcador grande); los puntos pequeños son el resto de variantes. La línea
+  discontinua marca el frente de Pareto: HDBSCAN (rojo) domina a todas excepto
+  a OPTICS, que paga $\sim$25 veces más coste por $\sim$0.02 más de silueta.}
   \label{fig:e3-pareto}
 \end{figure}
 
@@ -387,7 +381,7 @@ ganancia marginal o negativa en calidad y un sobrecoste de ingesta del 44\%.
 
 El detector \textit{fine-tuned} es un caso interesante: a $N=1000$ obtiene la
 mejor silueta, mejor CH y mejor DB del panel, pero este liderazgo desaparece
-con $N=6416$, donde obtiene casi 2.4 imágenes sobre cada imagen original y
+con $N=6416$, donde obtiene casi 2.4 recortes sobre cada imagen original y
 degenera el agrupamiento, con un 29.8\% de ruido, una silueta de 0.122 y un
 coeficiente de variación de tamaños de 1.06, con mil cuarenta y nueve clústeres
 y una cola larga de clústeres pequeños. El coste de ingesta también se dispara
@@ -555,23 +549,21 @@ acumula sobre el tiempo de consulta.
 
 SQLite mantiene un \textit{throughput} aproximadamente plano ($\sim$150~ips)
 con tiempo de ejecución lineal en $N$. PostgreSQL exacto eleva el
-\textit{throughput} en dos órdenes de magnitud porque el \textit{kernel} de
-coseno corre en C dentro del SGBD; por debajo de $N=1000$ la latencia está
-dominada por el \textit{round-trip} de la conexión. PostgreSQL con HNSW es el
-único \textit{backend} cuyo \textit{throughput} \emph{crece} con el tamaño del
-banco con respecto al exacto: a $N=2500$ es 100 veces más rápido que SQLite y a
-$N=6416$ es 3.2 veces más rápido que el exacto y 240 veces más rápido que
-SQLite, con \texttt{recall@5} = 1.000 a las cuatro escalas. La construcción del
-índice cuesta 0.47~s a $N=6416$, se amortiza en una sola consulta frente a
-SQLite y en varias docenas frente al exacto.
+\textit{throughput} en dos órdenes de magnitud. Por debajo de $N=1000$ la
+latencia está dominada por el \textit{round-trip} de la conexión. PostgreSQL
+con HNSW es el único \textit{backend} cuyo \textit{throughput} \emph{crece} con
+el tamaño del banco con respecto al exacto: a $N=2500$ es 100 veces más rápido
+que SQLite y a $N=6416$ es 3.2 veces más rápido que el exacto y 240 veces más
+rápido que SQLite, con \texttt{recall@5} = 1.000 a las cuatro escalas. La
+construcción del índice cuesta 0.47~s a $N=6416$, se amortiza en una sola
+consulta frente a SQLite y en varias docenas frente al exacto.
 
-El punto en el que HNSW parece separarse del resto es en $N=2500$. Por debajo,
-las tres opciones sobre PostgreSQL son indistinguibles en latencia y HNSW sólo
-añade complejidad sin ganancia. Por encima, HNSW pasa al frente y el exacto
-sigue creciendo linealmente. El corpus objetivo del trabajo está por encima de
-ese cruce, por lo que HNSW es la elección por defecto recomendada para la
-búsqueda; SQLite queda como \textit{backend} de desarrollo de muy pequeña
-escala.
+Por debajo de $N\approx2500$ las tres opciones sobre PostgreSQL son
+indistinguibles en latencia y HNSW solo añade complejidad sin ganancia; por
+encima, HNSW pasa al frente mientras el exacto sigue creciendo linealmente. El
+corpus objetivo del trabajo está por encima de ese cruce, por lo que HNSW es la
+elección por defecto recomendada para la búsqueda; SQLite queda como
+\textit{backend} de desarrollo de muy pequeña escala.
 
 Para validar que la configuración por defecto del índice no es una decisión
 arbitraria, un barrido complementario E9 recorre once configuraciones en torno
@@ -592,10 +584,9 @@ botella $O(n^2)$ de SQLite.
   \centering
   \includegraphics[width=\linewidth]{figures/e6_e9_pareto.pdf}
   \caption{E6+E9: latencia por consulta (eje logarítmico) y \textit{recall}@5
-      por \textit{backend} y configuración HNSW a $N=6416$. Una fila por
-      configuración, ordenadas de menor a mayor latencia; cada barra anota su
-      latencia y, para las configuraciones HNSW, el \textit{recall}. La
-      configuración utilizada para el barrido E6 aparece resaltada en rojo.
+      por \textit{backend} y configuración HNSW a $N=6416$, una fila por
+      configuración ordenada por latencia (cada barra anota su latencia y, para
+      HNSW, el \textit{recall}). La configuración del barrido E6 aparece en rojo;
       SQLite y pgvector exacto se incluyen como referencia.}
   \label{fig:similaritysearch-pareto}
 \end{figure}
@@ -719,12 +710,12 @@ gran mayoría de los \textit{pieces}. El tercero está formado por los
 \subsubsection{Evaluación por autor}
 \label{subsubsec:res-autor}
 El barrido E8b evalúa la capacidad de los extractores para separar un conjunto
-de imágenes por autoría. Se parta de una hipótesis simétrica a la de E8a: una
+de imágenes por autoría. Se parte de una hipótesis simétrica a la de E8a: una
 cabeza entrenada para autoría podría superar a su propio \textit{backbone} por
 bastante margen, y superar a los extractores sin entrenar. La
 tabla~\ref{tab:e8b-best} muestra que esta hipótesis no es correcta. El mejor
 ARI global lo obtiene CLIP ViT-B/32 (0.076), y los ocho extractores caben en
-una banda 0.041--0.076 cercano al agrupamiento aleatorio (la celda ganadora de
+una banda 0.041--0.076 cercana al agrupamiento aleatorio (la celda ganadora de
 E8a vale 0.722, $\sim$10 veces más). Dentro de la familia DINOv2 la cabeza de
 autoría sí supera a su \textit{backbone} (0.065 vs.\ 0.055) y a la cabeza de
 estilo (0.054), aunque a escala dominada por ruido; en la familia MobileNetV3
