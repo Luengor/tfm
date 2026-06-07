@@ -354,6 +354,15 @@ agrupa. Esta doble lectura es asimétrica respecto al tratamiento del ruido en
 las métricas intrínsecas, donde el ruido siempre se excluye y se complementan
 con valores como el porcentaje de ruido.
 
+Para evaluar la calidad de la búsqueda por similitud, también se hace uso de
+las etiquetas de estilo. Para cada consulta, se calculan: la fracción de
+vecinos recuperados que comparten estilo con la consulta (P@k), el promedio de
+las precisiones en cada posición de vecino recuperado (MAP@k), el ranking medio
+de los vecinos que comparten estilo (MRR) y si por lo menos uno de los vecinos
+recuperados comparte estilo (R@5). Estas métricas se promedian sobre todas las
+consultas realizadas para obtener una media global de la calidad de la búsqueda
+for similitud.
+
 \subsubsection{Salida y agregación de resultados}
 \label{subsubsec:salida}
 Cada lote de \textit{benchmark} produce un único fichero JSON con dos
