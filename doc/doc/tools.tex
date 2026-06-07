@@ -122,14 +122,16 @@ distancia euclidiana y la distancia coseno. Esta última depende exclusivamente
 de la dirección de los vectores y resulta equivalente a la distancia euclidiana
 cuando los \textit{embeddings} están normalizados a norma unitaria
 (normalización $L_2$), práctica frecuente para evitar que la magnitud del
-vector domine la comparación. En este trabajo, ciertos modelos de extracción de
-características como CLIP, y las cabezas de proyección ajustadas al dominio,
-producen \textit{embeddings} normalizados a norma unitaria, lo que hace que la
-distancia coseno sea la métrica de similitud natural para estos casos. El resto
-de modelos no aplican esta normalización, por lo que la distancia euclidiana es
-la métrica de referencia para ellos. No obstante, las métricas internas que
-dependen de distancias normalizan los \textit{embeddings} antes del cálculo, de
-modo que las puntuaciones resulten comparables entre familias de modelos.
+vector domine la comparación. En este trabajo, CLIP, MobileNetV3 y las cabezas
+de proyección ajustadas al dominio producen \textit{embeddings} normalizados a
+norma unitaria, lo que hace que la distancia coseno sea la métrica natural para
+estos modelos. MobileNetV3 aplica esta normalización explícitamente para
+facilitar la comparación con la cabeza DINOv2, que también opera en espacio
+normalizado. El resto de modelos no lo hacen, por lo que la distancia
+euclidiana es la métrica de referencia para ellos. No obstante, las métricas
+internas que dependen de distancias normalizan los \textit{embeddings} antes
+del cálculo, de modo que las puntuaciones resulten comparables entre familias
+de modelos.
 
 Las técnicas de reducción de dimensionalidad aplicadas en este trabajo se
 pueden agrupar entre lineales y no lineales. Las técnicas lineales, como el
@@ -190,7 +192,7 @@ el índice de Rand ajustado (ARI), la información mutua normalizada (NMI) y la
 F1 por pares, que constituyen el complemento más sólido a las métricas internas
 en el plano de calidad. Por otro lado, se reportan también métricas relativas a
 la calidad de la búsqueda por similitud, como son la precisión a $k$ (P@$k$),
-la media del inverso del rango del primer venico del mismo estilo (MRR) o la
+la media del inverso del rango del primer vecino del mismo estilo (MRR) o la
 fracción media de vecinos del mismo estilo recuperados frente al máximo posible
 (R@k).
 
@@ -235,7 +237,13 @@ principal cuando este no se declara. Este es el caso de K-Means, los modelos de
 mezcla gaussiana y DBSCAN, que hacen uso del método del codo, el criterio
 bayesiano de información y la curva de $k$-distancias respectivamente para
 seleccionar el número de clústeres o el radio de densidad cuando no se
-especifica un valor concreto en la configuración.
+especifica un valor concreto en la configuración. En cuanto al coste
+computacional, K-Means cuenta con variantes escalables como la versión
+\textit{mini-batch}~\cite{sculley_web-scale_2010}, mientras que los métodos
+basados en densidad presentan un crecimiento superlineal con el tamaño del
+banco. En cualquier caso, el rendimiento en calidad depende fuertemente del
+conjunto de datos~\cite{franti_k-means_2018, ahmed_k-means_2020}, lo que
+refuerza el enfoque comparativo adoptado en este trabajo.
 
 \begin{longtable}{|l|l|c|} \hline
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
