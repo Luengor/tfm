@@ -158,12 +158,6 @@ y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
   \label{fig:e1-silhouette}
 \end{figure}
 
-La elección del extractor base de los siguientes experimentos
-(\texttt{dinov2\_graffiti\_style\_head}) no se justifica con E1: descansa sobre
-el ancla supervisada de E8a (\ref{subsubsec:res-estilo}) y sobre el diseño de
-la cabeza. El papel de E1 es documentar la inversión silueta/CH que invalida
-cualquier ranking basado en una sola métrica intrínseca.
-
 \subsubsection{Reducción de dimensionalidad}
 \label{subsubsec:res-reduccion}
 Reducir la dimensionalidad de los vectores de características es un paso común
@@ -408,7 +402,7 @@ y el aumento de coste a medida que el tamaño del banco crece.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e5_yolo_detections.pdf}
-  \caption{Ejemplos de detecciones del backbone YOLO sobre imágenes del
+  \caption{Ejemplos de detecciones del detector de YOLO sobre imágenes del
   corpus. Cabe destacar que el modelo muchas veces no encuentra grafiti,
   recortando la imagen completa. Esos casos no se muestran aquí.}
   \label{fig:e5-yolo-detections}
