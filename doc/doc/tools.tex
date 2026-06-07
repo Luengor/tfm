@@ -109,29 +109,19 @@ su propósito, procedencia y tamaño.
 \subsubsection{Representación vectorial y búsqueda por similitud}
 \label{subsec:fundamentos}
 
-Como se mencionó en la sección del estado del arte, el sistema de agrupamiento
-de grafiti se basa en la representación vectorial de las imágenes de grafiti,
-la reducción de dimensionalidad de estas representaciones y el agrupamiento no
-supervisado y búsqueda por similitud de los vectores resultantes. Para esta
-búsqueda por similitud se emplean métricas de distancia sobre los vectores, que
-cuantifican la similitud entre imágenes a través de la proximidad de sus
-representaciones en el espacio latente.
-
-Las métricas de distancia utilizadas habitualmente en este contexto son la
-distancia euclidiana y la distancia coseno. Esta última depende exclusivamente
-de la dirección de los vectores y resulta equivalente a la distancia euclidiana
-cuando los \textit{embeddings} están normalizados a norma unitaria
-(normalización $L_2$), práctica frecuente para evitar que la magnitud del
-vector domine la comparación. En este trabajo, CLIP, MobileNetV3 y las cabezas
-de proyección ajustadas al dominio producen \textit{embeddings} normalizados a
-norma unitaria, lo que hace que la distancia coseno sea la métrica natural para
-estos modelos. MobileNetV3 aplica esta normalización explícitamente para
-facilitar la comparación con la cabeza DINOv2, que también opera en espacio
-normalizado. El resto de modelos no lo hacen, por lo que la distancia
-euclidiana es la métrica de referencia para ellos. No obstante, las métricas
-internas que dependen de distancias normalizan los \textit{embeddings} antes
-del cálculo, de modo que las puntuaciones resulten comparables entre familias
-de modelos.
+Como se mencionó en el estado del arte, el sistema se apoya en la
+representación vectorial de las pintadas. Por tanto, la similitud entre
+imágenes se mide mediante métricas de distancia sobre sus vectores en el
+espacio utilizado. Las dos habituales son la distancia euclidiana y la
+distancia coseno. Esta última depende solo de la dirección de los vectores y
+equivale a la euclidiana cuando los \textit{embeddings} están normalizados a
+norma unitaria (normalización $L_2$), práctica frecuente para que la magnitud
+del vector no domine la comparación. Algunos modelos de este trabajo (CLIP,
+MobileNetV3 y las cabezas ajustadas al dominio) ya producen \textit{embeddings}
+normalizados, por lo que la distancia coseno es su métrica natural; el resto
+usa la euclidiana. En cualquier caso, las métricas internas que dependen de
+distancias normalizan los \textit{embeddings} antes del cálculo, de modo que
+las puntuaciones resulten comparables entre familias de modelos.
 
 \subsubsection{Agrupamiento no supervisado}
 Los principales algoritmos de agrupamiento se diferencian por la manera en la
@@ -177,10 +167,7 @@ cuantifican la cohesión intracluster y la separación intercluster directamente
 sobre los \textit{embeddings}. Se emplean el coeficiente de
 silueta~\cite{rousseeuw_silhouettes_1987}, que combina para cada punto la
 distancia media a los miembros de su propio clúster con la distancia media al
-clúster más cercano; este se reporta en dos lecturas: la media sobre todos los
-puntos (silueta \textit{micro}) y la media por clúster promediada después entre
-clústeres (silueta \textit{macro}), que pondera por igual cada grupo y evita
-que los clústeres pequeños queden eclipsados por los grandes. Se incluyen
+clúster más cercano, promediado sobre todos los puntos. Se incluyen
 además el índice de Calinski--Harabász~\cite{calinski_dendrite_1974}, que mide
 el cociente entre la dispersión intercluster e intracluster, y el índice de
 Davies--Bouldin~\cite{davies_cluster_1979}, que promedia la similitud de cada
