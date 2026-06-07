@@ -69,86 +69,29 @@ que se sitúa el presente trabajo y motiva su planteamiento combinatorio.
 \subsection{Análisis de similitud y agrupamiento de imágenes}
 \label{subsec:art-emb-red-clus}
 
-El agrupamiento de imágenes es un problema clásico en visión por computador. El
-primer paso para esto se obtiene una representación numérica de cada imagen
-que, idealmente, refleje la similitud perceptual entre ellas. Tradicionalmente,
-modelos de clasificación supervisada como ResNet~\cite{he_deep_2015} se han
-utilizado como extractores de características, aprovechando las activaciones de
-las capas finales como representación vectorial de la imagen. Actualmente,
-modelos de inteligencia artifical como CLIP~\cite{radford_learning_2021} o
-DINOv2~\cite{oquab_dinov2_2024} entrenados con supervisión por lenguaje natural
-o objetivos de auto-supervisión permiten obtener representaciones visuales
-transferibles a múltiples tareas sin la necesidad de hacer un
-\textit{fine-tuning} específico de dominio, lo que los convierte en candidatos
-naturales para representar grafiti, un dominio para el que prácticamente no
-existen sets etiquetados de similitud.
+El agrupamiento de imágenes se aborda habitualmente encadenando tres etapas:
+extracción de una representación vectorial, reducción de dimensionalidad y
+agrupamiento. Los modelos de clasificación preentrenados como
+ResNet~\cite{he_deep_2015} se usan ampliamente como extractores de
+características, y modelos más recientes como CLIP~\cite{radford_learning_2021}
+o DINOv2~\cite{oquab_dinov2_2024}, entrenados por supervisión lingüística o
+auto-supervisión, ofrecen representaciones transferibles sin ajuste específico
+de dominio. La reducción de dimensionalidad previa al agrupamiento (PCA,
+UMAP~\cite{mcinnes_umap_2020}) es práctica estándar para mitigar la
+inestabilidad de las distancias en espacios de alta dimensión. Las familias
+clásicas de agrupamiento (por centroides como K-Means, densidad como DBSCAN y
+HDBSCAN, jerárquicos o utilizando modelos probabilísticos) cubren distintos
+supuestos estructurales sobre los datos~\cite{ester_density-based_1996,
+campello_density-based_2013, arthur_k-means_2007}. Para la recuperación por
+similitud, los índices ANN como HNSW~\cite{malkov_efficient_2018} o
+FAISS~\cite{johnson_billion-scale_2017} son el estándar de facto en bases de
+datos vectoriales modernas.
 
-Sin embargo, estos modelos producen representaciones de muchas dimensiones, que
-normaliza las distancias y, por tanto, hace inestables los algoritmos clásicos
-de agrupamiento (fenómeno conocido como la maldición de la
-dimensionalidad~\cite{aggarwal_surprising_2001}). Por eso, el segundo paso es
-proyectar estos vectores a un espacio de menor dimensión, ya sea de forma
-lineal mediante análisis de componentes principales o de forma no lineal con
-métodos como UMAP~\cite{mcinnes_umap_2020}, que preserva en mayor medida la
-estructura local y global del espacio subyacente. Sobre este espacio reducido
-convergen las familias clásicas de \textit{clustering}, como K-Means, DBSCAN u
-OPTICS, cada una con sus ventajas e inconvenientes, lo que justifica la
-evaluación comparativa de este trabajo.
-
-Por último, la representación vectorial de las imágenes también permite abordar
-la recuperación por similitud, que se resuelve como un problema de búsqueda de
-vecinos más cercanos. El coste de esta búsqueda crece con el tamaño del banco,
-lo que ha motivado el desarrollo de índices aproximados de vecinos más cercanos
-(ANN) de gran eficiencia, como FAISS~\cite{johnson_billion-scale_2017} o
-HNSW~\cite{malkov_efficient_2018}, que se han convertido en el estándar de
-facto de las bases de datos vectoriales modernas (pgvector, Qdrant, Milvus).
-Este trabajo se apoya en estas soluciones ya existentes para la fase de
-recuperación por similitud, y se centra en evaluar sistemáticamente qué
-combinaciones de extractor, reducción y agrupamiento funcionan mejor sobre
-imágenes de grafiti, así como en caracterizar el coste computacional de cada
-etapa en función del tamaño del banco.
-
-% Computational cost is something to elavorate on in the next sections
-% % ---------------------------------------------------------------------
-% \subsection{Coste computacional y evaluación empírica}
-% \label{subsec:art-cost}
-% 
-% La eficiencia computacional se ha consolidado como un criterio de diseño de
-% primer orden en visión por computador, y no como una preocupación secundaria.
-% Buena parte de la investigación reciente en extractores de características
-% persigue de forma explícita el compromiso entre la calidad de la representación
-% y el coste de cómputo: arquitecturas como
-% MobileNetV3~\cite{howard_searching_2019} se buscan teniendo en cuenta el
-% hardware objetivo. Mientras que otras arquitecturas más pesadas como ResNet o
-% ViT se centran en obtener mejores resultados, MobileNet trata de optimizar la
-% relación calidad-coste, teniendo más en cuenta factores como la latencia de la
-% propia red. En un sistema que debe procesar bancos de imágenes crecientes, esta
-% elección determina el coste dominante de la fase de ingesta.
-% 
-% En la etapa de agrupamiento, la literatura ya ha descrito cómo el coste crece
-% con el tamaño del conjunto de datos. K-Means cuenta con variantes escalables
-% como la \textit{mini-batch}~\cite{sculley_web-scale_2010}, mientras que los
-% métodos basados en densidad (OPTICS~\cite{ankerst_optics_1999} o
-% HDBSCAN~\cite{campello_density-based_2013}) presentan un crecimiento
-% superlineal con el tamaño del banco, agravado por la normalización de
-% distancias propia de los espacios de alta
-% dimensión~\cite{aggarwal_surprising_2001}. Para valorar la calidad de las
-% agrupaciones, el campo dispone además de un repertorio consolidado de métricas,
-% internas cuando no se dispone de etiquetas y externas cuando se cuenta con una
-% verdad de referencia~\cite{rousseeuw_silhouettes_1987, calinski_dendrite_1974,
-% davies_cluster_1979, hubert_comparing_1985, strehl_cluster_2002,
-% van_rijsbergen_c_j_information_1979}, cuyas definiciones se detallan en el
-% marco conceptual (sección~\ref{subsubsec:metricas}).
-% 
-% Pese a la madurez de estos componentes, no se han localizado trabajos que
-% evalúen de forma sistemática qué combinación de extractor, reducción y
-% agrupamiento se comporta mejor sobre imágenes de grafiti, ni que caractericen
-% su coste en función del tamaño del banco. La falta de casos en los que se
-% aplican estos algoritmos al tipo de datos particular del grafiti es
-% especialmente importante, ya que el rendimiento de estos sistemas depende
-% fuertemente del conjunto de datos sobre el que se aplica
-% ~\cite{franti_k-means_2018,ahmed_k-means_2020}. Esta carencia es la que
-% justifica el enfoque comparativo y empírico adoptado en este trabajo. 
+Estos componentes están bien caracterizados de forma individual, pero no se han
+localizado trabajos que los evalúen de forma combinada sobre imágenes de
+grafiti ni que caractericen el coste computacional de cada etapa en función del
+tamaño del banco. Esta carencia es la que motiva el enfoque comparativo y
+empírico de este trabajo.
 
 % ---------------------------------------------------------------------
 \subsection{Identificación de autoría a partir de firmas y escritura}
