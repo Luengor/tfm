@@ -38,10 +38,10 @@ agrupamiento en el dominio, pero utiliza exclusivamente estadísticas cromática
 de la imagen y prescinde de la estructura espacial, la textura y el contenido
 semántico del grafiti.
 
-La Tabla~\ref{tab:art-comparativa} resume estos trabajos previos y los sitúa
-frente al planteamiento del presente, haciendo visible el hueco: ninguno
-combina descriptores visuales profundos con técnicas estándar de agrupamiento
-ni acompaña la evaluación de una caracterización del coste.
+% La Tabla~\ref{tab:art-comparativa} resume estos trabajos previos y los sitúa
+% frente al planteamiento del presente, haciendo visible el hueco: ninguno
+% combina descriptores visuales profundos con técnicas estándar de agrupamiento
+% ni acompaña la evaluación de una caracterización del coste.
 
 {\scriptsize
 \setlength{\tabcolsep}{3pt}
@@ -66,199 +66,118 @@ pintadas. Esta carencia en la literatura es la que delimita el espacio en el
 que se sitúa el presente trabajo y motiva su planteamiento combinatorio.
 
 % ---------------------------------------------------------------------
+\subsection{Análisis de similitud y agrupamiento de imágenes}
+\label{subsec:art-emb-red-clus}
+
+El agrupamiento de imágenes es un problema clásico en visión por computador. El
+primer paso para esto se obtiene una representación numérica de cada imagen
+que, idealmente, refleje la similitud perceptual entre ellas. Tradicionalmente,
+modelos de clasificación supervisada como ResNet~\cite{he_deep_2015} se han
+utilizado como extractores de características, aprovechando las activaciones de
+las capas finales como representación vectorial de la imagen. Actualmente,
+modelos de inteligencia artifical como CLIP~\cite{radford_learning_2021} o
+DINOv2~\cite{oquab_dinov2_2024} entrenados con supervisión por lenguaje natural
+o objetivos de auto-supervisión permiten obtener representaciones visuales
+transferibles a múltiples tareas sin la necesidad de hacer un
+\textit{fine-tuning} específico de dominio, lo que los convierte en candidatos
+naturales para representar grafiti, un dominio para el que prácticamente no
+existen sets etiquetados de similitud.
+
+Sin embargo, estos modelos producen representaciones de muchas dimensiones, que
+normaliza las distancias y, por tanto, hace inestables los algoritmos clásicos
+de agrupamiento (fenómeno conocido como la maldición de la
+dimensionalidad~\cite{aggarwal_surprising_2001}). Por eso, el segundo paso es
+proyectar estos vectores a un espacio de menor dimensión, ya sea de forma
+lineal mediante análisis de componentes principales o de forma no lineal con
+métodos como UMAP~\cite{mcinnes_umap_2020}, que preserva en mayor medida la
+estructura local y global del espacio subyacente. Sobre este espacio reducido
+convergen las familias clásicas de \textit{clustering}, como K-Means, DBSCAN u
+OPTICS, cada una con sus ventajas e inconvenientes, lo que justifica la
+evaluación comparativa de este trabajo.
+
+Por último, la representación vectorial de las imágenes también permite abordar
+la recuperación por similitud, que se resuelve como un problema de búsqueda de
+vecinos más cercanos. El coste de esta búsqueda crece con el tamaño del banco,
+lo que ha motivado el desarrollo de índices aproximados de vecinos más cercanos
+(ANN) de gran eficiencia, como FAISS~\cite{johnson_billion-scale_2017} o
+HNSW~\cite{malkov_efficient_2018}, que se han convertido en el estándar de
+facto de las bases de datos vectoriales modernas (pgvector, Qdrant, Milvus).
+Este trabajo se apoya en estas soluciones ya existentes para la fase de
+recuperación por similitud, y se centra en evaluar sistemáticamente qué
+combinaciones de extractor, reducción y agrupamiento funcionan mejor sobre
+imágenes de grafiti, así como en caracterizar el coste computacional de cada
+etapa en función del tamaño del banco.
+
+% Computational cost is something to elavorate on in the next sections
+% % ---------------------------------------------------------------------
+% \subsection{Coste computacional y evaluación empírica}
+% \label{subsec:art-cost}
+% 
+% La eficiencia computacional se ha consolidado como un criterio de diseño de
+% primer orden en visión por computador, y no como una preocupación secundaria.
+% Buena parte de la investigación reciente en extractores de características
+% persigue de forma explícita el compromiso entre la calidad de la representación
+% y el coste de cómputo: arquitecturas como
+% MobileNetV3~\cite{howard_searching_2019} se buscan teniendo en cuenta el
+% hardware objetivo. Mientras que otras arquitecturas más pesadas como ResNet o
+% ViT se centran en obtener mejores resultados, MobileNet trata de optimizar la
+% relación calidad-coste, teniendo más en cuenta factores como la latencia de la
+% propia red. En un sistema que debe procesar bancos de imágenes crecientes, esta
+% elección determina el coste dominante de la fase de ingesta.
+% 
+% En la etapa de agrupamiento, la literatura ya ha descrito cómo el coste crece
+% con el tamaño del conjunto de datos. K-Means cuenta con variantes escalables
+% como la \textit{mini-batch}~\cite{sculley_web-scale_2010}, mientras que los
+% métodos basados en densidad (OPTICS~\cite{ankerst_optics_1999} o
+% HDBSCAN~\cite{campello_density-based_2013}) presentan un crecimiento
+% superlineal con el tamaño del banco, agravado por la normalización de
+% distancias propia de los espacios de alta
+% dimensión~\cite{aggarwal_surprising_2001}. Para valorar la calidad de las
+% agrupaciones, el campo dispone además de un repertorio consolidado de métricas,
+% internas cuando no se dispone de etiquetas y externas cuando se cuenta con una
+% verdad de referencia~\cite{rousseeuw_silhouettes_1987, calinski_dendrite_1974,
+% davies_cluster_1979, hubert_comparing_1985, strehl_cluster_2002,
+% van_rijsbergen_c_j_information_1979}, cuyas definiciones se detallan en el
+% marco conceptual (sección~\ref{subsubsec:metricas}).
+% 
+% Pese a la madurez de estos componentes, no se han localizado trabajos que
+% evalúen de forma sistemática qué combinación de extractor, reducción y
+% agrupamiento se comporta mejor sobre imágenes de grafiti, ni que caractericen
+% su coste en función del tamaño del banco. La falta de casos en los que se
+% aplican estos algoritmos al tipo de datos particular del grafiti es
+% especialmente importante, ya que el rendimiento de estos sistemas depende
+% fuertemente del conjunto de datos sobre el que se aplica
+% ~\cite{franti_k-means_2018,ahmed_k-means_2020}. Esta carencia es la que
+% justifica el enfoque comparativo y empírico adoptado en este trabajo. 
+
+% ---------------------------------------------------------------------
 \subsection{Identificación de autoría a partir de firmas y escritura}
 \label{subsec:art-author-id}
 
 La identificación de los grafiteros a partir de las fotografías de sus firmas
-encuentra su análogo más directo en la literatura forense de identificación de
-la escritura y de verificación de firmas manuscritas. En ambos casos el
-objetivo es recuperar la identidad de un productor a partir de los patrones
-motores difíciles de falsificar que quedan impresos en sus marcas. Este es un
-problema que Schomaker define formalmente como uno de
-biometría~\cite{schomaker_writer_2008}, distinguiendo dos tareas que se
-transladan de manera muy directa al grafiti: la identificación, que busca al
-autor de una muestra entre un conjunto de escritores conocidos, y la
-verificación, que decide si dos muestras proceden de la misma mano.
+es un problema muy análogo a otros ya estudiados, como pueden ser la
+verificación de firmas manuscritas o el reconocimiento facial. Para el caso de
+la identificación de autoría, Fiel y Sablatnig~\cite{fiel_writer_2015} hacen
+uso de las activaciones de una red convolucional entrenada para la
+clasificación de escritores para recuperar la identidad de un productor a
+partir de una muestra de su escritura. Estos vectores de características se
+almacenan y la consulta se resuelve por vecindad más cercana sobre los vectores
+guardados. Este patrón de \enquote{codificar una vez y recuperar por similitud}
+es precisamente el que aplica este trabajo, trasladando los descriptores
+profundos descritos en la sección anterior al dominio específico de la autoría.
 
-Fiel y Sablatnig~\cite{fiel_writer_2015} abordan la identificación y
-recuperación de escritura entrenando una red convolucional como clasificador
-sobre un conjunto de escritores conocidos para, una vez entrenada, descartar la
-capa de clasificación y utilizar las activaciones de la penúltima capa como
-vector de características. Estos vectores de características se almacenan y la
-consulta se resuelve por vecindad más cercana sobre los vectores guardados.
-Este patrón de \enquote{codificar una vez y recuperar por similitud} es
-precisamente el que aplica este trabajo, trasladando los descriptores profundos
-descritos en la sección anterior al dominio específico de la autoría.
-
-La identificación de autoría comparte estructura con el reconocimiento facial
-moderno, del que FaceNet~\cite{schroff_facenet_2015} es el más representativo.
-Se trata de un problema de aprendizaje métrico de conjunto abierto, en el que
-el número de identidades no se conoce \textit{a priori}, las muestras por clase
-son escasas y la evaluación se realiza por verificación o recuperación antes
-que por clasificación directa. Esta caracterización justifica el recurso a
-cabezas de proyección entrenadas con aprendizaje métrico para inducir un
-espacio en el que las pintadas de un mismo autor queden próximas, en lugar de
-un clasificador cerrado sobre un catálogo fijo de grafiteros. Este enfoque se
-adapta mejor al caso particular de este trabajo, puesto que resulta más
-sencillo el etiquetado de un subconjunto reducido de imágenes con un par de
-entradas por autor que la construcción de un catálogo exhaustivo de grafiteros
-necesariamente cerrado.
-
-% ---------------------------------------------------------------------
-\subsection{Representación vectorial de imágenes}
-\label{subsec:art-embeddings}
-
-El agrupamiento automático de imágenes requiere, en primer lugar, una
-representación numérica de estas. El objetivo es que la proximidad en el
-espacio de representación refleje la similitud perceptual, de modo que las
-tareas posteriores de recuperación y agrupamiento puedan operar sobre
-distancias. Esto se ha conseguido tradicionalmente con técnicas de extracción
-de características basadas en redes profundas, que condensan la imagen en un
-vector de características de alto nivel. El paradigma moderno se estableció con
-FaceNet \cite{schroff_facenet_2015}, una red profunda entrenada con
-\textit{triplet loss}. En este y otros trabajos posteriores como el de
-\citea[etali]{Wu}{wu_sampling_2017} se matizó que la estrategia de muestreo de
-tripletes o de pares era tan o más importante que la función de perdida en la
-calidad del espacio aprendido. \citea[etali]{Khosla}{khosla_supervised_2021}
-extendieron este paradigma al régimen supervisado con la pérdida
-\textit{Supervised Contrastive} (SupCon), que utiliza las etiquetas de clase
-para juntar en el espacio de representación todos los ejemplos de una misma
-categoría y separarlos del resto, mejorando la robustez del espacio aprendido
-frente a las pérdidas basadas en tripletes.
-
-Sobre esta base se han utilizado arquitecturas de redes residuales como
-ResNet~\cite{he_deep_2015}, MobileNet~\cite{howard_mobilenets_2017} y, más
-recientemente, modelos basados en \textit{transformers} para
-visión~\cite{dosovitskiy_image_2021} como extractores de características para
-tareas de agrupamiento. Es más, el cambio más relevante en este ámbito no ha
-sido la arquitectura, sino el método de entrenamiento. Las redes de
-clasificación clásicas se han visto superadas por modelos de fundación
-entrenados con objetivos de autosupervisión o supervisión por lenguaje natural.
-DINOv2~\cite{oquab_dinov2_2024} demuestra que la primera produce características
-visuales transferibles a múltiples tareas sin la necesidad de hacer
-\textit{fine-tuning}. Por otro lado, modelos como
-CLIP~\cite{radford_learning_2021} alinean un codificador visual con un
-codificador textual sobre pares imagen-texto, obteniendo un espacio en el que
-la proximidad codifica también semántica. Ambos modelos resultan candidatos
-naturales para representar grafiti, dominio para el que prácticamente no
-existen sets etiquetados de similitud y donde los detectores específicos de
-propósito general, como las familias YOLO~\cite{ultralytics_ultralytics_2024},
-ofrecen además sus propios mapas de características como vectores de partida.
-
-% ---------------------------------------------------------------------
-\subsection{Búsqueda por similitud e indexación en bancos de imágenes}
-\label{subsec:art-similarity-search}
-
-Una vez obtenida la representación vectorial de cada imagen, la tarea se vuelve
-una de recuperación de imágenes basada en contenido. A diferencia de los
-sistemas tradicionales de recuperación de texto, aquí la propia representación
-de cada imagen se utiliza como consulta. Por esto, la recuperación por
-similitud se aleja de la búsqueda clásica y se vuelve un problema geométrico de
-vecinos más cercanos. El cálculo exacto por fuerza bruta tiene un coste lineal
-en el tamaño del banco y por imagen consultada, lo que resulta asumible en
-escalas modestas, pero deja de serlo a medida que el banco crece. La literatura
-ha respondido a esto con dos grandes familias de índices aproximados de vecinos
-más cercanos (\textit{Approximate Nearest Neighbor}, ANN). Por un lado, los
-basados en cuantificación y particionado del espacio
-(FAISS~\cite{johnson_billion-scale_2017}), que combina listas invertidas con
-cuantificación de productos para escalar la búsqueda a miles de millones de
-vectores con uso intensivo de GPU. Por otro, los basados en grafos de
-proximidad, encabezados por HNSW~\cite{malkov_efficient_2018}, que construye
-una jerarquía de grafos navegables de mundo pequeño con coste de consulta
-logarítmico y que se ha convertido en el estándar de facto de las bases de
-datos vectoriales modernas (pgvector, Qdrant, Milvus).
-
-El presente trabajo no aporta novedad en este eje y se apoya en estas
-soluciones ya existentes; su integración concreta en el sistema, sobre
-\texttt{pgvector} y un \textit{backend} de búsqueda lineal, se describe en
-\ref{subsec:configuraciones}. La caracterización empírica del coste de búsqueda
-en función del tamaño del banco, planteada por el enunciado, se aborda en este
-marco sin entrar a comparar índices ANN entre sí.
-
-% ---------------------------------------------------------------------
-\subsection{Reducción de dimensionalidad y agrupamiento clásico}
-\label{subsec:art-clustering}
-
-Los \textit{embeddings} producidos por las redes profundas viven habitualmente
-en espacios de varios cientos o miles de dimensiones, lo que vuelve inestables
-tanto las nociones de distancia como los algoritmos clásicos de agrupamiento.
-La técnica establecida para mitigarlo es proyectar a un espacio de menor
-dimensión antes de agrupar, ya sea de forma lineal mediante análisis de
-componentes principales o de forma no lineal con métodos como
-UMAP~\cite{mcinnes_umap_2020}, que preserva en mayor medida la estructura local
-y global del \textit{manifold} subyacente.
-
-Sobre el espacio reducido convergen las familias clásicas de
-\textit{clustering}. K-Means sigue siendo la opción más extendida por su
-simplicidad, aunque su sensibilidad a la inicialización y a la geometría de los
-datos está bien documentada. Arthur y Vassilvitskii~\cite{arthur_k-means_2007}
-introdujeron la inicialización \textit{k-means++}, con garantías teóricas y
-mejoras consistentes en calidad y velocidad;
-Sculley~\cite{sculley_web-scale_2010} mostró que la variante \textit{mini-batch}
-reduce el coste computacional varios órdenes de magnitud sin pérdida
-significativa de calidad; y Fränti y Sieranoja~\cite{franti_k-means_2018} han
-caracterizado experimentalmente las condiciones bajo las que el algoritmo deja
-de funcionar, identificando el solapamiento entre clústeres como el factor
-crítico. La revisión reciente de \citea[etali]{Ahmed}{ahmed_k-means_2020}
-aporta evidencia empírica de que el rendimiento depende del conjunto de datos,
-lo que refuerza el enfoque comparativo adoptado en este trabajo.
-
-Las alternativas basadas en densidad nacen para tratar formas no convexas y
-ruido. DBSCAN~\cite{ester_density-based_1996} fija un único umbral de densidad,
-lo que limita su aplicabilidad a datos con densidades heterogéneas;
-OPTICS~\cite{ankerst_optics_1999} resuelve esa rigidez devolviendo un orden de
-alcanzabilidad del que pueden extraerse particiones para distintos umbrales; y
-HDBSCAN~\cite{campello_density-based_2013} construye una jerarquía de densidades
-de la que selecciona los clústeres más estables, sin requerir parámetros
-geométricos a priori. La implementación moderna de estas tres familias está
-bien estudiada~\cite{hahsler_dbscan_2019}. Para agrupamientos jerárquicos
-aglomerativos, los algoritmos descritos por Müllner~\cite{mullner_modern_2011}
-constituyen la referencia computacional actual.
-
-La selección entre estas familias depende de hipótesis sobre los datos que no
-se conocen \textit{a priori} en el caso del grafiti, lo que refuerza la
-conveniencia de una evaluación empírica comparativa.
-
-% ---------------------------------------------------------------------
-\subsection{Coste computacional y evaluación empírica}
-\label{subsec:art-cost}
-
-La eficiencia computacional se ha consolidado como un criterio de diseño de
-primer orden en visión por computador, y no como una preocupación secundaria.
-Buena parte de la investigación reciente en extractores de características
-persigue de forma explícita el compromiso entre la calidad de la representación
-y el coste de cómputo: arquitecturas como
-MobileNetV3~\cite{howard_searching_2019} se buscan teniendo en cuenta el
-hardware objetivo. Mientras que otras arquitecturas más pesadas como ResNet o
-ViT se centran en obtener mejores resultados, MobileNet trata de optimizar la
-relación calidad-coste, teniendo más en cuenta factores como la latencia de la
-propia red. En un sistema que debe procesar bancos de imágenes crecientes, esta
-elección determina el coste dominante de la fase de ingesta.
-
-En la etapa de agrupamiento, la literatura ya ha descrito cómo el coste crece
-con el tamaño del conjunto de datos. K-Means cuenta con variantes escalables
-como la \textit{mini-batch}~\cite{sculley_web-scale_2010}, mientras que los
-métodos basados en densidad (OPTICS~\cite{ankerst_optics_1999} o
-HDBSCAN~\cite{campello_density-based_2013}) presentan un crecimiento
-superlineal con el tamaño del banco, agravado por la normalización de
-distancias propia de los espacios de alta
-dimensión~\cite{aggarwal_surprising_2001}. Para valorar la calidad de las
-agrupaciones, el campo dispone además de un repertorio consolidado de métricas,
-internas cuando no se dispone de etiquetas y externas cuando se cuenta con una
-verdad de referencia~\cite{rousseeuw_silhouettes_1987, calinski_dendrite_1974,
-davies_cluster_1979, hubert_comparing_1985, strehl_cluster_2002,
-van_rijsbergen_c_j_information_1979}, cuyas definiciones se detallan en el
-marco conceptual (sección~\ref{subsubsec:metricas}).
-
-Pese a la madurez de estos componentes, no se han localizado trabajos que
-evalúen de forma sistemática qué combinación de extractor, reducción y
-agrupamiento se comporta mejor sobre imágenes de grafiti, ni que caractericen
-su coste en función del tamaño del banco. La falta de casos en los que se
-aplican estos algoritmos al tipo de datos particular del grafiti es
-especialmente importante, ya que el rendimiento de estos sistemas depende
-fuertemente del conjunto de datos sobre el que se aplica
-~\cite{franti_k-means_2018,ahmed_k-means_2020}. Esta carencia es la que
-justifica el enfoque comparativo y empírico adoptado en este trabajo. 
+El área del reconocimiento facial, por su parte, ha experimentado un auge en
+los últimos años gracias a la disponibilidad de grandes conjuntos de datos
+etiquetados y a la mejora de las arquitecturas de redes neuronales.
+FaceNet~\cite{schroff_facenet_2015} es un modelo que aprende a mapear imágenes
+de rostros a un espacio de características donde las distancias corresponden a
+la similitud facial. Este enfoque se basa en el aprendizaje métrico, utilizando
+una función de pérdida \enquote{por tripletes}, que fomenta que una imagen de
+un individuo quede más próxima a otras imágenes del mismo individuo que a las
+de individuos diferentes. La identificación de autoría en grafiti puede
+beneficiarse de este enfoque, ya que también se trata de un problema de
+aprendizaje métrico en el que el número de identidades no se conoce \textit{a
+priori} y las muestras por clase son escasas.
 
 % ---------------------------------------------------------------------
 \subsection{Aprendizaje profundo de clústeres y posicionamiento de
