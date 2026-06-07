@@ -133,16 +133,6 @@ internas que dependen de distancias normalizan los \textit{embeddings} antes
 del cálculo, de modo que las puntuaciones resulten comparables entre familias
 de modelos.
 
-Las técnicas de reducción de dimensionalidad aplicadas en este trabajo se
-pueden agrupar entre lineales y no lineales. Las técnicas lineales, como el
-análisis de componentes principales (PCA), proyectan los datos sobre ejes de
-máxima varianza y suponen que la estructura de datos subyacente es lineal. Por
-otro lado, las técnicas no lineales relajan esta hipótesis y buscan preservar
-relaciones de vecindad, distancias o estructura en el espacio original. Las
-opciones concretas integradas en el sistema y sus referencias canónicas se
-recogen en la tabla~\ref{tab:reduction}.
-
-
 \subsubsection{Agrupamiento no supervisado}
 Los principales algoritmos de agrupamiento se diferencian por la manera en la
 que agrupan los datos. Los métodos basados en centroides, como K-Means, modelan
@@ -164,6 +154,20 @@ el criterio bayesiano de información (BIC). Los algoritmos basados en densidad
 y los jerárquicos lo evitan en su formulación, pero a cambio introducen otros
 hiperparámetros (umbrales de densidad, criterios de corte) cuyo ajuste también
 carece de un óptimo evidente sin verdad fundamental.
+
+\subsubsection{Reducción de dimensionalidad}
+\label{subsubsec:reduccion}
+Los \textit{embeddings} producidos por las redes utilizadas en este trabajo
+contienen entre $128$ y $4096$ dimensiones. A medida que la dimensionalidad
+crece, las distancias entre puntos tienden a igualarse y perder poder
+discriminativo, fenómeno conocido como la maldición de la
+dimensionalidad~\cite{aggarwal_surprising_2001}. Esto degrada especialmente
+los algoritmos basados en densidad y motiva aplicar una etapa previa de
+reducción. Las técnicas lineales, como PCA~\cite{jolliffe_principal_2002},
+proyectan sobre ejes de máxima varianza; las no lineales, como
+UMAP~\cite{mcinnes_umap_2020}, preservan relaciones de vecindad en la variedad
+subyacente. Las opciones integradas en el sistema se recogen en la
+tabla~\ref{tab:reduction}.
 
 \subsubsection{Métricas de evaluación}
 \label{subsubsec:metricas}
@@ -389,8 +393,9 @@ categorías estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
 \textit{character}). Las cuatro cabezas resultantes se entrenan exclusivamente
 sobre los subconjuntos anotados descritos en \ref{subsec:dataset} (detalles
 sobre el entrenamiento en  \ref{subsubsec:entrenamiento-cabezas}) y se añaden
-al catálogo de modelos de \textit{embedding}, conservando la dimensionalidad
-del modelo base.
+al catálogo de modelos de \textit{embedding}, proyectando los
+\textit{embeddings} base a un espacio de $128$ dimensiones (DINOv2 $384\to128$,
+MobileNetV3 $1280\to128$).
 
 \subsection{Entorno de ejecución}
 \label{subsec:entorno}
