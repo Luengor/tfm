@@ -349,10 +349,15 @@ las métricas intrínsecas, donde el ruido siempre se excluye y se complementan
 con valores como el porcentaje de ruido.
 
 Para evaluar la calidad de la búsqueda por similitud se emplean también las
-etiquetas de estilo: las métricas P@$k$, MAP@$k$, MRR y R@$k$ definidas en
-\ref{subsubsec:metricas} se calculan por consulta y se promedian sobre todas
-las consultas realizadas para obtener una media global de la calidad de la
-búsqueda por similitud.
+etiquetas disponibles según la evaluación: las métricas P@$k$, MAP@$k$, MRR y
+R@$k$ definidas en \ref{subsubsec:metricas} se calculan por consulta y se
+promedian sobre todas las consultas realizadas para obtener una media global de
+la calidad de la búsqueda por similitud. Como R@$k$ acota su denominador al
+máximo de vecinos relevantes recuperables en $k$ posiciones
+($\min(k,\,|\text{clase}|-1)$), cuando las clases son grandes frente a $k$
+(como en la evaluación de estilo, con cuatro clases densas) ese denominador se
+satura en $k$ y R@$k$ coincide numéricamente con P@$k$. en ese caso se omite de
+las tablas por redundancia y solo se incluye cuando ambas divergen.
 
 \subsubsection{Salida y agregación de resultados}
 \label{subsubsec:salida}
