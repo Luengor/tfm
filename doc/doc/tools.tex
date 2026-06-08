@@ -136,36 +136,96 @@ su propósito, procedencia y tamaño.
 \label{subsec:conceptos}
 % Conceptos teóricos necesarios para interpretar la evaluación.
 
-\subsubsection{Representación vectorial y búsqueda por similitud}
+\subsubsection{Representación vectorial y métricas de distancia}
 \label{subsec:fundamentos}
 
 Como se mencionó en el estado de la cuestión, el sistema se apoya en la
-representación vectorial de las pintadas. Por tanto, la similitud entre
-imágenes se mide mediante métricas de distancia sobre sus vectores en el
-espacio utilizado. Las dos habituales son la distancia euclidiana y la
-distancia coseno. Esta última depende solo de la dirección de los vectores y
-equivale a la euclidiana cuando los \textit{embeddings} están normalizados a
-norma unitaria (normalización $L_2$), práctica frecuente para que la magnitud
-del vector no domine la comparación. Algunos modelos de este trabajo (CLIP,
+representación vectorial de las pintadas. Estas representaciones, conocidas
+como \textit{embeddings}, se obtienen a través de modelos de extracción de
+características preentrenados sobre tareas de visión generalistas, que se
+aplican directamente sobre las imágenes de grafiti o sobre recortes de las
+mismas. Para las redes de clasificación como pueden ser ResNet o VGG, se accede
+a esta representación eliminando las últimas capas de los modelos, que suelen
+corresonder a la tarea de clasificación, y quedándonos con la representación
+latente previa. Otros modelos como DINOv2 o CLIP están entrenados
+específicamente para devolver una representación vectorial de la imagen, por lo
+que no es necesario modificar su arquitectura para acceder a los
+\textit{embeddings}.
+
+Teniendo una representación numérica de cada imagen, la similitud entre estas
+se mide mediante métricas de distancia sobre sus vectores en el espacio
+utilizado. Las dos más habituales son la distancia euclidiana y la distancia
+del coseno. Esta última depende solo de la dirección de los vectores y equivale
+a la euclidiana cuando los \textit{embeddings} están normalizados a norma
+unitaria (normalización $L_2$), práctica frecuente para que la magnitud del
+vector no domine la comparación. Algunos modelos de este trabajo (CLIP,
 MobileNetV3 y las cabezas ajustadas al dominio) ya producen \textit{embeddings}
 normalizados, por lo que la distancia coseno es su métrica natural; el resto
-usa la euclidiana. En cualquier caso, las métricas internas que dependen de
-distancias normalizan los \textit{embeddings} antes del cálculo, de modo que
-las puntuaciones resulten comparables entre familias de modelos.
+usan la euclidiana. El modelo que hace uso de MobileNetV3 explícitamente
+normaliza sus vectores a norma unitaria para que las cabezas entrenadas en
+estilo y autoría (que sí que normalizan sus vectores) puedan compararse con los
+\textit{backbones} de los que proceden.
+
+\subsection{Búsqueda por similitud}
+\label{subsubsec:tools-similarity-search}
+Para la búsqueda por similitud, el sistema implementa dos enfoques. El primero
+y más simple de ellos consiste en una búsqueda exacta sobre SQLite, que se
+resuelve por fuerza bruta recuperando todos los vectores almacenados y
+calculando la distancia a cada uno de ellos. Este método es ineficiente en
+cuanto a velocidad y memoria, pero garantiza la recuperación del vecino más
+cercano real. Por otro lado, el segundo enfoque hace uso de un índice HNSW
+sobre PostgreSQL, que organiza la información en una estructura de grafo
+jerárquicos de vecinos más cercanos. Al recibir una consulta, el índice recorre
+la lista de vecinos más cercanos a la consulta, y a su vez los vecinos de
+estos, hasta encontrar el mínimo local. Este método es mucho más eficiente,
+aunque no garantiza la recuperación del vecino más cercano real, sino de un
+vecino cercano, lo que puede afectar a la calidad de los resultados.
+
+Para evaluar esto último, al utilizar el índice HNSW también se realiza una
+búsqueda por fuerza bruta y se comparan los resultados obtenidos por ambos
+métodos, cuantificando el porcentaje de vecinos más cercanos reales recuperados
+por el índice. Además, cuando el dataset utilizado dispone de etiquetas se
+evalua también la calidad de la búsqueda por similitud. En estos casos se
+calculan métricas como la precisión y \textit{recall} a $k$ que cuantifican el
+porcentaje de elementos relevantes recuperados respecto a los $k$ buscados
+(P@$k$) o al total de elementos relevantes (R@$k$). También se calculan el
+rango recíproco medio (MRR) que mide la posición del primer vecino relevante
+recuperado, y la precisión media promedio (MAP@$k$) que promedia la precisión a
+$k$ sobre las posiciones relevantes.
 
 \subsubsection{Agrupamiento no supervisado}
+\label{subsubsec:agrupamiento}
 Los principales algoritmos de agrupamiento se diferencian por la manera en la
 que agrupan los datos. Los métodos basados en centroides, como K-Means, modelan
-cada clúster por su media y buscan minimizar la varianza intracluster, siendo
-eficientes pero sensibles a la forma y al solapamiento de los grupos. Los
-basados en densidad, como DBSCAN, OPTICS y HDBSCAN, definen un clúster como una
-región conectada de alta densidad y permiten descartar puntos como ruido. Los
-métodos jerárquicos construyen un dendrograma de fusiones o divisiones
+cada clúster por su media y buscan minimizar la varianza intracluster. Esto los
+hace bastante eficientes, pero también sensibles a la forma y al solapamiento
+de los grupos. Por esto, estos algoritmos no suelen dar los mejores resultados
+cuando los datos no se agrupan en formas esféricas bien separadas o cuando los
+distintos grupos tiene una cantidad de puntos muy desigual (como es el caso de
+este trabajo).
+
+Los algoritmos basados en densidad, como DBSCAN, OPTICS y HDBSCAN, definen un
+clúster como una región conectada de alta densidad y permiten descartar puntos
+como ruido. Los tres algoritmos son muy similares; siendo OPTICS y HDBSCAN
+extensiones de DBSCAN que resuelven algunas de sus limitaciones como pueden ser
+el manejo de clústeres de distintas densidades o dando lugar a una estructura
+jerárquica de clústeres. Estos métodos son especialmente adecuados para datos
+con formas arbitrarias y con ruido, aunque su rendimiento puede degradarse en
+espacios de alta dimensionalidad, lo que motiva la reducción previa.
+
+También se utilizan otros métodos menos comunes como \textit{affinity
+propagation}, que crea \textit{clusters} a partir del envío de mensajes de
+responsabilidad entre los puntos; los métodos probabilísticos, como los modelos
+de mezcla gaussiana, que modelan los datos como una superposición de
+distribuciones gaussianas; los métodos espectrales, que utilizan la
+descomposición espectral de una matriz de similitud para reducir la
+dimensionalidad antes de aplicar un método de agrupamiento tradicional; y los
+métodos jerárquicos, que construyen un dendrograma de fusiones o divisiones
 sucesivas del que pueden extraerse particiones a distintos niveles de
-granularidad. Por último, los enfoques probabilísticos (mezclas gaussianas
-resueltas con el algoritmo EM~\cite{dempster_maximum_1977}) modelan los datos
-como una superposición de distribuciones y asignan cada punto al componente más
-probable.
+granularidad. Estos algorimos resultan ser útiles para tratar con datos con
+estructuras más complejas, aunque su coste computacional suele ser mayor que el
+de los métodos más simples (especialmente \textit{affinity propagation} y los
+métodos basados en modelos probabilísticos).
 
 La principal dificultad en un escenario sin etiquetas es la selección del
 número de clústeres. K-Means y los modelos de mezcla requieren fijarlo a
@@ -181,13 +241,28 @@ Los \textit{embeddings} producidos por las redes utilizadas en este trabajo
 contienen entre $128$ y $4096$ dimensiones. A medida que la dimensionalidad
 crece, las distancias entre puntos tienden a igualarse y perder poder
 discriminativo, fenómeno conocido como la maldición de la
-dimensionalidad~\cite{aggarwal_surprising_2001}. Esto degrada especialmente
-los algoritmos basados en densidad y motiva aplicar una etapa previa de
-reducción. Las técnicas lineales, como PCA~\cite{jolliffe_principal_2002},
-proyectan sobre ejes de máxima varianza; las no lineales, como
-UMAP~\cite{mcinnes_umap_2020}, preservan relaciones de vecindad en la variedad
-subyacente. Las opciones integradas en el sistema se recogen en la
-tabla~\ref{tab:reduction}.
+dimensionalidad~\cite{aggarwal_surprising_2001}. Esto degrada especialmente los
+algoritmos basados en densidad y motiva aplicar una etapa previa de reducción.
+Las técnicas lineales, como PCA~\cite{jolliffe_principal_2002}, proyectan los
+datos sobre los ejes que generan la máxima varianza. Esto los hace eficientes,
+pero los limita a capturar relaciones lineales entre las características.
+Kernel PCA~\cite{scholkopf_nonlinear_1998} resuelve este problema calculando
+esta varianza en un espacio de características no lineal, permitiendo capturar
+relacciones más complejas a costa de un mayor coste computacional.
+
+Otras técnicas no lineales, como Isomap~\cite{tenenbaum_global_2000} o
+UMAP~\cite{mcinnes_umap_2020} buscan preservar relaciones de vecindad en el
+espacio original. Isomap construye un grafo de vecinos más cercanos sobre el
+espacio original y posteriormente busca una representación de menor
+dimensionalidad que preserve estas relaciones de vecindad, lo que lo convierte
+en un algoritmo especialmente costoso a medida que el tamaño del conjunto
+crece. UMAP, por su parte, asigna a cada enlace entre puntos una probabilidad
+de conexión basada en la distancia entre estos, y luego busca una
+representación de menor dimensionalidad que respete estas probabilidades a
+través de una serie de operaciones de atracción--repulsión entre los puntos.
+
+Un resumen de las opciones de reductor implementadas en el sistema se recogen
+en la tabla~\ref{tab:reduction}.
 
 \subsubsection{Métricas de evaluación}
 \label{subsubsec:metricas}
@@ -195,28 +270,37 @@ La calidad de los clústeres resultantes se valora con dos familias de métricas
 Sobre el banco principal sin etiquetar se recurre a métricas internas, que
 cuantifican la cohesión intracluster y la separación intercluster directamente
 sobre los \textit{embeddings}. Se emplean el coeficiente de
-silueta~\cite{rousseeuw_silhouettes_1987}, que combina para cada punto la
-distancia media a los miembros de su propio clúster con la distancia media al
-clúster más cercano, promediado sobre todos los puntos. Se incluyen
-además el índice de Calinski--Harabász~\cite{calinski_dendrite_1974}, que mide
-el cociente entre la dispersión intercluster e intracluster, y el índice de
-Davies--Bouldin~\cite{davies_cluster_1979}, que promedia la similitud de cada
-clúster con su vecino más parecido (valores menores indican mejor separación).
-Se complementan con dos indicadores estructurales: la proporción de puntos
-clasificados como ruido y el coeficiente de variación del tamaño de los
-clústeres.
+silueta~\cite{rousseeuw_silhouettes_1987}, el índice de
+Calinski--Harabász~\cite{calinski_dendrite_1974} y el índice de
+Davies--Bouldin~\cite{davies_cluster_1979}. El primero de estos mide, para cada
+punto, la diferencia entre la distancia media a los puntos del \textit{cluster}
+más cercano y la distancia media a los puntos de su propio \textit{cluster},
+normalizada por la mayor de las dos. Esta favorece a los agrupamientos con
+clústeres compactos y bien separados. El índice de Calinski--Harabász fomenta
+clústeres muy compactos y separados entre sí al medir la razón entre la
+varianza intercluster y la varianza intracluster, penalizando los agrupamientos
+con clústeres dispersos o con solapamiento. Por último, el índice de
+Davies--Bouldin realiza la evaluación opuesta: para cada \textit{cluster}
+calcula la razón entre la suma de la dispersión intracluster y la distancia
+intercluster a su vecino más cercano, y devuelve la media de estas razones.
+Esto penaliza el peor caso de cada agrupamiento, favoreciendo aquellos con
+clústeres bien separados y con baja dispersión intracluster.
 
-Adicionalmente, sobre los $294$ recortes de evaluación etiquetados por estilo o
-los $185$ etiquetados por autoría, ambos descritos en \ref{subsec:dataset}, se
-calculan métricas extrínsecas que sí utilizan la verdad fundamental disponible:
-el índice de Rand ajustado (ARI), la información mutua normalizada (NMI) y la
-F1 por pares, que constituyen el complemento más sólido a las métricas internas
-en el plano de calidad. Por otro lado, se reportan también métricas relativas a
-la calidad de la búsqueda por similitud, como son la precisión a $k$ (P@$k$),
-la precisión media promediada únicamente sobre las posiciones en las que
-aparece un vecino del mismo estilo (MAP@$k$), la media del inverso del rango
-del primer vecino del mismo estilo (MRR) y la fracción media de vecinos del
-mismo estilo recuperados frente al máximo posible (R@$k$).
+Puesto que algunos de los algoritmos admiten la clasificación de puntos como
+ruido, estas métricas se complementan con dos indicadores estructurales: la
+proporción de puntos clasificados como ruido y el coeficiente de variación del
+tamaño de los clústeres. Haciendo uso de estas métricas, se puede identificar
+si un valor anormalmente alto en las métricas de calidad se debe a un muy buen
+agrupamiento o a un agrupamiento en el que los puntos más difíciles de
+clasificar se han descartado como ruido o se han agrupado en un clúster muy
+grande.
+
+% TODO: extend this a bit too
+Adicionalmente, sobre los recortes de evaluación etiquetados por estilo o
+autoría se calculan métricas extrínsecas que sí utilizan la verdad fundamental
+disponible: el índice de Rand ajustado (ARI), la información mutua normalizada
+(NMI) y la F1 por pares, que constituyen el complemento más sólido a las
+métricas internas en el plano de calidad. 
 
 \subsection{Componentes implementados}
 \label{subsec:configuraciones}
