@@ -7,27 +7,45 @@
 El banco de imágenes de grafiti utilizado en este trabajo se compone de $6681$
 fotografías capturadas en condiciones reales en la ciudad de Salamanca. En la
 figura~\ref{fig:dataset-location-distribution} se puede ver un mapa con la
-ubicación de las imágenes capturadas en la ciudad. Las imágenes presentan una
-alta variabilidad cromática y de escenas urbanas, con condiciones de
-iluminación diversas. Tampoco existe un lienzo por defecto para los grafitis,
-sino que aparecen en muros, puertas, vallas y mobiliario urbano en general. En
-muchas ocasiones, y debido a la alta densidad de pintadas en ciertas zonas, una
-misma imagen puede contener varias pintadas distintas, lo que añade complejidad
-a cualquier labor de clasificación o agrupamiento.
+ubicación de las imágenes capturadas en la ciudad que contenían información de
+GPS. Las imágenes presentan una alta variabilidad cromática y de escenas
+urbanas, con condiciones de iluminación diversas. Tampoco existe un lienzo por
+defecto para los grafitis, sino que aparecen en muros, puertas, vallas y
+mobiliario urbano en general. En muchas ocasiones, y debido a la alta densidad
+de pintadas en ciertas zonas, una misma imagen puede contener varias pintadas
+distintas, lo que añade complejidad a cualquier labor de clasificación o
+agrupamiento.
 
 \begin{figure}[h!]
   \centering
   \includegraphics[width=0.8\linewidth]{figures/map_with_photos.pdf}
-  \caption[Ubicación de las imágenes agrupadas]{Ubicación de las imágenes en la
-  ciudad de Salamanca.}
+  \caption[Ubicación de las imágenes agrupadas]{Ubicación de las imágenes con
+  información de GPS en la ciudad de Salamanca.}
   \label{fig:dataset-location-distribution}
 \end{figure}
 
-Las fotografías fueron tomadas entre los años $2022$ y $2023$ con un
-dispositivo móvil Samsung, presentando en su mayoría una resolución de $4032
-\times 2268$ píxeles. No se ha aplicado ningún tipo de filtrado ni
-postprocesado sobre las imágenes originales, de modo que la evaluación opera
-directamente sobre el material en bruto.
+Las fotografías comenzaron a tomarse a mediados de $2022$, aunque no fue hasta
+el otoño de ese mismo año que se intensificó la toma de imágenes, capturando
+prácticamente el corpus completo en el mes de octubre de ese año. Durante el
+primer trimestre de $2023$ se tomaron las últimas 500 fotografías de manera más
+dispersa, como se puede ver en la figura~\ref{fig:dataset-capture-evolution}.
+
+Todas las imágenes se tomaron con un teléfono móvil, en especifico con un
+Samsung Galaxy S7 Edge. La resolución de las imágenes suele ser de $4032 \times
+3024$ o $4032 \times 2268$ píxeles, con una definición media de $10.6$~MP. No
+se ha aplicado ningún tipo de filtrado ni postprocesado sobre las imágenes
+originales más que el realizado por defecto por el dispositivo, de modo que la
+evaluación opera directamente sobre el material en bruto.
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{figures/dataset-evolution.pdf}
+  \caption[Progreso de la toma de imágenes de grafiti]{Progreso de toma de imágenes
+  de grafiti a lo largo del tiempo. La gran mayoría de las imágenes se
+capturaron en el otoño de 2022. Durante el primer trimestre de 2023 se
+añadieron las últimas 500 imágenes al corpus.}
+  \label{fig:dataset-capture-evolution}
+\end{figure}
 
 De manera adicional a este banco de datos, se dispone de otro conjunto de
 $1106$ imágenes de la ciudad de Cuenca cedidas por la iniciativa
