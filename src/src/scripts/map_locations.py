@@ -41,7 +41,7 @@ def dms_to_dd(dms, ref: str) -> float:
     return -dd if ref in ("S", "W") else dd
 
 
-def extract_gps(image_path: str) -> tuple[float, float] | None:
+def extract_gps(image_path: str, filter_salamanca: bool = True) -> tuple[float, float] | None:
     try:
         with Image.open(image_path) as img:
             exif = img._getexif()
@@ -52,20 +52,21 @@ def extract_gps(image_path: str) -> tuple[float, float] | None:
             return None
         lat = dms_to_dd(gps[2], gps[1])
         lon = dms_to_dd(gps[4], gps[3])
-        if not (SALAMANCA_LAT[0] <= lat <= SALAMANCA_LAT[1]):
-            return None
-        if not (SALAMANCA_LON[0] <= lon <= SALAMANCA_LON[1]):
-            return None
+        if filter_salamanca:
+            if not (SALAMANCA_LAT[0] <= lat <= SALAMANCA_LAT[1]):
+                return None
+            if not (SALAMANCA_LON[0] <= lon <= SALAMANCA_LON[1]):
+                return None
         return lat, lon
     except Exception:
         return None
 
 
-def collect_coords(dataset_roots: list[str]) -> tuple[np.ndarray, np.ndarray]:
+def collect_coords(dataset_roots: list[str], filter_salamanca: bool = True) -> tuple[np.ndarray, np.ndarray]:
     lats, lons = [], []
     for root in dataset_roots:
         for p in glob.glob(os.path.join(root, "**", "*.jpg"), recursive=True):
-            result = extract_gps(p)
+            result = extract_gps(p, filter_salamanca=filter_salamanca)
             if result:
                 lats.append(result[0])
                 lons.append(result[1])
@@ -92,13 +93,20 @@ def main() -> None:
     parser.add_argument(
         "--dpi", type=int, default=150, help="Figure DPI"
     )
+    parser.add_argument(
+        "--no-location-filter",
+        action="store_true",
+        help="Disable Salamanca bounding box filter and include all GPS coordinates",
+    )
     args = parser.parse_args()
 
+    filter_salamanca = not args.no_location_filter
     print("Extracting GPS coordinates…", flush=True)
-    lats, lons = collect_coords(args.dataset)
+    lats, lons = collect_coords(args.dataset, filter_salamanca=filter_salamanca)
     if len(lats) == 0:
         sys.exit("No GPS coordinates found — check the dataset path.")
-    print(f"  {len(lats)} images with valid Salamanca GPS")
+    location_label = "Salamanca " if filter_salamanca else ""
+    print(f"  {len(lats)} images with valid {location_label}GPS")
 
     # --- WGS84 → Web Mercator (EPSG:3857) for contextily compatibility ---
     transformer = Transformer.from_crs("EPSG:4326", "EPSG:3857", always_xy=True)
@@ -121,9 +129,9 @@ def main() -> None:
         print(f"  Warning: could not load basemap tiles ({e}). Figure saved without map background.")
 
     ax.set_axis_off()
+    title_loc = "Salamanca" if filter_salamanca else "todas las ubicaciones"
     ax.set_title(
-        f"Ubicaciones de fotografías de grafiti — Salamanca\n"
-        f"({len(lats)} imágenes)",
+        f"Ubicaciones de fotografías de grafiti — {title_loc}",
         fontsize=11,
     )
 
