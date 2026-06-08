@@ -25,6 +25,8 @@ dependencies = [
     "transformers>=5.7.0",
     "ultralytics>=8.4.26",
     "umap-learn>=0.5.12",
+    "contextily>=1.6.2",
+    "pyproj>=3.7.1",
 ]
 
 [project.scripts]
