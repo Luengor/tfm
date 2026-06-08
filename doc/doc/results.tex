@@ -29,7 +29,7 @@ identificador.
   E8a & Extractor $\times$ reducción $\times$ agrupamiento sobre etiquetas de estilo & SQLite, identidad, sin límite & 294 recortes, 4 clases, $K{=}3$ \\ \hline
   E8b & Extractor $\times$ reducción $\times$ agrupamiento sobre etiquetas de autoría & SQLite, identidad, sin límite & 185 recortes, 87 autores, $K{=}3$ \\ \hline
   E9 & Parámetros HNSW & \textit{Pipeline} base, PostgreSQL & $N{=}6416$, $K{=}5$ \\ \hline
-  \caption{Catálogo de barridos experimentales. El detalle metodológico común
+  \caption[Catálogo de barridos experimentales]{Catálogo de barridos experimentales. El detalle metodológico común
   (métricas, cronometría, repeticiones) se describe en \ref{sec:metodologia}.}
   \label{tab:catalogo-experimentos}
 \end{longtable}
@@ -83,7 +83,7 @@ $N=6416$.
   \texttt{dinov2\_graffiti\_style\_head}  & 562 & 0.202 & 0.155 & 27.9 & 1.70 & 0.74 \\ \hline
   \texttt{yolom}                          & 480 & 0.253 & 0.131 & 32.2 & 1.75 & 0.74 \\ \hline
   \texttt{yolon}                          & 348 & 0.341 & 0.085 & 51.2 & 1.91 & 0.81 \\ \hline
-  \caption{E1, calidad intrínseca a $N=6416$. Las CNN ImageNet encabezan la silueta; el extractor base
+  \caption[E1, calidad intrínseca a $N=6416$]{E1, calidad intrínseca a $N=6416$. Las CNN ImageNet encabezan la silueta; el extractor base
   (\texttt{dinov2\_graffiti\_style\_head}) presenta un CH (27.9) sólo superado
   por los \textit{backbones} YOLO, pese a una silueta inferior a la de su
   \textit{backbone} DINOv2.}
@@ -149,7 +149,7 @@ y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e1_silhouette_by_embedding.pdf}
-  \caption{E1: silueta por extractor a tres tamaños de banco. Las CNN ImageNet
+  \caption[E1, silueta por extractor]{E1: silueta por extractor a tres tamaños de banco. Las CNN ImageNet
   encabezan la columna, pero la cabeza estilística de DINOv2 invierte
   silueta/CH (ver texto).}
   \label{fig:e1-silhouette}
@@ -175,7 +175,7 @@ de corpus completo.
   UMAP-10     & 562 & 0.202 &  0.155 & 27.9 & 1.70 & 0.74 \\ \hline
   UMAP-50     & 558 & 0.195 &  0.154 & 27.8 & 1.71 & 0.70 \\ \hline
   Isomap-10   & 125 & 0.624 &  0.044 & 38.4 & 1.80 & 3.40 \\ \hline
-  \caption{E2, calidad intrínseca a $N=6416$. UMAP es la única reducción que
+  \caption[E2, calidad intrínseca a $N=6416$]{E2, calidad intrínseca a $N=6416$. UMAP es la única reducción que
   produce simultáneamente un número de clústeres no trivial, ruido moderado y
   tamaños balanceados.}
   \label{tab:e2-quality-6416}
@@ -215,7 +215,7 @@ general.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e2_reduction_quality_cost.pdf}
-  \caption{E2: calidad intrínseca (panel izquierdo) y coste por etapa (panel
+  \caption[E2, calidad y coste por reducción]{E2: calidad intrínseca (panel izquierdo) y coste por etapa (panel
   derecho) por familia de reducción a $N=6416$. La fila identidad produce una
   partición de cobertura muy baja (ruido $\sim$0.68) y traslada el coste a la
   etapa de \textit{clustering}.}
@@ -244,7 +244,7 @@ tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
   DBSCAN auto-$\varepsilon$ & 239 & 0.059 & -0.015 & 46 & 1.97 & 2.47 & 0.080 & 0.2 \\ \hline
   Aglom. \textit{avg} $k=10$ &  10 & 0.000 & -0.015 & 506 & 3.11 & 1.36 & 0.408 & 314.2 \\ \hline
   Espectral $k=10$       &  10 & 0.000 & -0.117 & 264 & 3.33 & 1.56 & 2.073 & 1.1 \\ \hline
-  \caption{E3, fila representativa de cada familia a $N=6416$. La columna
+  \caption[E3, fila representativa por familia a $N=6416$]{E3, fila representativa de cada familia a $N=6416$. La columna
   \textbf{mem} reporta el pico de RSS delta de la etapa de agrupamiento. Sólo
   HDBSCAN combina un número no trivial de clústeres, ruido moderado, tamaños
   balanceados, coste despreciable y huella de memoria mínima.}
@@ -277,7 +277,7 @@ presenta la peor silueta del panel) o por el escalado de memoria.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e3_pareto_quality_cost.pdf}
-  \caption{E3: calidad frente a coste por familia a $N=6416$ (eje horizontal
+  \caption[E3, calidad frente a coste por familia]{E3: calidad frente a coste por familia a $N=6416$ (eje horizontal
   logarítmico). Cada familia se representa por su mejor variante en silueta
   (marcador grande); los puntos pequeños son el resto de variantes. La línea
   discontinua marca el frente de Pareto: HDBSCAN (rojo) domina a todas excepto
@@ -288,7 +288,7 @@ presenta la peor silueta del panel) o por el escalado de memoria.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e3_scaling_with_n.pdf}
-  \caption{E3: escalado con el tamaño del banco $N$ por familia. Para cada $N$
+  \caption[E3, escalado por familia con $N$]{E3: escalado con el tamaño del banco $N$ por familia. Para cada $N$
   se selecciona la variante de mejor silueta dentro de la familia. El coste
   (izquierda) y la huella de memoria (centro) crecen varios órdenes de
   magnitud para OPTICS y aglomerativo mientras HDBSCAN se mantiene plano. El
@@ -318,7 +318,7 @@ tabla~\ref{tab:e4-mcs-6416} a $N=6416$.
    50 &   4 & 0.026 & 0.193 & 1404 & 2.01 & 0.86 \\ \hline
   100 &   2 & 0.008 & 0.269 & 2765 & 1.27 & 0.40 \\ \hline
   200 &   2 & 0.011 & 0.270 & 2776 & 1.27 & 0.40 \\ \hline
-  \caption{E4, barrido de \texttt{min\_cluster\_size} a $N=6416$. La silueta y
+  \caption[E4, barrido de \texttt{min\_cluster\_size} a $N=6416$]{E4, barrido de \texttt{min\_cluster\_size} a $N=6416$. La silueta y
   el CH alcanzan su máximo en los valores degenerados ($k{=}2$); el criterio
   conjunto sitúa el óptimo en \texttt{mcs}=5.}
   \label{tab:e4-mcs-6416}
@@ -366,7 +366,7 @@ YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}) manteniendo fijo el resto del
   YOLO11s             & 6590  & 1.03 &  502 & 0.225 & 0.127 & 30.4 & 1777.0 \\ \hline
   YOLO11m             & 6603  & 1.03 &  506 & 0.230 & 0.131 & 29.5 & 1811.6 \\ \hline
   YOLO11m \textit{ft} & 15362 & 2.39 & 1049 & 0.298 & 0.122 & 36.2 & 2152.3 \\ \hline
-  \caption{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
+  \caption[E5, calidad y coste de ingesta a $N=6416$]{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
   \enquote{recortes} son los puntos efectivamente agrupados, no las imágenes leídas).
   Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.}
   \label{tab:e5-segmenter-6416}
@@ -396,7 +396,7 @@ y el aumento de coste a medida que el tamaño del banco crece.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e5_yolo_detections.pdf}
-  \caption{Ejemplos de detecciones del detector de YOLO sobre imágenes del
+  \caption[Ejemplos de detecciones de YOLO]{Ejemplos de detecciones del detector de YOLO sobre imágenes del
   corpus. Cabe destacar que el modelo muchas veces no encuentra grafiti,
   recortando la imagen completa. Esos casos no se muestran aquí.}
   \label{fig:e5-yolo-detections}
@@ -436,7 +436,7 @@ complejidad teórica de referencia.
   2000 &  455.9 &  4.542 & 0.1106 & 0.0047 & 0.0427 & 306.81 \\ \hline
   3500 &  776.0 & 11.870 & 0.1863 & 0.0066 & 0.1405 & 995.52 \\ \hline
   6416 & 1294.9 &  6.237 & 0.3580 & 0.0098 & 0.5988 & 3266.60 \\ \hline
-  \caption{E7, tiempo por etapa frente a $N$ (extracto). A $N=6416$ la búsqueda
+  \caption[E7, tiempo por etapa frente a $N$]{E7, tiempo por etapa frente a $N$ (extracto). A $N=6416$ la búsqueda
   por similitud SQLite domina absolutamente, con la ingesta como segundo coste.
 La caída de UMAP a $N=6416$ se discute en el texto.}
   \label{tab:e7-cost}
@@ -455,7 +455,7 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
   HDBSCAN                & $O(n\log n)$ amort. & 1.53 & 1.84 \\ \hline
   Aglomerativo           & $O(n^2 \log n)$   & 1.77 & 1.76 \\ \hline
   Búsqueda (SQLite)      & $O(n^2)$ por pasada & \textbf{2.10} & 2.13 \\ \hline
-  \caption{E7, pendientes observadas (regresión log-log) por etapa, comparadas
+  \caption[E7, pendientes observadas por etapa]{E7, pendientes observadas (regresión log-log) por etapa, comparadas
   con la complejidad teórica de referencia. La ventana $500\ldots3500$ excluye
   el punto $N=6416$ de reducción (anomalía pynndescent, ver texto).}
   \label{tab:e7-slopes}
@@ -496,7 +496,7 @@ que se reportan dos pendientes distintas en la tabla~\ref{tab:e7-slopes}.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e7_scalability_loglog.pdf}
-  \caption{E7 (figura titular): tiempo de pared vs $N$ por etapa del
+  \caption[E7, tiempo de pared vs $N$ por etapa]{E7 (figura titular): tiempo de pared vs $N$ por etapa del
   \textit{pipeline}, escala log-log. La pendiente de la búsqueda por
   similitud SQLite ($\approx 2.10$) confirma el coste $O(n^2)$ por pasada.
   La caída de UMAP a $N=6416$ refleja el cambio interno a pynndescent.}
@@ -506,7 +506,7 @@ que se reportan dos pendientes distintas en la tabla~\ref{tab:e7-slopes}.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e7_memory.pdf}
-  \caption{E7: memoria pico por etapa. El aglomerativo materializa la matriz
+  \caption[E7, memoria pico por etapa]{E7: memoria pico por etapa. El aglomerativo materializa la matriz
   $O(n^2)$ de distancias y crece cuadráticamente con $N$; HDBSCAN, DBSCAN y
   OPTICS se mantienen sublineales.}
   \label{fig:e7-memory}
@@ -538,7 +538,7 @@ acumula sobre el tiempo de consulta.
   6416 & SQLite             & 43.10 &    149 & --     & --    \\ \hline
   6416 & PostgreSQL exacto  & 0.578 & 11 109 & 0.0    & --    \\ \hline
   6416 & PostgreSQL + HNSW  & 0.179 & 35 936 & 0.465  & 1.000 \\ \hline
-  \caption{E6, latencia, \textit{throughput} y \textit{recall} de la búsqueda
+  \caption[E6, latencia y \textit{recall} por \textit{backend}]{E6, latencia, \textit{throughput} y \textit{recall} de la búsqueda
   por similitud por \textit{backend} y tamaño de banco. SQLite escala
   linealmente en tiempo por consulta; pgvector exacto está dominado por la
   latencia de \textit{round-trip} en los tamaños pequeños; HNSW sólo se
@@ -583,7 +583,7 @@ botella $O(n^2)$ de SQLite.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e6_e9_pareto.pdf}
-  \caption{E6+E9: latencia por consulta (eje logarítmico) y \textit{recall}@5
+  \caption[E6+E9, latencia y \textit{recall}@5 por configuración HNSW]{E6+E9: latencia por consulta (eje logarítmico) y \textit{recall}@5
       por \textit{backend} y configuración HNSW a $N=6416$, una fila por
       configuración ordenada por latencia (cada barra anota su latencia y, para
       HNSW, el \textit{recall}). La configuración del barrido E6 aparece en rojo;
@@ -632,7 +632,7 @@ con distinto número de clústeres.
   \texttt{resnet50}                           & 0.334 & 0.277 & 0.548 & 0.058 & identidad + espectral  \\ \hline
   \texttt{mob.\_graffiti\_author\_head}       & 0.318 & 0.295 & 0.517 & 0.046 & UMAP + aglomerativo    \\ \hline
   \texttt{dinov2\_graffiti\_author\_head}     & 0.302 & 0.273 & 0.519 & 0.094 & UMAP + aglomerativo    \\ \hline
-  \caption{E8a, mejor celda por extractor sobre la evaluación de estilo (294
+  \caption[E8a, mejor celda por extractor (estilo)]{E8a, mejor celda por extractor sobre la evaluación de estilo (294
   recortes, 4 clases). El ranking sitúa las cabezas de autoría por debajo del
   \textit{backbone} en ambas familias, aunque con un margen modesto
   ($-0.054$ DINOv2, $-0.038$ MobileNetV3).}
@@ -680,7 +680,7 @@ del propio \textit{backbone}.
   \texttt{clip\_vit\_b32}                    & 0.669 & 0.792 & 0.825 \\ \hline
   \texttt{resnet50}                          & 0.654 & 0.789 & 0.829 \\ \hline
   \texttt{mob.\_graffiti\_author\_head}      & 0.639 & 0.775 & 0.799 \\ \hline
-  \caption{E8a, recuperación supervisada \textit{top-5} por extractor sobre
+  \caption[E8a, recuperación supervisada \textit{top-5} (estilo)]{E8a, recuperación supervisada \textit{top-5} por extractor sobre
   la evaluación de estilo. Reproduce el mismo ordenamiento que el ARI de la
   tabla~\ref{tab:e8a-best}, lo que descarta que el liderazgo de la cabeza
   estilística esté inducido por la elección de agrupador.}
@@ -701,7 +701,7 @@ gran mayoría de los \textit{pieces}. El tercero está formado por los
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.9\linewidth]{figures/e8a_hdbscan_3clusters.pdf}
-  \caption{Representación bidimensional de la distribución de los recortes de E8a
+  \caption[Distribución 2D de los recortes de E8a por clúster HDBSCAN]{Representación bidimensional de la distribución de los recortes de E8a
     en el espacio de características de la cabeza estilística de DINOv2, coloreados
     por los tres clústeres generados por HDBSCAN.}
   \label{fig:e8a-hdbscan}
@@ -734,7 +734,7 @@ y supera a la cabeza de estilo (0.041).
   \texttt{mob.\_graffiti\_author\_head}       & 0.048 & 0.627 & 0.077 & 0.021 & UMAP + aglo-30 \\ \hline
   \texttt{mobilenet\_v3}                      & 0.046 & 0.780 & 0.060 & 0.023 & UMAP + aglo-87 \\ \hline
   \texttt{mob.\_graffiti\_style\_head}        & 0.041 & 0.629 & 0.070 & 0.020 & UMAP + aglo-30 \\ \hline
-  \caption{E8b, mejor celda por extractor sobre la evaluación de autoría
+  \caption[E8b, mejor celda por extractor (autoría)]{E8b, mejor celda por extractor sobre la evaluación de autoría
   (185 recortes, 87 autores, evaluación entre ciudades Cuenca$\to$Salamanca).
   Todos los ARI caen en una banda estrecha cercana al suelo; la simetría
   esperada con E8a no se materializa.}
@@ -777,7 +777,7 @@ representación útil para esta tarea.
   \texttt{dinov2\_graffiti\_author\_head}    & 0.077 & 0.228 & 0.232 & 0.254 \\ \hline
   \texttt{mob.\_graffiti\_style\_head}       & 0.071 & 0.196 & 0.200 & 0.176 \\ \hline
   \texttt{dinov2\_graffiti\_style\_head}     & 0.065 & 0.226 & 0.229 & 0.192 \\ \hline
-  \caption{E8b, recuperación supervisada \textit{top-5} por extractor sobre
+  \caption[E8b, recuperación supervisada \textit{top-5} (autoría)]{E8b, recuperación supervisada \textit{top-5} por extractor sobre
   la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
   campo cabe en una banda estrecha; las cabezas de autoría quedan en la
   zona media en ambos ejes (ARI y $P@5$), coherentemente con un soporte
@@ -818,7 +818,7 @@ figura~\ref{fig:e8-correlacion} representa ambas relaciones.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/e8_correlation.pdf}
-  \caption{Silueta frente a ARI por ejecución en E8a (estilo) y E8b (autoría).
+  \caption[Silueta frente a ARI en E8a y E8b]{Silueta frente a ARI por ejecución en E8a (estilo) y E8b (autoría).
     Las rectas son ajustes por mínimos cuadrados sobre los agrupadores de $k$
     fijo (azul, continua) y sobre todas las celdas (gris, discontinua); en E8b se
     omiten porque el ARI no se despega del azar.}

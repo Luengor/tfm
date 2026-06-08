@@ -75,7 +75,7 @@ extrínsecas por estilo.
 \begin{figure}[h]
   \centering
   \includegraphics[width=\linewidth]{figures/dataset_style_distribution.pdf}
-  \caption{Distribución por clase de los recortes etiquetados por estilo,
+  \caption[Distribución por clase de los recortes etiquetados]{Distribución por clase de los recortes etiquetados por estilo,
   separando los subconjuntos de entrenamiento y evaluación.}
   \label{fig:dataset-style-distribution}
 \end{figure}
@@ -98,7 +98,7 @@ su propósito, procedencia y tamaño.
     Detección & Ajuste del detector & Ambos bancos & $447$ \\ \hline
     No superv. & Agrupamiento & Salamanca (disjunto) & $6416$ \\ \hline
   \end{tabular}
-  \caption{Subconjuntos empleados (en recortes, salvo detección y no
+  \caption[Subconjuntos etiquetados empleados]{Subconjuntos empleados (en recortes, salvo detección y no
   supervisión, en imágenes). Los recortes de entrenamiento nunca se solapan con
   los de evaluación.}
   \label{tab:subconjuntos}
@@ -369,7 +369,7 @@ producido sea directamente comparable mediante distancia coseno
           label=below:{\scriptsize Cabeza entrenada}] {};
   \end{tikzpicture}%
   \shorthandon{<>}%
-  \caption{Cabeza de proyección ajustada a grafiti. El \textit{backbone} permanece
+  \caption[Cabeza de proyección ajustada a grafiti]{Cabeza de proyección ajustada a grafiti. El \textit{backbone} permanece
     congelado y solo se entrena una secuencia ligera de capas para luego normalizar
     la salida a norma unitaria.}
   \label{fig:cabeza-proyeccion}
