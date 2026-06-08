@@ -691,12 +691,16 @@ del propio \textit{backbone}.
 HDBSCAN no parece llegar a distinguir las cuatro categorías de estilo posibles
 como clústeres separados, sino que las agrupa en tres grupos. Tras una revisión
 manual de los clústeres generados, parece que HDBSCAN agrupa los grafitis en
-\enquote{sencillos}, \enquote{elaborados} y \enquote{characters} (color naranja, verde y azul en
-la figura~\ref{fig:e8a-hdbscan}). El primero de estos grupos está
-principalmente formado por \textit{tags} y algunos \textit{throw-ups} más
-simples. El segundo está formado por \textit{throw-ups} más elaborados y la
-gran mayoría de los \textit{pieces}. El tercero está formado por los
-\textit{characters} de estilo cómic, manga o grafiti de personajes.
+\enquote{sencillos}, \enquote{elaborados} y \enquote{characters} (color
+naranja, verde y azul en la figura~\ref{fig:e8a-hdbscan}). El primero de estos
+grupos, con unos 150 recortes, está principalmente formado por \textit{tags} y
+algunos \textit{throw-ups} más simples (figura~\ref{fig:e8a-cluster-simple}).
+El segundo, con aproximadamente 120 recortes, está formado por
+\textit{throw-ups} más elaborados y la gran mayoría de los \textit{pieces}
+(figura~\ref{fig:e8a-cluster-elaborate}). El tercero y el más pequeño con
+diferencia, con solo 17 recortes, está formado por los \textit{characters} de
+estilo cómic, manga o grafiti de personajes
+(figura~\ref{fig:e8a-cluster-character}.
 
 \begin{figure}[h]
   \centering
@@ -705,6 +709,27 @@ gran mayoría de los \textit{pieces}. El tercero está formado por los
     en el espacio de características de la cabeza estilística de DINOv2, coloreados
     por los tres clústeres generados por HDBSCAN.}
   \label{fig:e8a-hdbscan}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{figures/cluster_simple.pdf}
+    \caption{Ejemplo del clúster de sencillo.}
+    \label{fig:e8a-cluster-simple}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{figures/cluster_elaborate.pdf}
+    \caption{Ejemplo del clúster de elaborado.}
+    \label{fig:e8a-cluster-elaborate}
+\end{figure}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\linewidth]{figures/cluster_characters.pdf}
+    \caption{Ejemplo del clúster de personajes.}
+    \label{fig:e8a-cluster-character}
 \end{figure}
 
 \subsubsection{Evaluación por autor}
