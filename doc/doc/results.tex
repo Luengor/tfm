@@ -412,7 +412,6 @@ Esta conclusión cierra la configuración base del trabajo y la fija como:
 \texttt{mcs}=5~+~segmentador identidad~+~SQLite. Es la configuración sobre la
 que se asientan las subsecciones siguientes.
 
-% =====================================================================
 \subsection{Coste computacional}
 \label{subsec:res-coste}
 Este es uno de los ejes centrales del trabajo: caracterizar empíricamente cómo
@@ -596,7 +595,6 @@ botella $O(n^2)$ de SQLite.
   \label{fig:similaritysearch-pareto}
 \end{figure}
 
-% =====================================================================
 \subsection{Validación supervisada}
 \label{subsec:res-supervisada}
 Cuando se dispone de etiquetas, las métricas extrínsecas miden directamente la
@@ -818,15 +816,6 @@ representación útil para esta tarea.
 
 \subsubsection{Correlación interna-externa}
 \label{subsubsec:res-correlacion}
-% VALORES VERIFICADOS (recomputados de exp/exp08{a,b}/output/*.json, fusión
-% newest-wins por run_id; coinciden con exp/exp08{a,b}/report.md):
-%   E8a oracle-k partitional (kmeans/agglo/spectral): r=+0.781  n=48  p~6e-11
-%   E8a todas las celdas con ARI válido (+HDBSCAN):    r=+0.545  n=89  p~3e-8
-%   E8b todas con ARI válido y >1 clúster:             r=-0.542  n=89  p~4e-8
-%   E8b solo aglomerativo:                             r=-0.126  n=32  p~0.49 (NO sig.)
-% Clave de fusión = run_id (hash de config con params); run_name NO es único
-% (variantes mcs de HDBSCAN y k de aglomerativo comparten nombre). n es 48-89,
-% NO 8: la correlación es sobre celdas, no sobre el mejor-por-extractor.
 Esta última subsección responde a si las métricas intrínsecas guardan alguna
 relación clara con las extrínsecas. Sobre los resultados de E8a y E8b se calcula
 la correlación de Pearson entre la silueta y el ARI a nivel de celda (cada celda

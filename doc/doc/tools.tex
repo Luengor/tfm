@@ -134,7 +134,6 @@ su propósito, procedencia y tamaño.
 
 \subsection{Marco conceptual}
 \label{subsec:conceptos}
-% Conceptos teóricos necesarios para interpretar la evaluación.
 
 \subsubsection{Representación vectorial y métricas de distancia}
 \label{subsec:fundamentos}
@@ -146,7 +145,7 @@ características preentrenados sobre tareas de visión generalistas, que se
 aplican directamente sobre las imágenes de grafiti o sobre recortes de las
 mismas. Para las redes de clasificación como pueden ser ResNet o VGG, se accede
 a esta representación eliminando las últimas capas de los modelos, que suelen
-corresonder a la tarea de clasificación, y quedándonos con la representación
+corresponder a la tarea de clasificación, y quedándonos con la representación
 latente previa. Otros modelos como DINOv2 o CLIP están entrenados
 específicamente para devolver una representación vectorial de la imagen, por lo
 que no es necesario modificar su arquitectura para acceder a los
@@ -295,7 +294,7 @@ agrupamiento o a un agrupamiento en el que los puntos más difíciles de
 clasificar se han descartado como ruido o se han agrupado en un clúster muy
 grande.
 
-% TODO: extend this a bit too
+% TODO: a lo mejor extender esto un poco tb 
 Adicionalmente, sobre los recortes de evaluación etiquetados por estilo o
 autoría se calculan métricas extrínsecas que sí utilizan la verdad fundamental
 disponible: el índice de Rand ajustado (ARI), la información mutua normalizada
@@ -304,8 +303,6 @@ métricas internas en el plano de calidad.
 
 \subsection{Componentes implementados}
 \label{subsec:configuraciones}
-% Catálogo de implementaciones intercambiables que cubren cada pieza del
-% sistema modular. Tabla resumen de opciones por componente.
 
 \subsubsection{Modelos de extracción de características}
 Todos los modelos se utilizan congelados, sin reentrenar sus pesos. En algunos
@@ -404,9 +401,6 @@ el resto del \textit{pipeline}.
 
 \subsection{Extensiones específicas para grafiti}
 \label{subsec:extras}
-% Componentes adicionales centrados en el dominio de grafiti. No forman
-% parte del núcleo de la evaluación de rendimiento, pero amplían el espacio
-% de configuraciones evaluable.
 
 \subsubsection{Segmentador YOLO}
 \label{subsubsec:segmentador}
@@ -476,7 +470,6 @@ producido sea directamente comparable mediante distancia coseno
     \draw[->] (l1)--(relu); \draw[->] (relu)--(l2); \draw[->] (l2)--(norm);
     \draw[->] (norm)--(e);
 
-    % caja "cabeza" alrededor de la parte entrenada
     \node[draw, dotted, fit=(l1)(relu)(l2), inner sep=2mm,
           label=below:{\scriptsize Cabeza entrenada}] {};
   \end{tikzpicture}%

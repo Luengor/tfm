@@ -2,7 +2,7 @@
 \section{Conclusiones}
 \label{sec:conclusion}
 
-Este trabajo plantaba como objetivo general diseñar y evaluar un sistema
+Este trabajo planteaba como objetivo general diseñar y evaluar un sistema
 modular para el agrupamiento de imágenes de grafiti, con un enfoque específico
 en la evaluación del coste computacional y la calidad del agrupamiento en
 función del tamaño del conjunto de datos. Los resultados obtenidos permiten
@@ -13,19 +13,21 @@ futuro.
 \subsection{Resultados principales}
 \label{sec:main-results}
 
-% TODO: fact check this
-En cuanto al coste computacional, el barrido de escalabilidad (E7) confirma que
-la etapa de ingesta es la más costosa en tiempo y memoria, pero también la que
-mejor escala, de manera completamente predecible. Por otro lado, la etapa de
-reducción de dimensionalidad con UMAP muestra un comportamiento más complejo,
-puesto que presenta dos regímenes de ejecución distintos dependiendo del tamaño
-de la muestra y de la activación de \texttt{pynndescent}. El agrupamiento con
-HDBSCAN es despreciable en coste a esta escala, mientras que otros agrupadores
-como el algomerativo u OPTICS empiezan a encontrarse con limitaciones de
-memoria o tiempo respectivamente. Finalmente, la búsqueda exacta sobre SQLite
-confirma su coste cuadrático. Frente a esto, la búsqueda con PostgreSQL
-haciendo uso de un índice HNSW elimina este cuello de botella, ofreciendo un
-aumento de rendimiento de dos órdenes de magnitud a esta escala.
+En cuanto al coste computacional, el barrido de escalabilidad (E7) confirma
+que, a esta escala, la ingesta de imágenes es el proceso inevitable más
+costoso, aun con un escalado lineal. La búsqueda por similitud en el
+almacenamiento con SQLite se convierte en un proceso aun más costoso, con un
+escalado cuadrático, lo que lo convertiría en el cuello de botella la
+arquitectura de no ser por la existencia de alternativas como PostgreSQL con
+índices HNSW, que obtienen los mismos resultados de calidad a una frácción del
+coste.
+
+La etapa de reducción de dimensionalidad con UMAP muestra un comportamiento 
+complejo, puesto que presenta dos regímenes de ejecución distintos dependiendo
+del tamaño de la muestra y de la activación de \texttt{pynndescent}. El
+agrupamiento con HDBSCAN es despreciable en coste a esta escala, mientras que
+otros agrupadores como el aglomerativo u OPTICS empiezan a encontrarse con
+limitaciones de memoria o tiempo respectivamente.
 
 En cuanto a la calidad del agrupamiento, los barridos iniciales (de E1 a E5) se
 centraron en identificar combinaciones de componentes que ofrecieran un buen
@@ -55,15 +57,15 @@ representaciones útiles para esta tarea.
 \label{sec:future-work}
 
 Tres limitaciones del trabajo dejan abiertas extensiones directas. La primera y
-más evidente es estrecho rango de $N$ evaluado en el barrido de escalabilidad.
-Con solo 6416 imágenes reales, el barrido abarca $\approx 1.8$ décadas en
-escala logarítmica, insuficiente para distinguir con seguridad $O(n \log n)$ de
-$O(n^2)$ en las etapas intermedias. Esto sería relativamente sencillo de
-solucionar remuestreando con reemplazo los vectores DINOv2 ya calculados para
-aumentar el rango de $N$ lo que fuese necesario, pero afectaría a los
-resultados de calidad obtenidos, puesto que los valores remuestreados no tienen
-significado real. Esta solución sería exclusivamente de coste y se etiquetaría
-como proyección, no como medición.
+más evidente es el estrecho rango de $N$ evaluado en el barrido de
+escalabilidad. Con solo 6416 imágenes reales, el barrido abarca $\approx 1.4$
+décadas en escala logarítmica, insuficiente para distinguir con seguridad $O(n
+\log n)$ de $O(n^2)$ en las etapas intermedias. Esto sería relativamente
+sencillo de solucionar remuestreando con reemplazo los vectores DINOv2 ya
+calculados para aumentar el rango de $N$ lo que fuese necesario, pero afectaría
+a los resultados de calidad obtenidos, puesto que los valores remuestreados no
+tienen significado real. Esta solución sería exclusivamente de coste y se
+etiquetaría como proyección, no como medición.
 
 Tanto esta limitación como a la siguiente, la escasez de datos anotados por
 autoría, también podrían ser abordadas mediante una gran extensión del conjunto

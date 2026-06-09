@@ -26,7 +26,7 @@ otro permite aislar el coste computacional de cada etapa al medir
     io/.style={font=\footnotesize, align=center},
     lbl/.style={font=\scriptsize, midway, fill=white, inner sep=2pt},
   ]
-    % --- Fase de ingesta (fila superior, izquierda a derecha) ---
+    % ingesta
     \node[io] (img) {fotografía};
     \node[block, right=of img] (seg) {Segmentador};
     \node[block, right=of seg] (ext) {Extractor};
@@ -36,7 +36,7 @@ otro permite aislar el coste computacional de cada etapa al medir
     \draw[->] (seg)--(ext) node[lbl, above]{recortes};
     \draw[->] (ext)--(sto) node[lbl, above]{\textit{embeddings}};
 
-    % --- Fase de agrupamiento (fila inferior, izquierda a derecha) ---
+    % agrupamiento
     \node[block, below=14mm of seg] (red) {Reducción};
     \node[block, right=of red] (clu) {Agrupamiento};
     \node[io, right=of clu] (out) {clústeres\\y métricas};
@@ -44,11 +44,10 @@ otro permite aislar el coste computacional de cada etapa al medir
     \draw[->] (red)--(clu);
     \draw[->] (clu)--(out);
 
-    % carga masiva: del almacenamiento baja y enlaza con la reducción
+    % leer almacenamiento
     \draw[->] (sto.south) -- ++(0,-7mm) -| (red.north)
         node[lbl, pos=0.25, above]{carga masiva};
 
-    % --- Recuadros de fase ---
     \node[draw, dotted, fit=(img)(seg)(ext), inner sep=3mm,
           label=above:{\scriptsize Fase de ingesta (incremental)}] {};
     \node[draw, dotted, fit=(red)(clu)(out), inner sep=3mm,
@@ -378,7 +377,6 @@ de medición.
 
 \subsubsection{Detector de grafiti}
 \label{subsubsec:entrenamiento-detector}
-% TODO: actually get the number of boxes annotated in the dataset
 El detector se entrena a partir del subconjunto anotado descrito en
 \ref{subsec:dataset}, cuyas $447$ fotografías de ambos bancos contienen
 aproximadamente un total de $650$ cajas anotadas. El entrenamiento parte de los
