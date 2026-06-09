@@ -35,7 +35,6 @@ identificador.
 \end{longtable}
 }
 
-% =====================================================================
 \subsection{Calibración del pipeline}
 \label{subsec:res-calibracion}
 En esta sección se recorren las decisiones tomadas para el diseño de lo que se
@@ -359,7 +358,6 @@ El barrido E5 compara cuatro opciones de segmentación (imagen completa,
 YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}) manteniendo fijo el resto del
 \textit{pipeline}.
 
- 
 {\footnotesize
 \begin{longtable}{|p{2.5cm}|p{1.5cm}|p{1.0cm}|p{1.0cm}|p{1.1cm}|p{1.0cm}|p{1.0cm}|p{1.4cm}|} \hline
   \textbf{Segmentador} & \textbf{recortes} & \textbf{r/img} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{ingesta (s)} \\ \hline
@@ -390,20 +388,34 @@ con $N=6416$, donde obtiene casi 2.4 recortes sobre cada imagen original y
 degenera el agrupamiento, con un 29.8\% de ruido, una silueta de 0.122 y un
 coeficiente de variación de tamaños de 1.06, con mil cuarenta y nueve clústeres
 y una cola larga de clústeres pequeños. El coste de ingesta también se dispara
-a 2152~s, un 74\% más que la identidad. La explicación más plausible es que el
-detector \textit{fine-tuned} produce unos recortes de calidad muy variable,
-muchas veces llegando a no recortar la imagen y devolverla completa o
-recortando un área muy pequeña o que no contiene un grafiti. Esta variabilidad
-en los datos de entrada, junto con el hecho de que el extractor base no fue
+a 2152~s, un 74\% más que la identidad.
+
+Las razones de esta caída de calidad se vuelven más claras al consultar las
+métricas de validación del modelo de detección. En primer lugar, este
+obtiene una precisión de $0.849$ y un recall de $0.741$. Esto implica que,
+cuando el modelo detecta un grafiti, lo hace correctamente el 84.9\% de las
+veces, pero también que no anota uno de cada cuatro grafitis presentes en la
+imagen. Por otro lado, obtiene valores de $0.808$ y $0.603$ para mAP@0.5 y
+mAP@0.5-0.95 respectivamente. Esto nos indica que, incluso en los casos en los
+que el modelo detecta un grafiti, la caja delimitadora no se ajusta con mucha
+precisión al valor real, lo que sugiere que los recortes pueden ser de calidad
+variable.
+
+Con estos datos en mente, es posible que el modelo \textit{fine-tuned} produzca
+recortes de calidad muy variable, muchas veces llegando a no recortar la imagen
+y devolviéndola completa o dejando atrás varios grafitis. Esta variabilidad en
+los datos de entrada, junto con el hecho de que el extractor base no fue
 entrenado con recortes de este tipo, podría ser la causa de la caída de calidad
-y el aumento de coste a medida que el tamaño del banco crece.
+y el aumento de coste a medida que el tamaño del banco crece. En la
+figura~\ref{fig:e5-yolo-detections} se muestran ejemplos de detecciones del
+modelo obtenidas durante el proceso de entrenamiento. 
 
 \begin{figure}[h!]
   \centering
-  \includegraphics[width=\linewidth]{figures/e5_yolo_detections.pdf}
-  \caption[Ejemplos de detecciones de YOLO]{Ejemplos de detecciones del detector de YOLO sobre imágenes del
-  corpus. Cabe destacar que el modelo muchas veces no encuentra grafiti,
-  recortando la imagen completa. Esos casos no se muestran aquí.}
+  \includegraphics[width=\linewidth]{figures/val_batch2_pred.jpg}
+  \caption[Ejemplos de detecciones de YOLO]{Ejemplos de detecciones del
+  detector de YOLO durante el entrenamiento. Este es uno de los <<mejores>>
+  casos, en los que la gran mayoría de los grafitis son identificados. }
   \label{fig:e5-yolo-detections}
 \end{figure}
 
