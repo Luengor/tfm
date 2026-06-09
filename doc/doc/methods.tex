@@ -379,19 +379,22 @@ de medición.
 \label{subsubsec:entrenamiento-detector}
 El detector se entrena a partir del subconjunto anotado descrito en
 \ref{subsec:dataset}, cuyas $447$ fotografías de ambos bancos contienen
-aproximadamente un total de $650$ cajas anotadas. El entrenamiento parte de los
-pesos preentrenados sobre COCO y solo ajusta sus parámetros para la única clase
-de interés, \enquote{grafiti}.
+aproximadamente un total de $650$ cajas anotadas. Puesto que se trata de un
+número bastante reducido, se realiza una aumentación de datos bastante agresiva
+aplicando diversas transformaciones sobre las imágenes y sus cajas
+correspondientes. El entrenamiento parte de los pesos preentrenados sobre COCO
+y solo ajusta sus parámetros para la única clase de interés, \enquote{grafiti}.
 
 Se utilizan los hiperparámetros por defecto de la implementación de referencia,
 salvo el número de épocas, el tamaño de \textit{batch} y la resolución de
 entrada, que se fijan para encajar en la memoria de la GPU descrita en
 \ref{subsec:entorno}. El optimizador, las \textit{augmentations} (jitter HSV,
-escalado, volteo horizontal y \textit{mosaic}) y la \textit{learning rate} con
-\textit{warm-up} y el descenso por defecto del \textit{framework} (lineal) se
-mantienen en sus valores por defecto. El entrenamiento incorpora parada
-temprana cuando la métrica mAP@$0.5$ sobre validación no mejora durante un
-número fijo de épocas.
+escalado, volteos horizontales y verticales, cambios de perspectiva,
+rotaciones, traslaciones, oclusiones parciales de partes de la imagen y
+\textit{mosaic}) y la \textit{learning rate} con \textit{warm-up} y el descenso
+por defecto del \textit{framework} (lineal) se mantienen en sus valores por
+defecto. El entrenamiento incorpora parada temprana cuando la métrica mAP@$0.5$
+sobre validación no mejora durante un número fijo de épocas.
 
 \subsubsection{Cabezas de proyección}
 \label{subsubsec:entrenamiento-cabezas}
