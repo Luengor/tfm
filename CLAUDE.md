@@ -6,8 +6,6 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Master's thesis (TFM) on graffiti image clustering using deep learning embeddings. The system detects graffiti in images (via YOLO segmentation), generates embeddings, stores them, reduces dimensionality, and clusters them. A benchmarking framework evaluates combinations of these components.
 
-The title and description of the thesis is in `doc/enunciado.md`.
-
 ## Sources 
 From a Zotero project, all sources and other articles relevant to the project are stored in a sumarized form in the `papers` folder. Consider consulting these documents when the project requires performing or implementing a specific method, or when you need to understand the rationale behind a design decision.
 
@@ -142,18 +140,6 @@ Model paths are resolved **relative to the working directory** (i.e. run from `s
 
 Produces the custom `.pth` head weights. Contains triplet-loss trainer (`trainer.py`), supervised contrastive style trainer (`style_trainer.py`), dataset loaders (`dataset.py`), and sub-packages for MobileNet and DINOv2 head training (`mobilenet/`, `dino/`).
 
-### Data Preparation Scripts (`src/src/scripts/`)
-
-| Script | Purpose |
-|---|---|
-| `auto_annotate.py` | Run YOLO on raw images to produce initial annotations |
-| `annotate_cluttered.py` | Flag images with too many/ambiguous detections for manual review |
-| `crop_from_cvat.py` | Export crops from CVAT XML annotations into class-labeled folders |
-| `deduplicate_dataset.py` | Remove near-duplicate images using perceptual hashing |
-| `fine_tune_yolo.py` | Fine-tune YOLO detection model on the graffiti dataset |
-| `sample_and_annotate.py` | Sample a subset of images and prepare annotation batches |
-| `visualize_detections.py` | Draw YOLO detection boxes on images for inspection |
-
 ### Key Design Decisions
 
 - `KMeans`, `DBSCAN`, and `GMM` clusterers auto-detect the optimal number of clusters via the elbow method (KMeans/DBSCAN) or BIC (GMM) when `n_clusters`/`eps` is not provided. When a run does **not** pin `n_clusters` and uses multiple repeats, the runner auto-detects k on the first repeat and **propagates that k** to the remaining repeats — so repeats vary only by seed and the aggregated metrics describe a single partition family rather than a mix of different k. `clusters_per_repeat` is recorded for transparency.
@@ -162,10 +148,6 @@ Produces the custom `.pth` head weights. Contains triplet-loss trainer (`trainer
 - `HeadEmbeddingModel` wraps a frozen base model with a two-layer projection head (Linear → ReLU → Linear) trained for graffiti-specific similarity.
 - Extrinsic metrics are only computed for IdentitySegmenter runs (where the ground-truth filename mapping is unambiguous).
 
-## Configuration Reference
-
-See `doc/CLUSTERING_CONFIG.md` for clustering algorithm parameters and `doc/REDUCTION_CONFIG.md` for reduction algorithm parameters.
-
 ## Documentation
-The document for the Master's thesis lives in `doc/`. It's written in Latex, built with tectonicinto the `build` subfolder, and information about the format used can be checked on `infos/LATEX_GUIDE.md` and `doc/enunciado.md`
+The document for the Master's thesis lives in `doc/`. It's written in Latex, and built with tectonic into the `build` subfolder.
 
