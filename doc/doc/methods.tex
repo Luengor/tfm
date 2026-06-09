@@ -188,14 +188,17 @@ lugar de los tiempos de caché, que no reflejarían el coste real de la etapa.
 
 \subsubsection{Instrumentación y cronometría}
 \label{subsubsec:cronometria}
-El \textit{runner} de evaluación mide cuatro etapas: ingesta, reducción,
-agrupamiento y búsqueda por similitud. Cada una se envuelve en un gestor de
-contexto (\texttt{profile\_stage}) que registra los instantes de entrada y
-salida con \texttt{time.perf\_counter}, un reloj monotónico de alta resolución.
-La diferencia entre ambos instantes es el tiempo de pared (\textit{wall time})
-de la etapa, en segundos y con resolución de microsegundos. La preparación de
-componentes y la limpieza del almacenamiento quedan fuera del gestor de
-contexto y no se contabilizan.
+
+\begin{sloppypar}
+    El \textit{runner} de evaluación mide cuatro etapas: ingesta, reducción,
+    agrupamiento y búsqueda por similitud. Cada una se envuelve en un gestor de
+    contexto (\texttt{profile\_stage}) que registra los instantes de entrada y
+    salida con \texttt{time.perf\_counter}, un reloj monotónico de alta resolución.
+    La diferencia entre ambos instantes es el tiempo de pared (\textit{wall time})
+    de la etapa, en segundos y con resolución de microsegundos. La preparación de
+    componentes y la limpieza del almacenamiento quedan fuera del gestor de
+    contexto y no se contabilizan.
+\end{sloppypar}
 
 Para acotar la variabilidad entre ejecuciones, las etapas de reducción y
 agrupamiento se repiten $K$ veces dentro del mismo proceso, con las semillas
