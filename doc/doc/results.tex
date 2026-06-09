@@ -47,14 +47,15 @@ E4. El extractor base se elige a partir de los resultados supervisados de E8a,
 no a partir de E1, aunque este último es el primer experimento del hilo
 narrativo.
 
-A lo largo de toda la subsección las métricas intrínsecas (silueta, CH, DB) se
-leen siempre de forma conjunta con el número de clústeres, la fracción de ruido
-y el coeficiente de variación de los tamaños de clúster. Tal y como se mencionó
-en la sección anterior, leer la silueta o el CH de forma aislada lleva a
-inversiones consistentes del ranking, porque ambos premian configuraciones
-degeneradas: pocos clústeres grandes y bien separados (CH alto) o particiones
-binarias triviales (silueta alta). El juicio final se emite siempre sobre el
-criterio conjunto, no sobre la métrica.
+A lo largo de toda la subsección las métricas intrínsecas o de calidad
+intrínseca (silueta~$\uparrow$, CH~$\uparrow$, DB~$\downarrow$; definidas en
+\ref{subsubsec:metricas}) se leen siempre de forma conjunta con el número de
+clústeres, la fracción de ruido y el coeficiente de variación de los tamaños de
+clúster. Tal y como se mencionó en la sección anterior, leer la silueta o el CH
+de forma aislada lleva a inversiones consistentes del ranking, porque ambos
+premian configuraciones degeneradas: pocos clústeres grandes y bien separados
+(CH alto) o particiones binarias triviales (silueta alta). El juicio final se
+emite siempre sobre el criterio conjunto, no sobre la métrica.
 
 \subsubsection{Extractor de características}
 \label{subsubsec:res-extractor}
@@ -86,7 +87,7 @@ $N=6416$.
   \caption[E1, calidad intrínseca a $N=6416$]{E1, calidad intrínseca a $N=6416$. Las CNN ImageNet encabezan la silueta; el extractor base
   (\texttt{dinov2\_graffiti\_style\_head}) presenta un CH (27.9) sólo superado
   por los \textit{backbones} YOLO, pese a una silueta inferior a la de su
-  \textit{backbone} DINOv2.}
+  \textit{backbone} DINOv2. \glosacalidad}
   \label{tab:e1-quality-6416}
 \end{longtable}
 }
@@ -177,7 +178,7 @@ de corpus completo.
   Isomap-10   & 125 & 0.624 &  0.044 & 38.4 & 1.80 & 3.40 \\ \hline
   \caption[E2, calidad intrínseca a $N=6416$]{E2, calidad intrínseca a $N=6416$. UMAP es la única reducción que
   produce simultáneamente un número de clústeres no trivial, ruido moderado y
-  tamaños balanceados.}
+  tamaños balanceados. \glosacalidad}
   \label{tab:e2-quality-6416}
 \end{longtable}
 }
@@ -247,7 +248,8 @@ tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
   \caption[E3, fila representativa por familia a $N=6416$]{E3, fila representativa de cada familia a $N=6416$. La columna
   \textbf{mem} reporta el pico de RSS delta de la etapa de agrupamiento. Sólo
   HDBSCAN combina un número no trivial de clústeres, ruido moderado, tamaños
-  balanceados, coste despreciable y huella de memoria mínima.}
+  balanceados, coste despreciable y huella de memoria mínima. \glosacalidad{}
+  \textit{clu}=tiempo de agrupamiento, \textit{mem}=pico de RSS delta.}
   \label{tab:e3-summary-6416}
 \end{longtable}
 }
@@ -320,7 +322,7 @@ tabla~\ref{tab:e4-mcs-6416} a $N=6416$.
   200 &   2 & 0.011 & 0.270 & 2776 & 1.27 & 0.40 \\ \hline
   \caption[E4, barrido de \texttt{min\_cluster\_size} a $N=6416$]{E4, barrido de \texttt{min\_cluster\_size} a $N=6416$. La silueta y
   el CH alcanzan su máximo en los valores degenerados ($k{=}2$); el criterio
-  conjunto sitúa el óptimo en \texttt{mcs}=5.}
+  conjunto sitúa el óptimo en \texttt{mcs}=5. \glosacalidad}
   \label{tab:e4-mcs-6416}
 \end{longtable}
 }
@@ -368,7 +370,10 @@ YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}) manteniendo fijo el resto del
   YOLO11m \textit{ft} & 15362 & 2.39 & 1049 & 0.298 & 0.122 & 36.2 & 2152.3 \\ \hline
   \caption[E5, calidad y coste de ingesta a $N=6416$]{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
   \enquote{recortes} son los puntos efectivamente agrupados, no las imágenes leídas).
-  Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.}
+  Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.
+  Columnas: r/img=recortes por imagen, cls=número de clústeres,
+  ruido=fracción de ruido~$\downarrow$, sil=silueta~$\uparrow$,
+  CH=Calinski--Harabász~$\uparrow$, ingesta=tiempo de ingesta.}
   \label{tab:e5-segmenter-6416}
 \end{longtable}
 }
