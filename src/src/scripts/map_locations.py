@@ -118,22 +118,17 @@ def main() -> None:
     ys = ys + rng.uniform(-args.jitter, args.jitter, size=ys.shape)
 
     # --- Plot ---
-    fig, ax = plt.subplots(figsize=(8, 7))
+    fig, ax = plt.subplots(figsize=(16, 12))
 
-    ax.scatter(xs, ys, c="#1f77b4", s=10, alpha=0.55, linewidths=0, zorder=3)
+    ax.scatter(xs, ys, c="#1f77b4", s=32, alpha=0.40, linewidths=0, zorder=3)
 
     # Basemap (OpenStreetMap)
     try:
-        cx.add_basemap(ax, crs="EPSG:3857", source=cx.providers.CartoDB.Positron, zoom="auto")
+        cx.add_basemap(ax, crs="EPSG:3857", source=cx.providers.Esri.WorldTopoMap, zoom="auto")
     except Exception as e:
         print(f"  Warning: could not load basemap tiles ({e}). Figure saved without map background.")
 
     ax.set_axis_off()
-    title_loc = "Salamanca" if filter_salamanca else "todas las ubicaciones"
-    ax.set_title(
-        f"Ubicaciones de fotografías de grafiti — {title_loc}",
-        fontsize=11,
-    )
 
     Path(args.output).parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(args.output, dpi=args.dpi, bbox_inches="tight")
