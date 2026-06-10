@@ -286,13 +286,13 @@ Esto penaliza el peor caso de cada agrupamiento, favoreciendo aquellos con
 clústeres bien separados y con baja dispersión intracluster.
 
 Puesto que algunos de los algoritmos admiten la clasificación de puntos como
-ruido, estas métricas se complementan con dos indicadores estructurales: la
-proporción de puntos clasificados como ruido y el coeficiente de variación del
-tamaño de los clústeres. Haciendo uso de estas métricas, se puede identificar
-si un valor anormalmente alto en las métricas de calidad se debe a un muy buen
-agrupamiento o a un agrupamiento en el que los puntos más difíciles de
-clasificar se han descartado como ruido o se han agrupado en un clúster muy
-grande.
+ruido, estas métricas se complementan con tres indicadores estructurales: el
+número de \textit{clusters}, la proporción de puntos clasificados como ruido y
+el coeficiente de variación del tamaño de los clústeres. Haciendo uso de estas
+métricas, se puede identificar si un valor anormalmente alto en las métricas de
+calidad se debe a un muy buen agrupamiento o a un agrupamiento en el que los
+puntos más difíciles de clasificar se han descartado como ruido o se han
+agrupado en un único clúster muy grande.
 
 % TODO: a lo mejor extender esto un poco tb 
 Adicionalmente, sobre los recortes de evaluación etiquetados por estilo o
