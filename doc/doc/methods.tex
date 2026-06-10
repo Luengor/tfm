@@ -289,17 +289,17 @@ clústeres resultantes.
 
 \subsubsection{Evaluación extrínseca sobre los subconjuntos etiquetados}
 \label{subsubsec:eval-extrinseca}
-La evaluación supervisada sigue las restricciones mencionadas anteriormente
+La evaluación supervisada hace uso de las métricas descritas anteriormente
 (sección \ref{subsubsec:metricas}) y opera sobre dos conjuntos de recortes
 etiquetados, uno por cada tarea supervisada del trabajo: evaluación por estilo
 y evaluación por autor. En ambos casos, se utilizan los recortes directamente
 como imágenes a evaluar en vez de aportar la imagen original y utilizar un
 segmentador para extraer los recortes de evaluación, porque el objetivo es
 medir la calidad del espacio de representación para agrupar pintadas, no la
-capacidad de un sistema completo. Tampoco se utilizan imágenes completas, puesto
-que muchas de estas contienen varias pintadas de estilos y autores distintos,
-haciendo difícil atribuir una etiqueta de estilo o autor a la imagen completa y
-complicando la interpretación de las métricas.
+capacidad de un sistema completo. Tampoco se utilizan imágenes completas,
+puesto que muchas de estas contienen varias pintadas de estilos y autores
+distintos, haciendo difícil atribuir una etiqueta de estilo o autor a la imagen
+completa y complicando la interpretación de las métricas.
 
 Ambas evaluaciones comparten métricas y procedimiento, pero responden a
 preguntas distintas, y esa diferencia justifica el reparto asimétrico de las
