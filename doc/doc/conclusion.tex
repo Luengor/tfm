@@ -17,9 +17,9 @@ En cuanto al coste computacional, el barrido de escalabilidad (E7) confirma
 que, a esta escala, la ingesta de imágenes es el proceso inevitable más
 costoso, aun con un escalado lineal. La búsqueda por similitud en el
 almacenamiento con SQLite se convierte en un proceso aun más costoso, con un
-escalado cuadrático, lo que lo convertiría en el cuello de botella la
+escalado cuadrático, lo que lo convertiría en el cuello de botella de la
 arquitectura de no ser por la existencia de alternativas como PostgreSQL con
-índices HNSW, que obtienen los mismos resultados de calidad a una frácción del
+índices HNSW, que obtienen los mismos resultados de calidad a una fracción del
 coste.
 
 La etapa de reducción de dimensionalidad con UMAP muestra un comportamiento 

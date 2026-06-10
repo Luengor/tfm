@@ -96,7 +96,7 @@ silueta y Calinski--Harabasz sobre ambas cabezas estilísticas. La silueta cae
 con respecto a su \textit{backbone} (DINOv2: 0.185 \(\to\) 0.155; MobileNetV3:
 0.260 \(\to\) 0.164) mientras que el CH sube en los dos casos (DINOv2: 19.2
 \(\to\) 27.9, solo superado por los \textit{backbones} YOLO; MobileNetV3: 13.1
-\(\to\) 19.7). Este fenómeno, aunque contra intuitivo a primera vista, puede
+\(\to\) 19.7). Este fenómeno, aunque contraintuitivo a primera vista, puede
 explicarse por la naturaleza del entrenamiento contrastivo y los datos
 utilizados: el \textit{contrastive loss} optimiza la relación entre la
 compactación de los \textit{clusters} y su separación (CH), pero no la cohesión
@@ -105,7 +105,7 @@ estilísticas, entrenadas con recortes y no con imágenes completas como aquí s
 evalúan, este cambio de dominio  junto con la función de pérdida explicaría la
 caída de la silueta.
 
-Las CNN ImageNet lideran la silueta (a $N=6416$: \texttt{mobilenet\_v3}=0,260,
+Las CNN ImageNet lideran la silueta (a $N=6416$: \texttt{mobilenet\_v3}=0.260,
 \texttt{resnet50}=0.257), con ruido bajo (0.078--0.118) y los clústeres más
 balanceados (csCV~$\approx$~0.5--0.7). Sin embargo, esto no significa que sean
 los mejores extractores para el agrupamiento de grafiti: es muy probable que
@@ -271,7 +271,7 @@ se ve completamente dominado en coste, con un tiempo de ejecución $\sim$25
 veces mayor y un uso de memoria $\sim$2500 veces mayor que HDBSCAN a $N=6416$.
 
 Por otro lado, entre los métodos particionales, GMM con selección de $k$ por
-BIC es la mejor alternativa si es necesario una agrupación sin ruido. El resto
+BIC es la mejor alternativa si es necesaria una agrupación sin ruido. El resto
 de métodos quedan dominados por baja calidad (DBSCAN es inestable, espectral
 presenta la peor silueta del panel) o por el escalado de memoria.
 
@@ -482,7 +482,7 @@ Como se puede ver en la segunda tabla, el rango reducido de $N$ provoca que
 varias de las etapas tengan pendientes observadas menores que la complejidad
 teórica de referencia, como puede ser el caso de DBSCAN o OPTICS. Algoritmos
 como HDBSCAN o el aglomerativo, con complejidades más altas, sí que presentan
-pendientes superiores a 1, dejando claro su naturaleza super-lineal. El tiempo
+pendientes superiores a 1, dejando clara su naturaleza super-lineal. El tiempo
 de ejecución de estos algoritmos fue prácticamente despreciable al compararlo
 con la ingesta o la búsqueda por similitud, no llegando a superar los 5~s en
 ningún caso. El único cuello de botella para el agrupamiento a esta escala es
@@ -589,7 +589,7 @@ en la figura~\ref{fig:similaritysearch-pareto}. Ninguna cae por debajo de
 \textit{recall} 0.990, y el ancla proporciona 0.321~s por consulta a
 \textit{recall} 0.995, 3.4 veces más rápida que el método exacto. Alcanzar
 \textit{recall} 1.000 sin penalizar la latencia es posible subiendo \texttt{m}
-a 32 o \texttt{ef\_construction} a 256; ambas son parámetros para la
+a 32 o \texttt{ef\_construction} a 256; ambos son parámetros para la
 construcción, preferibles a \texttt{ef\_search} en un flujo de \enquote{ingesta única,
 muchas consultas} porque su sobrecoste se amortiza una sola vez. A esta
 escala, parece que el uso de HNSW proporciona una mejora de latencia muy
@@ -715,7 +715,7 @@ El segundo, con aproximadamente 120 recortes, está formado por
 (figura~\ref{fig:e8a-cluster-elaborate}). El tercero y el más pequeño con
 diferencia, con solo 17 recortes, está formado por los \textit{characters} de
 estilo cómic, manga o grafiti de personajes
-(figura~\ref{fig:e8a-cluster-character}.
+(figura~\ref{fig:e8a-cluster-character}).
 
 \begin{figure}[h!]
   \centering
@@ -796,7 +796,7 @@ partida, pero su uso provocaría un sesgo de selección importante al evaluar
 sobre el mismo conjunto utilizado para pre-entrenar la red.
 
 El problema de recuperación sigue la misma tendencia que el anterior,
-empeorando aun más la posición de las cabezas de autoría. CLIP sigue siendo el
+empeorando aún más la posición de las cabezas de autoría. CLIP sigue siendo el
 mejor recuperador (P@5~$=0.091$), seguido de cerca por ResNet50 (0.085),
 MobileNetV3 (0.083), DINOv2 base (0.081) y las dos cabezas de autoría
 (MobileNetV3 0.078, DINOv2 0.077): todos dentro de un rango estrecho. En este

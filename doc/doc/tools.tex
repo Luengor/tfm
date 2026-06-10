@@ -30,7 +30,7 @@ prácticamente el corpus completo en el mes de octubre de ese año. Durante el
 primer trimestre de $2023$ se tomaron las últimas 500 fotografías de manera más
 dispersa, como se puede ver en la figura~\ref{fig:dataset-capture-evolution}.
 
-Todas las imágenes se tomaron con un teléfono móvil, en especifico con un
+Todas las imágenes se tomaron con un teléfono móvil, en específico con un
 Samsung Galaxy S7 Edge. La resolución de las imágenes suele ser de $4032 \times
 3024$ o $4032 \times 2268$ píxeles, con una definición media de $10.6$~MP. No
 se ha aplicado ningún tipo de filtrado ni postprocesado sobre las imágenes
@@ -174,7 +174,7 @@ calculando la distancia a cada uno de ellos. Este método es ineficiente en
 cuanto a velocidad y memoria, pero garantiza la recuperación del vecino más
 cercano real. Por otro lado, el segundo enfoque hace uso de un índice HNSW
 sobre PostgreSQL, que organiza la información en una estructura de grafo
-jerárquicos de vecinos más cercanos. Al recibir una consulta, el índice recorre
+jerárquico de vecinos más cercanos. Al recibir una consulta, el índice recorre
 la lista de vecinos más cercanos a la consulta, y a su vez los vecinos de
 estos, hasta encontrar el mínimo local. Este método es mucho más eficiente,
 aunque no garantiza la recuperación del vecino más cercano real, sino de un
@@ -184,7 +184,7 @@ Para evaluar esto último, al utilizar el índice HNSW también se realiza una
 búsqueda por fuerza bruta y se comparan los resultados obtenidos por ambos
 métodos, cuantificando el porcentaje de vecinos más cercanos reales recuperados
 por el índice. Además, cuando el dataset utilizado dispone de etiquetas se
-evalua también la calidad de la búsqueda por similitud. En estos casos se
+evalúa también la calidad de la búsqueda por similitud. En estos casos se
 calculan métricas como la precisión y \textit{recall} a $k$ que cuantifican el
 porcentaje de elementos relevantes recuperados respecto a los $k$ buscados
 (P@$k$) o al total de elementos relevantes (R@$k$). También se calculan el
@@ -200,7 +200,7 @@ cada clúster por su media y buscan minimizar la varianza intracluster. Esto los
 hace bastante eficientes, pero también sensibles a la forma y al solapamiento
 de los grupos. Por esto, estos algoritmos no suelen dar los mejores resultados
 cuando los datos no se agrupan en formas esféricas bien separadas o cuando los
-distintos grupos tiene una cantidad de puntos muy desigual (como es el caso de
+distintos grupos tienen una cantidad de puntos muy desigual (como es el caso de
 este trabajo).
 
 Los algoritmos basados en densidad, como DBSCAN, OPTICS y HDBSCAN, definen un
@@ -221,7 +221,7 @@ descomposición espectral de una matriz de similitud para reducir la
 dimensionalidad antes de aplicar un método de agrupamiento tradicional; y los
 métodos jerárquicos, que construyen un dendrograma de fusiones o divisiones
 sucesivas del que pueden extraerse particiones a distintos niveles de
-granularidad. Estos algorimos resultan ser útiles para tratar con datos con
+granularidad. Estos algoritmos resultan ser útiles para tratar con datos con
 estructuras más complejas, aunque su coste computacional suele ser mayor que el
 de los métodos más simples (especialmente \textit{affinity propagation} y los
 métodos basados en modelos probabilísticos).
@@ -247,7 +247,7 @@ datos sobre los ejes que generan la máxima varianza. Esto los hace eficientes,
 pero los limita a capturar relaciones lineales entre las características.
 Kernel PCA~\cite{scholkopf_nonlinear_1998} resuelve este problema calculando
 esta varianza en un espacio de características no lineal, permitiendo capturar
-relacciones más complejas a costa de un mayor coste computacional.
+relaciones más complejas a costa de un mayor coste computacional.
 
 Otras técnicas no lineales, como Isomap~\cite{tenenbaum_global_2000} o
 UMAP~\cite{mcinnes_umap_2020} buscan preservar relaciones de vecindad en el
@@ -274,7 +274,7 @@ Calinski--Harabász~\cite{calinski_dendrite_1974} y el índice de
 Davies--Bouldin~\cite{davies_cluster_1979}. El primero de estos mide, para cada
 punto, la diferencia entre la distancia media a los puntos del \textit{cluster}
 más cercano y la distancia media a los puntos de su propio \textit{cluster},
-normalizada por la mayor de las dos. Esta favorece a los agrupamientos con
+normalizada por la mayor de las dos. Este favorece a los agrupamientos con
 clústeres compactos y bien separados. El índice de Calinski--Harabász fomenta
 clústeres muy compactos y separados entre sí al medir la razón entre la
 varianza intercluster y la varianza intracluster, penalizando los agrupamientos
@@ -494,7 +494,7 @@ MobileNetV3 $1280\to128$).
 
 \subsection{Entorno de ejecución}
 \label{subsec:entorno}
-Los experimentos se realizaron en el ordenador personal del autor: Un portátil
+Los experimentos se realizaron en el ordenador personal del autor: un portátil
 con CPU AMD Ryzen 7 5800H, GPU NVIDIA GeForce GTX 1650 y 16 GB de RAM DDR4. El
 entorno de ejecución se basa en Python 3.14 gestionado con \texttt{uv},
 empleando como dependencias nucleares PyTorch (2.10.0),
