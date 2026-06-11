@@ -46,26 +46,27 @@ entre los dos ejes de similitud evaluados. Sobre estilo (4 clases, 294
 recortes), la cabeza específica de DINOv2 alcanza ARI~=~0.722 y F1~=~0.806,
 mientras que los mejores extractores sin entrenar no superan ARI~=~0.368. Sobre
 autoría (87 autores, 185 recortes), todos los extractores caen en una banda
-ARI~=~0.041--0.076, cercana al azar. La causa más probable del fracaso en E8b
-es la combinación de un cambio de dominio Cuenca$\to$Salamanca, un número
-insuficiente de recortes por autor y la escasa variabilidad intraautor en el
-subconjunto disponible. No es un resultado que invalide las cabezas de autoría,
-sino que indica que el conjunto de datos anotado es insuficiente para entrenar
-representaciones útiles para esta tarea.
+ARI~=~0.041--0.076, cercana al azar. La causa más probable de la falta de éxito
+en E8b es la combinación de un cambio de dominio Cuenca$\to$Salamanca, un
+número insuficiente de recortes por autor y la escasa variabilidad intraautor
+en el subconjunto disponible. No es un resultado que invalide las cabezas de
+autoría, sino que indica que el conjunto de datos anotado es insuficiente para
+entrenar representaciones útiles para esta tarea.
 
 \subsection{Trabajo futuro}
 \label{sec:future-work}
 
-Tres limitaciones del trabajo dejan abiertas extensiones directas. La primera y
-más evidente es el estrecho rango de $N$ evaluado en el barrido de
-escalabilidad. Con solo 6416 imágenes reales, el barrido abarca $\approx 1.4$
-décadas en escala logarítmica, insuficiente para distinguir con seguridad $O(n
-\log n)$ de $O(n^2)$ en las etapas intermedias. Esto sería relativamente
-sencillo de solucionar remuestreando con reemplazo los vectores DINOv2 ya
-calculados para aumentar el rango de $N$ lo que fuese necesario, pero afectaría
-a los resultados de calidad obtenidos, puesto que los valores remuestreados no
-tienen significado real. Esta solución sería exclusivamente de coste y se
-etiquetaría como proyección, no como medición.
+Aunque el trabajo ha permitido obtener las conclusiones antes destacadas, queda
+abierta la vía para la extensión del trabajo a partir de la superación de
+algunas limitaciones presentes. La más evidente es el estrecho rango de $N$
+evaluado en el barrido de escalabilidad. Con solo 6416 imágenes reales, el
+barrido abarca $\approx 1.4$ décadas en escala logarítmica, insuficiente para
+distinguir con seguridad $O(n \log n)$ de $O(n^2)$ en las etapas intermedias.
+Esto sería relativamente sencillo de solucionar remuestreando con reemplazo los
+vectores DINOv2 ya calculados para aumentar el rango de $N$ lo que fuese
+necesario, pero afectaría a los resultados de calidad obtenidos, puesto que los
+valores remuestreados no tienen significado real. Esta solución sería
+exclusivamente de coste y se etiquetaría como proyección, no como medición.
 
 Tanto esta limitación como a la siguiente, la escasez de datos anotados por
 autoría, también podrían ser abordadas mediante una gran extensión del conjunto
