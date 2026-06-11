@@ -230,12 +230,12 @@ de los métodos más simples (especialmente \textit{affinity propagation} y los
 métodos basados en modelos probabilísticos).
 
 La principal dificultad en un escenario sin etiquetas es la selección del
-número de clústeres. K-medias y los modelos de mezcla requieren fijarlo a
-priori, y se recurre a heurísticas como el método del codo sobre la inercia o
-el criterio bayesiano de información (BIC). Los algoritmos basados en densidad
-y los jerárquicos lo evitan en su formulación, pero a cambio introducen otros
-hiperparámetros (umbrales de densidad, criterios de corte) cuyo ajuste también
-carece de un óptimo evidente sin verdad fundamental.
+número de clústeres. K-medias y los modelos de mezcla requieren fijarlo
+\textit{a priori}, y se recurre a heurísticas como el método del codo sobre la
+inercia o el criterio bayesiano de información (BIC). Los algoritmos basados en
+densidad y los jerárquicos lo evitan en su formulación, pero a cambio
+introducen otros hiperparámetros (umbrales de densidad, criterios de corte)
+cuyo ajuste también carece de un óptimo evidente sin verdad fundamental.
 
 \subsubsection{Reducción de dimensionalidad}
 \label{subsubsec:reduccion}
@@ -307,7 +307,7 @@ métricas internas en el plano de calidad.
 \subsubsection{Modelos de extracción de características}
 Todos los modelos se utilizan congelados, sin reentrenar sus pesos. En algunos
 casos se retiran las últimas capas que corresponden a la tarea de clasificación
-para acceder a la representación latente previa (ResNet50, VGG16 e InceptionV3
+para acceder a la representación latente previa (ResNet50, VGG16 e InceptionV3,
 por ejemplo). Para el resto de modelos se utiliza la propia API de extracción
 de características, que ya devuelve la representación latente sin necesidad de
 modificar la arquitectura (DINOv2, CLIP y YOLO). La

@@ -35,7 +35,7 @@ identificador.
 \end{longtable}
 }
 
-\subsection{Calibración del pipeline}
+\subsection{Calibración del \textit{pipeline}}
 \label{subsec:res-calibracion}
 En esta sección se recorren las decisiones tomadas para el diseño de lo que se
 considera el \textit{pipeline} base del proyecto, la configuración sobre la que
@@ -158,9 +158,9 @@ y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
 \subsubsection{Reducción de dimensionalidad}
 \label{subsubsec:res-reduccion}
 Reducir la dimensionalidad de los vectores de características es un paso común
-en los pipelines de agrupamiento. Sobre los vectores de 128 dimensiones de
-\texttt{dinov2\_graffiti\_style\_head}, el barrido (E2) compara seis
-configuraciones y revela a UMAP como la única familia que produce
+en los \textit{pipelines} de agrupamiento. Sobre los vectores de 128
+dimensiones de \texttt{dinov2\_graffiti\_style\_head}, el barrido (E2) compara
+seis configuraciones y revela a UMAP como la única familia que produce
 simultáneamente un número de clústeres no trivial, ruido moderado y tamaños
 balanceados. La tabla~\ref{tab:e2-quality-6416} resume el resultado al tamaño
 de dataset completo.
@@ -473,7 +473,7 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
   Búsqueda (SQLite)      & $O(n^2)$ por pasada & \textbf{2.10} & 2.13 \\ \hline
   \caption[E7, pendientes observadas por etapa]{E7, pendientes observadas (regresión log-log) por etapa, comparadas
   con la complejidad teórica de referencia. La ventana $500\ldots3500$ excluye
-  el punto $N=6416$ de reducción (anomalía pynndescent, ver texto).}
+el punto $N=6416$ de reducción (anomalía \texttt{pynndescent}, ver texto).}
   \label{tab:e7-slopes}
 \end{longtable}
 }
@@ -515,7 +515,7 @@ que se reportan dos pendientes distintas en la tabla~\ref{tab:e7-slopes}.
   \caption[E7, tiempo de pared vs $N$ por etapa]{E7 (figura titular): tiempo de pared vs $N$ por etapa del
   \textit{pipeline}, escala log-log. La pendiente de la búsqueda por
   similitud SQLite ($\approx 2.10$) confirma el coste $O(n^2)$ por pasada.
-  La caída de UMAP a $N=6416$ refleja el cambio interno a pynndescent.}
+La caída de UMAP a $N=6416$ refleja el cambio interno a \texttt{pynndescent}.}
   \label{fig:e7-scaling}
 \end{figure}
 
@@ -658,7 +658,7 @@ con distinto número de clústeres.
 El resultado es inequívoco: la cabeza estilística de DINOv2 + identidad +
 K-medias-4 obtiene ARI = 0.722 y F1 = 0.806, presenta más del doble del ARI del
 \textit{backbone} y de cualquier otro extractor sin entrenar. Va seguido por la
-cabeza estilística de MobileNetV3, que aunque no llega a doblar el ARI del
+cabeza estilística de MobileNetV3, que, aunque no llega a doblar el ARI del
 siguiente extractor, sí lo mejora sustancialmente (0.627 vs 0.368). El resto de
 extractores sin entrenar (CLIP, DINOv2 y MobileNetV3) se agrupan en un segundo
 bloque con ARI entre 0.33 y 0.37.

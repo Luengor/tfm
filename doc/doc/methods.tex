@@ -66,7 +66,7 @@ que habilita la evaluación combinatoria que forma el trabajo: cada combinación
 define una configuración independiente y reproducible cuyo coste y calidad
 pueden compararse con cualquier otra.
 
-\subsection{Pipeline operativo}
+\subsection{\textit{Pipeline} operativo}
 \label{subsec:pipeline}
 
 \subsubsection{Ingesta y generación de \textit{embeddings}}
@@ -246,11 +246,11 @@ se mantiene.
 \label{subsubsec:similarity-search}
 La medición del coste de búsqueda por similitud se realiza sobre los
 \textit{backends} de almacenamiento descritos anteriormente. Tras realizarse la
-ingesta, se seleccionan $n$ embeddings de manera aleatoria (pero reproducible)
-y se buscan los $k$ vecinos más próximos a cada uno de ellos, midiendo el
-tiempo total de las consultas. La distancia utilizada para la búsqueda puede
-ser tanto euclidiana como coseno, y el número de vecinos también es
-configurable. 
+ingesta, se seleccionan $n$ \textit{embeddings} de manera aleatoria (pero
+reproducible) y se buscan los $k$ vecinos más próximos a cada uno de ellos,
+midiendo el tiempo total de las consultas. La distancia utilizada para la
+búsqueda puede ser tanto euclidiana como coseno, y el número de vecinos también
+es configurable.
 
 El tiempo total de las consultas se mide con el mismo procedimiento que el
 resto de etapas. De la misma forma que en el almacenamiento, la búsqueda por
