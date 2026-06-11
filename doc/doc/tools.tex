@@ -204,15 +204,16 @@ los mejores resultados cuando los datos no se agrupan en formas esféricas bien
 separadas o cuando los distintos grupos tienen una cantidad de puntos muy
 desigual (como es el caso de este trabajo).
 
-Los algoritmos basados en densidad, como DBSCAN~\cite{ester_density-based_1996},
-OPTICS~\cite{ankerst_optics_1999} y HDBSCAN~\cite{campello_density-based_2013}, definen un
-clúster como una región conectada de alta densidad y permiten descartar puntos
-como ruido. Los tres algoritmos son muy similares; siendo OPTICS y HDBSCAN
-extensiones de DBSCAN que resuelven algunas de sus limitaciones como pueden ser
-el manejo de clústeres de distintas densidades o dando lugar a una estructura
-jerárquica de clústeres. Estos métodos son especialmente adecuados para datos
-con formas arbitrarias y con ruido, aunque su rendimiento puede degradarse en
-espacios de alta dimensionalidad, lo que motiva la reducción previa.
+Los algoritmos basados en densidad, como
+DBSCAN~\cite{ester_density-based_1996}, OPTICS~\cite{ankerst_optics_1999} y
+HDBSCAN~\cite{campello_density-based_2013}, definen un clúster como una región
+conectada de alta densidad y permiten descartar puntos como ruido. Los tres
+algoritmos son muy similares; siendo OPTICS y HDBSCAN extensiones de DBSCAN que
+resuelven algunas de sus limitaciones como pueden ser el manejo de clústeres de
+distintas densidades o la dificultad de ajustar el umbral de densidad. Estos
+métodos son especialmente adecuados para datos con formas arbitrarias y con
+ruido, aunque su rendimiento puede degradarse en espacios de alta
+dimensionalidad, lo que motiva la reducción previa.
 
 También se utilizan otros métodos menos comunes como \textit{affinity
 propagation}~\cite{frey_clustering_2007}, que crea \textit{clusters} a partir del envío de mensajes de
@@ -261,9 +262,6 @@ crece. UMAP, por su parte, asigna a cada enlace entre puntos una probabilidad
 de conexión basada en la distancia entre estos, y luego busca una
 representación de menor dimensionalidad que respete estas probabilidades a
 través de una serie de operaciones de atracción--repulsión entre los puntos.
-
-Un resumen de las opciones de reductor implementadas en el sistema se recogen
-en la tabla~\ref{tab:reduction}.
 
 \subsubsection{Métricas de evaluación}
 \label{subsubsec:metricas}
@@ -334,8 +332,11 @@ arquitectura, dimensionalidad de salida y preentrenamiento.
 El sistema cubre los principales paradigmas de agrupamiento descritos en la
 sección~\ref{subsubsec:agrupamiento}. Todas las implementaciones exponen una
 interfaz común y se configuran por hiperparámetros declarados en la
-configuración del \textit{benchmark}. La tabla~\ref{tab:clustering-algos}
-recoge las opciones implementadas con sus hiperparámetros clave.
+configuración del \textit{benchmark}. Estas implementaciones no se han
+implementado desde cero, sino que se hace uso de las implementaciones
+disponibles en scikit-learn~\cite{pedregosa_scikit-learn_2011}. La
+tabla~\ref{tab:clustering-algos} recoge las opciones implementadas con sus
+hiperparámetros clave.
 
 Tres de los algoritmos admiten la selección automática de su hiperparámetro
 principal cuando este no se declara. Este es el caso de K-medias, los modelos de
@@ -385,21 +386,21 @@ disponibles.
 La persistencia de los \textit{embeddings} y los metadatos asociados se abstrae
 tras una interfaz común, de la que se han implementado dos \textit{backends}
 con características operativas distintas. El primero, basado en SQLite, no
-requiere servicios externos y realiza la búsqueda por similitud mediante un
-recorrido lineal; resulta apropiado para despliegues ligeros y como referencia
-de cálculo exacto frente a alternativas aproximadas. El segundo se apoya en la
-extensión \textit{pgvector} de PostgreSQL y delega la búsqueda al motor de la
-base de datos. Por defecto la consulta es un recorrido exacto; opcionalmente
-puede habilitarse un índice aproximado HNSW~\cite{malkov_efficient_2018} sobre
-los vectores, lo que permite contrastar el coste de la búsqueda exacta frente a
-la aproximada. El índice HNSW de \textit{pgvector} impone un límite de 2000
-dimensiones sobre el tipo \texttt{vector}, por lo que no es aplicable a los
-modelos cuya salida lo supera (ResNet50 e InceptionV3, con 2048, y VGG16, con
-4096); para estos casos debe recurrirse a una reducción de dimensionalidad
-previa al almacenamiento o al \textit{backend} SQLite con búsqueda exacta. Ambos
-\textit{backends} comparten el esquema lógico y la
-persistencia de metadatos, lo que permite cambiar de uno a otro sin modificar
-el resto del \textit{pipeline}.
+requiere servicios externos, almacena los vectores como \textit{blobs} y
+realiza la búsqueda por similitud mediante un recorrido lineal; resulta
+apropiado para despliegues ligeros y como referencia de cálculo exacto frente a
+alternativas aproximadas. El segundo se apoya en la extensión \textit{pgvector}
+de PostgreSQL y delega la búsqueda al motor de la base de datos. Por defecto la
+consulta es un recorrido exacto; opcionalmente puede habilitarse un índice
+aproximado HNSW~\cite{malkov_efficient_2018} sobre los vectores, lo que permite
+contrastar el coste de la búsqueda exacta frente a la aproximada. El índice
+HNSW de \textit{pgvector} impone un límite de 2000 dimensiones sobre el tipo
+\texttt{vector}, por lo que no es aplicable a los modelos cuya salida lo supera
+(ResNet50 e InceptionV3, con 2048, y VGG16, con 4096); para estos casos debe
+recurrirse a una reducción de dimensionalidad previa al almacenamiento o al
+\textit{backend} SQLite con búsqueda exacta. Ambos \textit{backends} comparten
+el esquema lógico y la persistencia de metadatos, lo que permite cambiar de uno
+a otro sin modificar el resto del \textit{pipeline}.
 
 \subsection{Extensiones específicas para grafiti}
 \label{subsec:extras}
