@@ -42,9 +42,9 @@ considera el \textit{pipeline} base del proyecto, la configuración sobre la que
 se asientan los estudios de coste y calidad supervisada en las secciones
 siguientes. Tras esta serie de experimentos, la elección de segmentador,
 reducción y agrupamiento queda decidida por la triada de experimentos E2, E3 y
-E4. El extractor base se elige a partir de los resultados supervisados de E8a,
-no a partir de E1, aunque este último es el primer experimento del hilo
-narrativo.
+E4. La excepción a esto es la elección del extractor, que se basa en un
+criterio de calidad supervisada (E8a) que se discute en la sección de
+resultados supervisados (\ref{subsec:res-supervisada}).
 
 A lo largo de toda la subsección las métricas intrínsecas, que denominaremos
 simplemente \textit{calidad intrínseca} (silueta~$\uparrow$, CH~$\uparrow$,
@@ -72,8 +72,8 @@ $N=6416$.
 \begin{longtable}{|p{5.4cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|} \hline
   \textbf{Extractor} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} \\ \hline
   \endhead
-  \texttt{mobilenet\_v3}                  & 820 & 0.078 & 0.260 & 13.1 & 1.48 & 0.52 \\ \hline
-  \texttt{resnet50}                       & 794 & 0.086 & 0.257 & 15.6 & 1.46 & 0.71 \\ \hline
+  \texttt{mobilenet\_v3}                  & 820 & \textbf{0.078} & \textbf{0.260} & 13.1 & 1.48 & \textbf{0.52} \\ \hline
+  \texttt{resnet50}                       & 794 & 0.086 & 0.257 & 15.6 & \textbf{1.46} & 0.71 \\ \hline
   \texttt{vgg16}                          & 773 & 0.095 & 0.228 & 13.4 & 1.55 & 0.54 \\ \hline
   \texttt{mob.\_graffiti\_author\_head}   & 779 & 0.124 & 0.227 & 13.4 & 1.53 & 0.53 \\ \hline
   \texttt{inception\_v3}                  & 724 & 0.118 & 0.213 & 11.5 & 1.61 & 0.64 \\ \hline
@@ -83,7 +83,7 @@ $N=6416$.
   \texttt{mob.\_graffiti\_style\_head}    & 629 & 0.214 & 0.164 & 19.7 & 1.74 & 0.58 \\ \hline
   \texttt{dinov2\_graffiti\_style\_head}  & 562 & 0.202 & 0.155 & 27.9 & 1.70 & 0.74 \\ \hline
   \texttt{yolom}                          & 480 & 0.253 & 0.131 & 32.2 & 1.75 & 0.74 \\ \hline
-  \texttt{yolon}                          & 348 & 0.341 & 0.085 & 51.2 & 1.91 & 0.81 \\ \hline
+  \texttt{yolon}                          & 348 & 0.341 & 0.085 & \textbf{51.2} & 1.91 & 0.81 \\ \hline
   \caption[E1, calidad intrínseca a $N=6416$]{E1, calidad intrínseca a $N=6416$. Las CNN entrenadas en ImageNet encabezan la silueta; el extractor base
   (\texttt{dinov2\_graffiti\_style\_head}) presenta un CH (27.9) solo superado
   por los \textit{backbones} YOLO, pese a una silueta inferior a la de su
@@ -129,14 +129,14 @@ y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
 \begin{longtable}{|p{5.4cm}|p{1.7cm}|p{1.0cm}|p{1.4cm}|p{1.4cm}|} \hline
   \textbf{Extractor} & \textbf{ingesta (s)} & \textbf{ips} & \textbf{RSS pico (MB)} & \textbf{VRAM (MB)} \\ \hline
   \endhead
-  \texttt{mobilenet\_v3}                  & 808.8  & 7.93 & 366.0 & 31.8  \\ \hline
+  \texttt{mobilenet\_v3}                  & \textbf{808.8}  & \textbf{7.93} & 366.0 & \textbf{31.8}  \\ \hline
   \texttt{mob.\_graffiti\_author\_head}   & 879.1  & 7.30 & 406.4 & 34.5  \\ \hline
   \texttt{inception\_v3}                  & 973.7  & 6.59 & 337.2 & 116.1 \\ \hline
   \texttt{vgg16}                          & 980.8  & 6.54 & 315.0 & 551.7 \\ \hline
   \texttt{resnet50}                       & 1080.0 & 5.94 & 336.0 & 117.8 \\ \hline
   \texttt{dinov2\_vits14}                 & 1215.7 & 5.28 & 209.6 & 98.0  \\ \hline
   \texttt{dinov2\_graffiti\_style\_head}  & 1245.0 & 5.15 & 286.2 & 99.7  \\ \hline
-  \texttt{clip\_vit\_b32}                 & 1247.0 & 5.15 & 193.1 & 591.9 \\ \hline
+  \texttt{clip\_vit\_b32}                 & 1247.0 & 5.15 & \textbf{193.1} & 591.9 \\ \hline
   \texttt{yolon}                          & 1301.0 & 4.93 & 853.8 & 65.4  \\ \hline
   \texttt{yolom}                          & 1407.4 & 4.56 & 824.9 & 192.9 \\ \hline
   \caption[E1, coste de ingesta a $N=6416$.]{E1, coste de ingesta a $N=6416$. La cabeza añade un sobrecoste
@@ -172,12 +172,12 @@ de dataset completo.
 \begin{longtable}{|p{2.0cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|} \hline
   \textbf{Reducción} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} \\ \hline
   \endhead
-  identidad   & 301 & 0.684 &  0.307 & 37.5 & 1.16 & 0.55 \\ \hline
-  PCA-10      & 2   & 0.010 &  0.000 &  4.2 & 1.39 & 1.00 \\ \hline
+  identidad   & 301 & 0.684 &  \textbf{0.307} & 37.5 & \textbf{1.16} & \textbf{0.55} \\ \hline
+  PCA-10      & 2   & \textbf{0.010} &  0.000 &  4.2 & 1.39 & 1.00 \\ \hline
   PCA-50      & 238 & 0.698 &  0.238 & 36.6 & 1.29 & 2.29 \\ \hline
   UMAP-10     & 562 & 0.202 &  0.155 & 27.9 & 1.70 & 0.74 \\ \hline
   UMAP-50     & 558 & 0.195 &  0.154 & 27.8 & 1.71 & 0.70 \\ \hline
-  Isomap-10   & 125 & 0.624 &  0.044 & 38.4 & 1.80 & 3.40 \\ \hline
+  Isomap-10   & 125 & 0.624 &  0.044 & \textbf{38.4} & 1.80 & 3.40 \\ \hline
   \caption[E2, calidad intrínseca a $N=6416$]{E2, calidad intrínseca a $N=6416$. UMAP es la única reducción que
   produce simultáneamente un número de clústeres no trivial, ruido moderado y
   tamaños balanceados. \glosacalidad}
@@ -242,12 +242,12 @@ tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
   \textbf{Algoritmo} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} & \textbf{clu (s)} & \textbf{mem (MB)} \\ \hline
   \endhead
   HDBSCAN (mcs=5)        & 563 & 0.199 &  0.151 &  33 & 1.70 & 0.75 & 0.348 & 0.3 \\ \hline
-  OPTICS (cos)           & 648 & 0.247 &  0.177 &  30 & 1.64 & 0.45 & 8.578 & 763.3 \\ \hline
-  GMM·300 (BIC)          & 297 & 0.000 &  0.054 &  50 & 2.52 & 0.58 & 1.839 & 49.7 \\ \hline
-  K-medias (codo, $k=8$)   &   8 & 0.000 &  0.057 & 805 & 3.23 & 0.37 & 0.009 & 0.2 \\ \hline
-  DBSCAN auto-$\varepsilon$ & 239 & 0.059 & -0.015 & 46 & 1.97 & 2.47 & 0.080 & 0.2 \\ \hline
-  Aglom. \textit{avg} $k=10$ &  10 & 0.000 & -0.015 & 506 & 3.11 & 1.36 & 0.408 & 314.2 \\ \hline
-  Espectral $k=10$       &  10 & 0.000 & -0.117 & 264 & 3.33 & 1.56 & 2.073 & 1.1 \\ \hline
+  OPTICS (cos)           & 648 & 0.247 &  \textbf{0.177} &  30 & \textbf{1.64} & 0.45 & 8.578 & 763.3 \\ \hline
+  GMM·300 (BIC)          & 297 & \textbf{0.000} &  0.054 &  50 & 2.52 & 0.58 & 1.839 & 49.7 \\ \hline
+  K-medias (codo, $k=8$)   &   8 & \textbf{0.000} &  0.057 & \textbf{805} & 3.23 & \textbf{0.37} & \textbf{0.009} & \textbf{0.2} \\ \hline
+  DBSCAN auto-$\varepsilon$ & 239 & 0.059 & -0.015 & 46 & 1.97 & 2.47 & 0.080 & \textbf{0.2} \\ \hline
+  Aglom. \textit{avg} $k=10$ &  10 & \textbf{0.000} & -0.015 & 506 & 3.11 & 1.36 & 0.408 & 314.2 \\ \hline
+  Espectral $k=10$       &  10 & \textbf{0.000} & -0.117 & 264 & 3.33 & 1.56 & 2.073 & 1.1 \\ \hline
   \caption[E3, fila representativa por familia a $N=6416$]{E3, fila representativa de cada familia a $N=6416$. La columna
   \textbf{mem} reporta el pico de RSS delta de la etapa de agrupamiento. Sólo
   HDBSCAN combina un número no trivial de clústeres, ruido moderado, tamaños
@@ -323,8 +323,8 @@ tabla~\ref{tab:e4-mcs-6416} a $N=6416$.
    10 & 154 & 0.277 & 0.037 &   56 & 2.20 & 1.78 \\ \hline
    25 &  26 & 0.228 & 0.047 &  209 & 2.66 & 1.81 \\ \hline
    50 &   4 & 0.026 & 0.193 & 1404 & 2.01 & 0.86 \\ \hline
-  100 &   2 & 0.008 & 0.269 & 2765 & 1.27 & 0.40 \\ \hline
-  200 &   2 & 0.011 & 0.270 & 2776 & 1.27 & 0.40 \\ \hline
+  100 &   2 & \textbf{0.008} & 0.269 & 2765 & \textbf{1.27} & \textbf{0.40} \\ \hline
+  200 &   2 & 0.011 & \textbf{0.270} & \textbf{2776} & \textbf{1.27} & \textbf{0.40} \\ \hline
   \caption[E4, barrido de \texttt{min\_cluster\_size} a $N=6416$]{E4, barrido de \texttt{min\_cluster\_size} a $N=6416$. La silueta y
   el CH alcanzan su máximo en los valores degenerados ($k{=}2$); el criterio
   conjunto sitúa el óptimo en \texttt{mcs}=5. \glosacalidad}
@@ -368,10 +368,10 @@ YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}) manteniendo fijo el resto del
 \begin{longtable}{|p{2.5cm}|p{1.5cm}|p{1.0cm}|p{1.0cm}|p{1.1cm}|p{1.0cm}|p{1.0cm}|p{1.4cm}|} \hline
   \textbf{Segmentador} & \textbf{recortes} & \textbf{r/img} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{ingesta (s)} \\ \hline
   \endhead
-  identidad           & 6416  & 1.00 &  563 & 0.199 & 0.151 & 33.1 & 1235.5 \\ \hline
+  identidad           & 6416  & 1.00 &  563 & \textbf{0.199} & \textbf{0.151} & 33.1 & \textbf{1235.5} \\ \hline
   YOLO11s             & 6590  & 1.03 &  502 & 0.225 & 0.127 & 30.4 & 1777.0 \\ \hline
   YOLO11m             & 6603  & 1.03 &  506 & 0.230 & 0.131 & 29.5 & 1811.6 \\ \hline
-  YOLO11m \textit{ft} & 15362 & 2.39 & 1049 & 0.298 & 0.122 & 36.2 & 2152.3 \\ \hline
+  YOLO11m \textit{ft} & 15362 & 2.39 & 1049 & 0.298 & 0.122 & \textbf{36.2} & 2152.3 \\ \hline
   \caption[E5, calidad y coste de ingesta a $N=6416$]{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
   \enquote{recortes} son los puntos efectivamente agrupados, no las imágenes leídas).
   Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.
@@ -645,7 +645,7 @@ con distinto número de clústeres.
 \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
   \textbf{Extractor} & \textbf{ARI} & \textbf{NMI} & \textbf{F1} & \textbf{sil} & \textbf{Celda} \\ \hline
   \endhead
-  \texttt{dinov2\_graffiti\_style\_head}      & \textbf{0.722} & 0.678 & 0.806 & 0.284 & identidad + K-medias-4   \\ \hline
+  \texttt{dinov2\_graffiti\_style\_head}      & \textbf{0.722} & \textbf{0.678} & \textbf{0.806} & \textbf{0.284} & identidad + K-medias-4   \\ \hline
   \texttt{mob.\_graffiti\_style\_head}        & 0.627 & 0.539 & 0.740 & 0.272 & identidad + K-medias-4   \\ \hline
   \texttt{clip\_vit\_b32}                     & 0.368 & 0.392 & 0.556 & 0.047 & UMAP + aglomerativo    \\ \hline
   \texttt{dinov2\_vits14}                     & 0.356 & 0.374 & 0.558 & 0.135 & identidad + K-medias-4   \\ \hline
@@ -693,7 +693,7 @@ del propio \textit{backbone}.
 \begin{longtable}{|p{5.4cm}|p{1.3cm}|p{1.6cm}|p{1.3cm}|} \hline
   \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} \\ \hline
   \endhead
-  \texttt{dinov2\_graffiti\_style\_head}     & \textbf{0.851} & 0.909 & 0.922 \\ \hline
+  \texttt{dinov2\_graffiti\_style\_head}     & \textbf{0.851} & \textbf{0.909} & \textbf{0.922} \\ \hline
   \texttt{mob.\_graffiti\_style\_head}       & 0.760 & 0.818 & 0.835 \\ \hline
   \texttt{dinov2\_vits14}                    & 0.699 & 0.805 & 0.837 \\ \hline
   \texttt{mobilenet\_v3}                     & 0.687 & 0.806 & 0.830 \\ \hline
@@ -772,9 +772,9 @@ y supera a la cabeza de estilo (0.041).
 \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
   \textbf{Extractor} & \textbf{ARI} & \textbf{NMI} & \textbf{F1} & \textbf{sil} & \textbf{Celda} \\ \hline
   \endhead
-  \texttt{clip\_vit\_b32}                     & \textbf{0.076} & 0.789 & 0.090 & 0.003 & UMAP + aglo-87 \\ \hline
-  \texttt{dinov2\_graffiti\_author\_head}     & 0.065 & 0.647 & 0.093 & 0.052 & UMAP + aglo-30 \\ \hline
-  \texttt{dinov2\_vits14}                     & 0.055 & 0.754 & 0.079 & 0.096 & identidad + aglo-87 \\ \hline
+  \texttt{clip\_vit\_b32}                     & \textbf{0.076} & \textbf{0.789} & 0.090 & 0.003 & UMAP + aglo-87 \\ \hline
+  \texttt{dinov2\_graffiti\_author\_head}     & 0.065 & 0.647 & \textbf{0.093} & 0.052 & UMAP + aglo-30 \\ \hline
+  \texttt{dinov2\_vits14}                     & 0.055 & 0.754 & 0.079 & \textbf{0.096} & identidad + aglo-87 \\ \hline
   \texttt{dinov2\_graffiti\_style\_head}      & 0.054 & 0.628 & 0.085 & 0.037 & UMAP + aglo-30 \\ \hline
   \texttt{resnet50}                           & 0.049 & 0.778 & 0.064 & 0.028 & UMAP + aglo-87 \\ \hline
   \texttt{mob.\_graffiti\_author\_head}       & 0.048 & 0.627 & 0.077 & 0.021 & UMAP + aglo-30 \\ \hline
@@ -815,10 +815,10 @@ representación útil para esta tarea.
 \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.6cm}|p{1.2cm}|p{1.2cm}|} \hline
   \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} & \textbf{R@5} \\ \hline
   \endhead
-  \texttt{clip\_vit\_b32}                    & \textbf{0.091} & 0.252 & 0.262 & 0.268 \\ \hline
+  \texttt{clip\_vit\_b32}                    & \textbf{0.091} & \textbf{0.252} & \textbf{0.262} & \textbf{0.268} \\ \hline
   \texttt{resnet50}                          & 0.085 & 0.246 & 0.256 & 0.236 \\ \hline
   \texttt{mobilenet\_v3}                     & 0.083 & 0.240 & 0.245 & 0.251 \\ \hline
-  \texttt{dinov2\_vits14}                    & 0.081 & 0.248 & 0.251 & 0.268 \\ \hline
+  \texttt{dinov2\_vits14}                    & 0.081 & 0.248 & 0.251 & \textbf{0.268} \\ \hline
   \texttt{mob.\_graffiti\_author\_head}      & 0.078 & 0.217 & 0.222 & 0.233 \\ \hline
   \texttt{dinov2\_graffiti\_author\_head}    & 0.077 & 0.228 & 0.232 & 0.254 \\ \hline
   \texttt{mob.\_graffiti\_style\_head}       & 0.071 & 0.196 & 0.200 & 0.176 \\ \hline
