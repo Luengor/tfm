@@ -168,8 +168,8 @@ El muestreo de las imágenes para cada $N$ es determinista: las fotografías se
 ordenan por su nombre de fichero y se toman las primeras $N$. Para cada tamaño
 se obtienen las métricas temporales descritas en \ref{subsubsec:cronometria},
 lo que permite caracterizar el crecimiento de cada etapa por separado y, a
-partir de ahí, estimar empíricamente el exponente de crecimiento de cada
-combinación de componentes.
+partir de ahí, estimar empíricamente el órden de crecimiento de la función de
+coste respecto a $N$ para cada etapa.
 
 \subsubsection{Reutilización de almacenamientos}
 \label{subsubsec:reutilizacion}
@@ -263,7 +263,7 @@ HNSW de \texttt{PostgreSQLStorage}.
 De esta etapa también se reporta la distancia media a los $k$ vecinos
 recuperados, promediada sobre todas las consultas. Si el \textit{backend}
 dispone de índice ANN (como es el caso de \texttt{PostgreSQL} con
-\texttt{HNSW}), también se reporta el \textit{recall}@$k$ de sus vecinos frente
+\texttt{HNSW}), también se reporta el R@$k$ de sus vecinos frente
 a una búsqueda exacta por fuerza bruta, que cuantifica la pérdida de exactitud
 del índice aproximado y es nulo en los \textit{backends} exactos.
 
