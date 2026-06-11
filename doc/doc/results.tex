@@ -173,10 +173,10 @@ de dataset completo.
   \textbf{Reducción} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} \\ \hline
   \endhead
   identidad   & 301 & 0.684 &  \textbf{0.307} & 37.5 & \textbf{1.16} & \textbf{0.55} \\ \hline
-  PCA-10      & 2   & \textbf{0.010} &  0.000 &  4.2 & 1.39 & 1.00 \\ \hline
+  PCA-10      & 2   & 0.010 &  0.000 &  4.2 & 1.39 & 1.00 \\ \hline
   PCA-50      & 238 & 0.698 &  0.238 & 36.6 & 1.29 & 2.29 \\ \hline
   UMAP-10     & 562 & 0.202 &  0.155 & 27.9 & 1.70 & 0.74 \\ \hline
-  UMAP-50     & 558 & 0.195 &  0.154 & 27.8 & 1.71 & 0.70 \\ \hline
+  UMAP-50     & 558 & \textbf{0.195} &  0.154 & 27.8 & 1.71 & 0.70 \\ \hline
   Isomap-10   & 125 & 0.624 &  0.044 & \textbf{38.4} & 1.80 & 3.40 \\ \hline
   \caption[E2, calidad intrínseca a $N=6416$]{E2, calidad intrínseca a $N=6416$. UMAP es la única reducción que
   produce simultáneamente un número de clústeres no trivial, ruido moderado y
@@ -319,12 +319,12 @@ tabla~\ref{tab:e4-mcs-6416} a $N=6416$.
 \begin{longtable}{|p{1.4cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|} \hline
   \textbf{mcs} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} \\ \hline
   \endhead
-    5 & 563 & 0.199 & 0.151 &   33 & 1.70 & 0.75 \\ \hline
+    5 & 563 & 0.199 & 0.151 &   33 & \textbf{1.70} & \textbf{0.75} \\ \hline
    10 & 154 & 0.277 & 0.037 &   56 & 2.20 & 1.78 \\ \hline
    25 &  26 & 0.228 & 0.047 &  209 & 2.66 & 1.81 \\ \hline
-   50 &   4 & 0.026 & 0.193 & 1404 & 2.01 & 0.86 \\ \hline
-  100 &   2 & \textbf{0.008} & 0.269 & 2765 & \textbf{1.27} & \textbf{0.40} \\ \hline
-  200 &   2 & 0.011 & \textbf{0.270} & \textbf{2776} & \textbf{1.27} & \textbf{0.40} \\ \hline
+   50 &   4 & \textbf{0.026} & \textbf{0.193} & \textbf{1404} & 2.01 & 0.86 \\ \hline
+  100 &   2 & 0.008 & 0.269 & 2765 & 1.27 & 0.40 \\ \hline
+  200 &   2 & 0.011 & 0.270 & 2776 & 1.27 & 0.40 \\ \hline
   \caption[E4, barrido de \texttt{min\_cluster\_size} a $N=6416$]{E4, barrido de \texttt{min\_cluster\_size} a $N=6416$. La silueta y
   el CH alcanzan su máximo en los valores degenerados ($k{=}2$); el criterio
   conjunto sitúa el óptimo en \texttt{mcs}=5. \glosacalidad}
