@@ -68,7 +68,7 @@ etiquetados.
 
 Se etiquetan manualmente recortes por estilo, asignándoles una de las cuatro
 categorías estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
-\textit{character}) ilustradas en la figura~\ref{fig:estilos-ejemplos}, y otros
+\textit{character}) definidas e ilustradas en la tabla~\ref{tab:estilos-definiciones}, y otros
 recortes por autoría. La procedencia de cada subconjunto difiere: el
 entrenamiento de estilo contiene recortes del banco principal, mientras que el
 de autoría se restringe a StopGrafiti; el reparto y su justificación se
@@ -79,19 +79,19 @@ de las cabezas, así como los recortes de autoría), y las $6416$ ($5880+536$)
 restantes constituyen el conjunto de evaluación sin supervisión del sistema
 completo, del que nunca se extraen recortes de entrenamiento.
 
-\begin{figure}[h!]
+\begin{table}[h!]
   \centering
-  \setlength{\tabcolsep}{4pt}%
-  \begin{tabular}{cccc}
-    \includegraphics[height=1.5cm,width=2.8cm,keepaspectratio]{figures/style_tag.jpg} &
-    \includegraphics[height=1.5cm,width=2.8cm,keepaspectratio]{figures/style_throwup.jpg} &
-    \includegraphics[height=1.5cm,width=2.8cm,keepaspectratio]{figures/style_piece.jpg} &
-    \includegraphics[height=1.5cm,width=2.8cm,keepaspectratio]{figures/style_character.jpg} \\
-    \textit{tag} & \textit{throw-up} & \textit{piece} & \textit{character} \\
+  \renewcommand{\arraystretch}{1.4}%
+  \begin{tabular}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}m{1.8cm}|m{0.55\linewidth}|} \hline
+    \textbf{Ejemplo} & \textbf{Categoría} & \textbf{Definición} \\ \hline
+    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_tag.jpg} & \textit{tag} & Firma estilizada del autor, monocroma y de trazo rápido en una sola línea; es la forma más simple y frecuente. \\ \hline
+    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_throwup.jpg} & \textit{throw-up} & Nombre escrito en letras redondeadas, normalmente con no más de dos colores (contorno y relleno) y ejecución veloz. \\ \hline
+    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_piece.jpg} & \textit{piece} & Obra elaborada, multicolor y con letras complejas, sombreados y mayor inversión de tiempo. \\ \hline
+    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_character.jpg} & \textit{character} & Figura o personaje ilustrado en lugar de letras, a menudo acompañando a otras categorías. \\ \hline
   \end{tabular}
-  \caption{Ejemplos de recortes de cada categoría estilística etiquetada.}
-  \label{fig:estilos-ejemplos}
-\end{figure}
+  \caption{Categorías estilísticas etiquetadas, con un recorte de ejemplo y su definición.}
+  \label{tab:estilos-definiciones}
+\end{table}
 
 La figura~\ref{fig:dataset-style-distribution} muestra la distribución por
 clase de los recortes etiquetados por estilo. El reparto es desigual: las
@@ -120,9 +120,9 @@ su propósito, procedencia y tamaño.
   \begin{tabular}{|l|l|l|r|} \hline
     \textbf{Subconjunto} & \textbf{Propósito} & \textbf{Procedencia} & \textbf{Tamaño} \\ \hline
     Estilo (entr.) & Cabezas de estilo & StopGrafiti + Salamanca & $385$ \\ \hline
-    Estilo (eval.) & Extrínsecas & Banco completo & $294$ \\ \hline
+    Estilo (eval.) & M. Extrínsecas & Banco completo & $294$ \\ \hline
     Autoría (entr.) & Cabezas de autoría & StopGrafiti & $321$ \\ \hline
-    Autoría (eval.) & Extrínsecas & Salamanca & $185$ \\ \hline
+    Autoría (eval.) & M. Extrínsecas & Salamanca & $185$ \\ \hline
     Detección & Ajuste del detector & Ambos bancos & $447$ \\ \hline
     No superv. & Agrupamiento & Salamanca (disjunto) & $6416$ \\ \hline
   \end{tabular}
@@ -145,10 +145,10 @@ características preentrenados sobre tareas de visión generalistas, que se
 aplican directamente sobre las imágenes de grafiti o sobre recortes de las
 mismas. Para las redes de clasificación como pueden ser ResNet o VGG, se accede
 a esta representación eliminando las últimas capas de los modelos, que suelen
-corresponder a la tarea de clasificación, y quedándonos con la representación
-latente previa. Otros modelos como DINOv2 o CLIP están entrenados
-específicamente para devolver una representación vectorial de la imagen, por lo
-que no es necesario modificar su arquitectura para acceder a los
+corresponder a la tarea de clasificación, y tomando solamente con la
+representación latente previa. Otros modelos como DINOv2 o CLIP están
+entrenados específicamente para devolver una representación vectorial de la
+imagen, por lo que no es necesario modificar su arquitectura para acceder a los
 \textit{embeddings}.
 
 Teniendo una representación numérica de cada imagen, la similitud entre estas
@@ -167,7 +167,7 @@ estilo y autoría (que sí que normalizan sus vectores) puedan compararse con lo
 
 \subsection{Búsqueda por similitud}
 \label{subsubsec:tools-similarity-search}
-Para la búsqueda por similitud, el sistema implementa dos enfoques. El primero
+Para la búsqueda por similitud la propuesta considera dos enfoques. El primero
 y más simple de ellos consiste en una búsqueda exacta sobre SQLite, que se
 resuelve por fuerza bruta recuperando todos los vectores almacenados y
 calculando la distancia a cada uno de ellos. Este método es ineficiente en
@@ -185,7 +185,7 @@ búsqueda por fuerza bruta y se comparan los resultados obtenidos por ambos
 métodos, cuantificando el porcentaje de vecinos más cercanos reales recuperados
 por el índice. Además, cuando el dataset utilizado dispone de etiquetas se
 evalúa también la calidad de la búsqueda por similitud. En estos casos se
-calculan métricas como la precisión y \textit{recall} a $k$ que cuantifican el
+calculan métricas como la precisión y \textit{recall} a $k$, que cuantifican el
 porcentaje de elementos relevantes recuperados respecto a los $k$ buscados
 (P@$k$) o al total de elementos relevantes (R@$k$). También se calculan el
 rango recíproco medio (MRR) que mide la posición del primer vecino relevante
@@ -195,13 +195,13 @@ $k$ sobre las posiciones relevantes.
 \subsubsection{Agrupamiento no supervisado}
 \label{subsubsec:agrupamiento}
 Los principales algoritmos de agrupamiento se diferencian por la manera en la
-que agrupan los datos. Los métodos basados en centroides, como K-medias, modelan
-cada clúster por su media y buscan minimizar la varianza intracluster. Esto los
-hace bastante eficientes, pero también sensibles a la forma y al solapamiento
-de los grupos. Por esto, estos algoritmos no suelen dar los mejores resultados
-cuando los datos no se agrupan en formas esféricas bien separadas o cuando los
-distintos grupos tienen una cantidad de puntos muy desigual (como es el caso de
-este trabajo).
+que agrupan los datos. Los métodos basados en centroides, como K-medias,
+modelan cada clúster por su media y buscan minimizar la varianza intracluster.
+Esto los hace bastante eficientes, pero también sensibles a la forma y al
+solapamiento de los grupos. Por esto, estos algoritmos no suelen proporcionar
+los mejores resultados cuando los datos no se agrupan en formas esféricas bien
+separadas o cuando los distintos grupos tienen una cantidad de puntos muy
+desigual (como es el caso de este trabajo).
 
 Los algoritmos basados en densidad, como DBSCAN, OPTICS y HDBSCAN, definen un
 clúster como una región conectada de alta densidad y permiten descartar puntos
