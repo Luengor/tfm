@@ -227,7 +227,7 @@ general.
 HDBSCAN es el único agrupador del panel que combina una silueta competitiva,
 escalado sensato del número de clústeres con $N$, ruido moderado, tamaños
 balanceados y coste despreciable bajo el criterio conjunto. El barrido (E3)
-cubre 14 configuraciones sobre el extractor base y UMAP-10: HDBSCAN, KMeans
+cubre 14 configuraciones sobre el extractor base y UMAP-10: HDBSCAN, K-medias
 (codo), GMM diagonal (BIC con tres techos), DBSCAN (auto-$\varepsilon$ y tres
 $\varepsilon$ fijos), OPTICS coseno, aglomerativo (\textit{average linkage},
 $k\in\{10, 20\}$) y espectral ($k\in\{10, 20\}$); la
@@ -240,7 +240,7 @@ tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
   HDBSCAN (mcs=5)        & 563 & 0.199 &  0.151 &  33 & 1.70 & 0.75 & 0.348 & 0.3 \\ \hline
   OPTICS (cos)           & 648 & 0.247 &  0.177 &  30 & 1.64 & 0.45 & 8.578 & 763.3 \\ \hline
   GMM·300 (BIC)          & 297 & 0.000 &  0.054 &  50 & 2.52 & 0.58 & 1.839 & 49.7 \\ \hline
-  KMeans (codo, $k=8$)   &   8 & 0.000 &  0.057 & 805 & 3.23 & 0.37 & 0.009 & 0.2 \\ \hline
+  K-medias (codo, $k=8$)   &   8 & 0.000 &  0.057 & 805 & 3.23 & 0.37 & 0.009 & 0.2 \\ \hline
   DBSCAN auto-$\varepsilon$ & 239 & 0.059 & -0.015 & 46 & 1.97 & 2.47 & 0.080 & 0.2 \\ \hline
   Aglom. \textit{avg} $k=10$ &  10 & 0.000 & -0.015 & 506 & 3.11 & 1.36 & 0.408 & 314.2 \\ \hline
   Espectral $k=10$       &  10 & 0.000 & -0.117 & 264 & 3.33 & 1.56 & 2.073 & 1.1 \\ \hline
@@ -257,7 +257,7 @@ Como se anticipó en \ref{subsec:res-calibracion}, es necesario leer las
 métricas intrínsecas  en conjunto con el número de clústeres, el ruido y el
 csCV; nunca de manera aislada. Esto es especialmente importante aquí puesto que
 los algoritmos basados en densidad (HDBSCAN, DBSCAN, OPTICS) son juzgados solo
-sobre el subconjunto que agrupan, mientras que los particionales (KMeans, GMM,
+sobre el subconjunto que agrupan, mientras que los particionales (K-medias, GMM,
 aglomerativo, espectral) lo son sobre el conjunto de datos completo. La silueta
 penaliza menos a un método que se abstiene de los puntos difíciles y CH premia
 la compactación, sin importar la estructura.
@@ -294,7 +294,7 @@ presenta la peor silueta del panel) o por el escalado de memoria.
   (izquierda) y la huella de memoria (centro) crecen varios órdenes de
   magnitud para OPTICS y aglomerativo mientras HDBSCAN se mantiene plano. El
   número de clústeres (derecha) crece de forma sensata para HDBSCAN, OPTICS y
-  GMM, frente a los métodos con $k$ fijo (KMeans, aglomerativo, espectral) o
+  GMM, frente a los métodos con $k$ fijo (K-medias, aglomerativo, espectral) o
   inestables (DBSCAN).}
   \label{fig:e3-scaling}
 \end{figure}
@@ -444,7 +444,7 @@ complejidad teórica de referencia.
 
 {\footnotesize
 \begin{longtable}{|p{1.0cm}|p{1.6cm}|p{1.2cm}|p{2.0cm}|p{2.0cm}|p{1.4cm}|p{2.0cm}|} \hline
-  \textbf{$N$} & \textbf{ingesta (s)} & \textbf{red (s)} & \textbf{HDBSCAN (s)} & \textbf{KMeans (s)} & \textbf{aglo (s)} & \textbf{búsqueda (s)} \\ \hline
+  \textbf{$N$} & \textbf{ingesta (s)} & \textbf{red (s)} & \textbf{HDBSCAN (s)} & \textbf{K-medias (s)} & \textbf{aglo (s)} & \textbf{búsqueda (s)} \\ \hline
   \endhead
    250 &   58.7 &  0.253 & 0.0038 & 0.0025 & 0.0019 &   3.66 \\ \hline
    500 &  115.7 &  0.603 & 0.0069 & 0.0027 & 0.0046 &  16.32 \\ \hline
@@ -465,7 +465,7 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
   \endhead
   Ingesta (DINOv2)       & $O(n)$            & 0.95 & --   \\ \hline
   Reducción (UMAP)       & $\sim O(n^{1.14})$ & 1.15 & 1.53 \\ \hline
-  KMeans ($k$ fijo)      & $\approx O(n)$    & 0.43 & 0.46 \\ \hline
+  K-medias ($k$ fijo)      & $\approx O(n)$    & 0.43 & 0.46 \\ \hline
   DBSCAN                 & $O(n\log n)$--$O(n^2)$ & 0.99 & 1.10 \\ \hline
   OPTICS                 & $O(n\log n)$--$O(n^2)$ & 0.94 & 0.98 \\ \hline
   HDBSCAN                & $O(n\log n)$ amort. & 1.53 & 1.84 \\ \hline
@@ -639,10 +639,10 @@ con distinto número de clústeres.
 \begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
   \textbf{Extractor} & \textbf{ARI} & \textbf{NMI} & \textbf{F1} & \textbf{sil} & \textbf{Celda} \\ \hline
   \endhead
-  \texttt{dinov2\_graffiti\_style\_head}      & \textbf{0.722} & 0.678 & 0.806 & 0.284 & identidad + KMeans-4   \\ \hline
-  \texttt{mob.\_graffiti\_style\_head}        & 0.627 & 0.539 & 0.740 & 0.272 & identidad + KMeans-4   \\ \hline
+  \texttt{dinov2\_graffiti\_style\_head}      & \textbf{0.722} & 0.678 & 0.806 & 0.284 & identidad + K-medias-4   \\ \hline
+  \texttt{mob.\_graffiti\_style\_head}        & 0.627 & 0.539 & 0.740 & 0.272 & identidad + K-medias-4   \\ \hline
   \texttt{clip\_vit\_b32}                     & 0.368 & 0.392 & 0.556 & 0.047 & UMAP + aglomerativo    \\ \hline
-  \texttt{dinov2\_vits14}                     & 0.356 & 0.374 & 0.558 & 0.135 & identidad + KMeans-4   \\ \hline
+  \texttt{dinov2\_vits14}                     & 0.356 & 0.374 & 0.558 & 0.135 & identidad + K-medias-4   \\ \hline
   \texttt{mobilenet\_v3}                      & 0.356 & 0.336 & 0.550 & 0.038 & UMAP + aglomerativo    \\ \hline
   \texttt{resnet50}                           & 0.334 & 0.277 & 0.548 & 0.058 & identidad + espectral  \\ \hline
   \texttt{mob.\_graffiti\_author\_head}       & 0.318 & 0.295 & 0.517 & 0.046 & UMAP + aglomerativo    \\ \hline
@@ -656,7 +656,7 @@ con distinto número de clústeres.
 }
 
 El resultado es inequívoco: la cabeza estilística de DINOv2 + identidad +
-KMeans-4 obtiene ARI = 0.722 y F1 = 0.806, presenta más del doble del ARI del
+K-medias-4 obtiene ARI = 0.722 y F1 = 0.806, presenta más del doble del ARI del
 \textit{backbone} y de cualquier otro extractor sin entrenar. Va seguido por la
 cabeza estilística de MobileNetV3, que aunque no llega a doblar el ARI del
 siguiente extractor, sí lo mejora sustancialmente (0.627 vs 0.368). El resto de
@@ -835,7 +835,7 @@ es una combinación de extractor, reducción y agrupador, agregada sobre sus
 repeticiones).
 
 En E8a (estilos, 4 clases) la correlación es positiva y significativa: $r =
-+0.78$ ($n = 48$, $p < 10^{-7}$) sobre los agrupadores de $k$ fijo (KMeans,
++0.78$ ($n = 48$, $p < 10^{-7}$) sobre los agrupadores de $k$ fijo (K-medias,
 aglomerativo y espectral con $k=4$), y $r = +0.55$ ($n = 89$, $p < 10^{-7}$) al
 incluir las celdas HDBSCAN, de $k$ libre. En E8b (autoría, 87 clases) el signo
 se invierte ($r = -0.54$ sobre las celdas con más de un clúster), pero este

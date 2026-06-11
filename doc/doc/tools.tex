@@ -195,7 +195,8 @@ $k$ sobre las posiciones relevantes.
 \subsubsection{Agrupamiento no supervisado}
 \label{subsubsec:agrupamiento}
 Los principales algoritmos de agrupamiento se diferencian por la manera en la
-que agrupan los datos. Los métodos basados en centroides, como K-medias,
+que agrupan los datos. Los métodos basados en centroides, como
+K-medias~\cite{arthur_k-means_2007},
 modelan cada clúster por su media y buscan minimizar la varianza intracluster.
 Esto los hace bastante eficientes, pero también sensibles a la forma y al
 solapamiento de los grupos. Por esto, estos algoritmos no suelen proporcionar
@@ -203,7 +204,8 @@ los mejores resultados cuando los datos no se agrupan en formas esféricas bien
 separadas o cuando los distintos grupos tienen una cantidad de puntos muy
 desigual (como es el caso de este trabajo).
 
-Los algoritmos basados en densidad, como DBSCAN, OPTICS y HDBSCAN, definen un
+Los algoritmos basados en densidad, como DBSCAN~\cite{ester_density-based_1996},
+OPTICS~\cite{ankerst_optics_1999} y HDBSCAN~\cite{campello_density-based_2013}, definen un
 clúster como una región conectada de alta densidad y permiten descartar puntos
 como ruido. Los tres algoritmos son muy similares; siendo OPTICS y HDBSCAN
 extensiones de DBSCAN que resuelven algunas de sus limitaciones como pueden ser
@@ -213,13 +215,13 @@ con formas arbitrarias y con ruido, aunque su rendimiento puede degradarse en
 espacios de alta dimensionalidad, lo que motiva la reducción previa.
 
 También se utilizan otros métodos menos comunes como \textit{affinity
-propagation}, que crea \textit{clusters} a partir del envío de mensajes de
+propagation}~\cite{frey_clustering_2007}, que crea \textit{clusters} a partir del envío de mensajes de
 responsabilidad entre los puntos; los métodos probabilísticos, como los modelos
-de mezcla gaussiana, que modelan los datos como una superposición de
-distribuciones gaussianas; los métodos espectrales, que utilizan la
+de mezcla gaussiana~\cite{dempster_maximum_1977}, que modelan los datos como una superposición de
+distribuciones gaussianas; los métodos espectrales~\cite{ng_spectral_2001}, que utilizan la
 descomposición espectral de una matriz de similitud para reducir la
 dimensionalidad antes de aplicar un método de agrupamiento tradicional; y los
-métodos jerárquicos, que construyen un dendrograma de fusiones o divisiones
+métodos jerárquicos~\cite{mullner_modern_2011}, que construyen un dendrograma de fusiones o divisiones
 sucesivas del que pueden extraerse particiones a distintos niveles de
 granularidad. Estos algoritmos resultan ser útiles para tratar con datos con
 estructuras más complejas, aunque su coste computacional suele ser mayor que el

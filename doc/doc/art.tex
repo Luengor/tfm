@@ -32,7 +32,7 @@ categorización de forma manual, sin aplicar técnicas de agrupamiento
 automático. En esta dirección,
 \citea[etali]{Garcia~Garcia}{garcia_garcia_graffiti_2025} proponen un método de
 identificación y agrupamiento basado en el análisis de los colores dominantes
-de cada pintada haciendo uso de K-Medias sobre los espacios RGB y Lab. La
+de cada pintada haciendo uso de K-medias sobre los espacios RGB y Lab. La
 aportación es relevante porque introduce el agrupamiento en el dominio, pero
 utiliza exclusivamente estadísticas cromáticas de la imagen y prescinde de la
 estructura espacial, la textura y el contenido semántico del grafiti.
@@ -51,7 +51,7 @@ caracterización del coste.
   Fogaça (2023) & Clasificación y detección de grafiti & Imágenes de calle (Lisboa) & CNN \textit{fine-tuned} & Clasificación supervisada + detector & Exactitud / mAP (precisión media promedio, supervisada) \\ \hline
   Tokuda (2019) & Cuantificación de densidad de pintadas & Google Street View (São Paulo) & Mask-RCNN & Segmentación supervisada & Precisión / \textit{recall} \\ \hline
   Taylor (2010) & Categorización por contenido & Fotografías de grafiti & Inspección visual & Categorización manual & --- (cualitativa) \\ \hline
-  García~García (2025) & Agrupamiento de pintadas & Imágenes de grafiti & Colores dominantes (RGB / Lab) & K-Medias & Interna (no supervisada) \\ \hline
+  García~García (2025) & Agrupamiento de pintadas & Imágenes de grafiti & Colores dominantes (RGB / Lab) & K-medias & Interna (no supervisada) \\ \hline
   \textbf{Este trabajo} & Agrupamiento y recuperación por similitud & Banco de grafiti & \textit{Embeddings} profundos & Reducción + \textit{clustering} clásico (comparativo) & Interna, externa y coste computacional \\ \hline
   \caption[Comparativa de trabajos previos sobre análisis de grafiti]{Comparativa de trabajos previos sobre análisis de grafiti frente al
   planteamiento de este trabajo.}
@@ -78,7 +78,7 @@ auto-supervisión, ofrecen representaciones transferibles sin ajuste específico
 de dominio. La reducción de dimensionalidad previa al agrupamiento (PCA,
 UMAP~\cite{mcinnes_umap_2020}) es práctica estándar para mitigar la
 inestabilidad de las distancias en espacios de alta dimensión. Las familias
-clásicas de agrupamiento (por centroides, como K-Medias; por densidad, como
+clásicas de agrupamiento (por centroides, como K-medias; por densidad, como
 DBSCAN y HDBSCAN; jerárquicos o utilizando modelos probabilísticos) cubren
 distintos supuestos estructurales sobre los
 datos~\cite{ester_density-based_1996, campello_density-based_2013,
@@ -128,7 +128,7 @@ Una línea más reciente integra la representación y el agrupamiento en un mism
 proceso de entrenamiento. \citea[etali]{Min}{min_survey_2018} ofrecen una
 revisión exhaustiva de estas propuestas de \textit{deep clustering}. Entre las
 más relevantes se encuentran DeepCluster~\cite{caron_deep_2019}, que reagrupa
-iterativamente las características de la red con K-Medias y emplea las
+iterativamente las características de la red con K-medias y emplea las
 asignaciones resultantes como pseudo-etiquetas para reentrenarla, o
 SCAN~\cite{van_gansbeke_scan_2020}, que disocia el aprendizaje de
 características auto-supervisadas de la asignación de clústeres con resultados

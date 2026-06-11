@@ -202,7 +202,7 @@ lugar de los tiempos de caché, que no reflejarían el coste real de la etapa.
 Para acotar la variabilidad entre ejecuciones, las etapas de reducción y
 agrupamiento se repiten $K$ veces dentro del mismo proceso, con las semillas
 $0, 1, \ldots, K-1$. La semilla afecta a la reducción estocástica (UMAP) y a
-los agrupamientos estocásticos (K-Medias, GMM, \textit{spectral clustering} y
+los agrupamientos estocásticos (K-medias, GMM, \textit{spectral clustering} y
 \textit{affinity propagation}); los algoritmos deterministas (DBSCAN, OPTICS,
 HDBSCAN y aglomerativo) la reciben por la interfaz común pero la ignoran. Cuando
 la reducción y el agrupamiento son ambos deterministas, las repeticiones serían
@@ -229,7 +229,7 @@ minimizar interferencias externas.
 \label{subsubsec:hiperparam-auto}
 Salvo que se desee evaluar explícitamente el efecto de fijar un hiperparámetro
 a un valor concreto, todas las configuraciones del \textit{benchmark} emplean
-por defecto la estimación automática del hiperparámetro principal de K-Medias,
+por defecto la estimación automática del hiperparámetro principal de K-medias,
 DBSCAN y los modelos de mezcla gaussiana, descrita en
 \ref{subsubsec:algoritmos-agrupamiento}. En los tres casos las semillas
 aleatorias se fijan para que el resultado sea reproducible.
@@ -436,7 +436,7 @@ seleccionada para los \textit{benchmarks} es la que minimiza dicha pérdida.
 \label{subsec:reproducibilidad} Más allá del entorno y las versiones de
 dependencias (sección~\ref{subsec:entorno}), la reproducibilidad se apoya en
 dos elementos. Primero, todo estimador estocástico se instancia con
-\texttt{random\_state} fijo (K-Medias, GMM, UMAP y la selección automática de
+\texttt{random\_state} fijo (K-medias, GMM, UMAP y la selección automática de
 hiperparámetros descrita en \ref{subsubsec:hiperparam-auto} comparten semilla);
 además, los modelos de \textit{embeddings} en PyTorch se fuerzan a ser
 deterministas (\texttt{cudnn.deterministic} activado y \texttt{benchmark}
