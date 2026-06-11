@@ -1,7 +1,18 @@
 \documentclass[runningheads]{llncs}
 
 % --- Content packages only (NO layout packages: llncs forbids them) ---
-\usepackage[spanish]{babel}
+% Spanish via babel. The [spanish] option needs spanish.ldf, which some
+% TeX installs lack (ini-only babel); \babelprovide loads it from babel-es.ini
+% and works with both pdflatex and tectonic.
+\usepackage{babel}
+\babelprovide[import, main]{spanish}
+% ini-loaded spanish does not register `<` `>` as active shorthands, so the
+% \shorthandoff{<>}/\shorthandon{<>} guards around tikz pictures in the shared
+% sections would error ("not a shorthand"). Under ini-spanish those chars are
+% already inactive, so make the guards no-ops. (Thesis build via tectonic uses
+% the real babel definitions and is unaffected — it does not load this file.)
+\renewcommand{\shorthandoff}[1]{}
+\renewcommand{\shorthandon}[1]{}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}

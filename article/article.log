@@ -1,52 +1,55 @@
-**
-(article.tex
-LaTeX2e <2021-11-15> patch level 1
-L3 programming layer <2022-02-24> (llncs.cls
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (TeX Live 2026/Arch Linux) (preloaded format=pdflatex 2026.6.6)  12 JUN 2026 00:20
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**article.tex
+(./article.tex
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+(./llncs.cls
 Document Class: llncs 2004/08/17 v2.14 
  LaTeX document class for Lecture Notes in Computer Science
-(article.cls
-Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
-(size10.clo
-File: size10.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
+(/usr/share/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+(/usr/share/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
 )
-\c@part=\count181
-\c@section=\count182
-\c@subsection=\count183
-\c@subsubsection=\count184
-\c@paragraph=\count185
-\c@subparagraph=\count186
-\c@figure=\count187
-\c@table=\count188
-\abovecaptionskip=\skip47
-\belowcaptionskip=\skip48
-\bibindent=\dimen138
-) (multicol.sty
-Package: multicol 2021/10/28 v1.9b multicolumn formatting (FMi)
-\c@tracingmulticols=\count189
-\mult@box=\box50
-\multicol@leftmargin=\dimen139
-\c@unbalance=\count190
-\c@collectmore=\count191
-\doublecol@number=\count192
-\multicoltolerance=\count193
-\multicolpretolerance=\count194
-\full@width=\dimen140
-\page@free=\dimen141
-\premulticols=\dimen142
-\postmulticols=\dimen143
-\multicolsep=\skip49
-\multicolbaselineskip=\skip50
-\partial@page=\box51
-\last@line=\box52
-\maxbalancingoverflow=\dimen144
-\mult@rightbox=\box53
-\mult@grightbox=\box54
-\mult@firstbox=\box55
-\mult@gfirstbox=\box56
-\@tempa=\box57
-\@tempa=\box58
-\@tempa=\box59
-\@tempa=\box60
+\c@part=\count275
+\c@section=\count276
+\c@subsection=\count277
+\c@subsubsection=\count278
+\c@paragraph=\count279
+\c@subparagraph=\count280
+\c@figure=\count281
+\c@table=\count282
+\abovecaptionskip=\skip49
+\belowcaptionskip=\skip50
+\bibindent=\dimen148
+)
+(/usr/share/texmf-dist/tex/latex/tools/multicol.sty
+Package: multicol 2025/10/21 v2.0b multicolumn formatting (FMi)
+\c@tracingmulticols=\count283
+\mult@box=\box53
+\multicol@leftmargin=\dimen149
+\c@unbalance=\count284
+\c@collectmore=\count285
+\doublecol@number=\count286
+\multicoltolerance=\count287
+\multicolpretolerance=\count288
+\full@width=\dimen150
+\page@free=\dimen151
+\premulticols=\dimen152
+\postmulticols=\dimen153
+\multicolsep=\skip51
+\multicolbaselineskip=\skip52
+\partial@page=\box54
+\last@line=\box55
+\mc@boxedresult=\box56
+\maxbalancingoverflow=\dimen154
+\mult@rightbox=\box57
+\mult@grightbox=\box58
+\mult@firstbox=\box59
+\mult@gfirstbox=\box60
 \@tempa=\box61
 \@tempa=\box62
 \@tempa=\box63
@@ -79,17 +82,22 @@ Package: multicol 2021/10/28 v1.9b multicolumn formatting (FMi)
 \@tempa=\box90
 \@tempa=\box91
 \@tempa=\box92
-\c@minrows=\count195
-\c@columnbadness=\count196
-\c@finalcolumnbadness=\count197
-\last@try=\dimen145
-\multicolovershoot=\dimen146
-\multicolundershoot=\dimen147
-\mult@nat@firstbox=\box93
-\colbreak@box=\box94
-\mc@col@check@num=\count198
+\@tempa=\box93
+\@tempa=\box94
+\@tempa=\box95
+\@tempa=\box96
+\c@minrows=\count289
+\c@columnbadness=\count290
+\c@finalcolumnbadness=\count291
+\last@try=\dimen155
+\multicolovershoot=\dimen156
+\multicolundershoot=\dimen157
+\mult@nat@firstbox=\box97
+\colbreak@box=\box98
+\mc@col@check@num=\count292
+\g__mc_curr_col_int=\count293
 )
-\c@chapter=\count199
+\c@chapter=\count294
 LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 360.
 LaTeX Font Info:    Redeclaring math symbol \Delta on input line 361.
 LaTeX Font Info:    Redeclaring math symbol \Theta on input line 362.
@@ -101,496 +109,689 @@ LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 367.
 LaTeX Font Info:    Redeclaring math symbol \Phi on input line 368.
 LaTeX Font Info:    Redeclaring math symbol \Psi on input line 369.
 LaTeX Font Info:    Redeclaring math symbol \Omega on input line 370.
-\tocchpnum=\dimen148
-\tocsecnum=\dimen149
-\tocsectotal=\dimen150
-\tocsubsecnum=\dimen151
-\tocsubsectotal=\dimen152
-\tocsubsubsecnum=\dimen153
-\tocsubsubsectotal=\dimen154
-\tocparanum=\dimen155
-\tocparatotal=\dimen156
-\tocsubparanum=\dimen157
-\@tempcntc=\count266
-\fnindent=\dimen158
-\c@@inst=\count267
-\c@@auth=\count268
-\c@auco=\count269
-\instindent=\dimen159
-\authrun=\box95
-\authorrunning=\toks16
-\tocauthor=\toks17
-\titrun=\box96
-\titlerunning=\toks18
-\toctitle=\toks19
-\c@theorem=\count270
-\c@case=\count271
-\c@conjecture=\count272
-\c@corollary=\count273
-\c@definition=\count274
-\c@example=\count275
-\c@exercise=\count276
-\c@lemma=\count277
-\c@note=\count278
-\c@problem=\count279
-\c@property=\count280
-\c@proposition=\count281
-\c@question=\count282
-\c@solution=\count283
-\c@remark=\count284
-\headlineindent=\dimen160
-) (babel.sty
-Package: babel 2022/02/26 3.73 The Babel package
-\babel@savecnt=\count285
-\U@D=\dimen161
-\l@unhyphenated=\language87
- (xebabel.def (txtbabel.def))
-\bbl@readstream=\read2
-\bbl@dirlevel=\count286
-
-(spanish.ldf
-Language: spanish.ldf 2021/05/27 v5.0q Spanish support from the babel system
-\es@quottoks=\toks20
-\es@quotdepth=\count287
-Package babel Info: Making " an active character on input line 570.
-Package babel Info: Making . an active character on input line 675.
-Package babel Info: Making < an active character on input line 722.
-Package babel Info: Making > an active character on input line 722.
-)) (graphicx.sty
-Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
- (keyval.sty
-Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
-\KV@toks@=\toks21
-) (graphics.sty
-Package: graphics 2021/03/04 v1.4d Standard LaTeX Graphics (DPC,SPQR)
- (trig.sty
-Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+\tocchpnum=\dimen158
+\tocsecnum=\dimen159
+\tocsectotal=\dimen160
+\tocsubsecnum=\dimen161
+\tocsubsectotal=\dimen162
+\tocsubsubsecnum=\dimen163
+\tocsubsubsectotal=\dimen164
+\tocparanum=\dimen165
+\tocparatotal=\dimen166
+\tocsubparanum=\dimen167
+\@tempcntc=\count295
+\fnindent=\dimen168
+\c@@inst=\count296
+\c@@auth=\count297
+\c@auco=\count298
+\instindent=\dimen169
+\authrun=\box99
+\authorrunning=\toks17
+\tocauthor=\toks18
+\titrun=\box100
+\titlerunning=\toks19
+\toctitle=\toks20
+\c@theorem=\count299
+\c@case=\count300
+\c@conjecture=\count301
+\c@corollary=\count302
+\c@definition=\count303
+\c@example=\count304
+\c@exercise=\count305
+\c@lemma=\count306
+\c@note=\count307
+\c@problem=\count308
+\c@property=\count309
+\c@proposition=\count310
+\c@question=\count311
+\c@solution=\count312
+\c@remark=\count313
+\headlineindent=\dimen170
 )
-(graphics.cfg
+(/usr/share/texmf-dist/tex/generic/babel/babel.sty
+Package: babel 2026/02/14 v26.3 The multilingual framework for LuaLaTeX, pdfLaT
+eX and XeLaTeX
+\babel@savecnt=\count314
+LaTeX Encoding Info:    Redeclaring text command \ij (encoding OT1) on input li
+ne 2078.
+LaTeX Encoding Info:    Redeclaring text command \IJ (encoding OT1) on input li
+ne 2080.
+LaTeX Encoding Info:    Redeclaring text command \ij (encoding T1) on input lin
+e 2082.
+LaTeX Encoding Info:    Redeclaring text command \IJ (encoding T1) on input lin
+e 2083.
+LaTeX Encoding Info:    Ignoring declaration for text command \ij (encoding ?) 
+on input line 2084.
+LaTeX Encoding Info:    Ignoring declaration for text command \IJ (encoding ?) 
+on input line 2086.
+LaTeX Encoding Info:    Ignoring declaration for text command \SS (encoding ?) 
+on input line 2111.
+\U@D=\dimen171
+\l@unhyphenated=\language3
+
+(/usr/share/texmf-dist/tex/generic/babel/txtbabel.def)
+\bbl@readstream=\read2
+\bbl@dirlevel=\count315
+Package babel Info: You haven't specified a language as a class or package
+(babel)             option. I'll load 'nil'. Reported on input line 4265.
+Package babel Info: Importing font and identification data for nil
+(babel)             from babel-und-x-nil.ini. Reported on input line 4330.
+
+(/usr/share/texmf-dist/tex/generic/babel/nil.ldf
+Language: nil 2026/02/14 v26.3 Nil language
+\l@nil=\language4
+))
+(/usr/share/texmf-dist/tex/generic/babel/locale/es/babel-spanish.tex)
+Package babel Info: Importing data for spanish
+(babel)             from babel-es.ini. Reported on input line 8.
+Package babel Info: Hyphen rules for 'spanish' set to \l@nil
+(babel)             (\language4). Reported on input line 8.
+
+(/usr/share/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks21
+)
+(/usr/share/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2024/08/06 v1.4g Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/share/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
+)
+(/usr/share/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
-Package graphics Info: Driver file: xetex.def on input line 107.
- (xetex.def
-File: xetex.def 2021/03/18 v5.0k Graphics/color driver for xetex
+Package graphics Info: Driver file: pdftex.def on input line 106.
+
+(/usr/share/texmf-dist/tex/latex/graphics-def/pdftex.def
+File: pdftex.def 2025/09/29 v1.2d Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen162
-\Gin@req@width=\dimen163
-) (amsmath.sty
-Package: amsmath 2021/10/15 v2.17l AMS math features
-\@mathmargin=\skip51
+\Gin@req@height=\dimen172
+\Gin@req@width=\dimen173
+)
+(/usr/share/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2025/07/09 v2.17z AMS math features
+\@mathmargin=\skip53
 
 For additional information on amsmath, use the `?' option.
-(amstext.sty
-Package: amstext 2021/08/26 v2.01 AMS text
- (amsgen.sty
+(/usr/share/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2024/11/17 v2.01 AMS text
+
+(/usr/share/texmf-dist/tex/latex/amsmath/amsgen.sty
 File: amsgen.sty 1999/11/30 v2.0 generic functions
 \@emptytoks=\toks22
-\ex@=\dimen164
-)) (amsbsy.sty
+\ex@=\dimen174
+))
+(/usr/share/texmf-dist/tex/latex/amsmath/amsbsy.sty
 Package: amsbsy 1999/11/29 v1.2d Bold Symbols
-\pmbraise@=\dimen165
-) (amsopn.sty
-Package: amsopn 2021/08/26 v2.02 operator names
+\pmbraise@=\dimen175
 )
-\inf@bad=\count288
-LaTeX Info: Redefining \frac on input line 234.
-\uproot@=\count289
-\leftroot@=\count290
-LaTeX Info: Redefining \overline on input line 399.
-\classnum@=\count291
-\DOTSCASE@=\count292
-LaTeX Info: Redefining \ldots on input line 496.
-LaTeX Info: Redefining \dots on input line 499.
-LaTeX Info: Redefining \cdots on input line 620.
-\Mathstrutbox@=\box97
-\strutbox@=\box98
-\big@size=\dimen166
-LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
-LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
-\macc@depth=\count293
-\c@MaxMatrixCols=\count294
-\dotsspace@=\muskip16
-\c@parentequation=\count295
-\dspbrk@lvl=\count296
+(/usr/share/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2022/04/08 v2.04 operator names
+)
+\inf@bad=\count316
+LaTeX Info: Redefining \frac on input line 233.
+\uproot@=\count317
+\leftroot@=\count318
+LaTeX Info: Redefining \overline on input line 398.
+LaTeX Info: Redefining \colon on input line 409.
+\classnum@=\count319
+\DOTSCASE@=\count320
+LaTeX Info: Redefining \ldots on input line 495.
+LaTeX Info: Redefining \dots on input line 498.
+LaTeX Info: Redefining \cdots on input line 619.
+\Mathstrutbox@=\box101
+\strutbox@=\box102
+LaTeX Info: Redefining \big on input line 721.
+LaTeX Info: Redefining \Big on input line 722.
+LaTeX Info: Redefining \bigg on input line 723.
+LaTeX Info: Redefining \Bigg on input line 724.
+\big@size=\dimen176
+LaTeX Font Info:    Redeclaring font encoding OML on input line 742.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 743.
+\macc@depth=\count321
+LaTeX Info: Redefining \bmod on input line 904.
+LaTeX Info: Redefining \pmod on input line 909.
+LaTeX Info: Redefining \smash on input line 939.
+LaTeX Info: Redefining \relbar on input line 969.
+LaTeX Info: Redefining \Relbar on input line 970.
+\c@MaxMatrixCols=\count322
+\dotsspace@=\muskip17
+\c@parentequation=\count323
+\dspbrk@lvl=\count324
 \tag@help=\toks23
-\row@=\count297
-\column@=\count298
-\maxfields@=\count299
+\row@=\count325
+\column@=\count326
+\maxfields@=\count327
 \andhelp@=\toks24
-\eqnshift@=\dimen167
-\alignsep@=\dimen168
-\tagshift@=\dimen169
-\tagwidth@=\dimen170
-\totwidth@=\dimen171
-\lineht@=\dimen172
+\eqnshift@=\dimen177
+\alignsep@=\dimen178
+\tagshift@=\dimen179
+\tagwidth@=\dimen180
+\totwidth@=\dimen181
+\lineht@=\dimen182
 \@envbody=\toks25
-\multlinegap=\skip52
-\multlinetaggap=\skip53
+\multlinegap=\skip54
+\multlinetaggap=\skip55
 \mathdisplay@stack=\toks26
-LaTeX Info: Redefining \[ on input line 2938.
-LaTeX Info: Redefining \] on input line 2939.
-) (amssymb.sty
+LaTeX Info: Redefining \[ on input line 2950.
+LaTeX Info: Redefining \] on input line 2951.
+)
+(/usr/share/texmf-dist/tex/latex/amsfonts/amssymb.sty
 Package: amssymb 2013/01/14 v3.01 AMS font symbols
 
-(amsfonts.sty
+(/usr/share/texmf-dist/tex/latex/amsfonts/amsfonts.sty
 Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 \symAMSa=\mathgroup4
 \symAMSb=\mathgroup5
 LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
-)) (longtable.sty
-Package: longtable 2021-09-01 v4.17 Multi-page Table package (DPC)
-\LTleft=\skip54
-\LTright=\skip55
-\LTpre=\skip56
-\LTpost=\skip57
-\LTchunksize=\count300
-\LTcapwidth=\dimen173
-\LT@head=\box99
-\LT@firsthead=\box100
-\LT@foot=\box101
-\LT@lastfoot=\box102
-\LT@gbox=\box103
-\LT@cols=\count301
-\LT@rows=\count302
-\c@LT@tables=\count303
-\c@LT@chunks=\count304
+))
+(/usr/share/texmf-dist/tex/latex/tools/longtable.sty
+Package: longtable 2025-10-13 v4.24 Multi-page Table package (DPC)
+\LTleft=\skip56
+\LTright=\skip57
+\LTpre=\skip58
+\LTpost=\skip59
+\LTchunksize=\count328
+\LTcapwidth=\dimen183
+\LT@head=\box103
+\LT@firsthead=\box104
+\LT@foot=\box105
+\LT@lastfoot=\box106
+\LT@gbox=\box107
+\LT@cols=\count329
+\LT@rows=\count330
+\c@LT@tables=\count331
+\c@LT@chunks=\count332
 \LT@p@ftn=\toks27
-) (array.sty
-Package: array 2021/10/04 v2.5f Tabular extension package (FMi)
-\col@sep=\dimen174
-\ar@mcellbox=\box104
-\extrarowheight=\dimen175
-\NC@list=\toks28
-\extratabsurround=\skip58
-\backup@length=\skip59
-\ar@cellbox=\box105
-) (csquotes.sty
-Package: csquotes 2021-02-22 v5.2l context-sensitive quotations (JAW)
- (etoolbox.sty
-Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
-\etb@tempcnta=\count305
 )
-\csq@reset=\count306
-\csq@gtype=\count307
-\csq@glevel=\count308
-\csq@qlevel=\count309
-\csq@maxlvl=\count310
-\csq@tshold=\count311
+(/usr/share/texmf-dist/tex/latex/tools/array.sty
+Package: array 2025/09/25 v2.6n Tabular extension package (FMi)
+\col@sep=\dimen184
+\ar@mcellbox=\box108
+\extrarowheight=\dimen185
+\NC@list=\toks28
+\extratabsurround=\skip60
+\backup@length=\skip61
+\ar@cellbox=\box109
+)
+(/usr/share/texmf-dist/tex/latex/csquotes/csquotes.sty
+Package: csquotes 2024-04-04 v5.2o context-sensitive quotations (JAW)
+
+(/usr/share/texmf-dist/tex/latex/etoolbox/etoolbox.sty
+Package: etoolbox 2025/10/02 v2.5m e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count333
+)
+\csq@reset=\count334
+\csq@gtype=\count335
+\csq@glevel=\count336
+\csq@qlevel=\count337
+\csq@maxlvl=\count338
+\csq@tshold=\count339
 \csq@ltx@everypar=\toks29
 
-(csquotes.def
-File: csquotes.def 2021-02-22 v5.2l csquotes generic definitions (JAW)
+(/usr/share/texmf-dist/tex/latex/csquotes/csquotes.def
+File: csquotes.def 2024-04-04 v5.2o csquotes generic definitions (JAW)
 )
 Package csquotes Info: Trying to load configuration file 'csquotes.cfg'...
 Package csquotes Info: ... configuration file loaded successfully.
- (csquotes.cfg
+
+(/usr/share/texmf-dist/tex/latex/csquotes/csquotes.cfg
 File: csquotes.cfg 
-)) (tikz.sty (pgf.sty (pgfrcs.sty
-(pgfutil-common.tex
-\pgfutil@everybye=\toks30
-\pgfutil@tempdima=\dimen176
-\pgfutil@tempdimb=\dimen177
- (pgfutil-common-lists.tex)) (pgfutil-latex.def
-\pgfutil@abb=\box106
-)
-(pgfrcs.code.tex (pgf.revision.tex)
-Package: pgfrcs 2021/05/15 v3.1.9a (3.1.9a)
 ))
-Package: pgf 2021/05/15 v3.1.9a (3.1.9a)
- (pgfcore.sty (pgfsys.sty (pgfsys.code.tex
-Package: pgfsys 2021/05/15 v3.1.9a (3.1.9a)
-(pgfkeys.code.tex
+(/usr/share/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
+(/usr/share/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
+(/usr/share/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty
+(/usr/share/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.tex
+\pgfutil@everybye=\toks30
+\pgfutil@tempdima=\dimen186
+\pgfutil@tempdimb=\dimen187
+)
+(/usr/share/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
+\pgfutil@abb=\box110
+)
+(/usr/share/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.tex
+(/usr/share/texmf-dist/tex/generic/pgf/pgf.revision.tex)
+Package: pgfrcs 2025-08-29 v3.1.11a (3.1.11a)
+))
+Package: pgf 2025-08-29 v3.1.11a (3.1.11a)
+
+(/usr/share/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty
+(/usr/share/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty
+(/usr/share/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.code.tex
+Package: pgfsys 2025-08-29 v3.1.11a (3.1.11a)
+
+(/usr/share/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
 \pgfkeys@pathtoks=\toks31
 \pgfkeys@temptoks=\toks32
- (pgfkeysfiltered.code.tex
+
+(/usr/share/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibraryfiltered.code.te
+x
 \pgfkeys@tmptoks=\toks33
 ))
-\pgf@x=\dimen178
-\pgf@y=\dimen179
-\pgf@xa=\dimen180
-\pgf@ya=\dimen181
-\pgf@xb=\dimen182
-\pgf@yb=\dimen183
-\pgf@xc=\dimen184
-\pgf@yc=\dimen185
-\pgf@xd=\dimen186
-\pgf@yd=\dimen187
+\pgf@x=\dimen188
+\pgf@y=\dimen189
+\pgf@xa=\dimen190
+\pgf@ya=\dimen191
+\pgf@xb=\dimen192
+\pgf@yb=\dimen193
+\pgf@xc=\dimen194
+\pgf@yc=\dimen195
+\pgf@xd=\dimen196
+\pgf@yd=\dimen197
 \w@pgf@writea=\write3
 \r@pgf@reada=\read3
-\c@pgf@counta=\count312
-\c@pgf@countb=\count313
-\c@pgf@countc=\count314
-\c@pgf@countd=\count315
+\c@pgf@counta=\count340
+\c@pgf@countb=\count341
+\c@pgf@countc=\count342
+\c@pgf@countd=\count343
 \t@pgf@toka=\toks34
 \t@pgf@tokb=\toks35
 \t@pgf@tokc=\toks36
-\pgf@sys@id@count=\count316
- (pgf.cfg
-File: pgf.cfg 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@sys@id@count=\count344
+ (/usr/share/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
+File: pgf.cfg 2025-08-29 v3.1.11a (3.1.11a)
 )
-Driver file for pgf: pgfsys-xetex.def
- (pgfsys-xetex.def
-File: pgfsys-xetex.def 2021/05/15 v3.1.9a (3.1.9a)
+Driver file for pgf: pgfsys-pdftex.def
 
-(pgfsys-dvipdfmx.def
-File: pgfsys-dvipdfmx.def 2021/05/15 v3.1.9a (3.1.9a)
- (pgfsys-common-pdf.def
-File: pgfsys-common-pdf.def 2021/05/15 v3.1.9a (3.1.9a)
+(/usr/share/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-pdftex.def
+File: pgfsys-pdftex.def 2025-08-29 v3.1.11a (3.1.11a)
+
+(/usr/share/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-common-pdf.def
+File: pgfsys-common-pdf.def 2025-08-29 v3.1.11a (3.1.11a)
+)))
+(/usr/share/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoftpath.code.tex
+File: pgfsyssoftpath.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfsyssoftpath@smallbuffer@items=\count345
+\pgfsyssoftpath@bigbuffer@items=\count346
 )
-\pgfsys@objnum=\count317
-))) (pgfsyssoftpath.code.tex
-File: pgfsyssoftpath.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgfsyssoftpath@smallbuffer@items=\count318
-\pgfsyssoftpath@bigbuffer@items=\count319
-)
-(pgfsysprotocol.code.tex
-File: pgfsysprotocol.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-)) (xcolor.sty
-Package: xcolor 2021/10/31 v2.13 LaTeX color extensions (UK)
- (color.cfg
+(/usr/share/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprotocol.code.tex
+File: pgfsysprotocol.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+))
+(/usr/share/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2024/09/29 v3.02 LaTeX color extensions (UK)
+
+(/usr/share/texmf-dist/tex/latex/graphics-cfg/color.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
-Package xcolor Info: Driver file: xetex.def on input line 227.
-Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1352.
-Package xcolor Info: Model `RGB' extended on input line 1368.
-Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1370.
-Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1371.
-Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1372.
-Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1373.
-Package xcolor Info: Model `Gray' substituted by `gray' on input line 1374.
-Package xcolor Info: Model `wave' substituted by `hsb' on input line 1375.
-) (pgfcore.code.tex
-Package: pgfcore 2021/05/15 v3.1.9a (3.1.9a)
+Package xcolor Info: Driver file: pdftex.def on input line 274.
 
-(pgfmath.code.tex (pgfmathcalc.code.tex (pgfmathutil.code.tex)
-(pgfmathparser.code.tex
-\pgfmath@dimen=\dimen188
-\pgfmath@count=\count320
-\pgfmath@box=\box107
+(/usr/share/texmf-dist/tex/latex/graphics/mathcolor.ltx)
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1349.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1353.
+Package xcolor Info: Model `RGB' extended on input line 1365.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1367.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1368.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1370.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1371.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1372.
+)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.code.tex
+Package: pgfcore 2025-08-29 v3.1.11a (3.1.11a)
+
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.tex)
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathparser.code.tex
+\pgfmath@dimen=\dimen198
+\pgfmath@count=\count347
+\pgfmath@box=\box111
 \pgfmath@toks=\toks37
 \pgfmath@stack@operand=\toks38
 \pgfmath@stack@operation=\toks39
-) (pgfmathfunctions.code.tex
-(pgfmathfunctions.basic.code.tex) (pgfmathfunctions.trigonometric.code.tex)
-(pgfmathfunctions.random.code.tex) (pgfmathfunctions.comparison.code.tex)
-(pgfmathfunctions.base.code.tex) (pgfmathfunctions.round.code.tex)
-(pgfmathfunctions.misc.code.tex) (pgfmathfunctions.integerarithmetics.code.tex)
-)) (pgfmathfloat.code.tex
-\c@pgfmathroundto@lastzeros=\count321
-)) (pgfint.code.tex) (pgfcorepoints.code.tex
-File: pgfcorepoints.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgf@picminx=\dimen189
-\pgf@picmaxx=\dimen190
-\pgf@picminy=\dimen191
-\pgf@picmaxy=\dimen192
-\pgf@pathminx=\dimen193
-\pgf@pathmaxx=\dimen194
-\pgf@pathminy=\dimen195
-\pgf@pathmaxy=\dimen196
-\pgf@xx=\dimen197
-\pgf@xy=\dimen198
-\pgf@yx=\dimen199
-\pgf@yy=\dimen256
-\pgf@zx=\dimen257
-\pgf@zy=\dimen258
 )
-(pgfcorepathconstruct.code.tex
-File: pgfcorepathconstruct.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgf@path@lastx=\dimen259
-\pgf@path@lasty=\dimen260
-) (pgfcorepathusage.code.tex
-File: pgfcorepathusage.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgf@shorten@end@additional=\dimen261
-\pgf@shorten@start@additional=\dimen262
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.code.tex)
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.basic.code.tex)
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.trigonometric.code
+.tex)
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.random.code.tex)
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.comparison.code.te
+x) (/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.base.code.tex)
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.round.code.tex)
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.misc.code.tex)
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.integerarithmetics
+.code.tex) (/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.tex)
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code.tex
+\c@pgfmathroundto@lastzeros=\count348
+))
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfint.code.tex)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoints.code.tex
+File: pgfcorepoints.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@picminx=\dimen199
+\pgf@picmaxx=\dimen256
+\pgf@picminy=\dimen257
+\pgf@picmaxy=\dimen258
+\pgf@pathminx=\dimen259
+\pgf@pathmaxx=\dimen260
+\pgf@pathminy=\dimen261
+\pgf@pathmaxy=\dimen262
+\pgf@xx=\dimen263
+\pgf@xy=\dimen264
+\pgf@yx=\dimen265
+\pgf@yy=\dimen266
+\pgf@zx=\dimen267
+\pgf@zy=\dimen268
 )
-(pgfcorescopes.code.tex
-File: pgfcorescopes.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgfpic=\box108
-\pgf@hbox=\box109
-\pgf@layerbox@main=\box110
-\pgf@picture@serial@count=\count322
-) (pgfcoregraphicstate.code.tex
-File: pgfcoregraphicstate.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgflinewidth=\dimen263
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathconstruct.code.tex
+File: pgfcorepathconstruct.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@path@lastx=\dimen269
+\pgf@path@lasty=\dimen270
+) (/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathusage.code.tex
+File: pgfcorepathusage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@shorten@end@additional=\dimen271
+\pgf@shorten@start@additional=\dimen272
 )
-(pgfcoretransformations.code.tex
-File: pgfcoretransformations.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgf@pt@x=\dimen264
-\pgf@pt@y=\dimen265
-\pgf@pt@temp=\dimen266
-) (pgfcorequick.code.tex
-File: pgfcorequick.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescopes.code.tex
+File: pgfcorescopes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfpic=\box112
+\pgf@hbox=\box113
+\pgf@layerbox@main=\box114
+\pgf@picture@serial@count=\count349
 )
-(pgfcoreobjects.code.tex
-File: pgfcoreobjects.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-) (pgfcorepathprocessing.code.tex
-File: pgfcorepathprocessing.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregraphicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgflinewidth=\dimen273
 )
-(pgfcorearrows.code.tex
-File: pgfcorearrows.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgfarrowsep=\dimen267
-) (pgfcoreshade.code.tex
-File: pgfcoreshade.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgf@max=\dimen268
-\pgf@sys@shading@range@num=\count323
-\pgf@shadingcount=\count324
-) (pgfcoreimage.code.tex
-File: pgfcoreimage.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-
-(pgfcoreexternal.code.tex
-File: pgfcoreexternal.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgfexternal@startupbox=\box111
-)) (pgfcorelayers.code.tex
-File: pgfcorelayers.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransformations.code.t
+ex
+File: pgfcoretransformations.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@pt@x=\dimen274
+\pgf@pt@y=\dimen275
+\pgf@pt@temp=\dimen276
+) (/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequick.code.tex
+File: pgfcorequick.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-(pgfcoretransparency.code.tex
-File: pgfcoretransparency.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-) (pgfcorepatterns.code.tex
-File: pgfcorepatterns.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-) (pgfcorerdf.code.tex
-File: pgfcorerdf.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-))) (pgfmoduleshapes.code.tex
-File: pgfmoduleshapes.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgfnodeparttextbox=\box112
-) (pgfmoduleplot.code.tex
-File: pgfmoduleplot.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobjects.code.tex
+File: pgfcoreobjects.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )
-(pgfcomp-version-0-65.sty
-Package: pgfcomp-version-0-65 2021/05/15 v3.1.9a (3.1.9a)
-\pgf@nodesepstart=\dimen269
-\pgf@nodesepend=\dimen270
-) (pgfcomp-version-1-18.sty
-Package: pgfcomp-version-1-18 2021/05/15 v3.1.9a (3.1.9a)
-)) (pgffor.sty (pgfkeys.sty (pgfkeys.code.tex)) (pgfmath.sty (pgfmath.code.tex)
-) (pgffor.code.tex
-Package: pgffor 2021/05/15 v3.1.9a (3.1.9a)
-
-(pgfmath.code.tex)
-\pgffor@iter=\dimen271
-\pgffor@skip=\dimen272
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepathprocessing.code.te
+x
+File: pgfcorepathprocessing.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearrows.code.tex
+File: pgfcorearrows.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfarrowsep=\dimen277
+)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshade.code.tex
+File: pgfcoreshade.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@max=\dimen278
+\pgf@sys@shading@range@num=\count350
+\pgf@shadingcount=\count351
+)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimage.code.tex
+File: pgfcoreimage.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexternal.code.tex
+File: pgfcoreexternal.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfexternal@startupbox=\box115
+)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelayers.code.tex
+File: pgfcorelayers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretransparency.code.tex
+File: pgfcoretransparency.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatterns.code.tex
+File: pgfcorepatterns.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(/usr/share/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.code.tex
+File: pgfcorerdf.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)))
+(/usr/share/texmf-dist/tex/generic/pgf/modules/pgfmoduleshapes.code.tex
+File: pgfmoduleshapes.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfnodeparttextbox=\box116
+)
+(/usr/share/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.code.tex
+File: pgfmoduleplot.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(/usr/share/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-0-65.sty
+Package: pgfcomp-version-0-65 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@nodesepstart=\dimen279
+\pgf@nodesepend=\dimen280
+)
+(/usr/share/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-version-1-18.sty
+Package: pgfcomp-version-1-18 2025-08-29 v3.1.11a (3.1.11a)
+))
+(/usr/share/texmf-dist/tex/latex/pgf/utilities/pgffor.sty
+(/usr/share/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty
+(/usr/share/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex))
+(/usr/share/texmf-dist/tex/latex/pgf/math/pgfmath.sty
+(/usr/share/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex))
+(/usr/share/texmf-dist/tex/generic/pgf/utilities/pgffor.code.tex
+Package: pgffor 2025-08-29 v3.1.11a (3.1.11a)
+\pgffor@iter=\dimen281
+\pgffor@skip=\dimen282
 \pgffor@stack=\toks40
 \pgffor@toks=\toks41
-)) (tikz.code.tex
-Package: tikz 2021/05/15 v3.1.9a (3.1.9a)
- (pgflibraryplothandlers.code.tex
-File: pgflibraryplothandlers.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgf@plot@mark@count=\count325
-\pgfplotmarksize=\dimen273
-)
-\tikz@lastx=\dimen274
-\tikz@lasty=\dimen275
-\tikz@lastxsaved=\dimen276
-\tikz@lastysaved=\dimen277
-\tikz@lastmovetox=\dimen278
-\tikz@lastmovetoy=\dimen279
-\tikzleveldistance=\dimen280
-\tikzsiblingdistance=\dimen281
-\tikz@figbox=\box113
-\tikz@figbox@bg=\box114
-\tikz@tempbox=\box115
-\tikz@tempbox@bg=\box116
-\tikztreelevel=\count326
-\tikznumberofchildren=\count327
-\tikznumberofcurrentchild=\count328
-\tikz@fig@count=\count329
+))
+(/usr/share/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.code.tex
+Package: tikz 2025-08-29 v3.1.11a (3.1.11a)
 
-(pgfmodulematrix.code.tex
-File: pgfmodulematrix.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgfmatrixcurrentrow=\count330
-\pgfmatrixcurrentcolumn=\count331
-\pgf@matrix@numberofcolumns=\count332
+(/usr/share/texmf-dist/tex/generic/pgf/libraries/pgflibraryplothandlers.code.te
+x
+File: pgflibraryplothandlers.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgf@plot@mark@count=\count352
+\pgfplotmarksize=\dimen283
 )
-\tikz@expandcount=\count333
- (tikzlibrarytopaths.code.tex
-File: tikzlibrarytopaths.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\tikz@lastx=\dimen284
+\tikz@lasty=\dimen285
+\tikz@lastxsaved=\dimen286
+\tikz@lastysaved=\dimen287
+\tikz@lastmovetox=\dimen288
+\tikz@lastmovetoy=\dimen289
+\tikzleveldistance=\dimen290
+\tikzsiblingdistance=\dimen291
+\tikz@figbox=\box117
+\tikz@figbox@bg=\box118
+\tikz@tempbox=\box119
+\tikz@tempbox@bg=\box120
+\tikztreelevel=\count353
+\tikznumberofchildren=\count354
+\tikznumberofcurrentchild=\count355
+\tikz@fig@count=\count356
+ (/usr/share/texmf-dist/tex/generic/pgf/modules/pgfmodulematrix.code.tex
+File: pgfmodulematrix.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfmatrixcurrentrow=\count357
+\pgfmatrixcurrentcolumn=\count358
+\pgf@matrix@numberofcolumns=\count359
+)
+\tikz@expandcount=\count360
+
+(/usr/share/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrary
+topaths.code.tex
+File: tikzlibrarytopaths.code.tex 2025-08-29 v3.1.11a (3.1.11a)
 )))
-(pgflibraryarrows.meta.code.tex
-File: pgflibraryarrows.meta.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-\pgfarrowinset=\dimen282
-\pgfarrowlength=\dimen283
-\pgfarrowwidth=\dimen284
-\pgfarrowlinewidth=\dimen285
-) (tikzlibrarypositioning.code.tex
-File: tikzlibrarypositioning.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+(/usr/share/texmf-dist/tex/generic/pgf/libraries/pgflibraryarrows.meta.code.tex
+File: pgflibraryarrows.meta.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+\pgfarrowinset=\dimen292
+\pgfarrowlength=\dimen293
+\pgfarrowwidth=\dimen294
+\pgfarrowlinewidth=\dimen295
 )
-(tikzlibraryfit.code.tex
-File: tikzlibraryfit.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-) (doc/macros.tex)
+(/usr/share/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrary
+positioning.code.tex
+File: tikzlibrarypositioning.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+)
+(/usr/share/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrary
+fit.code.tex
+File: tikzlibraryfit.code.tex 2025-08-29 v3.1.11a (3.1.11a)
+) (./doc/macros.tex)
 Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... found 'babel' package.
 Package csquotes Info: Adjusting default style.
 Package csquotes Info: Redefining alias 'default' -> 'spanish'.
- (l3backend-xetex.def
-File: l3backend-xetex.def 2022-02-07 L3 backend support: XeTeX
-\c__kernel_sys_dvipdfmx_version_int=\count334
-\l__color_backend_stack_int=\count335
-\g__color_backend_stack_int=\count336
-\g__graphics_track_int=\count337
-\l__pdf_internal_box=\box117
-\g__pdf_backend_object_int=\count338
-\g__pdf_backend_annotation_int=\count339
-\g__pdf_backend_link_int=\count340
-) (article.aux
-LaTeX Info: Redefining \. on input line 10.
-LaTeX Info: Redefining \% on input line 10.
-)
+
+(/usr/share/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
+File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count361
+) (./article.aux)
 \openout1 = `article.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 17.
-LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 1
-7.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 28.
+LaTeX Font Info:    ... okay on input line 28.
+ (/usr/share/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count362
+\scratchdimen=\dimen296
+\scratchbox=\box121
+\nofMPsegments=\count363
+\nofMParguments=\count364
+\everyMPshowfont=\toks42
+\MPscratchCnt=\count365
+\MPscratchDim=\dimen297
+\MPnumerator=\count366
+\makeMPintoPDFobject=\count367
+\everyMPtoPDFconversion=\toks43
+) (/usr/share/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
 
-(ts1cmr.fd
-File: ts1cmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
-)
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 17.
-LaTeX Font Info:    ... okay on input line 17.
-LaTeX Info: Redefining \. on input line 17.
-LaTeX Info: Redefining \% on input line 17.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 29.
+(/usr/share/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+LaTeX Font Info:    Trying to load font information for U+msa on input line 40.
 
- (umsa.fd
+
+(/usr/share/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 29.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 40.
 
- (umsb.fd
+
+(/usr/share/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) (doc/content/abstract_en.tex)
-(doc/content/keywords_en.tex) (doc/intro.tex
-File: figures/graffiti_mosaic.jpg Graphic file (type bmp)
-<figures/graffiti_mosaic.jpg>
- [1
-
-]
-LaTeX Info: Redefining \. on input line 64.
-LaTeX Info: Redefining \% on input line 64.
- [2]
-LaTeX Info: Redefining \. on input line 111.
-LaTeX Info: Redefining \% on input line 111.
- [3]) (doc/art.tex
-Overfull \hbox (4.54318pt too wide) in paragraph at lines 8--21
-\TU/lmr/m/n/10 escasa, reciente y de alcance acotado. Un trabajo relevante es e
-l de Fogaça \TU/lmr/m/it/10 et al. \TU/lmr/m/n/10 [[]],
+)
+(./doc/content/abstract_en.tex)
+Overfull \hbox (2.38899pt too wide) in paragraph at lines 1--44
+\OT1/cmr/m/n/9 images and on disjoint manually labelled subsets. The style head
+ separates
  []
 
-LaTeX Info: Redefining \. on input line 26.
-LaTeX Info: Redefining \% on input line 26.
+(./doc/content/keywords_en.tex) (./doc/intro.tex
+Overfull \hbox (1.12715pt too wide) in paragraph at lines 8--20
+\OT1/cmr/m/n/10 El grafiti no autorizado es un fen^^Someno urbano cotidiano que
+ las administraciones
+ []
+
+
+Overfull \hbox (0.93263pt too wide) in paragraph at lines 8--20
+\OT1/cmr/m/n/10 municipales gestionan con un coste econ^^Somico y social sosten
+ido [[]]. La diversidad
+ []
+
+<figures/graffiti_mosaic.jpg, id=4, 1300.86pt x 626.34pt>
+File: figures/graffiti_mosaic.jpg Graphic file (type jpg)
+<use figures/graffiti_mosaic.jpg>
+Package pdftex.def Info: figures/graffiti_mosaic.jpg  used on input line 23.
+(pdftex.def)             Requested size: 347.12354pt x 167.12616pt.
+[1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]
+Overfull \hbox (6.3215pt too wide) in paragraph at lines 30--39
+[]\OT1/cmr/m/n/10 En esta l^^S^^Pnea, trabajos recientes han abordado la detecc
+i^^Son y conteo autom^^Satico
+ []
+
+
+Overfull \hbox (12.34932pt too wide) in paragraph at lines 30--39
+\OT1/cmr/m/n/10 en localizar grafitis y estimar su presencia geogr^^Safica, per
+o sin abordar su agrupaci^^Son
+ []
+
+
+Overfull \hbox (5.76596pt too wide) in paragraph at lines 30--39
+\OT1/cmr/m/n/10 habilita una gran cantidad de procedimientos de an^^Salisis que
+ van desde el estil^^S^^Pstico
+ []
+
+
+Overfull \hbox (2.01599pt too wide) in paragraph at lines 43--49
+\OT1/cmr/m/n/10 reales, agruparlas autom^^Saticamente de modo que los grafitis 
+visualmente similares
+ []
+
+[2 <./figures/graffiti_mosaic.jpg>]
+Overfull \hbox (6.33481pt too wide) in paragraph at lines 70--75
+ \OT1/cmr/bx/n/10 Objetivo general[] \OT1/cmr/m/n/10 Dise~nar, implementar y ev
+aluar experimentalmente un sistema
+ []
+
+
+Overfull \hbox (23.44745pt too wide) in paragraph at lines 70--75
+\OT1/cmr/m/n/10 generaci^^Son de representaciones vectoriales (\OT1/cmr/m/it/10
+ embeddings\OT1/cmr/m/n/10 ), reducci^^Son de dimensionalidad
+ []
+
+
+Overfull \hbox (10.98825pt too wide) in paragraph at lines 104--110
+\OT1/cmr/m/n/10 extr^^S^^Pnseca limitada sobre el subconjunto etiquetado manual
+mente para este trabajo. 
+ []
+
+
+Overfull \hbox (8.09926pt too wide) in paragraph at lines 111--121
+[]\OT1/cmr/m/n/10 Conviene tener en cuenta dos limitaciones metodol^^Sogicas. P
+rimero, las etiquetas
+ []
+
+
+Overfull \hbox (15.7659pt too wide) in paragraph at lines 111--121
+\OT1/cmr/m/n/10 solo es directamente aplicable a las configuraciones que no hac
+en uso de segmentaci^^Son
+ []
+
+
+Overfull \hbox (3.15485pt too wide) in paragraph at lines 111--121
+\OT1/cmr/m/n/10 con los recortes etiquetados manualmente, lo que impide una com
+paraci^^Son directa. 
+ []
+
+[3]
+Overfull \hbox (5.96028pt too wide) in paragraph at lines 122--127
+[]\OT1/cmr/m/n/10 Por ^^Sultimo, cabe destacar que este trabajo se centra exclu
+sivamente en aspectos
+ []
+
+
+Overfull \hbox (2.73808pt too wide) in paragraph at lines 130--139
+\OT1/cmr/m/n/10 se discuten los trabajos relacionados en la secci^^Son 2[]. Pos
+teriormente, se mencionan
+ []
+
+) (./doc/art.tex
+Overfull \hbox (16.71043pt too wide) in paragraph at lines 8--21
+\OT1/cmr/m/n/10 La literatura espec^^S^^Pfica sobre la aplicaci^^Son tanto de t
+^^Secnicas de visi^^Son por computador
+ []
+
+
+Overfull \hbox (6.42123pt too wide) in paragraph at lines 26--39
+\OT1/cmr/m/n/10 de Taylor \OT1/cmr/m/it/10 et al. \OT1/cmr/m/n/10 [[]], en el q
+ue se buscaba una r^^Subrica consistente para la clasificaci^^Son
+ []
+
+
+Overfull \hbox (4.01598pt too wide) in paragraph at lines 26--39
+\OT1/cmr/m/n/10 realizan esta categorizaci^^Son de forma manual, sin aplicar t^
+^Secnicas de agrupamiento
+ []
+
 [4]
 Overfull \hbox (41.64491pt too wide) in alignment at lines 48--50
  [] [] [] [] [] [] 
@@ -598,97 +799,132 @@ Overfull \hbox (41.64491pt too wide) in alignment at lines 48--50
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 51--51
-[]|\TU/lmr/m/n/7 Clasificación y
+[]|\OT1/cmr/m/n/7 Clasificaci^^Son y
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 51--51
-\TU/lmr/m/n/7 detección de
+\OT1/cmr/m/n/7 detecci^^Son de
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 51--51
-[]|\TU/lmr/m/n/7 Clasificación
+[]|\OT1/cmr/m/n/7 Im^^Sagenes de
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 51--51
-\TU/lmr/m/n/7 supervisada +
+[]|\OT1/cmr/m/n/7 Clasificaci^^Son
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 51--51
-[]|\TU/lmr/m/n/7 Exactitud /
+\OT1/cmr/m/n/7 supervisada +
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 51--51
-\TU/lmr/m/n/7 mAP (pre-
+[]|\OT1/cmr/m/n/7 Exactitud /
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 51--51
-\TU/lmr/m/n/7 cisión media
+\OT1/cmr/m/n/7 media
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 51--51
-\TU/lmr/m/n/7 promedio, su-
+\OT1/cmr/m/n/7 promedio,
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 52--52
-[]|\TU/lmr/m/n/7 Google Street
+[]|\OT1/cmr/m/n/7 Cuantificaci^^Son
+ []
+
+
+Underfull \hbox (badness 2726) in paragraph at lines 52--52
+\OT1/cmr/m/n/7 de densidad de
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 52--52
+[]|\OT1/cmr/m/n/7 Google Street
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 52--52
+\OT1/cmr/m/n/7 View (S~ao
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 52--52
+[]|\OT1/cmr/m/n/7 Segmentaci^^Son
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 52--52
+[]|\OT1/cmr/m/n/7 Precisi^^Son /
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 53--53
-[]|\TU/lmr/m/n/7 Categorización
+[]|\OT1/cmr/m/n/7 Categorizaci^^Son
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 53--53
-[]|\TU/lmr/m/n/7 Fotografías de
+[]|\OT1/cmr/m/n/7 Fotograf^^S^^Pas de
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 53--53
-[]|\TU/lmr/m/n/7 Categorización
+[]|\OT1/cmr/m/n/7 Categorizaci^^Son
  []
 
 
-Underfull \hbox (badness 5667) in paragraph at lines 54--54
-[]|\TU/lmr/m/n/7 García García
+Underfull \hbox (badness 6348) in paragraph at lines 54--54
+[]|\OT1/cmr/m/n/7 Garc^^S^^Pa Garc^^S^^Pa
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 54--54
-[]|\TU/lmr/m/n/7 Imágenes de
+[]|\OT1/cmr/m/n/7 Im^^Sagenes de
  []
 
 
-Underfull \hbox (badness 1515) in paragraph at lines 55--55
-[]|\TU/lmr/m/n/7 Agrupamiento y
+Underfull \hbox (badness 10000) in paragraph at lines 54--54
+[]|\OT1/cmr/m/n/7 Colores
  []
 
 
-Underfull \hbox (badness 2221) in paragraph at lines 55--55
-[]|\TU/lmr/m/it/7 Embeddings \TU/lmr/m/n/7 pro-
+Underfull \hbox (badness 10000) in paragraph at lines 54--54
+\OT1/cmr/m/n/7 dominantes
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 54--54
+[]|\OT1/cmr/m/n/7 Interna (no
+ []
+
+
+Underfull \hbox (badness 1694) in paragraph at lines 55--55
+[]|\OT1/cmr/m/n/7 Agrupamiento y
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 55--55
-[]|\TU/lmr/m/n/7 Reducción +
+[]|\OT1/cmr/m/it/7 Embeddings
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 55--55
-[]|\TU/lmr/m/n/7 Interna, ex-
+[]|\OT1/cmr/m/n/7 Reducci^^Son +
  []
 
 
-Underfull \hbox (badness 3568) in paragraph at lines 55--55
-\TU/lmr/m/n/7 terna y coste
+Underfull \hbox (badness 10000) in paragraph at lines 55--55
+[]|\OT1/cmr/m/n/7 Interna,
  []
 
 
@@ -697,177 +933,476 @@ Overfull \hbox (41.64491pt too wide) in alignment at lines 50--59
  []
 
 
-LaTeX Warning: Citation ` campello_density-based_2013' on page 5 undefined on i
-nput line 85.
+Overfull \hbox (36.4883pt too wide) in paragraph at lines 71--87
+\OT1/cmr/m/n/10 extracci^^Son de una representaci^^Son vectorial, reducci^^Son 
+de dimensionalidad y agrupamiento.
+ []
 
 
-LaTeX Warning: Citation ` arthur_k-means_2007' on page 5 undefined on input lin
-e 85.
+Overfull \hbox (19.59929pt too wide) in paragraph at lines 71--87
+\OT1/cmr/m/n/10 cubren distintos supuestos estructurales sobre los datos [[],[]
+,[]]. Para la recuperaci^^Son
+ []
 
-LaTeX Info: Redefining \. on input line 88.
-LaTeX Info: Redefining \% on input line 88.
 [5]
-LaTeX Info: Redefining \. on input line 136.
-LaTeX Info: Redefining \% on input line 136.
- [6]) (doc/tools.tex
+Overfull \hbox (6.01602pt too wide) in paragraph at lines 97--108
+\OT1/cmr/m/n/10 autor^^S^^Pa, Fiel y Sablatnig [[]] hacen uso de las activacion
+es de una red convolucional
+ []
+
+
+Overfull \hbox (4.29362pt too wide) in paragraph at lines 97--108
+\OT1/cmr/m/n/10 productor a partir de una muestra de su escritura. Estos vector
+es de caracter^^S^^Psticas
+ []
+
+
+Overfull \hbox (8.79388pt too wide) in paragraph at lines 97--108
+\OT1/cmr/m/n/10 vectores guardados. Este patr^^Son de []  codificar una vez y r
+ecuperar por similitud[] es
+ []
+
+
+Overfull \hbox (9.7659pt too wide) in paragraph at lines 109--121
+\OT1/cmr/m/n/10 un modelo que aprende a mapear im^^Sagenes de rostros a un espa
+cio de caracter^^S^^Psticas
+ []
+
+[6]) (./doc/tools.tex
+<figures/map_with_photos.pdf, id=39, 910.602pt x 682.22879pt>
 File: figures/map_with_photos.pdf Graphic file (type pdf)
 <use figures/map_with_photos.pdf>
+Package pdftex.def Info: figures/map_with_photos.pdf  used on input line 21.
+(pdftex.def)             Requested size: 347.12354pt x 260.0616pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
+
+Overfull \hbox (4.90482pt too wide) in paragraph at lines 27--32
+\OT1/cmr/m/n/10 hasta el oto~no de ese mismo a~no que se intensific^^So la toma
+ de im^^Sagenes, capturando
+ []
+
+<figures/dataset-evolution.pdf, id=40, 621.23659pt x 279.20607pt>
 File: figures/dataset-evolution.pdf Graphic file (type pdf)
 <use figures/dataset-evolution.pdf>
+Package pdftex.def Info: figures/dataset-evolution.pdf  used on input line 42.
+(pdftex.def)             Requested size: 347.12354pt x 156.0135pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-LaTeX Info: Redefining \. on input line 60.
-LaTeX Info: Redefining \% on input line 60.
 [7]
-Underfull \vbox (badness 2277) has occurred while \output is active []
+Underfull \vbox (badness 2401) has occurred while \output is active []
 
-LaTeX Info: Redefining \. on input line 60.
-LaTeX Info: Redefining \% on input line 60.
- [8]
-File: figures/style_tag.jpg Graphic file (type bmp)
-<figures/style_tag.jpg>
-File: figures/style_throwup.jpg Graphic file (type bmp)
-<figures/style_throwup.jpg>
-File: figures/style_piece.jpg Graphic file (type bmp)
-<figures/style_piece.jpg>
-File: figures/style_character.jpg Graphic file (type bmp)
-<figures/style_character.jpg>
+ [8 <./figures/map_with_photos.pdf> <./figures/dataset-evolution.pdf>]
+<figures/style_tag.jpg, id=127, 1221.56375pt x 312.16624pt>
+File: figures/style_tag.jpg Graphic file (type jpg)
+<use figures/style_tag.jpg>
+Package pdftex.def Info: figures/style_tag.jpg  used on input line 87.
+(pdftex.def)             Requested size: 68.27663pt x 17.44785pt.
+<figures/style_throwup.jpg, id=128, 2556.55125pt x 1392.20125pt>
+File: figures/style_throwup.jpg Graphic file (type jpg)
+<use figures/style_throwup.jpg>
+Package pdftex.def Info: figures/style_throwup.jpg  used on input line 88.
+(pdftex.def)             Requested size: 67.91602pt x 36.9845pt.
+
+Underfull \hbox (badness 10000) in paragraph at lines 88--88
+[]|\OT1/cmr/m/n/9 Nombre escrito en letras redondeadas,
+ []
+
+
+Underfull \hbox (badness 3449) in paragraph at lines 88--88
+\OT1/cmr/m/n/9 normalmente con no m^^Sas de dos colores
+ []
+
+<figures/style_piece.jpg, id=129, 2222.3025pt x 1251.67625pt>
+File: figures/style_piece.jpg Graphic file (type jpg)
+<use figures/style_piece.jpg>
+Package pdftex.def Info: figures/style_piece.jpg  used on input line 89.
+(pdftex.def)             Requested size: 65.64891pt x 36.9757pt.
+
+Underfull \hbox (badness 6625) in paragraph at lines 89--89
+[]|\OT1/cmr/m/n/9 Obra elaborada, multicolor y con letras
+ []
+
+<figures/style_character.jpg, id=130, 2267.47125pt x 1754.555pt>
+File: figures/style_character.jpg Graphic file (type jpg)
+<use figures/style_character.jpg>
+Package pdftex.def Info: figures/style_character.jpg  used on input line 90.
+(pdftex.def)             Requested size: 47.78091pt x 36.97256pt.
+
+Overfull \hbox (6.46967pt too wide) in paragraph at lines 96--102
+\OT1/cmr/m/n/10 mayor parte de los recortes, mientras que \OT1/cmr/m/it/10 char
+acter \OT1/cmr/m/n/10 resulta claramente minoritaria,
+ []
+
+<figures/dataset_style_distribution.pdf, id=131, 395.71652pt x 221.54507pt>
 File: figures/dataset_style_distribution.pdf Graphic file (type pdf)
 <use figures/dataset_style_distribution.pdf>
-
+Package pdftex.def Info: figures/dataset_style_distribution.pdf  used on input 
+line 105.
+(pdftex.def)             Requested size: 347.12354pt x 194.35176pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-LaTeX Info: Redefining \. on input line 115.
-LaTeX Info: Redefining \% on input line 115.
-[9]
-LaTeX Info: Redefining \. on input line 153.
-LaTeX Info: Redefining \% on input line 153.
- [10]
-Underfull \vbox (badness 7203) has occurred while \output is active []
 
-LaTeX Info: Redefining \. on input line 206.
-LaTeX Info: Redefining \% on input line 206.
+Underfull \vbox (badness 4505) has occurred while \output is active []
+
+ [9 <./figures/style_tag.jpg> <./figures/style_throwup.jpg> <./figures/style_pi
+ece.jpg> <./figures/style_character.jpg>] [10 <./figures/dataset_style_distribu
+tion.pdf>]
+Overfull \hbox (0.141pt too wide) in paragraph at lines 154--167
+\OT1/cmr/m/n/10 (normalizaci^^Son $\OML/cmm/m/it/10 L[]$\OT1/cmr/m/n/10 ), pr^^
+Sactica frecuente para que la magnitud del vector no domine
+ []
+
+
+Overfull \hbox (1.2262pt too wide) in paragraph at lines 170--182
+ \OT1/cmr/bx/n/10 B^^Susqueda por similitud[] \OT1/cmr/m/n/10 Para la b^^Susque
+da por similitud la propuesta considera
+ []
+
+
+Underfull \vbox (badness 1466) has occurred while \output is active []
+
  [11]
-LaTeX Info: Redefining \. on input line 254.
-LaTeX Info: Redefining \% on input line 254.
+Overfull \hbox (14.99348pt too wide) in paragraph at lines 218--231
+[]\OT1/cmr/m/n/10 Tambi^^Sen se utilizan otros m^^Setodos menos comunes como \O
+T1/cmr/m/it/10 affinity propagation \OT1/cmr/m/n/10 [[]],
+ []
+
+
+Overfull \hbox (16.76604pt too wide) in paragraph at lines 232--239
+\OT1/cmr/m/n/10 bayesiano de informaci^^Son (BIC). Los algoritmos basados en de
+nsidad y los jer^^Sarquicos
+ []
 
 [12]
+Overfull \hbox (30.18259pt too wide) in paragraph at lines 255--265
+\OT1/cmr/m/n/10 vecinos m^^Sas cercanos sobre el espacio original y posteriorme
+nte busca una representaci^^Son
+ []
+
+
 Underfull \vbox (badness 4819) has occurred while \output is active []
 
-LaTeX Info: Redefining \. on input line 312.
-LaTeX Info: Redefining \% on input line 312.
  [13]
 Underfull \hbox (badness 10000) in paragraph at lines 328--328
-[]|\TU/lmr/m/n/10 DINOv2 ViT-
+[]|\OT1/cmr/m/n/10 DINOv2 ViT-
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 328--328
-[]|\TU/lmr/m/n/10 Autosupervisado (LVD-
+[]|\OT1/cmr/m/n/10 Autosupervisado (LVD-
  []
 
 
-Overfull \hbox (19.74724pt too wide) in alignment at lines 322--333
+Overfull \hbox (19.74725pt too wide) in alignment at lines 322--333
  [] [] [] [] 
  []
 
-LaTeX Info: Redefining \. on input line 363.
-LaTeX Info: Redefining \% on input line 363.
-[14]
-LaTeX Info: Redefining \. on input line 419.
-LaTeX Info: Redefining \% on input line 419.
- [15]
-LaTeX Info: Redefining \. on input line 468.
-LaTeX Info: Redefining \% on input line 468.
- [16]
-Overfull \hbox (47.0903pt too wide) in paragraph at lines 493--497
+
+Overfull \hbox (21.87717pt too wide) in paragraph at lines 337--345
+\OT1/cmr/m/n/10 una interfaz com^^Sun y se configuran por hiperpar^^Sametros de
+clarados en la configuraci^^Son
+ []
+
+
+Overfull \hbox (9.39812pt too wide) in paragraph at lines 346--350
+[]\OT1/cmr/m/n/10 La columna []Auto. $\OML/cmm/m/it/10 k$[] \OT1/cmr/m/n/10 ind
+ica qu^^Se algoritmos pueden estimar su hiperpar^^Sametro
+ []
+
+
+Overfull \hbox (1.98817pt too wide) in paragraph at lines 346--350
+\OT1/cmr/m/n/10 principal cuando este no se declara en la configuraci^^Son; el 
+procedimiento empleado
+ []
+
+
+ignored: Infinite glue shrinkage found in box being split [14]
+Overfull \hbox (8.50328pt too wide) in paragraph at lines 366--370
+ \OT1/cmr/bx/n/10 T^^Secnicas de reducci^^Son de dimensionalidad[] \OT1/cmr/m/n
+/10 La etapa de reducci^^Son es opcional,
+ []
+
+
+Overfull \hbox (38.0717pt too wide) in paragraph at lines 366--370
+\OT1/cmr/m/n/10 siendo la implementaci^^Son por defecto una identidad que no ap
+lica ninguna transformaci^^Son,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 378--378
+[]\OT1/cmr/m/n/10 Cuadro 6: T^^Secnicas de reducci^^Son de dimensionalidad
+ []
+
+
+Overfull \hbox (8.81017pt too wide) in paragraph at lines 383--401
+ \OT1/cmr/bx/n/10 Sistemas de almacenamiento[] \OT1/cmr/m/n/10 La persistencia 
+de los \OT1/cmr/m/it/10 embeddings \OT1/cmr/m/n/10 y los metadatos
+ []
+
+[15]
+Overfull \hbox (1.20927pt too wide) in paragraph at lines 431--448
+\OT1/cmr/m/n/10 distintos umbrales de intersecci^^Son sobre uni^^Son (IoU). La 
+IoU mide el solapamiento
+ []
+
+
+Overfull \hbox (16.59927pt too wide) in paragraph at lines 457--468
+\OT1/cmr/m/n/10 generalistas producen representaciones transferibles, pero no n
+ecesariamente ^^Soptimas
+ []
+
+[16]
+Overfull \hbox (47.41437pt too wide) in paragraph at lines 493--497
  [][] 
+ []
+
+
+Overfull \hbox (5.32147pt too wide) in paragraph at lines 515--526
+\OT1/cmr/m/n/10 versiones corresponden al requisito m^^S^^Pnimo declarado en el
+ gestor de dependencias.
  []
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-) (doc/methods.tex
-LaTeX Info: Redefining \. on input line 17.
-LaTeX Info: Redefining \% on input line 17.
- [17]
-Overfull \hbox (55.41573pt too wide) in paragraph at lines 55--58
+) (./doc/methods.tex [17]
+Overfull \hbox (55.56606pt too wide) in paragraph at lines 55--58
  [][] 
+ []
+
+
+Overfull \hbox (9.516pt too wide) in paragraph at lines 63--68
+\OT1/cmr/m/n/10 configuraci^^Son independiente y reproducible cuyo coste y cali
+dad pueden compararse
+ []
+
+
+Overfull \hbox (8.12708pt too wide) in paragraph at lines 76--84
+[]\OT1/cmr/m/n/10 El segmentador consume la imagen y devuelve una lista con caj
+as delimitadoras
+ []
+
+
+Overfull \hbox (12.98802pt too wide) in paragraph at lines 76--84
+\OT1/cmr/m/n/10 de los grafitis presentes en la imagen. En el caso de que no se
+ utilice segmentador,
+ []
+
+
+Overfull \hbox (3.96043pt too wide) in paragraph at lines 76--84
+\OT1/cmr/m/n/10 se comporta como un agrupador de im^^Sagenes completas. Este co
+mportamiento
+ []
+
+[18]
+Overfull \hbox (1.65482pt too wide) in paragraph at lines 84--90
+[]\OT1/cmr/m/n/10 Las cajas detectadas se fusionan seg^^Sun criterios de solapa
+miento y proximidad
+ []
+
+
+Overfull \hbox (12.51585pt too wide) in paragraph at lines 90--93
+\OT1/cmr/m/n/10 modelo de extracci^^Son de caracter^^S^^Psticas, que produce un
+ vector de caracter^^S^^Psticas
+ []
+
+<figures/segmentation_stages.pdf, id=180, 630.55576pt x 328.10373pt>
+File: figures/segmentation_stages.pdf Graphic file (type pdf)
+<use figures/segmentation_stages.pdf>
+Package pdftex.def Info: figures/segmentation_stages.pdf  used on input line 10
+4.
+(pdftex.def)             Requested size: 347.12354pt x 180.62782pt.
+
+Overfull \hbox (15.37717pt too wide) in paragraph at lines 114--127
+\OT1/cmr/m/n/10 obteniendo un nuevo conjunto de vectores. Finalmente, el algori
+tmo de agrupamiento
+ []
+
+
+Overfull \hbox (1.65475pt too wide) in paragraph at lines 114--127
+\OT1/cmr/m/n/10 listas de recortes para la generaci^^Son de visualizaciones int
+eractivas. Esta secuencia
+ []
+
+[19 <./figures/segmentation_stages.pdf>]
+Overfull \hbox (6.04495pt too wide) in paragraph at lines 130--139
+\OT1/cmr/m/it/10 pipeline \OT1/cmr/m/n/10 (preparaci^^Son, ingesta, reducci^^So
+n, agrupamiento y b^^Susqueda por similitud),
+ []
+
+LaTeX Font Info:    Trying to load font information for OMS+cmtt on input line 
+145.
+LaTeX Font Info:    No file OMScmtt.fd. on input line 145.
+
+LaTeX Font Warning: Font shape `OMS/cmtt/m/n' undefined
+(Font)              using `OMS/cmsy/m/n' instead
+(Font)              for symbol `textbraceleft' on input line 145.
+
+
+Overfull \hbox (13.09935pt too wide) in paragraph at lines 142--150
+\OT1/cmr/m/n/10 experimentos. Cada experimento declara un identificador ^^Sunic
+o y cinco componentes
+ []
+
+
+Overfull \hbox (26.23831pt too wide) in paragraph at lines 142--150
+\OT1/cmr/m/n/10 declarativa garantiza que toda la informaci^^Son necesaria para
+ reproducir un experimento
+ []
+
+[20]
+Overfull \hbox (28.34932pt too wide) in paragraph at lines 202--211
+[]\OT1/cmr/m/n/10 Para acotar la variabilidad entre ejecuciones, las etapas de 
+reducci^^Son y agrupamiento
+ []
+
+
+Overfull \hbox (15.5716pt too wide) in paragraph at lines 202--211
+\OT1/cmr/m/n/10 reciben por la interfaz com^^Sun pero la ignoran. Cuando la red
+ucci^^Son y el agrupamiento
+ []
+
+
+Overfull \hbox (23.48824pt too wide) in paragraph at lines 212--219
+\OT1/cmr/m/n/10 aritm^^Setica y la desviaci^^Son t^^S^^Ppica de cada m^^Setrica
+ de coste. La calidad del agrupamiento,
+ []
+
+[21]
+Overfull \hbox (36.27277pt too wide) in paragraph at lines 230--237
+ \OT1/cmr/bx/n/10 Selecci^^Son autom^^Satica de hiperpar^^Sametros[] \OT1/cmr/m
+/n/10 Salvo que se desee evaluar expl^^S^^Pcitamente
+ []
+
+
+Overfull \hbox (2.82526pt too wide) in paragraph at lines 256--263
+\OT1/cmr/m/n/10 similitud se realiza sobre los \OT1/cmr/m/it/10 backends \OT1/c
+mr/m/n/10 de almacenamiento descritos anteriormente.
+ []
+
+
+Overfull \hbox (6.75893pt too wide) in paragraph at lines 272--278
+[]\OT1/cmr/m/n/10 De esta etapa tambi^^Sen se reporta la distancia media a los 
+$\OML/cmm/m/it/10 k$ \OT1/cmr/m/n/10 vecinos recuperados,
+ []
+
+
+Overfull \hbox (11.28928pt too wide) in paragraph at lines 281--288
+ \OT1/cmr/bx/n/10 Evaluaci^^Son intr^^S^^Pnseca de los agrupamientos[] \OT1/cmr
+/m/n/10 Las m^^Setricas intr^^S^^Pnsecas definidas
+ []
+
+
+Overfull \hbox (14.89192pt too wide) in paragraph at lines 281--288
+\OT1/cmr/m/n/10 espacio de partida, no sobre los \OT1/cmr/m/it/10 embeddings \O
+T1/cmr/m/n/10 reducidos utilizados por el agrupamiento.
+ []
+
+[22]
+Overfull \hbox (0.96046pt too wide) in paragraph at lines 289--298
+\OT1/cmr/m/n/10 Harab^^Sasz y Davies--Bouldin, lo que evita penalizar a los alg
+oritmos que identifican
+ []
+
+
+Overfull \hbox (1.51595pt too wide) in paragraph at lines 301--312
+\OT1/cmr/m/n/10 opera sobre dos conjuntos de recortes etiquetados, uno por cada
+ tarea supervisada
+ []
+
+
+Overfull \hbox (0.18259pt too wide) in paragraph at lines 324--335
+[]\OT1/cmr/m/n/10 Las etiquetas de autor, en cambio, definen un problema abiert
+o de aprendizaje
+ []
+
+
+Overfull \hbox (12.2104pt too wide) in paragraph at lines 324--335
+\OT1/cmr/m/n/10 ^^Sunicamente identificadores de autor disjuntos de los vistos 
+durante el entrenamiento. 
+ []
+
+
+Overfull \hbox (6.93254pt too wide) in paragraph at lines 336--346
+\OT1/cmr/m/n/10 ciudades, que deber^^Sa tenerse en cuenta al interpretar los re
+sultados de la evaluaci^^Son
+ []
+
+[23]
+Overfull \hbox (5.46046pt too wide) in paragraph at lines 389--396
+\OT1/cmr/m/n/10 descrito en 3.1[], cuyas $447$ fotograf^^S^^Pas de ambos bancos
+ contienen aproximadamente
+ []
+
+
+Overfull \hbox (4.71042pt too wide) in paragraph at lines 389--396
+\OT1/cmr/m/n/10 reducido, se realiza una aumentaci^^Son de datos bastante agres
+iva aplicando diversas
+ []
+
+
+Overfull \hbox (8.46036pt too wide) in paragraph at lines 389--396
+\OT1/cmr/m/n/10 transformaciones sobre las im^^Sagenes y sus cajas correspondie
+ntes. El entrenamiento
  []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-LaTeX Info: Redefining \. on input line 75.
-LaTeX Info: Redefining \% on input line 75.
- [18]
-File: figures/segmentation_stages.pdf Graphic file (type pdf)
-<use figures/segmentation_stages.pdf>
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-LaTeX Info: Redefining \. on input line 139.
-LaTeX Info: Redefining \% on input line 139.
-[19]
-LaTeX Info: Redefining \. on input line 166.
-LaTeX Info: Redefining \% on input line 166.
- [20]
-Overfull \hbox (9.20744pt too wide) in paragraph at lines 202--211
-\TU/lmr/m/n/10 pamiento se repiten $\OML/cmm/m/it/10 K$ \TU/lmr/m/n/10 veces de
-ntro del mismo proceso, con las semillas $\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; \
-OT1/cmr/m/n/10 1\OML/cmm/m/it/10 ; [] ; K \OMS/cmsy/m/n/10 ^^@
+ [24]
+Overfull \hbox (2.87704pt too wide) in paragraph at lines 397--407
+[]\OT1/cmr/m/n/10 Se utilizan los hiperpar^^Sametros por defecto de la implemen
+taci^^Son de referencia,
  []
 
-LaTeX Info: Redefining \. on input line 220.
-LaTeX Info: Redefining \% on input line 220.
-[21]
 
-LaTeX Warning: Citation ` ahmed_k-means_2020' on page 22 undefined on input lin
-e 243.
+Overfull \hbox (3.6137pt too wide) in paragraph at lines 410--415
+ \OT1/cmr/bx/n/10 Cabezas de proyecci^^Son[] \OT1/cmr/m/n/10 Las cuatro cabezas
+ (autor^^S^^Pa y estilo sobre MobileNetV3
+ []
 
-LaTeX Info: Redefining \. on input line 279.
-LaTeX Info: Redefining \% on input line 279.
-[22]
-LaTeX Info: Redefining \. on input line 335.
-LaTeX Info: Redefining \% on input line 335.
- [23]
-LaTeX Info: Redefining \. on input line 383.
-LaTeX Info: Redefining \% on input line 383.
- [24]
-LaTeX Info: Redefining \. on input line 443.
-LaTeX Info: Redefining \% on input line 443.
- [25]) (doc/results.tex
+
+Overfull \hbox (1.30304pt too wide) in paragraph at lines 410--415
+\OT1/cmr/m/n/10 una partici^^Son de validaci^^Son. Los \OT1/cmr/m/it/10 backbon
+es \OT1/cmr/m/n/10 se mantienen estrictamente congelados
+ []
+
+[25])
+Overfull \hbox (15.82152pt too wide) in paragraph at lines 445--55
+\OT1/cmr/m/n/10 M^^Sas all^^Sa del entorno y las versiones de dependencias (sec
+ci^^Son 3.5[]), la reproducibilidad
+ []
+
+(./doc/results.tex
 Overfull \hbox (51.07176pt too wide) in alignment at lines 19--21
  [] [] [] [] 
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 22--22
-[]|\TU/lmr/m/n/9 UMAP-10, HDBSCAN
+[]|\OT1/cmr/m/n/9 UMAP-10, HDBSCAN
  []
 
 
-Underfull \hbox (badness 2012) in paragraph at lines 23--23
-[]|\TU/lmr/m/n/9 Extractor base, HDBS-
+Underfull \hbox (badness 10000) in paragraph at lines 23--23
+[]|\OT1/cmr/m/n/9 Extractor base,
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 25--25
-[]|\TU/lmr/m/n/9 HDBSCAN
+[]|\OT1/cmr/m/n/9 HDBSCAN
  []
 
 
 Underfull \hbox (badness 6364) in paragraph at lines 27--27
 []|$\OML/cmm/m/it/9 N \OMS/cmsy/m/n/9 2 f\OT1/cmr/m/n/9 500\OML/cmm/m/it/9 ; \O
 T1/cmr/m/n/9 1000\OML/cmm/m/it/9 ; \OT1/cmr/m/n/9 2500\OML/cmm/m/it/9 ; \OT1/cm
-r/m/n/9 6416\OMS/cmsy/m/n/9 g$\TU/lmr/m/n/9 ,
+r/m/n/9 6416\OMS/cmsy/m/n/9 g$\OT1/cmr/m/n/9 ,
  []
 
 
@@ -878,8 +1413,38 @@ T1/cmr/m/n/9 500\OML/cmm/m/it/9 ; \OT1/cmr/m/n/9 1000\OML/cmm/m/it/9 ; \OT1/cmr
  []
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 29--29
+[]|\OT1/cmr/m/n/9 Extractor $\OMS/cmsy/m/n/9 ^^B$ \OT1/cmr/m/n/9 reducci^^Son
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 29--29
+\OMS/cmsy/m/n/9 ^^B$ \OT1/cmr/m/n/9 agrupamiento sobre
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 29--29
+[]|\OT1/cmr/m/n/9 SQLite, identidad, sin
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 30--30
+[]|\OT1/cmr/m/n/9 Extractor $\OMS/cmsy/m/n/9 ^^B$ \OT1/cmr/m/n/9 reducci^^Son
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 30--30
+\OMS/cmsy/m/n/9 ^^B$ \OT1/cmr/m/n/9 agrupamiento sobre
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 30--30
+[]|\OT1/cmr/m/n/9 SQLite, identidad, sin
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 31--31
-[]|\TU/lmr/m/it/9 Pipeline \TU/lmr/m/n/9 base, Post-
+[]|\OT1/cmr/m/it/9 Pipeline \OT1/cmr/m/n/9 base,
  []
 
 
@@ -887,22 +1452,34 @@ Overfull \hbox (51.07176pt too wide) in alignment at lines 21--35
  [] [] [] [] 
  []
 
-LaTeX Info: Redefining \. on input line 35.
-LaTeX Info: Redefining \% on input line 35.
-[26]
+
+ignored: Infinite glue shrinkage found in box being split [26]
+Underfull \hbox (badness 1910) in paragraph at lines 62--70
+\OT1/cmr/m/n/10 de caracter^^S^^Psticas. Para esto se prueban doce extractores:
+ cuatro CNN
+ []
+
+
 Overfull \hbox (36.43758pt too wide) in alignment at lines 72--74
  [] [] [] [] [] [] [] 
  []
 
 
-Underfull \hbox (badness 1783) in paragraph at lines 90--90
-[]\TU/lmr/m/n/9 Cuadro 9: E1, calidad intrínseca a $\OML/cmm/m/it/9 N \OT1/cmr/
-m/n/9 = 6416$\TU/lmr/m/n/9 . Las CNN en-
+Underfull \hbox (badness 5203) in paragraph at lines 90--90
+[]\OT1/cmr/m/n/9 Cuadro 9: E1, calidad intr^^S^^Pnseca a $\OML/cmm/m/it/9 N \OT
+1/cmr/m/n/9 = 6416$. Las CNN
  []
 
 
-Underfull \hbox (badness 4254) in paragraph at lines 90--90
-\TU/lmr/m/n/9 trenadas en ImageNet encabezan la silueta; el extractor base
+Underfull \hbox (badness 2126) in paragraph at lines 90--90
+\OT1/cmr/m/n/9 entrenadas en ImageNet encabezan la silueta; el extractor base
+ []
+
+
+Underfull \hbox (badness 1360) in paragraph at lines 90--90
+\OT1/cmr/m/n/9 de ruido $\OMS/cmsy/m/n/9 #$\OT1/cmr/m/n/9 , sil=silueta $\OMS/c
+msy/m/n/9 "$\OT1/cmr/m/n/9 , CH=Calinski--Harab^^Sasz $\OMS/cmsy/m/n/9 "$\OT1/c
+mr/m/n/9 , DB=Davies--
  []
 
 
@@ -910,22 +1487,26 @@ Overfull \hbox (36.43758pt too wide) in alignment at lines 74--92
  [] [] [] [] [] [] [] 
  []
 
-LaTeX Info: Redefining \. on input line 92.
-LaTeX Info: Redefining \% on input line 92.
-[27]
-Underfull \hbox (badness 1062) in paragraph at lines 109--120
-[]\TU/lmr/m/n/10 Las CNN entrenadas en ImageNet lideran la silueta (a $\OML/cmm
-/m/it/10 N \OT1/cmr/m/n/10 = 6416$\TU/lmr/m/n/10 :
- []
 
-
-Underfull \hbox (badness 1199) in paragraph at lines 130--130
-[]|\TU/lmr/bx/n/9 RSS pi-
+ignored: Infinite glue shrinkage found in box being split [27]
+Underfull \hbox (badness 1057) in paragraph at lines 109--120
+[]\OT1/cmr/m/n/10 Las CNN entrenadas en ImageNet lideran la silueta (a $\OML/cm
+m/m/it/10 N \OT1/cmr/m/n/10 = 6416$:
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 130--130
-[]|\TU/lmr/bx/n/9 VRAM
+[]|\OT1/cmr/bx/n/9 RSS
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 130--130
+\OT1/cmr/bx/n/9 pico
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 130--130
+[]|\OT1/cmr/bx/n/9 VRAM
  []
 
 
@@ -938,30 +1519,33 @@ Overfull \hbox (5.41081pt too wide) in alignment at lines 131--149
  [] [] [] [] [] 
  []
 
-LaTeX Info: Redefining \. on input line 149.
-LaTeX Info: Redefining \% on input line 149.
-[28]
+
+ignored: Infinite glue shrinkage found in box being split [28]
+<figures/e1_silhouette_by_embedding.pdf, id=248, 509.9621pt x 268.3987pt>
 File: figures/e1_silhouette_by_embedding.pdf Graphic file (type pdf)
 <use figures/e1_silhouette_by_embedding.pdf>
-LaTeX Info: Redefining \. on input line 170.
-LaTeX Info: Redefining \% on input line 170.
- [29]
+Package pdftex.def Info: figures/e1_silhouette_by_embedding.pdf  used on input 
+line 154.
+(pdftex.def)             Requested size: 347.12354pt x 182.70117pt.
+ [29 <./figures/e1_silhouette_by_embedding.pdf>]
+<figures/e2_reduction_quality_cost.pdf, id=267, 585.99469pt x 292.53453pt>
 File: figures/e2_reduction_quality_cost.pdf Graphic file (type pdf)
 <use figures/e2_reduction_quality_cost.pdf>
+Package pdftex.def Info: figures/e2_reduction_quality_cost.pdf  used on input l
+ine 221.
+(pdftex.def)             Requested size: 347.12354pt x 173.29468pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-LaTeX Info: Redefining \. on input line 239.
-LaTeX Info: Redefining \% on input line 239.
 [30]
 Underfull \hbox (badness 10000) in paragraph at lines 242--242
-[]|\TU/lmr/bx/n/9 clu
+[]|\OT1/cmr/bx/n/9 clu
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 242--242
-[]|\TU/lmr/bx/n/9 mem
+[]|\OT1/cmr/bx/n/9 mem
  []
 
 
@@ -971,12 +1555,7 @@ Overfull \hbox (10.55844pt too wide) in alignment at lines 241--243
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 244--244
-[]|\TU/lmr/m/n/9 HDBSCAN
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 246--246
-[]|\TU/lmr/m/n/9 GMM·300
+[]|\OT1/cmr/m/n/9 HDBSCAN
  []
 
 
@@ -984,25 +1563,33 @@ Overfull \hbox (10.55844pt too wide) in alignment at lines 243--257
  [] [] [] [] [] [] [] [] [] 
  []
 
-LaTeX Info: Redefining \. on input line 257.
-LaTeX Info: Redefining \% on input line 257.
-[31]
+
+ignored: Infinite glue shrinkage found in box being split [31{/usr/share/texmf-dist/font
+s/enc/dvips/cm-super/cm-super-ts1.enc} <./figures/e2_reduction_quality_cost.pdf
+>]
+<figures/e3_pareto_quality_cost.pdf, id=292, 605.15288pt x 337.88106pt>
 File: figures/e3_pareto_quality_cost.pdf Graphic file (type pdf)
 <use figures/e3_pareto_quality_cost.pdf>
+Package pdftex.def Info: figures/e3_pareto_quality_cost.pdf  used on input line
+ 284.
+(pdftex.def)             Requested size: 347.12354pt x 193.82124pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
+<figures/e3_scaling_with_n.pdf, id=293, 825.43532pt x 272.1371pt>
 File: figures/e3_scaling_with_n.pdf Graphic file (type pdf)
 <use figures/e3_scaling_with_n.pdf>
+Package pdftex.def Info: figures/e3_scaling_with_n.pdf  used on input line 297.
+
+(pdftex.def)             Requested size: 347.12354pt x 114.44629pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-LaTeX Info: Redefining \. on input line 332.
-LaTeX Info: Redefining \% on input line 332.
-[32]
+
+ignored: Infinite glue shrinkage found in box being split [32]
 Underfull \hbox (badness 10000) in paragraph at lines 369--369
-[]|\TU/lmr/bx/n/9 ingesta
+[]|\OT1/cmr/bx/n/9 ingesta
  []
 
 
@@ -1015,42 +1602,51 @@ Overfull \hbox (19.23027pt too wide) in alignment at lines 370--382
  [] [] [] [] [] [] [] [] 
  []
 
-LaTeX Info: Redefining \. on input line 382.
-LaTeX Info: Redefining \% on input line 382.
-[33]
-File: figures/val_batch2_pred.jpg Graphic file (type bmp)
-<figures/val_batch2_pred.jpg>
+
+ignored: Infinite glue shrinkage found in box being split [33]
+<figures/val_batch2_pred.jpg, id=300, 1927.2pt x 1129.21875pt>
+File: figures/val_batch2_pred.jpg Graphic file (type jpg)
+<use figures/val_batch2_pred.jpg>
+Package pdftex.def Info: figures/val_batch2_pred.jpg  used on input line 421.
+(pdftex.def)             Requested size: 347.12354pt x 203.38844pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 428--432
+[]\OT1/cmr/m/n/10 Esta conclusi^^Son cierra la configuraci^^Son base del trabaj
+o y la
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 428--432
+\OT1/cmr/m/n/10 fija como: \OT1/cmtt/m/n/10 dinov2[]graffiti[]style[]head \OT1/
+cmr/m/n/10 + UMAP-10 + HDBSCAN
+ []
+
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-LaTeX Info: Redefining \. on input line 441.
-LaTeX Info: Redefining \% on input line 441.
  [34]
-LaTeX Info: Redefining \. on input line 441.
-LaTeX Info: Redefining \% on input line 441.
-
-[35]
+[35 <./figures/e3_pareto_quality_cost.pdf> <./figures/e3_scaling_with_n.pdf>]
 Underfull \hbox (badness 10000) in paragraph at lines 453--453
-[]|\TU/lmr/bx/n/9 ingesta
+[]|\OT1/cmr/bx/n/9 ingesta
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 453--453
-[]|\TU/lmr/bx/n/9 HDBSCAN
+[]|\OT1/cmr/bx/n/9 HDBSCAN
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 453--453
-[]|\TU/lmr/bx/n/9 K-medias
+[]|\OT1/cmr/bx/n/9 K-medias
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 453--453
-[]|\TU/lmr/bx/n/9 búsqueda
+[]|\OT1/cmr/bx/n/9 b^^Susqueda
  []
 
 
@@ -1065,12 +1661,17 @@ Overfull \hbox (30.74715pt too wide) in alignment at lines 454--465
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 470--470
-[]|\TU/lmr/bx/n/9 Pendiente
+[]|\OT1/cmr/bx/n/9 Etapa /
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 470--470
-[]|\TU/lmr/bx/n/9 Pendiente
+[]|\OT1/cmr/bx/n/9 Pendiente
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 470--470
+[]|\OT1/cmr/bx/n/9 Pendiente
  []
 
 
@@ -1080,12 +1681,29 @@ Overfull \hbox (2.70215pt too wide) in alignment at lines 469--471
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 472--472
-[]|\TU/lmr/m/n/9 Ingesta (DI-
+[]|\OT1/cmr/m/n/9 Ingesta
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 473--473
-[]|\TU/lmr/m/n/9 Reducción
+[]|\OT1/cmr/m/n/9 Reducci^^Son
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 479--479
+[]|\OT1/cmr/m/n/9 B^^Susqueda
+ []
+
+
+Underfull \hbox (badness 1043) in paragraph at lines 482--482
+\OT1/cmr/m/n/9 comparadas con la complejidad te^^Sorica de referencia. La venta
+na
+ []
+
+
+Underfull \hbox (badness 1014) in paragraph at lines 482--482
+\OT1/cmr/m/n/9 500 [] 3500$ excluye el punto $\OML/cmm/m/it/9 N \OT1/cmr/m/n/9 
+= 6416$ de reducci^^Son (anomal^^S^^Pa
  []
 
 
@@ -1093,45 +1711,68 @@ Overfull \hbox (2.70215pt too wide) in alignment at lines 471--484
  [] [] [] [] 
  []
 
-LaTeX Info: Redefining \. on input line 484.
-LaTeX Info: Redefining \% on input line 484.
-[36]
+[36 <./figures/val_batch2_pred.jpg>]
+<figures/e7_scalability_loglog.pdf, id=365, 651.5695pt x 335.6796pt>
 File: figures/e7_scalability_loglog.pdf Graphic file (type pdf)
 <use figures/e7_scalability_loglog.pdf>
+Package pdftex.def Info: figures/e7_scalability_loglog.pdf  used on input line 
+520.
+(pdftex.def)             Requested size: 347.12354pt x 178.8313pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
+<figures/e7_memory.pdf, id=366, 608.41052pt x 305.68767pt>
 File: figures/e7_memory.pdf Graphic file (type pdf)
 <use figures/e7_memory.pdf>
+Package pdftex.def Info: figures/e7_memory.pdf  used on input line 530.
+(pdftex.def)             Requested size: 347.12354pt x 174.40703pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-LaTeX Info: Redefining \. on input line 546.
-LaTeX Info: Redefining \% on input line 546.
 [37]
 Overfull \hbox (5.2762pt too wide) in alignment at lines 548--550
  [] [] [] [] [] [] 
  []
 
 
+Underfull \hbox (badness 10000) in paragraph at lines 552--552
+[]|\OT1/cmr/m/n/9 PostgreSQL
+ []
+
+
 Underfull \hbox (badness 10000) in paragraph at lines 553--553
-[]|\TU/lmr/m/n/9 PostgreSQL +
+[]|\OT1/cmr/m/n/9 PostgreSQL +
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 555--555
+[]|\OT1/cmr/m/n/9 PostgreSQL
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 556--556
-[]|\TU/lmr/m/n/9 PostgreSQL +
+[]|\OT1/cmr/m/n/9 PostgreSQL +
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 558--558
+[]|\OT1/cmr/m/n/9 PostgreSQL
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 559--559
-[]|\TU/lmr/m/n/9 PostgreSQL +
+[]|\OT1/cmr/m/n/9 PostgreSQL +
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 561--561
+[]|\OT1/cmr/m/n/9 PostgreSQL
  []
 
 
 Underfull \hbox (badness 10000) in paragraph at lines 562--562
-[]|\TU/lmr/m/n/9 PostgreSQL +
+[]|\OT1/cmr/m/n/9 PostgreSQL +
  []
 
 
@@ -1140,20 +1781,21 @@ Overfull \hbox (5.2762pt too wide) in alignment at lines 550--569
  []
 
 
-Underfull \vbox (badness 5260) has occurred while \output is active []
+Underfull \vbox (badness 5403) has occurred while \output is active []
 
-LaTeX Info: Redefining \. on input line 569.
-LaTeX Info: Redefining \% on input line 569.
- [38]
-LaTeX Info: Redefining \. on input line 604.
-LaTeX Info: Redefining \% on input line 604.
+ [38 <./figures/e7_scalability_loglog.pdf> <./figures/e7_memory.pdf>]
+Underfull \hbox (badness 1478) in paragraph at lines 583--589
+[]\OT1/cmr/m/n/10 Por debajo de $\OML/cmm/m/it/10 N \OMS/cmtt/m/n/10 ^^Y \OT1/c
+mr/m/n/10 2500$ las tres opciones sobre PostgreSQL son
+ []
 
 [39]
+<figures/e6_e9_pareto.pdf, id=422, 658.35965pt x 360.14021pt>
 File: figures/e6_e9_pareto.pdf Graphic file (type pdf)
 <use figures/e6_e9_pareto.pdf>
-LaTeX Info: Redefining \. on input line 634.
-LaTeX Info: Redefining \% on input line 634.
- [40]
+Package pdftex.def Info: figures/e6_e9_pareto.pdf  used on input line 607.
+(pdftex.def)             Requested size: 347.12354pt x 189.88974pt.
+ [40 <./figures/e6_e9_pareto.pdf>]
 Overfull \hbox (76.40721pt too wide) in alignment at lines 645--647
  [] [] [] [] [] [] 
  []
@@ -1163,27 +1805,40 @@ Overfull \hbox (76.40721pt too wide) in alignment at lines 647--661
  [] [] [] [] [] [] 
  []
 
-LaTeX Info: Redefining \. on input line 691.
-LaTeX Info: Redefining \% on input line 691.
 [41]
+<figures/e8a_hdbscan_3clusters.pdf, id=444, 362.77408pt x 318.28912pt>
 File: figures/e8a_hdbscan_3clusters.pdf Graphic file (type pdf)
 <use figures/e8a_hdbscan_3clusters.pdf>
+Package pdftex.def Info: figures/e8a_hdbscan_3clusters.pdf  used on input line 
+728.
+(pdftex.def)             Requested size: 312.40906pt x 274.1167pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
+<figures/cluster_simple.pdf, id=445, 378.51413pt x 85.76772pt>
 File: figures/cluster_simple.pdf Graphic file (type pdf)
 <use figures/cluster_simple.pdf>
+Package pdftex.def Info: figures/cluster_simple.pdf  used on input line 737.
+(pdftex.def)             Requested size: 347.12354pt x 78.65727pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
+<figures/cluster_elaborate.pdf, id=446, 378.51413pt x 85.67668pt>
 File: figures/cluster_elaborate.pdf Graphic file (type pdf)
 <use figures/cluster_elaborate.pdf>
+Package pdftex.def Info: figures/cluster_elaborate.pdf  used on input line 744.
+
+(pdftex.def)             Requested size: 347.12354pt x 78.57379pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
+<figures/cluster_characters.pdf, id=447, 364.40385pt x 136.87938pt>
 File: figures/cluster_characters.pdf Graphic file (type pdf)
 <use figures/cluster_characters.pdf>
+Package pdftex.def Info: figures/cluster_characters.pdf  used on input line 751
+.
+(pdftex.def)             Requested size: 347.12354pt x 130.39807pt.
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
@@ -1193,13 +1848,15 @@ Overfull \hbox (76.40721pt too wide) in alignment at lines 772--774
  []
 
 
-Underfull \hbox (badness 1867) in paragraph at lines 786--786
-[]\TU/lmr/m/n/9 Cuadro 20: E8b, mejor celda por extractor sobre la evaluación
+Underfull \hbox (badness 1888) in paragraph at lines 786--786
+[]\OT1/cmr/m/n/9 Cuadro 20: E8b, mejor celda por extractor sobre la evaluaci^^S
+on
  []
 
 
-Underfull \hbox (badness 2671) in paragraph at lines 786--786
-\TU/lmr/m/n/9 de autoría (185 recortes, 87 autores, evaluación entre ciudades
+Underfull \hbox (badness 2689) in paragraph at lines 786--786
+\OT1/cmr/m/n/9 de autor^^S^^Pa (185 recortes, 87 autores, evaluaci^^Son entre c
+iudades
  []
 
 
@@ -1207,56 +1864,104 @@ Overfull \hbox (76.40721pt too wide) in alignment at lines 774--788
  [] [] [] [] [] [] 
  []
 
-LaTeX Info: Redefining \. on input line 788.
-LaTeX Info: Redefining \% on input line 788.
 [42]
-LaTeX Info: Redefining \. on input line 788.
-LaTeX Info: Redefining \% on input line 788.
- [43]
-Underfull \vbox (badness 1990) has occurred while \output is active []
+ignored: Infinite glue shrinkage found in box being split [43 <./figures/e8a_hdbscan
+_3clusters.pdf> <./figures/cluster_simple.pdf>]
+Underfull \vbox (badness 1983) has occurred while \output is active []
 
-LaTeX Info: Redefining \. on input line 842.
-LaTeX Info: Redefining \% on input line 842.
  [44]
+<figures/e8_correlation.pdf, id=484, 587.06284pt x 295.42975pt>
 File: figures/e8_correlation.pdf Graphic file (type pdf)
 <use figures/e8_correlation.pdf>
+Package pdftex.def Info: figures/e8_correlation.pdf  used on input line 857.
+(pdftex.def)             Requested size: 347.12354pt x 174.68971pt.
 
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-LaTeX Info: Redefining \. on input line 875.
-LaTeX Info: Redefining \% on input line 875.
-[45]) (doc/conclusion.tex
-LaTeX Info: Redefining \. on input line 13.
-LaTeX Info: Redefining \% on input line 13.
- [46]
-LaTeX Info: Redefining \. on input line 70.
-LaTeX Info: Redefining \% on input line 70.
- [47]) (article.bbl
-LaTeX Info: Redefining \. on input line 44.
-LaTeX Info: Redefining \% on input line 44.
- [48]
-LaTeX Info: Redefining \. on input line 147.
-LaTeX Info: Redefining \% on input line 147.
- [49]
-Underfull \hbox (badness 7415) in paragraph at lines 185--189
-[]\TU/lmr/m/n/9 Caliński, T., Harabasz, J.:  A dendrite method for cluster anal
-y-
+[45 <./figures/cluster_elaborate.pdf> <./figures/cluster_characters.pdf>])
+(./doc/conclusion.tex [46 <./figures/e8_correlation.pdf>]
+Underfull \hbox (badness 2318) in paragraph at lines 25--31
+[]\OT1/cmr/m/n/10 La etapa de reducci^^Son de dimensionalidad con UMAP muestra 
+un
  []
 
 
-Underfull \hbox (badness 4001) in paragraph at lines 185--189
-\TU/lmr/m/n/9 sis.  Communications in Statistics \TU/lmr/bx/n/9 3\TU/lmr/m/n/9 
-(1) (January 1974) 1–27 _eprint:
+Underfull \hbox (badness 1365) in paragraph at lines 25--31
+\OT1/cmr/m/n/10 distintos dependiendo del tama~no de la muestra y de la activac
+i^^Son de
  []
 
-LaTeX Info: Redefining \. on input line 254.
-LaTeX Info: Redefining \% on input line 254.
-[50])
-LaTeX Info: Redefining \. on input line 52.
-LaTeX Info: Redefining \% on input line 52.
- [51] (article.aux
-LaTeX Info: Redefining \. on input line 10.
-LaTeX Info: Redefining \% on input line 10.
-) )
-Output written on article.xdv (51 pages, 1276112 bytes).
+[47]) (./article.bbl [48]
+Underfull \hbox (badness 1292) in paragraph at lines 83--87
+[]\OT1/cmr/m/n/9 Malkov, Y.A., Yashunin, D.A.:  Efficient and robust approximat
+e nearest
+ []
+
+
+Underfull \hbox (badness 1354) in paragraph at lines 113--116
+[]\OT1/cmr/m/n/9 Caron, M., Bojanowski, P., Joulin, A., Douze, M.:  Deep Cluste
+ring for
+ []
+
+[49]
+Underfull \hbox (badness 4805) in paragraph at lines 185--189
+[]\OT1/cmr/m/n/9 Cali^^Snski, T., Harabasz, J.:  A dendrite method for cluster 
+analysis.
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 185--189
+\OT1/cmr/m/n/9 Communications in Statistics \OT1/cmr/bx/n/9 3\OT1/cmr/m/n/9 (1)
+ (January 1974) 1--27 []eprint:
+ []
+
+
+Underfull \hbox (badness 1509) in paragraph at lines 243--246
+[]\OT1/cmr/m/n/9 Howard, J., Ruder, S.:  Universal Language Model Fine-tuning f
+or Text
+ []
+
+[50]) [51] (./article.aux)
+ ***********
+LaTeX2e <2025-11-01>
+L3 programming layer <2026-01-19>
+ ***********
+
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 16771 strings out of 469515
+ 329409 string characters out of 5470808
+ 763557 words of memory out of 5000000
+ 45122 multiletter control sequences out of 15000+600000
+ 637065 words of font info for 76 fonts, out of 8000000 for 9000
+ 14 hyphenation exceptions out of 8191
+ 84i,14n,104p,432b,899s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/share/
+texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/share/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmbx7.pfb></usr/share/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmbx9.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cm
+bxti10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></u
+sr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/share/texmf-dist/fonts/type
+1/public/amsfonts/cm/cmr10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfon
+ts/cm/cmr6.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb><
+/usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/share/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/share/texmf-dist/fonts/ty
+pe1/public/amsfonts/cm/cmsy5.pfb></usr/share/texmf-dist/fonts/type1/public/amsf
+onts/cm/cmsy7.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.p
+fb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/share
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmti7.pfb></usr/share/texmf-dist/fon
+ts/type1/public/amsfonts/cm/cmti9.pfb></usr/share/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmtt10.pfb></usr/share/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mtt9.pfb></usr/share/texmf-dist/fonts/type1/public/cm-super/sfrm0900.pfb>
+Output written on article.pdf (51 pages, 11204344 bytes).
+PDF statistics:
+ 650 PDF objects out of 1000 (max. 8388607)
+ 316 compressed objects within 4 object streams
+ 0 named destinations out of 1000 (max. 500000)
+ 123 words of extra memory for PDF output out of 10000 (max. 10000000)
+

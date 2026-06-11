@@ -1,14 +1,46 @@
-This is BibTeX, Version 0.99d
-Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+This is BibTeX, Version 0.99e (TeX Live 2026/Arch Linux)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: article.aux
-White space in argument---line 50 of file article.aux
- : \citation{ester_density-based_1996,
- :                                     campello_density-based_2013, arthur_k-means_2007}
-I'm skipping whatever remains of this command
-White space in argument---line 194 of file article.aux
- : \citation{franti_k-means_2018,
- :                                ahmed_k-means_2020}
-I'm skipping whatever remains of this command
 The style file: splncs.bst
 Database file #1: ../doc/bib.bib
-(There were 2 error messages)
+You've used 45 entries,
+            2087 wiz_defined-function locations,
+            773 strings with 14618 characters,
+and the built_in function-call counts, 14485 in all, are:
+= -- 1380
+> -- 752
+< -- 27
++ -- 264
+- -- 219
+* -- 1144
+:= -- 2030
+add.period$ -- 54
+call.type$ -- 45
+change.case$ -- 44
+chr.to.int$ -- 0
+cite$ -- 45
+duplicate$ -- 671
+empty$ -- 1253
+format.name$ -- 219
+if$ -- 3428
+int.to.chr$ -- 0
+int.to.str$ -- 45
+missing$ -- 30
+newline$ -- 212
+num.names$ -- 55
+pop$ -- 165
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 484
+stack$ -- 0
+substring$ -- 854
+swap$ -- 355
+text.length$ -- 27
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 127
+width$ -- 47
+write$ -- 508

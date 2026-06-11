@@ -64,6 +64,21 @@ Ester, M., Kriegel, H.P., Sander, J., Xu, X.:
   {Knowledge} {Discovery} and {Data} {Mining}. {KDD}'96, Portland, Oregon, AAAI
   Press (August 1996)  226--231
 
+\bibitem{campello_density-based_2013}
+Campello, R.J.G.B., Moulavi, D., Sander, J.:
+\newblock Density-{Based} {Clustering} {Based} on {Hierarchical} {Density}
+  {Estimates}.
+\newblock In Pei, J., Tseng, V.S., Cao, L., Motoda, H., Xu, G., eds.: Advances
+  in {Knowledge} {Discovery} and {Data} {Mining}, Berlin, Heidelberg, Springer
+  (2013)  160--172
+
+\bibitem{arthur_k-means_2007}
+Arthur, D., Vassilvitskii, S.:
+\newblock k-means++: the advantages of careful seeding.
+\newblock In: Proceedings of the eighteenth annual {ACM}-{SIAM} symposium on
+  {Discrete} algorithms. {SODA} '07, USA, Society for Industrial and Applied
+  Mathematics (January 2007)  1027--1035
+
 \bibitem{malkov_efficient_2018}
 Malkov, Y.A., Yashunin, D.A.:
 \newblock Efficient and robust approximate nearest neighbor search using
@@ -106,25 +121,10 @@ Van~Gansbeke, W., Vandenhende, S., Georgoulis, S., Proesmans, M., Van~Gool, L.:
   {Vision} – {ECCV} 2020, Cham, Springer International Publishing (2020)
   268--285
 
-\bibitem{arthur_k-means_2007}
-Arthur, D., Vassilvitskii, S.:
-\newblock k-means++: the advantages of careful seeding.
-\newblock In: Proceedings of the eighteenth annual {ACM}-{SIAM} symposium on
-  {Discrete} algorithms. {SODA} '07, USA, Society for Industrial and Applied
-  Mathematics (January 2007)  1027--1035
-
 \bibitem{ankerst_optics_1999}
 Ankerst, M., Breunig, M.M., Kriegel, H.P., Sander, J.:
 \newblock {OPTICS}: ordering points to identify the clustering structure.
 \newblock SIGMOD Rec. \textbf{28}(2) (June 1999)  49--60
-
-\bibitem{campello_density-based_2013}
-Campello, R.J.G.B., Moulavi, D., Sander, J.:
-\newblock Density-{Based} {Clustering} {Based} on {Hierarchical} {Density}
-  {Estimates}.
-\newblock In Pei, J., Tseng, V.S., Cao, L., Motoda, H., Xu, G., eds.: Advances
-  in {Knowledge} {Discovery} and {Data} {Mining}, Berlin, Heidelberg, Springer
-  (2013)  160--172
 
 \bibitem{frey_clustering_2007}
 Frey, B.J., Dueck, D.:
@@ -255,6 +255,12 @@ Sculley, D.:
 Fränti, P., Sieranoja, S.:
 \newblock K-means properties on six clustering benchmark datasets.
 \newblock Applied Intelligence \textbf{48}(12) (December 2018)  4743--4759
+
+\bibitem{ahmed_k-means_2020}
+Ahmed, M., Seraj, R., Islam, S.M.S.:
+\newblock The k-means {Algorithm}: {A} {Comprehensive} {Survey} and
+  {Performance} {Evaluation}.
+\newblock Electronics \textbf{9}(8) (August 2020)  1295
 
 \bibitem{hermans_defense_2017}
 Hermans, A., Beyer, L., Leibe, B.:
