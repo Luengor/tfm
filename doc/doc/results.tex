@@ -540,7 +540,7 @@ acumula sobre el tiempo de consulta.
 
 {\footnotesize
 \begin{longtable}{|p{1.0cm}|p{2.6cm}|p{1.6cm}|p{2.0cm}|p{1.6cm}|p{1.8cm}|} \hline
-  \textbf{$N$} & \textbf{Backend} & \textbf{ss (s)} & \textbf{ips} & \textbf{idx (s)} & \textbf{recall@5} \\ \hline
+  \textbf{$N$} & \textbf{Backend} & \textbf{ss (s)} & \textbf{ips} & \textbf{idx (s)} & \textbf{R@5} \\ \hline
   \endhead
    500 & SQLite             & 3.05  &    164 & --     & --    \\ \hline
    500 & PostgreSQL exacto  & 0.162 &  3 096 & 0.0    & --    \\ \hline
@@ -570,7 +570,7 @@ latencia está dominada por el \textit{round-trip} de la conexión. PostgreSQL
 con HNSW es el único \textit{backend} cuyo \textit{throughput} \emph{crece} con
 el tamaño del banco con respecto al exacto: a $N=2500$ es 100 veces más rápido
 que SQLite y a $N=6416$ es 3.2 veces más rápido que el exacto y 240 veces más
-rápido que SQLite, con \texttt{recall@5} = 1.000 a las cuatro escalas. La
+rápido que SQLite, con \texttt{R@5} = 1.000 a las cuatro escalas. La
 construcción del índice cuesta 0.47~s a $N=6416$, se amortiza en una sola
 consulta frente a SQLite y en varias docenas frente al exacto.
 
@@ -599,7 +599,7 @@ botella $O(n^2)$ de SQLite.
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\linewidth]{figures/e6_e9_pareto.pdf}
-  \caption[E6+E9, latencia y \textit{recall}@5 por configuración HNSW]{E6+E9: latencia por consulta (eje logarítmico) y \textit{recall}@5
+  \caption[E6+E9, latencia y \texttt{R@5} por configuración HNSW]{E6+E9: latencia por consulta (eje logarítmico) y \textit{recall}@5
       por \textit{backend} y configuración HNSW a $N=6416$, una fila por
       configuración ordenada por latencia (cada barra anota su latencia y, para
       HNSW, el \textit{recall}). La configuración del barrido E6 aparece en rojo;
