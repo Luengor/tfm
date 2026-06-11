@@ -5,7 +5,7 @@
 \subsection{Visión general del flujo de trabajo}
 \label{subsec:vision}
 El sistema implementado procesa cada fotografía en cuatro etapas operativas:
-segmentación de las pintadas contenidas en la imagen, extracción de un vector
+segmentación de los grafitis contenidos en la imagen, extracción de un vector
 de características por recorte, persistencia del vector junto a sus metadatos
 en un almacenamiento estructurado y, en un segundo tiempo, recuperación masiva
 del conjunto almacenado para reducirlo y agruparlo. La separación explícita
@@ -74,20 +74,20 @@ La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
 \begin{enumerate}
     \item La imagen se carga desde disco y se proporciona al segmentador.
     \item El segmentador consume la imagen y devuelve una lista con cajas
-        delimitadoras de las pintadas presentes en la imagen. En el caso de que
+        delimitadoras de los grafitis presentes en la imagen. En el caso de que
         no se utilice segmentador, se devuelve una única caja que abarca toda
         la imagen, de modo que el sistema se comporta como un agrupamiento de
         imágenes completas. Este comportamiento de respaldo también se puede
-        habilitar o deshabilitar para los modelos de detección de pintadas,
+        habilitar o deshabilitar para los modelos de detección de grafitis,
         de modo que las imágenes sin detección se emitan como recortes de
         escena completa o se descarten, respectivamente.
     \item Las cajas detectadas se fusionan según criterios de solapamiento y
         proximidad configurables, con salvaguardas para evitar mega-cajas;
         opcionalmente se trunca la lista a las $K$ de mayor confianza. Si se
         configura un margen no nulo, las cajas supervivientes se expanden para
-        incluir contexto visual alrededor de la pintada. Los parámetros que
+        incluir contexto visual alrededor del grafiti. Los parámetros que
         gobiernan este proceso se describen en \ref{subsubsec:segmentador}.
-    \item Cada pintada se recorta sobre la imagen original y el recorte se
+    \item Cada grafiti se recorta sobre la imagen original y el recorte se
         entrega al modelo de extracción de características, que produce un
         vector de características de dimensión fija.
     \item El vector resultante, junto con la referencia a la fotografía original
@@ -295,9 +295,9 @@ etiquetados, uno por cada tarea supervisada del trabajo: evaluación por estilo
 y evaluación por autor. En ambos casos, se utilizan los recortes directamente
 como imágenes a evaluar en vez de aportar la imagen original y utilizar un
 segmentador para extraer los recortes de evaluación, porque el objetivo es
-medir la calidad del espacio de representación para agrupar pintadas, no la
+medir la calidad del espacio de representación para agrupar grafitis, no la
 capacidad de un sistema completo. Tampoco se utilizan imágenes completas,
-puesto que muchas de estas contienen varias pintadas de estilos y autores
+puesto que muchas de estas contienen varios grafitis de estilos y autores
 distintos, haciendo difícil atribuir una etiqueta de estilo o autor a la imagen
 completa y complicando la interpretación de las métricas.
 
@@ -310,10 +310,10 @@ diversidad estilística se cubre mejor agregando recortes de Salamanca y de
 Cuenca (el banco StopGrafiti) al entrenamiento, y el conjunto de evaluación,
 extraído del banco principal de Salamanca, es disjunto a nivel de fotografía.
 La evaluación por estilo mide así el grado en que el espacio de representación
-agrupa pintadas estilísticamente homogéneas.
+agrupa grafitis estilísticamente homogéneos.
 
 Las etiquetas de autor, en cambio, definen un problema abierto de aprendizaje
-de métricas: en el uso real del sistema, los autores de las pintadas a agrupar
+de métricas: en el uso real del sistema, los autores de los grafitis a agrupar
 son en su mayoría desconocidos para el modelo en el momento de la inferencia.
 Si las cabezas de autoría se entrenasen sobre los mismos identificadores de
 autor que luego aparecen en la evaluación (aun utilizando fotografías

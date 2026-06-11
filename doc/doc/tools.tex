@@ -12,8 +12,8 @@ GPS. Las imágenes presentan una alta variabilidad cromática y de escenas
 urbanas, con condiciones de iluminación diversas. Tampoco existe un lienzo por
 defecto para los grafitis, sino que aparecen en muros, puertas, vallas y
 mobiliario urbano en general. En muchas ocasiones, y debido a la alta densidad
-de pintadas en ciertas zonas, una misma imagen puede contener varias pintadas
-distintas, lo que añade complejidad a cualquier labor de clasificación o
+de grafitis en ciertas zonas, una misma imagen puede contener varios grafitis
+distintos, lo que añade complejidad a cualquier labor de clasificación o
 agrupamiento.
 
 \begin{figure}[h!]
@@ -51,7 +51,7 @@ De manera adicional a este banco de datos, se dispone de otro conjunto de
 $1106$ imágenes de la ciudad de Cuenca cedidas por la iniciativa
 StopGrafiti\footnote{\url{https://stopgrafiti.com/}}. Estas imágenes, aunque no
 se incluyen en el banco principal, se utilizan para el ajuste fino del detector
-de pintadas, así como de las cabezas de proyección ajustadas al dominio. El
+de grafitis, así como de las cabezas de proyección ajustadas al dominio. El
 conjunto de StopGrafiti fue especialmente útil para esto, puesto que se trata
 de un banco de grafiti con autores, estilos y entornos distintos a los de
 Salamanca, lo que permite evitar el sesgo de solapamiento entre entrenamiento y
@@ -62,7 +62,7 @@ Ninguno de los dos bancos de datos cuenta con anotaciones de ningún tipo, lo
 que impide la evaluación supervisada directa de los modelos. Además, la
 existencia de varios grafitis por imagen hace que la anotación a nivel de
 imagen no sea suficiente para evaluar la calidad de los clústeres. Por tanto,
-se opta por recortar y etiquetar manualmente varios subconjuntos de pintadas,
+se opta por recortar y etiquetar manualmente varios subconjuntos de grafitis,
 de modo que la evaluación supervisada se realice sobre estos recortes
 etiquetados.
 
@@ -109,8 +109,8 @@ extrínsecas por estilo.
 \end{figure}
 
 Por último, se utilizan imágenes de ambos grupos para el ajuste fino del
-detector de pintadas, con un total de $447$ imágenes completamente anotadas con
-las cajas de las pintadas.
+detector de grafitis, con un total de $447$ imágenes completamente anotadas con
+las cajas de los grafitis.
 
 La tabla~\ref{tab:subconjuntos} resume los subconjuntos etiquetados empleados,
 su propósito, procedencia y tamaño.
@@ -139,7 +139,7 @@ su propósito, procedencia y tamaño.
 \label{subsec:fundamentos}
 
 Como se mencionó en el estado de la cuestión, el sistema se apoya en la
-representación vectorial de las pintadas. Estas representaciones, conocidas
+representación vectorial de los grafitis. Estas representaciones, conocidas
 como \textit{embeddings}, se obtienen a través de modelos de extracción de
 características preentrenados sobre tareas de visión generalistas, que se
 aplican directamente sobre las imágenes de grafiti o sobre recortes de las
@@ -407,22 +407,22 @@ a otro sin modificar el resto del \textit{pipeline}.
 
 \subsubsection{Segmentador YOLO}
 \label{subsubsec:segmentador}
-La etapa de segmentación localiza las pintadas dentro de la fotografía para que
+La etapa de segmentación localiza los grafitis dentro de la fotografía para que
 el extractor de características opere sobre los recortes correspondientes en
 lugar de la escena completa. Se han implementado dos variantes. La primera
 de ellas no aplica ningún tipo de segmentación, de modo que el extractor de
 características se aplica sobre la fotografía completa. La segunda, utiliza
 un modelo de YOLO~\cite{ultralytics_ultralytics_2024} en su versión oficial o
 ajustado sobre el conjunto de grafiti para detectar las cajas que encierran
-cada pintada, y recorta la imagen en consecuencia. Además, este proceso de
+cada grafiti, y recorta la imagen en consecuencia. Además, este proceso de
 recorte fusiona las cajas de detección solapadas para evitar duplicados y
 aplica un margen configurable alrededor de cada caja antes del recorte. El
 resultado es un conjunto de sub-imágenes que se procesan de forma independiente
-y que pueden producir varios \textit{embeddings} por fotografía original.
+y que pueden producir varios vectores por fotografía original.
 
 Además de la fusión por solapamiento estándar, el segmentador incorpora un
 criterio de proximidad que une cajas adyacentes cuya separación no supera un
-umbral, consolidando pintadas contiguas en una misma pared. Una salvaguarda
+umbral, consolidando grafitis contiguos en una misma pared. Una salvaguarda
 rechaza fusiones cuya caja unión supere una fracción del área de la imagen,
 evitando que cadenas de fusiones por contacto generen un recorte que cubra la
 escena completa. Tras la fusión, la lista de detecciones puede truncarse a las
@@ -485,7 +485,7 @@ producido sea directamente comparable mediante distancia coseno
 
 Se han entrenado dos tipos de cabezas (de autoría y de estilo) sobre dos
 arquitecturas base (MobileNetV3 y DINOv2). Las cabezas de autoría buscan
-acercar en el espacio latente las pintadas de un mismo autor y separar las de
+acercar en el espacio latente los grafitis de un mismo autor y separar los de
 autores distintos; las de estilo organizan el espacio según las cuatro
 categorías estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
 \textit{character}). Las cuatro cabezas resultantes se entrenan exclusivamente

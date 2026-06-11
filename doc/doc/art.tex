@@ -11,9 +11,9 @@ escasa, reciente y de alcance acotado. Un trabajo relevante es el de
 \citea[etali]{Fogaça}{fogaca_deep_2023}, en el que se presenta un sistema
 encargado por el Ayuntamiento de Lisboa para clasificar imágenes de calle en
 grafiti ilegal, arte urbano o ausencia de grafiti y, a continuación, localizar
-la pintada en la escena mediante un detector \textit{fine-tuned} por ellos
+el grafiti en la escena mediante un detector \textit{fine-tuned} por ellos
 mismos. En esta misma línea, \citea[etali]{Tokuda}{tokuda_quantifying_2019}
-desarrollan un sistema para cuantificar la densidad de pintadas en la ciudad de
+desarrollan un sistema para cuantificar la densidad de grafitis en la ciudad de
 São Paulo, Brasil. Las imágenes se obtienen a través de la plataforma de Street
 View de Google, y el modelo de detección utilizado (Mask-RCNN, un modelo capaz
 de segmentar instancias de objetos en una imagen) se entrena a partir de un
@@ -32,7 +32,7 @@ categorización de forma manual, sin aplicar técnicas de agrupamiento
 automático. En esta dirección,
 \citea[etali]{Garcia~Garcia}{garcia_garcia_graffiti_2025} proponen un método de
 identificación y agrupamiento basado en el análisis de los colores dominantes
-de cada pintada haciendo uso de K-medias sobre los espacios RGB y Lab. La
+de cada pieza haciendo uso de K-medias sobre los espacios RGB y Lab. La
 aportación es relevante porque introduce el agrupamiento en el dominio, pero
 utiliza exclusivamente estadísticas cromáticas de la imagen y prescinde de la
 estructura espacial, la textura y el contenido semántico del grafiti.
@@ -49,9 +49,9 @@ caracterización del coste.
   \textbf{Trabajo} & \textbf{Tarea} & \textbf{Datos} & \textbf{Características} & \textbf{Técnica} & \textbf{Métrica} \\ \hline
   \endhead
   Fogaça (2023) & Clasificación y detección de grafiti & Imágenes de calle (Lisboa) & CNN \textit{fine-tuned} & Clasificación supervisada + detector & Exactitud / mAP (precisión media promedio, supervisada) \\ \hline
-  Tokuda (2019) & Cuantificación de densidad de pintadas & Google Street View (São Paulo) & Mask-RCNN & Segmentación supervisada & Precisión / \textit{recall} \\ \hline
+  Tokuda (2019) & Cuantificación de densidad de grafitis & Google Street View (São Paulo) & Mask-RCNN & Segmentación supervisada & Precisión / \textit{recall} \\ \hline
   Taylor (2010) & Categorización por contenido & Fotografías de grafiti & Inspección visual & Categorización manual & --- (cualitativa) \\ \hline
-  García~García (2025) & Agrupamiento de pintadas & Imágenes de grafiti & Colores dominantes (RGB / Lab) & K-medias & Interna (no supervisada) \\ \hline
+  García~García (2025) & Agrupamiento de grafitis & Imágenes de grafiti & Colores dominantes (RGB / Lab) & K-medias & Interna (no supervisada) \\ \hline
   \textbf{Este trabajo} & Agrupamiento y recuperación por similitud & Banco de grafiti & \textit{Embeddings} profundos & Reducción + \textit{clustering} clásico (comparativo) & Interna, externa y coste computacional \\ \hline
   \caption[Comparativa de trabajos previos sobre análisis de grafiti]{Comparativa de trabajos previos sobre análisis de grafiti frente al
   planteamiento de este trabajo.}
@@ -62,7 +62,7 @@ caracterización del coste.
 No se han localizado trabajos previos que combinen descriptores visuales
 profundos con técnicas estándar de agrupamiento para esta aplicación, ni que
 evalúen sistemáticamente qué componentes funcionan mejor sobre fotografías de
-pintadas. Esta carencia en la literatura es la que delimita el espacio en el
+grafitis. Esta carencia en la literatura es la que delimita el espacio en el
 que se sitúa el presente trabajo y motiva su planteamiento combinatorio.
 
 \subsection{Análisis de similitud y agrupamiento de imágenes}

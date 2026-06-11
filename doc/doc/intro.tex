@@ -7,14 +7,14 @@
 
 El grafiti no autorizado es un fenómeno urbano cotidiano que las
 administraciones municipales gestionan con un coste económico y social
-sostenido~\cite{fogaca_deep_2023}. La diversidad estilística de las pintadas,
+sostenido~\cite{fogaca_deep_2023}. La diversidad estilística de los grafitis,
 desde firmas rápidas hasta piezas elaboradas, y la continua aparición de nuevos
 autores convierten su seguimiento manual en una tarea costosa y complicada.
 \citea[etali]{Taylor}{taylor_twenty-first_2010} documentan que la falta de
-criterios homogéneos de clasificación entre quien reporta una pintada y quien
-la retira es un problema recurrente, y proponen una tipología explícita que ha
-demostrado ser útil para priorizar la retirada de pintadas ofensivas o no
-autorizadas según el tipo y la ofensividad del contenido. Esa tipología, sin
+criterios homogéneos de clasificación entre quien reporta un grafiti y quien
+lo retira es un problema recurrente, y proponen una tipología explícita que ha
+demostrado ser útil para priorizar la retirada de grafitis ofensivos o no
+autorizados según el tipo y la ofensividad del contenido. Esa tipología, sin
 embargo, sigue aplicándose de forma manual, y su extensión a bancos de imágenes
 crecientes no es viable sin apoyo automatizado.
 
@@ -22,7 +22,7 @@ crecientes no es viable sin apoyo automatizado.
   \centering
   \includegraphics[width=\linewidth]{figures/graffiti_mosaic.jpg}
   \caption[Ejemplos de recortes de grafiti del conjunto de datos]{Ejemplos de recortes de grafiti del conjunto de datos, que ilustran
-    la diversidad estilística de las pintadas: desde firmas rápidas hasta piezas
+    la diversidad estilística de los grafitis: desde firmas rápidas hasta piezas
     elaboradas.}
   \label{fig:intro-mosaic}
 \end{figure}
@@ -30,7 +30,7 @@ crecientes no es viable sin apoyo automatizado.
 En esta línea, trabajos recientes han abordado la detección y conteo automático
 de grafiti sobre imágenes captadas en condiciones no
 controladas~\cite{fogaca_deep_2023,tokuda_quantifying_2019}, centrados en
-localizar pintadas y estimar su presencia geográfica, pero sin abordar su
+localizar grafitis y estimar su presencia geográfica, pero sin abordar su
 agrupación por similitud visual. Disponer de una agrupación automática por
 similitud visual habilita una gran cantidad de procedimientos de análisis que
 van desde el estilístico hasta el documental, incluyendo la priorización de la
@@ -42,7 +42,7 @@ en los que la inspección manual es inviable.
 
 El problema técnico abordado en este trabajo es el siguiente: dado un conjunto
 mayoritariamente no etiquetado de fotografías de grafiti captadas en
-condiciones reales, agruparlas automáticamente de modo que las pintadas
+condiciones reales, agruparlas automáticamente de modo que los grafitis
 visualmente similares queden en el mismo grupo. Este enunciado, aparentemente
 directo, encierra tres dificultades que condicionan tanto el diseño como la
 evaluación de la solución.
