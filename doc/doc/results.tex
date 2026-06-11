@@ -17,7 +17,7 @@ identificador.
 
 {\footnotesize
 \begin{longtable}{|p{0.6cm}|p{3.9cm}|p{3.6cm}|p{4.7cm}|} \hline
-  \textbf{Id} & \textbf{Eje variado} & \textbf{Fijo} & \textbf{$N$ / repeticiones} \\ \hline
+  \textbf{Id} & \textbf{Elementos variados} & \textbf{Fijo} & \textbf{$N$ / repeticiones} \\ \hline
   \endhead
   E1 & Extractor & UMAP-10, HDBSCAN \texttt{mcs}=5, identidad, SQLite & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
   E2 & Reducción & Extractor base, HDBSCAN \texttt{mcs}=5 & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
@@ -46,15 +46,16 @@ E4. El extractor base se elige a partir de los resultados supervisados de E8a,
 no a partir de E1, aunque este último es el primer experimento del hilo
 narrativo.
 
-A lo largo de toda la subsección las métricas intrínsecas o de calidad
-intrínseca (silueta~$\uparrow$, CH~$\uparrow$, DB~$\downarrow$; definidas en
-\ref{subsubsec:metricas}) se leen siempre de forma conjunta con el número de
-clústeres, la fracción de ruido y el coeficiente de variación de los tamaños de
-clúster. Tal y como se mencionó en la sección anterior, leer la silueta o el CH
-de forma aislada lleva a inversiones consistentes del ranking, porque ambos
-premian configuraciones degeneradas: pocos clústeres grandes y bien separados
-(CH alto) o particiones binarias triviales (silueta alta). El juicio final se
-emite siempre sobre el criterio conjunto, no sobre la métrica.
+A lo largo de toda la subsección las métricas intrínsecas, que denominaremos
+simplemente \textit{calidad intrínseca} (silueta~$\uparrow$, CH~$\uparrow$,
+DB~$\downarrow$; definidas en \ref{subsubsec:metricas}) se leen siempre de
+forma conjunta con el número de clústeres, la fracción de ruido y el
+coeficiente de variación de los tamaños de clúster. Tal y como se mencionó en
+la sección anterior, leer la silueta o el CH de forma aislada lleva a
+inversiones consistentes del ranking, porque ambos premian configuraciones
+degeneradas: pocos clústeres grandes y bien separados (CH alto) o particiones
+binarias triviales (silueta alta). El juicio final se emite siempre sobre el
+criterio conjunto, no sobre la métrica.
 
 \subsubsection{Extractor de características}
 \label{subsubsec:res-extractor}
@@ -83,8 +84,8 @@ $N=6416$.
   \texttt{dinov2\_graffiti\_style\_head}  & 562 & 0.202 & 0.155 & 27.9 & 1.70 & 0.74 \\ \hline
   \texttt{yolom}                          & 480 & 0.253 & 0.131 & 32.2 & 1.75 & 0.74 \\ \hline
   \texttt{yolon}                          & 348 & 0.341 & 0.085 & 51.2 & 1.91 & 0.81 \\ \hline
-  \caption[E1, calidad intrínseca a $N=6416$]{E1, calidad intrínseca a $N=6416$. Las CNN ImageNet encabezan la silueta; el extractor base
-  (\texttt{dinov2\_graffiti\_style\_head}) presenta un CH (27.9) sólo superado
+  \caption[E1, calidad intrínseca a $N=6416$]{E1, calidad intrínseca a $N=6416$. Las CNN entrenadas en ImageNet encabezan la silueta; el extractor base
+  (\texttt{dinov2\_graffiti\_style\_head}) presenta un CH (27.9) solo superado
   por los \textit{backbones} YOLO, pese a una silueta inferior a la de su
   \textit{backbone} DINOv2. \glosacalidad}
   \label{tab:e1-quality-6416}
@@ -105,20 +106,22 @@ estilísticas, entrenadas con recortes y no con imágenes completas como aquí s
 evalúan, este cambio de dominio  junto con la función de pérdida explicaría la
 caída de la silueta.
 
-Las CNN ImageNet lideran la silueta (a $N=6416$: \texttt{mobilenet\_v3}=0.260,
-\texttt{resnet50}=0.257), con ruido bajo (0.078--0.118) y los clústeres más
-balanceados (csCV~$\approx$~0.5--0.7). Sin embargo, esto no significa que sean
-los mejores extractores para el agrupamiento de grafiti: es muy probable que
-estos modelos estén realizando un buen agrupamiento de apariencia (textura,
-color, composición) sin que este agrupamiento codifique información relevante
-para el ámbito del grafiti. YOLO, por el contrario, pierde en todas las
-categorías a la vez (a excepción del índice CH, que presenta dos de los más
-altos), confirmando que sus características de detección no transfieren a un
-agrupamiento basado en apariencia.
+Las CNN entrenadas en ImageNet lideran la silueta (a $N=6416$:
+\texttt{mobilenet\_v3}=0.260, \texttt{resnet50}=0.257), con ruido bajo
+(0.078--0.118) y los clústeres más balanceados (csCV~$\approx$~0.5--0.7). Sin
+embargo, esto no significa que sean los mejores extractores para el
+agrupamiento de grafiti: es muy probable que estos modelos estén realizando un
+buen agrupamiento de apariencia (textura, color, composición) sin que este
+agrupamiento codifique información relevante para el ámbito del grafiti. YOLO,
+por el contrario, pierde en todas las categorías a la vez (a excepción del
+índice CH, que presenta dos de los más altos), confirmando que sus
+características de detección no transfieren a un agrupamiento basado en
+apariencia.
 
-Por otro lado, el coste del barrido figura en la tabla~\ref{tab:e1-cost-6416}.
-\texttt{mobilenet\_v3} es el extractor más barato en todos los ejes (7.93~ips,
-32~MB de VRAM) y la cabeza añade un sobrecoste pequeño ($\sim$8\,\%, 7.30~ips). Los
+Por otro lado, las métricas que describen el coste del barrido figuran en la
+tabla~\ref{tab:e1-cost-6416}. \texttt{mobilenet\_v3} es el extractor más barato
+tanto en velocidad como en memoria gráfica (7.93~ips, 32~MB de VRAM) y la
+cabeza añade un sobrecoste pequeño ($\sim$8\,\%, 7.30~ips). Los
 \textit{backbones} YOLO son los más caros (4.5--4.9~ips y $\sim$825~MB de RSS),
 y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
 
@@ -149,9 +152,9 @@ y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
 \begin{figure}[h!]
   \centering
   \includegraphics[width=\linewidth]{figures/e1_silhouette_by_embedding.pdf}
-  \caption[E1, silueta por extractor]{E1: silueta por extractor a tres tamaños de banco. Las CNN ImageNet
-  encabezan la columna, pero la cabeza estilística de DINOv2 invierte
-  silueta/CH (ver texto).}
+  \caption[E1, silueta por extractor]{E1: silueta por extractor a tres tamaños
+      de banco. Las CNN entrenadas en ImageNet encabezan la columna, pero la
+  cabeza estilística de DINOv2 invierte silueta/CH (ver texto).}
   \label{fig:e1-silhouette}
 \end{figure}
 
@@ -183,22 +186,23 @@ de dataset completo.
 }
 
 La fila \emph{identidad} responde directamente a la pregunta de cuánto aporta
-reducir: agrupando los 128-d crudos, HDBSCAN produce particiones muy distintas
-según la escala. Colapsa a $k=2$ a $N=250$, pero a $N=1000$ y $N=6416$ explota a
-52 y 301 clústeres respectivamente. Esos clústeres, sin embargo, se obtienen a
-costa de un ruido altísimo (0.605 y 0.684): HDBSCAN agrupa únicamente un núcleo
-denso y descarta entre el 60 y el 68\% de los puntos. La identidad no produce,
-por tanto, un colapso trivial, pero tampoco una partición utilizable bajo el
-criterio conjunto, sino una segmentación de cobertura muy baja. UMAP-10 sobre
-los mismos datos escala a 18, 106 y 562 clústeres manteniendo el ruido moderado
-(0.06, 0.11, 0.20) y los tamaños balanceados.
-PCA-10 y PCA-50 ilustran otra inestabilidad: PCA-10 colapsa a $k=2$ con silueta
-nula ($0.000$) a $N=6416$ y desciende a silueta negativa ($-0.020$) a $N=1000$,
-mientras que PCA-50 explota a $k=238$ con un 69.8\% de ruido y un coeficiente de
-variación de 2.29. Ambas son lecturas degeneradas que las métricas individuales
-premian engañosamente: tanto la identidad (silueta $0.307$, DB $1.16$) como
-PCA-50 (silueta $0.238$) encabezan la tabla en silueta pese a descartar dos
-tercios del dataset.
+la reduccion de dimensionalidad: agrupando los 128-d crudos, HDBSCAN produce
+particiones muy distintas según la escala. Colapsa a $k=2$ a $N=250$, pero a
+$N=1000$ y $N=6416$ explota a 52 y 301 clústeres respectivamente. Esos
+clústeres, sin embargo, se obtienen a costa de un ruido altísimo (0.605 y
+0.684): HDBSCAN agrupa únicamente un núcleo denso y descarta entre el 60 y el
+68\% de los puntos. La identidad no produce, por tanto, un colapso trivial,
+pero tampoco una partición utilizable bajo el criterio conjunto, sino una
+segmentación de cobertura muy baja. UMAP-10 sobre los mismos datos escala a 18,
+106 y 562 clústeres manteniendo el ruido moderado (0.06, 0.11, 0.20) y los
+tamaños balanceados. PCA-10 y PCA-50 ilustran otra inestabilidad: PCA-10
+colapsa a $k=2$ con silueta nula ($0.000$) a $N=6416$ y desciende a silueta
+negativa ($-0.020$) a $N=1000$, mientras que PCA-50 explota a $k=238$ con un
+69.8\% de ruido y un coeficiente de variación de 2.29. Ambas son
+configuraciones degeneradas que las métricas individuales premian
+engañosamente: tanto la identidad (silueta $0.307$, DB $1.16$) como PCA-50
+(silueta $0.238$) encabezan la tabla en silueta pese a descartar dos tercios
+del dataset.
 
 Las métricas de coste refuerzan la posición de la identidad como opción
 inferior. Esta reducción no es gratuita como podría parecer, sino que empuja el
@@ -228,9 +232,9 @@ HDBSCAN es el único agrupador del panel que combina una silueta competitiva,
 escalado sensato del número de clústeres con $N$, ruido moderado, tamaños
 balanceados y coste despreciable bajo el criterio conjunto. El barrido (E3)
 cubre 14 configuraciones sobre el extractor base y UMAP-10: HDBSCAN, K-medias
-(codo), GMM diagonal (BIC con tres techos), DBSCAN (auto-$\varepsilon$ y tres
-$\varepsilon$ fijos), OPTICS coseno, aglomerativo (\textit{average linkage},
-$k\in\{10, 20\}$) y espectral ($k\in\{10, 20\}$); la
+(ajustado con el método del codo), GMM diagonal (BIC con tres techos), DBSCAN
+(auto-$\varepsilon$ y tres $\varepsilon$ fijos), OPTICS coseno, aglomerativo
+(\textit{average linkage}, $k\in\{10, 20\}$) y espectral ($k\in\{10, 20\}$); la
 tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
 
 {\footnotesize
@@ -282,7 +286,9 @@ presenta la peor silueta del panel) o por el escalado de memoria.
   logarítmico). Cada familia se representa por su mejor variante en silueta
   (marcador grande); los puntos pequeños son el resto de variantes. La línea
   discontinua marca el frente de Pareto: HDBSCAN (rojo) domina a todas excepto
-  a OPTICS, que paga $\sim$25 veces más coste por $\sim$0.02 más de silueta.}
+  a OPTICS, que paga $\sim$25 veces más coste por $\sim$0.02 más de silueta, y
+K-medias, el algoritmo más barato pero con una silueta 0.094 puntos inferior a
+la de HDBSCAN.}
   \label{fig:e3-pareto}
 \end{figure}
 
@@ -386,9 +392,9 @@ El detector \textit{fine-tuned} es un caso interesante: a $N=1000$ obtiene la
 mejor silueta, mejor CH y mejor DB del panel, pero este liderazgo desaparece
 con $N=6416$, donde obtiene casi 2.4 recortes sobre cada imagen original y
 degenera el agrupamiento, con un 29.8\% de ruido, una silueta de 0.122 y un
-coeficiente de variación de tamaños de 1.06, con mil cuarenta y nueve clústeres
-y una cola larga de clústeres pequeños. El coste de ingesta también se dispara
-a 2152~s, un 74\% más que la identidad.
+coeficiente de variación de tamaños de 1.06, con $1049$ clústeres y una cola
+larga de clústeres pequeños. El coste de ingesta también se dispara a 2152~s,
+un 74\% más que la identidad.
 
 Las razones de esta caída de calidad se vuelven más claras al consultar las
 métricas de validación del modelo de detección. En primer lugar, este
@@ -557,7 +563,7 @@ acumula sobre el tiempo de consulta.
   \caption[E6, latencia y \textit{recall} por \textit{backend}]{E6, latencia, \textit{throughput} y \textit{recall} de la búsqueda
   por similitud por \textit{backend} y tamaño de banco. SQLite escala
   linealmente en tiempo por consulta; pgvector exacto está dominado por la
-  latencia de \textit{round-trip} en los tamaños pequeños; HNSW sólo se
+  latencia de \textit{round-trip} en los tamaños pequeños; HNSW solo se
   separa visiblemente por encima de $N\approx 2500$.}
   \label{tab:e6-storage}
 \end{longtable}
@@ -609,22 +615,22 @@ botella $O(n^2)$ de SQLite.
 
 \subsection{Validación supervisada}
 \label{subsec:res-supervisada}
-Cuando se dispone de etiquetas, las métricas extrínsecas miden directamente la
-concordancia entre los clústeres y la verdad de referencia. Esta subsección
-hace uso de los dos conjuntos etiquetados manualmente por autor y estilo para
-evaluar la capacidad de los extractores de características para separar ambos
-ejes y validar las métricas intrínsecas empleadas en el resto del trabajo. La
-unidad de análisis es el recorte (recortes pre-segmentados, segmentador
-identidad): 294 recortes sobre 4 estilos para E8a y 185 recortes sobre 87
-autores para E8b. Los dos diseños no son simétricos en su exposición al
-desplazamiento de dominio. La cabeza estilística se entrenó sobre un conjunto
-\emph{mixto} de 385 recortes (110 Salamanca + 275 Cuenca) y se evalúa sobre 294
-recortes de Salamanca disjuntos del entrenamiento, así que E8a es un
-\textit{held-out} dentro del propio dominio de entrenamiento. Las cabezas de
-autoría, en cambio, se entrenaron sobre 321 recortes \emph{exclusivamente} de
-Cuenca y se evalúan sobre 185 recortes de Salamanca, así que E8b mezcla
-generalización a autores no vistos con un desplazamiento de dominio
-Cuenca$\to$Salamanca.
+Las métricas extrínsecas, aplicables cuando se dispone de etiquetas sobre los
+pares, las métricas extrínsecas miden directamente la concordancia entre los
+clústeres y la verdad de referencia. Esta subsección hace uso de los dos
+conjuntos etiquetados manualmente por autor y estilo para evaluar la capacidad
+de los extractores de características para separar ambos ejes y validar las
+métricas intrínsecas empleadas en el resto del trabajo. La unidad de análisis
+es el recorte (recortes pre-segmentados, segmentador identidad): 294 recortes
+sobre 4 estilos para E8a y 185 recortes sobre 87 autores para E8b. Los dos
+diseños no son simétricos en su exposición al desplazamiento de dominio. La
+cabeza estilística se entrenó sobre un conjunto \emph{mixto} de 385 recortes
+(110 Salamanca + 275 Cuenca) y se evalúa sobre 294 recortes de Salamanca
+disjuntos del entrenamiento, así que E8a es un \textit{held-out} dentro del
+propio dominio de entrenamiento. Las cabezas de autoría, en cambio, se
+entrenaron sobre 321 recortes \emph{exclusivamente} de Cuenca y se evalúan
+sobre 185 recortes de Salamanca, así que E8b mezcla generalización a autores no
+vistos con un desplazamiento de dominio Cuenca$\to$Salamanca.
 
 \subsubsection{Evaluación por estilo}
 \label{subsubsec:res-estilo}
@@ -663,7 +669,7 @@ siguiente extractor, sí lo mejora sustancialmente (0.627 vs 0.368). El resto de
 extractores sin entrenar (CLIP, DINOv2 y MobileNetV3) se agrupan en un segundo
 bloque con ARI entre 0.33 y 0.37.
 
-Las cabezas de autoría no sólo no mejoran el ARI de estilo respecto a su
+Las cabezas de autoría no solo no mejoran el ARI de estilo respecto a su
 propio \textit{backbone} sino que lo empeoran (DINOv2 $0.356\to 0.302$, MobileNetV3
 $0.356\to 0.318$), aunque con un margen modesto que las sitúa en los puestos
 finales del panel. El \textit{fine-tuning} no produce una representación
