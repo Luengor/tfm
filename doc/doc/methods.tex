@@ -4,16 +4,16 @@
 
 \subsection{Visión general del flujo de trabajo}
 \label{subsec:vision}
-El sistema implementado procesa cada fotografía en cuatro etapas operativas:
-segmentación de los grafitis contenidos en la imagen, extracción de un vector
-de características por recorte, persistencia del vector junto a sus metadatos
-en un almacenamiento estructurado y, en un segundo tiempo, recuperación masiva
-del conjunto almacenado para reducirlo y agruparlo. La separación explícita
-entre la fase de ingesta y la fase de agrupamiento es intencionada. Por un
-lado, refleja el escenario de uso previsto (un banco que crece de forma
-incremental sobre el que se ejecutan sesiones de análisis puntuales), y por
-otro permite aislar el coste computacional de cada etapa al medir
-(figura~\ref{fig:pipeline}).
+El sistema procesa cada fotografía en dos fases. La \emph{ingesta} segmenta los
+grafitis, extrae un \textit{embedding} por recorte y persiste el vector con sus
+metadatos; la fase de \emph{agrupamiento} recupera el conjunto almacenado, lo
+reduce y lo agrupa (figura~\ref{fig:pipeline}). La separación es intencionada:
+refleja el escenario de uso (un banco que crece de forma incremental sobre el
+que se ejecutan análisis puntuales) y permite aislar el coste de cada etapa al
+medir. Cada una de las cinco etapas es un componente intercambiable tras una
+interfaz común, catalogados en \ref{subsec:configuraciones}; este desacoplamiento
+habilita la evaluación combinatoria, donde cada combinación define una
+configuración independiente y reproducible.
 
 \begin{figure}[h!]
   \centering
@@ -26,7 +26,6 @@ otro permite aislar el coste computacional de cada etapa al medir
     io/.style={font=\footnotesize, align=center},
     lbl/.style={font=\scriptsize, midway, fill=white, inner sep=2pt},
   ]
-    % ingesta
     \node[io] (img) {fotografía};
     \node[block, right=of img] (seg) {Segmentador};
     \node[block, right=of seg] (ext) {Extractor};
@@ -36,7 +35,6 @@ otro permite aislar el coste computacional de cada etapa al medir
     \draw[->] (seg)--(ext) node[lbl, above]{recortes};
     \draw[->] (ext)--(sto) node[lbl, above]{\textit{embeddings}};
 
-    % agrupamiento
     \node[block, below=14mm of seg] (red) {Reducción};
     \node[block, right=of red] (clu) {Agrupamiento};
     \node[io, right=of clu] (out) {clústeres\\y métricas};
@@ -44,7 +42,6 @@ otro permite aislar el coste computacional de cada etapa al medir
     \draw[->] (red)--(clu);
     \draw[->] (clu)--(out);
 
-    % leer almacenamiento
     \draw[->] (sto.south) -- ++(0,-7mm) -| (red.north)
         node[lbl, pos=0.25, above]{carga masiva};
 
@@ -59,397 +56,99 @@ otro permite aislar el coste computacional de cada etapa al medir
   \label{fig:pipeline}
 \end{figure}
 
-
-Cada una de las cinco etapas es un componente intercambiable tras una interfaz
-común, catalogados en \ref{subsec:configuraciones}. Este desacoplamiento es el
-que habilita la evaluación combinatoria que forma el trabajo: cada combinación
-define una configuración independiente y reproducible cuyo coste y calidad
-pueden compararse con cualquier otra.
-
-\subsection{\textit{Pipeline} operativo}
-\label{subsec:pipeline}
-
-\subsubsection{Ingesta y generación de \textit{embeddings}}
-La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
-\begin{enumerate}
-    \item La imagen se carga desde disco y se proporciona al segmentador.
-    \item El segmentador consume la imagen y devuelve una lista con cajas
-        delimitadoras de los grafitis presentes en la imagen. En el caso de que
-        no se utilice segmentador, se devuelve una única caja que abarca toda
-        la imagen, de modo que el sistema se comporta como un agrupador de
-        imágenes completas. Este comportamiento de respaldo también se puede
-        habilitar o deshabilitar para los modelos de detección de grafitis,
-        de modo que las imágenes sin detección se emitan como recortes de
-        escena completa o se descarten, respectivamente.
-    \item Las cajas detectadas se fusionan según criterios de solapamiento y
-        proximidad configurables, con salvaguardas para evitar mega-cajas;
-        opcionalmente se trunca la lista a las $K$ de mayor confianza. Si se
-        configura un margen no nulo, las cajas supervivientes se expanden para
-        incluir contexto visual alrededor del grafiti. Los parámetros que
-        gobiernan este proceso se describen en \ref{subsubsec:segmentador}.
-    \item Cada grafiti se recorta sobre la imagen original y el recorte se
-        entrega al modelo de extracción de características, que produce un
-        vector de características de dimensión fija.
-    \item El vector resultante, junto con la referencia a la fotografía original
-        y las coordenadas del recorte se almacenan en el sistema elegido.
-\end{enumerate}
-
-La figura~\ref{fig:segmentation-stages} ilustra el recorrido completo sobre una
-fotografía real: las cajas que emite el detector, su fusión por solapamiento, la
-expansión por el margen configurado y los recortes finales que se entregan al
-extractor.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\linewidth]{figures/segmentation_stages.pdf}
-  \caption[Etapas de la segmentación]{Etapas de la segmentación sobre una fotografía del banco, siguiendo
-  el flujo de las flechas: la fotografía original; las detecciones del modelo
-  YOLO ajustado; las cajas resultantes tras fusionar las solapadas; las cajas
-  expandidas con el margen de contexto; y los recortes finales que se entregan
-  al extractor.}
-  \label{fig:segmentation-stages}
-\end{figure}
-
-\subsubsection{Recuperación, reducción y agrupamiento}
-Una vez completada la ingesta, la fase de agrupamiento opera sobre el contenido
-completo del almacenamiento. En primer lugar, se recuperan todos los
-\textit{embeddings} junto con sus metadatos en una única consulta. A
-continuación, si la configuración declara una reducción, se aplica sobre cada
-vector de características el método de reducción seleccionado, obteniendo un
-nuevo conjunto de vectores. Finalmente, el algoritmo de agrupamiento se ajusta
-sobre el conjunto reducido, produciendo una etiqueta de clúster por cada
-vector. A partir de esta información se calculan las métricas de calidad
-intrínsecas y extrínsecas, y se conserva el mapeo entre identificadores de
-clúster y listas de recortes para la generación de visualizaciones
-interactivas. Esta secuencia de pasos se ejecuta además varias veces para cada
-configuración para obtener estadísticas sobre la variabilidad de las métricas
-de coste y calidad.
+En la ingesta, cada imagen se carga y se entrega al segmentador, que devuelve las
+cajas de los grafitis (o una caja que abarca toda la imagen si no se usa
+segmentación); las cajas se fusionan, se expanden con el margen configurado y
+cada grafiti se recorta y se pasa al extractor, que produce un vector de
+dimensión fija que se almacena junto a la referencia a la fotografía y las
+coordenadas del recorte. En la fase de agrupamiento se recuperan todos los
+\textit{embeddings} en una única consulta, se aplica la reducción seleccionada y
+el agrupador asigna una etiqueta por vector, a partir de la cual se calculan las
+métricas de calidad. La secuencia se repite varias veces por configuración para
+caracterizar la variabilidad de las métricas de coste y calidad.
 
 \subsection{Procedimiento experimental}
 \label{subsec:experimental}
-La evaluación se articula en dos ejes. El primero, y principal, es el
-rendimiento computacional, cuantificado mediante los tiempos absolutos de cada
-etapa del \textit{pipeline} (preparación, ingesta, reducción, agrupamiento y
-búsqueda por similitud), el \textit{throughput} de ingesta en imágenes por
-segundo, la latencia de búsqueda por consulta y la escalabilidad de estas
-magnitudes con el tamaño del banco; todas ellas son métricas objetivas e
-independientes de la existencia de etiquetas. El segundo eje, secundario, es la
-calidad de los clústeres resultantes, evaluada con las métricas internas y
-extrínsecas definidas en \ref{subsubsec:metricas}.
+La evaluación se articula en dos ejes. El principal es el rendimiento
+computacional, cuantificado mediante los tiempos absolutos de cada etapa
+(ingesta, reducción, agrupamiento y búsqueda por similitud), el
+\textit{throughput} de ingesta, la latencia de búsqueda y su escalabilidad con
+$N$; todas son métricas objetivas e independientes de la existencia de
+etiquetas. El secundario es la calidad de los clústeres, evaluada con las
+métricas internas y extrínsecas de \ref{subsubsec:metricas}.
 
-\subsubsection{Definición del espacio de configuraciones}
-\label{subsubsec:espacio-configs}
-Cada experimento queda descrito por un fichero de configuración en formato
-JSON. El fichero contiene una lista de experimentos. Cada experimento declara
-un identificador único y cinco componentes con la forma \texttt{\{type,
-params\}}: \texttt{storage}, \texttt{embedding}, \texttt{segmenter},
-\texttt{reduction} y \texttt{clustering}, además de un bloque opcional
-\texttt{similarity\_search}. Esta forma declarativa garantiza que toda la
-información necesaria para reproducir un experimento queda en un único fichero
-versionable.
+Cada experimento se describe por un fichero de configuración JSON que declara,
+por ejecución, los cinco componentes con la forma \texttt{\{type, params\}}; para barrer el
+espacio combinatorio, un
+\textit{script} expande por producto cartesiano un fichero auxiliar de
+alternativas. La caracterización del coste en función de $N$ se obtiene
+ejecutando cada configuración sobre una sucesión creciente de tamaños
+(parámetro \texttt{--limit}), con muestreo determinista (las fotografías se
+ordenan por nombre y se toman las primeras $N$). La ingesta, etapa más costosa,
+se reutiliza entre experimentos: se identifica cada almacenamiento por su
+configuración de ingesta y se omite si ya existe, leyendo sus métricas de la
+tabla de metadatos para reportar el coste real y no el de caché.
 
-Para barrer sistemáticamente el espacio combinatorio se utiliza un fichero
-auxiliar en el que cada componente se sustituye por una lista de alternativas.
-Un \textit{script} expande este fichero mediante producto cartesiano,
-materializando un experimento en el archivo final por cada combinación válida.
-
-\subsubsection{Protocolo de escalabilidad}
-\label{subsubsec:escalabilidad}
-La caracterización del coste computacional en función del tamaño del banco
-constituye uno de los ejes centrales del trabajo. Para obtenerla, se ejecuta
-cada configuración seleccionada sobre una sucesión creciente de tamaños $N$
-controlada mediante el parámetro \texttt{--limit}. La selección de tamaños es
-reducida en la mayoría de experimentos para evitar que el coste total de la
-evaluación se dispare, pero se realiza un barrido completo sobre un rango de
-tamaños lo suficientemente amplio como para identificar tendencias de
-crecimiento.
-
-El muestreo de las imágenes para cada $N$ es determinista: las fotografías se
-ordenan por su nombre de fichero y se toman las primeras $N$. Para cada tamaño
-se obtienen las métricas temporales descritas en \ref{subsubsec:cronometria},
-lo que permite caracterizar el crecimiento de cada etapa por separado y, a
-partir de ahí, estimar empíricamente el órden de crecimiento de la función de
-coste respecto a $N$ para cada etapa.
-
-\subsubsection{Reutilización de almacenamientos}
-\label{subsubsec:reutilizacion}
-La ingesta es, en la mayoría de ocasiones, la etapa más costosa del
-\textit{pipeline}. Para evitar repetirla, se crea un identificador para cada
-almacenamiento a partir de la configuración de ingesta (segmentador, modelo de
-representación y parámetros asociados) que luego es usado para situar la base
-de datos en un directorio específico (o nombrar la tabla en el caso de
-PostgreSQL). Cuando el sistema detecta que el almacenamiento ya existe y no se
-ha declarado explícitamente que se limpie (\texttt{clear\_storage: true}), la
-fase de ingesta se omite y se reutiliza el almacenamiento existente. Las
-métricas de ingesta se almacenan en la tabla de metadatos del almacenamiento
-para que, en casos como estos, se reporten los tiempos reales de ingesta en
-lugar de los tiempos de caché, que no reflejarían el coste real de la etapa.
-
-\subsubsection{Instrumentación y cronometría}
+\subsubsection{Instrumentación y cronometría.}
 \label{subsubsec:cronometria}
+El \textit{runner} envuelve cada etapa en un gestor de contexto que registra el
+tiempo de pared con \texttt{time.perf\_counter}. La reducción y el agrupamiento
+se repiten $K$ veces con semillas $0,\ldots,K-1$; cuando ambos son
+deterministas se fuerza $K=1$. Con $K\geq2$ se descarta la primera repetición
+(absorbe la inicialización: compilación JIT y poblamiento de cachés) y sobre las
+$K-1$ restantes se reportan media y desviación típica de cada métrica de coste;
+la calidad, en cambio, se evalúa sobre las $K$ repeticiones. La ingesta y la
+búsqueda por similitud, deterministas una vez fijada la semilla, se miden una
+sola vez.
 
-\begin{sloppypar}
-    El \textit{runner} de evaluación mide cuatro etapas: ingesta, reducción,
-    agrupamiento y búsqueda por similitud. Cada una se envuelve en un gestor de
-    contexto (\texttt{profile\_stage}) que registra los instantes de entrada y
-    salida con \texttt{time.perf\_counter}, un reloj monotónico de alta resolución.
-    La diferencia entre ambos instantes es el tiempo de pared (\textit{wall time})
-    de la etapa, en segundos y con resolución de microsegundos. La preparación de
-    componentes y la limpieza del almacenamiento quedan fuera del gestor de
-    contexto y no se contabilizan.
-\end{sloppypar}
-
-Para acotar la variabilidad entre ejecuciones, las etapas de reducción y
-agrupamiento se repiten $K$ veces dentro del mismo proceso, con las semillas
-$0, 1, \ldots, K-1$. La semilla afecta a la reducción estocástica (UMAP) y a
-los agrupamientos estocásticos (K-medias, GMM, \textit{spectral clustering} y
-\textit{affinity propagation}); los algoritmos deterministas (DBSCAN, OPTICS,
-HDBSCAN y aglomerativo) la reciben por la interfaz común pero la ignoran. Cuando
-la reducción y el agrupamiento son ambos deterministas, las repeticiones serían
-idénticas, así que se fuerza $K=1$; esas configuraciones, en consecuencia, no
-aportan barras de error.
-
-Cuando $K \geq 2$, la primera repetición ($i=0$) se descarta porque absorbe los
-efectos de inicialización (compilación \textit{just-in-time} de operadores y
-poblamiento de cachés del sistema operativo); sobre las $K-1$ restantes se
-reportan la media aritmética y la desviación típica de cada métrica de coste.
-La calidad del agrupamiento, en cambio, se evalúa sobre las $K$ repeticiones
-completas: no la afectan los costes de inicialización y así se cuantifica la
-sensibilidad de las métricas intrínsecas al muestreo aleatorio.
-
-La ingesta y la búsqueda por similitud se miden una sola vez por ejecución. La
-ingesta es determinista y, además, la reutilización de almacenamiento
-(\ref{subsubsec:reutilizacion}) exige una cronometría única; la búsqueda por
-similitud es barata y su variabilidad entre configuraciones se observa
-directamente a lo largo del barrido de tamaños. Los experimentos se ejecutan
-sobre un sistema sin otras cargas significativas (\ref{subsec:entorno}) para
-minimizar interferencias externas.
-
-\subsubsection{Selección automática de hiperparámetros}
+\subsubsection{Selección automática de hiperparámetros.}
 \label{subsubsec:hiperparam-auto}
-Salvo que se desee evaluar explícitamente el efecto de fijar un hiperparámetro
-a un valor concreto, todas las configuraciones del \textit{benchmark} emplean
-por defecto la estimación automática del hiperparámetro principal de K-medias,
-DBSCAN y los modelos de mezcla gaussiana, mediante el método del codo, la curva
-de $k$-distancias y el criterio bayesiano de información respectivamente. En los
-tres casos las semillas aleatorias se fijan para que el resultado sea
-reproducible.
+Salvo que se desee evaluar el efecto de fijarlo, las configuraciones estiman
+automáticamente el hiperparámetro principal de K-medias, DBSCAN y GMM mediante el
+método del codo, la curva de $k$-distancias y el criterio bayesiano de
+información, respectivamente, con semillas fijas. Cuando una configuración no
+fija \texttt{n\_clusters} y emplea varias repeticiones, el $k$ autodetectado en
+la primera repetición se propaga al resto, de modo que las repeticiones varían
+solo por la semilla y las métricas agregadas describen una única familia de
+particiones.
 
-La elección de estos algoritmos también atiende a su coste computacional:
-K-medias cuenta con variantes escalables como la versión
-\textit{mini-batch}~\cite{sculley_web-scale_2010}, mientras que los métodos
-basados en densidad presentan un crecimiento superlineal con el tamaño del
-banco. En cualquier caso, el rendimiento en calidad depende fuertemente del
-conjunto de datos~\cite{franti_k-means_2018,ahmed_k-means_2020}, lo que
-refuerza el enfoque comparativo adoptado en este trabajo.
-
-Cuando una configuración no fija \texttt{n\_clusters} y emplea varias
-repeticiones, el número de clústeres autodetectado en la primera repetición se
-propaga al resto, de modo que las repeticiones varían únicamente por la semilla
-y las métricas agregadas describen una sola familia de particiones en lugar de
-mezclar particiones con distinto número de clústeres. El número de clústeres
-obtenido en cada repetición se registra para poder verificar que la propagación
-se mantiene.
-
-\subsubsection{Protocolo de búsqueda por similitud}
-\label{subsubsec:similarity-search}
-La medición del coste de búsqueda por similitud se realiza sobre los
-\textit{backends} de almacenamiento descritos anteriormente. Tras realizarse la
-ingesta, se seleccionan $n$ \textit{embeddings} de manera aleatoria (pero
-reproducible) y se buscan los $k$ vecinos más próximos a cada uno de ellos,
-midiendo el tiempo total de las consultas. La distancia utilizada para la
-búsqueda puede ser tanto euclidiana como coseno, y el número de vecinos también
-es configurable.
-
-El tiempo total de las consultas se mide con el mismo procedimiento que el
-resto de etapas. De la misma forma que en el almacenamiento, la búsqueda por
-similitud es determinista una vez fijada la semilla que determina las entradas
-que buscar, así que no se repite varias veces como la reducción y el
-agrupamiento. El coste de esta etapa se espera que crezca como $O(n^2)$ para el
-recorrido lineal de \texttt{SQLiteStorage} y como $O(n \log n)$ para el índice
-HNSW de \texttt{PostgreSQLStorage}.
-
-De esta etapa también se reporta la distancia media a los $k$ vecinos
-recuperados, promediada sobre todas las consultas. Si el \textit{backend}
-dispone de índice ANN (como es el caso de \texttt{PostgreSQL} con
-\texttt{HNSW}), también se reporta el R@$k$ de sus vecinos frente
-a una búsqueda exacta por fuerza bruta, que cuantifica la pérdida de exactitud
-del índice aproximado y es nulo en los \textit{backends} exactos.
-
-\subsubsection{Evaluación intrínseca de los agrupamientos}
-\label{subsubsec:eval-intrinseca}
-Las métricas intrínsecas definidas en \ref{subsubsec:metricas} se calculan de
-manera operativa sobre los \textit{embeddings} originales en su espacio de
-partida, no sobre los \textit{embeddings} reducidos utilizados por el
-agrupamiento. Esto se hace porque el objetivo de estas métricas es evaluar la
-calidad del agrupamiento de los datos originales, no la habilidad del reductor
-para deformar el espacio de modo que los clústeres aparezcan más compactos o
-separados.
-
-Los algoritmos basados en densidad (DBSCAN, OPTICS y HDBSCAN) pueden asignar la
-etiqueta $-1$ a puntos considerados ruido. Estos puntos se excluyen del cálculo
-del coeficiente de silueta y de los índices de Calinski--Harabász y
-Davies--Bouldin, lo que evita penalizar a los algoritmos que identifican y
-reportan ruido. Por otro lado, un agrupamiento que rechace una gran fracción de
-puntos como ruido podría quedar artificialmente premiado por agrupar solo los
-puntos muy cercanos entre sí; por ello estas métricas se complementan con la
-proporción de puntos etiquetados como ruido y la variedad de tamaños de los
-clústeres resultantes.
-
-\subsubsection{Evaluación extrínseca sobre los subconjuntos etiquetados}
+\subsubsection{Evaluación de calidad.}
 \label{subsubsec:eval-extrinseca}
-La evaluación supervisada hace uso de las métricas descritas anteriormente
-(sección \ref{subsubsec:metricas}) y opera sobre dos conjuntos de recortes
-etiquetados, uno por cada tarea supervisada del trabajo: evaluación por estilo
-y evaluación por autor. En ambos casos, se utilizan los recortes directamente
-como imágenes a evaluar en vez de aportar la imagen original y utilizar un
-segmentador para extraer los recortes de evaluación, porque el objetivo es
-medir la calidad del espacio de representación para agrupar grafitis, no la
-capacidad de un sistema completo. Tampoco se utilizan imágenes completas,
-puesto que muchas de estas contienen varios grafitis de estilos y autores
-distintos, haciendo difícil atribuir una etiqueta de estilo o autor a la imagen
-completa y complicando la interpretación de las métricas.
-
-Ambas evaluaciones comparten métricas y procedimiento, pero responden a
-preguntas distintas, y esa diferencia justifica el reparto asimétrico de las
-anotaciones entre entrenamiento y evaluación. Las etiquetas de estilo definen
-una tarea de clasificación cerrada sobre cuatro categorías fijas, así que basta
-con que no se solapen las fotografías entre entrenamiento y evaluación. La
-diversidad estilística se cubre mejor agregando recortes de Salamanca y de
-Cuenca (el banco StopGrafiti) al entrenamiento, y el conjunto de evaluación,
-extraído del banco principal de Salamanca, es disjunto a nivel de fotografía.
-La evaluación por estilo mide así el grado en que el espacio de representación
-agrupa grafitis estilísticamente homogéneos.
-
-Las etiquetas de autor, en cambio, definen un problema abierto de aprendizaje
-de métricas: en el uso real del sistema, los autores de los grafitis a agrupar
-son en su mayoría desconocidos para el modelo en el momento de la inferencia.
-Si las cabezas de autoría se entrenasen sobre los mismos identificadores de
-autor que luego aparecen en la evaluación (aun utilizando fotografías
-distintas), las métricas medirían la capacidad de reidentificar autores ya
-vistos, no la de construir un espacio en el que autores nuevos queden
-separados. Para evitar este sesgo se sigue la convención habitual de la
-verificación de identidad (FaceNet~\cite{schroff_facenet_2015} y la literatura
-de reidentificación de personas): el conjunto de evaluación contiene únicamente
-identificadores de autor disjuntos de los vistos durante el entrenamiento.
-
-Esta restricción se cumple entrenando las cabezas de autoría exclusivamente con
-los recortes de Cuenca y evaluándolas sobre los de Salamanca. Dado que ambas
-ciudades están geográficamente separadas, es razonable asumir que los conjuntos
-de autores no se solapan. Esto, aunque no se ha verificado formalmente, se ha
-comprobado de manera informal al realizar la segmentación y anotación de los
-recortes, y no se ha encontrado ningún caso de un mismo autor operando en ambas
-ciudades. Esta elección introduce además un cambio de dominio entre ciudades,
-que deberá tenerse en cuenta al interpretar los resultados de la evaluación por
-autor (\ref{sec:results}). La asimetría entre entrenamiento y evaluación es,
-por tanto, intrínseca al problema de aprendizaje de métricas.
-
-Las métricas ARI, NMI y F1 por pares se aplican directamente sobre los
-\textit{clusters} obtenidos y las etiquetas de estilo y autoría, sin resolver
-explícitamente el problema de asignación clúster-clase: Las tres son
-invariantes ante permutaciones de etiquetas y comparan las relaciones de
-coagrupamiento entre pares de puntos. Para los algoritmos que pueden etiquetar
-puntos como ruido ($-1$) se reportan dos lecturas de cada métrica. En la
-lectura por defecto los puntos de ruido se tratan como un único clúster
-adicional, de modo que influyen en la métrica en lugar de ignorarse
-silenciosamente. En la lectura complementaria (\texttt{*\_no\_noise}) esas
-instancias se descartan antes de puntuar, de forma que los algoritmos de
-densidad y los particionales se comparan sobre el subconjunto que cada uno
-realmente agrupa. Esta doble lectura es asimétrica respecto al tratamiento del
-ruido en las métricas intrínsecas, donde el ruido siempre se excluye y se
-complementan con valores como el porcentaje de ruido.
-
-Para evaluar la calidad de la búsqueda por similitud se emplean también las
-etiquetas disponibles según la evaluación: las métricas P@$k$, MAP@$k$, MRR y
-R@$k$ definidas en \ref{subsubsec:tools-similarity-search} se calculan por
-consulta y se promedian sobre todas las consultas realizadas para obtener una
-media global de la calidad de la búsqueda por similitud. Como R@$k$ acota su
-denominador al máximo de vecinos relevantes recuperables en $k$ posiciones
-($\min(k,\,|\text{clase}|-1)$), cuando las clases son grandes frente a $k$
-(como en la evaluación de estilo, con cuatro clases densas) ese denominador se
-satura en $k$ y R@$k$ coincide numéricamente con P@$k$. En ese caso se omite de
-las tablas por redundancia y solo se incluye cuando ambas divergen.
-
-\subsubsection{Salida y agregación de resultados}
-\label{subsubsec:salida}
-Cada lote de \textit{benchmarks} produce un único fichero JSON con dos
-secciones: un bloque con información sobre el entorno de ejecución (versión de
-Python, librerías principales, \textit{hardware} utilizado), y otro bloque con
-una entrada por configuración que contiene todas las métricas y tiempos
-capturados. Para las etapas repetidas se incluyen tanto los valores medios como
-las desviaciones típicas y el número de muestras agregadas en cada caso, de
-manera que el análisis posterior pueda distinguir diferencias dentro del ruido
-de medición.
+Las métricas intrínsecas se calculan sobre los \textit{embeddings} originales (no
+los reducidos), L2-normalizados, excluyendo los puntos de ruido ($-1$) del
+cálculo de silueta, CH y DB. La evaluación supervisada opera sobre dos conjuntos
+de recortes etiquetados (estilo y autoría), usados directamente como imágenes
+(segmentador identidad) porque el objetivo es medir la calidad del espacio de
+representación, no la de un sistema completo. El reparto de las anotaciones entre
+entrenamiento y evaluación es asimétrico por la naturaleza de cada tarea: las
+etiquetas de estilo definen una clasificación cerrada sobre cuatro categorías
+(basta con no solapar fotografías), mientras que las de autoría definen un
+problema abierto de aprendizaje de métricas donde los autores de inferencia son
+desconocidos. Para evitar medir reidentificación de autores ya vistos se sigue la
+convención de la verificación de identidad
+(FaceNet~\cite{schroff_facenet_2015}): las cabezas de autoría se entrenan solo
+con recortes de Cuenca y se evalúan sobre los de Salamanca, lo que garantiza
+identificadores disjuntos a costa de introducir un cambio de dominio entre
+ciudades. ARI, NMI y F1 por pares se aplican directamente sobre los clústeres y
+las etiquetas; para los algoritmos con ruido se reportan dos lecturas, una que
+trata el ruido como un clúster adicional y otra (\texttt{*\_no\_noise}) que lo
+descarta antes de puntuar.
 
 \subsection{Entrenamiento de modelos auxiliares}
 \label{subsec:entrenamiento}
-
-\subsubsection{Detector de grafiti}
-\label{subsubsec:entrenamiento-detector}
-El detector se entrena a partir del subconjunto anotado descrito en
-\ref{subsec:dataset}, cuyas $447$ fotografías de ambos bancos contienen
-aproximadamente un total de $650$ cajas anotadas. Puesto que se trata de un
-número bastante reducido, se realiza una aumentación de datos bastante agresiva
-aplicando diversas transformaciones sobre las imágenes y sus cajas
-correspondientes. El entrenamiento parte de los pesos preentrenados sobre COCO
-y solo ajusta sus parámetros para la única clase de interés, \enquote{grafiti}.
-
-Se utilizan los hiperparámetros por defecto de la implementación de referencia,
-salvo el número de épocas, el tamaño de \textit{batch} y la resolución de
-entrada, que se fijan para encajar en la memoria de la GPU descrita en
-\ref{subsec:entorno}. El optimizador, las \textit{augmentations} (jitter HSV,
-escalado, volteos horizontales y verticales, cambios de perspectiva,
-rotaciones, traslaciones, oclusiones parciales de partes de la imagen y
-\textit{mosaic}) y la \textit{learning rate} con \textit{warm-up} y el descenso
-por defecto del \textit{framework} (lineal) se mantienen en sus valores por
-defecto. El entrenamiento incorpora parada temprana cuando la métrica mAP@$0.5$
-sobre validación no mejora durante un número fijo de épocas.
-
-\subsubsection{Cabezas de proyección}
-\label{subsubsec:entrenamiento-cabezas}
-Las cuatro cabezas (autoría y estilo sobre MobileNetV3 y DINOv2) se entrenan
-sobre la totalidad del subconjunto anotado, sin reservar una partición de
-validación. Los \textit{backbones} se mantienen estrictamente congelados
-durante todo el proceso y solo se actualizan los parámetros de la cabeza, según
-el esquema de \textit{transfer learning} descrito en \ref{subsubsec:cabezas}.
-
-Las cabezas de autoría se entrenan con la pérdida de tripletes en su variante
-\textit{batch-hard}~\cite{hermans_defense_2017} con margen $0.3$, optimizador
-Adam con \textit{learning rate} $10^{-4}$ y $20$ épocas, sin parada temprana:
-se conservan los pesos de la última época. Cada \textit{batch} se construye
-mediante un muestreador PK que selecciona $8$ autores y $4$ recortes por autor
-(tamaño de \textit{batch} $32$), de modo que cada ancla disponga de varios
-pares positivos dentro del mismo \textit{batch}. A continuación, y dada la
-relevancia del muestreo de negativos~\cite{wu_sampling_2017}, para cada ancla
-se forma el triplete con su positivo más difícil (el recorte del mismo autor
-más alejado en el espacio latente) y su negativo más difícil (el recorte de
-autor distinto más cercano), concentrando la pérdida en los tripletes más
-informativos del \textit{batch}. Los autores representados por un único recorte
-se conservan en el entrenamiento, ya que gracias a la fuerte aumentación de los
-datos, a partir de un solo recorte se generan múltiples ejemplos distintos que
-pueden actuar como par positivo entre sí.
-
-Las cabezas de estilo se entrenan con la pérdida \textit{Supervised
-Contrastive}~\cite{khosla_supervised_2021} y temperatura $T = 0.07$,
-optimizador Adam con \textit{learning rate} $10^{-4}$ y un \textit{scheduler}
-cosenoidal a lo largo de $60$ épocas. Para que cada \textit{batch} contenga al
-menos un par positivo por ancla, se utiliza un muestreador balanceado que toma
-$4$ recortes por clase y construye entre $10$ y $30$ \textit{batches} por época
-en función del tamaño efectivo del conjunto. El muestreo se realiza con
-reemplazo, de modo que las clases con menos de $4$ recortes repiten ejemplos
-dentro del \textit{batch} hasta completar la cuota. Se aplica parada temprana
-con paciencia de $15$ épocas sobre la pérdida de entrenamiento, y la cabeza
-seleccionada para los \textit{benchmarks} es la que minimiza dicha pérdida.
-
-\subsection{Reproducibilidad}
-\label{subsec:reproducibilidad} Más allá del entorno y las versiones de
-dependencias (sección~\ref{subsec:entorno}), la reproducibilidad se apoya en
-dos elementos. Primero, todo estimador estocástico se instancia con
-\texttt{random\_state} fijo (K-medias, GMM, UMAP y la selección automática de
-hiperparámetros descrita en \ref{subsubsec:hiperparam-auto} comparten semilla);
-además, los modelos de \textit{embeddings} en PyTorch se fuerzan a ser
-deterministas (\texttt{cudnn.deterministic} activado y \texttt{benchmark}
-desactivado) y UMAP se ejecuta con \texttt{n\_jobs=1} para que el orden de
-acumulación en paralelo no varíe entre máquinas. Segundo, todos los ficheros de
-configuración de los experimentos se publican junto con el código, de modo que
-cualquier resultado descrito puede reproducirse.
+El \textbf{detector} se entrena a partir de las $447$ fotografías anotadas
+($\sim$650 cajas) de ambos bancos, partiendo de los pesos preentrenados sobre
+COCO y ajustando para la única clase \enquote{grafiti}, con aumentación agresiva
+(jitter HSV, escalado, volteos, perspectiva, rotaciones, oclusiones y
+\textit{mosaic}) y parada temprana sobre mAP@0.5. Las cuatro \textbf{cabezas} se
+entrenan sobre la totalidad del subconjunto anotado con el \textit{backbone}
+congelado. Las de autoría usan la pérdida de tripletes
+\textit{batch-hard}~\cite{hermans_defense_2017} (margen $0.3$, Adam
+$10^{-4}$, $20$ épocas) con un muestreador PK ($8$ autores $\times$ $4$ recortes)
+que para cada ancla forma el triplete con su positivo y su negativo más
+difíciles~\cite{wu_sampling_2017}. Las de estilo usan la pérdida
+\textit{Supervised Contrastive}~\cite{khosla_supervised_2021} ($T=0.07$, Adam
+$10^{-4}$, \textit{scheduler} cosenoidal sobre $60$ épocas) con un muestreador
+balanceado. La reproducibilidad se apoya en semillas fijas para todo estimador
+estocástico, modelos de PyTorch deterministas y la publicación de todos los
+ficheros de configuración junto al código.
