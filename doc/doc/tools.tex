@@ -195,7 +195,7 @@ $k$ sobre las posiciones relevantes.
 \subsubsection{Agrupamiento no supervisado}
 \label{subsubsec:agrupamiento}
 Los principales algoritmos de agrupamiento se diferencian por la manera en la
-que agrupan los datos. Los métodos basados en centroides, como K-Means, modelan
+que agrupan los datos. Los métodos basados en centroides, como K-medias, modelan
 cada clúster por su media y buscan minimizar la varianza intracluster. Esto los
 hace bastante eficientes, pero también sensibles a la forma y al solapamiento
 de los grupos. Por esto, estos algoritmos no suelen dar los mejores resultados
@@ -227,7 +227,7 @@ de los métodos más simples (especialmente \textit{affinity propagation} y los
 métodos basados en modelos probabilísticos).
 
 La principal dificultad en un escenario sin etiquetas es la selección del
-número de clústeres. K-Means y los modelos de mezcla requieren fijarlo a
+número de clústeres. K-medias y los modelos de mezcla requieren fijarlo a
 priori, y se recurre a heurísticas como el método del codo sobre la inercia o
 el criterio bayesiano de información (BIC). Los algoritmos basados en densidad
 y los jerárquicos lo evitan en su formulación, pero a cambio introducen otros
@@ -336,12 +336,12 @@ configuración del \textit{benchmark}. La tabla~\ref{tab:clustering-algos}
 recoge las opciones implementadas con sus hiperparámetros clave.
 
 Tres de los algoritmos admiten la selección automática de su hiperparámetro
-principal cuando este no se declara. Este es el caso de K-Means, los modelos de
+principal cuando este no se declara. Este es el caso de K-medias, los modelos de
 mezcla gaussiana y DBSCAN, que hacen uso del método del codo, el criterio
 bayesiano de información y la curva de $k$-distancias respectivamente para
 seleccionar el número de clústeres o el radio de densidad cuando no se
 especifica un valor concreto en la configuración. En cuanto al coste
-computacional, K-Means cuenta con variantes escalables como la versión
+computacional, K-medias cuenta con variantes escalables como la versión
 \textit{mini-batch}~\cite{sculley_web-scale_2010}, mientras que los métodos
 basados en densidad presentan un crecimiento superlineal con el tamaño del
 banco. En cualquier caso, el rendimiento en calidad depende fuertemente del
@@ -350,7 +350,7 @@ refuerza el enfoque comparativo adoptado en este trabajo.
 
 \begin{longtable}{|l|l|c|} \hline
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
-  K-Means~\cite{arthur_k-means_2007} & $n\_clusters$ & sí \\ \hline
+  K-medias~\cite{arthur_k-means_2007} & $n\_clusters$ & sí \\ \hline
   DBSCAN~\cite{ester_density-based_1996} & $\epsilon$, $min\_samples$ & sí ($\epsilon$) \\ \hline
   HDBSCAN~\cite{campello_density-based_2013} & $min\_cluster\_size$, $max\_cluster\_size$ & no requiere \\ \hline
   OPTICS~\cite{ankerst_optics_1999} & $min\_samples$, $max\_eps$, $metric$ & no requiere \\ \hline
