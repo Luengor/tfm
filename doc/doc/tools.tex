@@ -165,7 +165,7 @@ normaliza sus vectores a norma unitaria para que las cabezas entrenadas en
 estilo y autoría (que sí que normalizan sus vectores) puedan compararse con los
 \textit{backbones} de los que proceden.
 
-\subsection{Búsqueda por similitud}
+\subsubsection{Búsqueda por similitud}
 \label{subsubsec:tools-similarity-search}
 Para la búsqueda por similitud la propuesta considera dos enfoques. El primero
 y más simple de ellos consiste en una búsqueda exacta sobre SQLite, que se
@@ -301,14 +301,13 @@ disponible: el índice de Rand ajustado (ARI), la información mutua normalizada
 (NMI) y la F1 por pares, que constituyen el complemento más sólido a las
 métricas internas en el plano de calidad. 
 
-% Este apartado no termina de encajarme aquí, al menos como está planteado. El
-% objetivo de este apartado es presentar conceptos y tecnologías que se usan;
-% pero con el objetivo de que se entiendan. Esto creo que se reubicaría mejor
-% en metodología, es decir, para describir lo que se debería hacer si se
-% quisiera reproducir el experimiento (que basicamente es describir de forma
-% parametrizada un pipeline)
-\subsection{Componentes implementados}
+\subsection{Catálogo de componentes}
 \label{subsec:configuraciones}
+
+Esta subsección cataloga los componentes concretos integrados en el sistema,
+que constituyen los materiales sobre los que opera la evaluación. Su
+combinación parametrizada para definir cada experimento se describe en
+\ref{subsubsec:espacio-configs}.
 
 \subsubsection{Modelos de extracción de características}
 Todos los modelos se utilizan congelados, sin reentrenar sus pesos. En algunos
@@ -344,18 +343,10 @@ disponibles en scikit-learn~\cite{pedregosa_scikit-learn_2011}. La
 tabla~\ref{tab:clustering-algos} recoge las opciones implementadas con sus
 hiperparámetros clave.
 
-Tres de los algoritmos admiten la selección automática de su hiperparámetro
-principal cuando este no se declara. Este es el caso de K-medias, los modelos de
-mezcla gaussiana y DBSCAN, que hacen uso del método del codo, el criterio
-bayesiano de información y la curva de $k$-distancias respectivamente para
-seleccionar el número de clústeres o el radio de densidad cuando no se
-especifica un valor concreto en la configuración. En cuanto al coste
-computacional, K-medias cuenta con variantes escalables como la versión
-\textit{mini-batch}~\cite{sculley_web-scale_2010}, mientras que los métodos
-basados en densidad presentan un crecimiento superlineal con el tamaño del
-banco. En cualquier caso, el rendimiento en calidad depende fuertemente del
-conjunto de datos~\cite{franti_k-means_2018, ahmed_k-means_2020}, lo que
-refuerza el enfoque comparativo adoptado en este trabajo.
+La columna «Auto. $k$» indica qué algoritmos pueden estimar su hiperparámetro
+principal cuando este no se declara en la configuración; el procedimiento
+empleado en cada caso y su papel en el protocolo comparativo se detallan en
+\ref{subsubsec:hiperparam-auto}.
 
 \begin{longtable}{|l|l|c|} \hline
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline

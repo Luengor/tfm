@@ -230,9 +230,18 @@ minimizar interferencias externas.
 Salvo que se desee evaluar explícitamente el efecto de fijar un hiperparámetro
 a un valor concreto, todas las configuraciones del \textit{benchmark} emplean
 por defecto la estimación automática del hiperparámetro principal de K-medias,
-DBSCAN y los modelos de mezcla gaussiana, descrita en
-\ref{subsubsec:algoritmos-agrupamiento}. En los tres casos las semillas
-aleatorias se fijan para que el resultado sea reproducible.
+DBSCAN y los modelos de mezcla gaussiana, mediante el método del codo, la curva
+de $k$-distancias y el criterio bayesiano de información respectivamente. En los
+tres casos las semillas aleatorias se fijan para que el resultado sea
+reproducible.
+
+La elección de estos algoritmos también atiende a su coste computacional:
+K-medias cuenta con variantes escalables como la versión
+\textit{mini-batch}~\cite{sculley_web-scale_2010}, mientras que los métodos
+basados en densidad presentan un crecimiento superlineal con el tamaño del
+banco. En cualquier caso, el rendimiento en calidad depende fuertemente del
+conjunto de datos~\cite{franti_k-means_2018, ahmed_k-means_2020}, lo que
+refuerza el enfoque comparativo adoptado en este trabajo.
 
 Cuando una configuración no fija \texttt{n\_clusters} y emplea varias
 repeticiones, el número de clústeres autodetectado en la primera repetición se
