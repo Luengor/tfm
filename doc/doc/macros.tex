@@ -1,0 +1,14 @@
+% Shared custom macros used by both the thesis (informe.tex) and the
+% article (../article/article.tex). Keep this file preamble-safe: only
+% \newcommand definitions, no text, no \begin{document}-dependent code.
+
+% Cita chula: \citea[etali]{Autor}{citekey} -> "Autor et al. [n]"
+\newcommand{\citea}[3][]{%
+    #2\ifx\\#1\\\else~\textit{et~al.}\fi~\cite{#3}%
+}
+
+% Glosa de columnas para las tablas de calidad intrínseca
+\newcommand{\glosacalidad}{Columnas: cls=n\'umero de cl\'usteres,
+ruido=fracci\'on de ruido~$\downarrow$, sil=silueta~$\uparrow$,
+CH=Calinski--Harab\'asz~$\uparrow$, DB=Davies--Bouldin~$\downarrow$,
+csCV=coef.\ de variaci\'on del tama\~no de cl\'uster~$\downarrow$.}

@@ -1,0 +1,452 @@
+\relax 
+\providecommand\babel@aux[2]{}
+\@nameuse{bbl@beforestart}
+\catcode `"\active 
+\catcode `<\active 
+\catcode `>\active 
+\@nameuse{es@quoting}
+\citation{fogaca_deep_2023}
+\citation{taylor_twenty-first_2010}
+\babel@aux{spanish}{}
+\@writefile{toc}{\contentsline {title}{Caracterizaci\'on del desempe\~no y el coste computacional en algoritmos de similitud en bancos de im\'agenes de grafiti}{1}{}\protected@file@percent }
+\@writefile{toc}{\authcount {1}}
+\@writefile{toc}{\contentsline {author}{Alberto Luengo Rom\'an\unskip {}}{1}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introducción}{1}{}\protected@file@percent }
+\newlabel{sec:intro}{{1}{1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.1}Contexto y motivación}{1}{}\protected@file@percent }
+\newlabel{subsec:intro-contexto}{{1.1}{1}}
+\citation{fogaca_deep_2023,tokuda_quantifying_2019}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Ejemplos de recortes de grafiti del conjunto de datos}}{2}{}\protected@file@percent }
+\newlabel{fig:intro-mosaic}{{1}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.2}Planteamiento del problema}{2}{}\protected@file@percent }
+\newlabel{subsec:intro-problema}{{1.2}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.3}Objetivos}{3}{}\protected@file@percent }
+\newlabel{subsec:intro-objetivos}{{1.3}{3}}
+\@writefile{toc}{\contentsline {subsubsection}{Objetivo general}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Objetivos específicos}{3}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.4}Alcance y limitaciones}{3}{}\protected@file@percent }
+\newlabel{subsec:intro-alcance}{{1.4}{3}}
+\citation{fogaca_deep_2023}
+\citation{tokuda_quantifying_2019}
+\@writefile{toc}{\contentsline {subsection}{\numberline {1.5}Estructura del documento}{4}{}\protected@file@percent }
+\newlabel{subsec:intro-estructura}{{1.5}{4}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Estado de la cuestión}{4}{}\protected@file@percent }
+\newlabel{sec:art}{{2}{4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Análisis automático de grafiti}{4}{}\protected@file@percent }
+\newlabel{subsec:art-grafiti}{{2.1}{4}}
+\citation{taylor_twenty-first_2010}
+\citation{garcia_garcia_graffiti_2025}
+\gdef \LT@i {\LT@entry 
+    {1}{60.86005pt}\LT@entry 
+    {1}{66.15094pt}\LT@entry 
+    {1}{63.3055pt}\LT@entry 
+    {1}{68.99596pt}\LT@entry 
+    {1}{68.99596pt}\LT@entry 
+    {1}{60.46005pt}}
+\citation{he_deep_2015}
+\citation{radford_learning_2021}
+\citation{oquab_dinov2_2024}
+\citation{mcinnes_umap_2020}
+\citation{ester_density-based_1996, campello_density-based_2013, arthur_k-means_2007}
+\citation{malkov_efficient_2018}
+\citation{johnson_billion-scale_2017}
+\@writefile{lot}{\contentsline {table}{\numberline {1}{Comparativa de trabajos previos sobre análisis de grafiti}}{5}{}\protected@file@percent }
+\newlabel{tab:art-comparativa}{{1}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Análisis de similitud y agrupamiento de imágenes}{5}{}\protected@file@percent }
+\newlabel{subsec:art-emb-red-clus}{{2.2}{5}}
+\citation{fiel_writer_2015}
+\citation{schroff_facenet_2015}
+\citation{min_survey_2018}
+\citation{caron_deep_2019}
+\citation{van_gansbeke_scan_2020}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Identificación de autoría a partir de firmas y escritura}{6}{}\protected@file@percent }
+\newlabel{subsec:art-author-id}{{2.3}{6}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Aprendizaje profundo de clústeres y posicionamiento de este trabajo}{6}{}\protected@file@percent }
+\newlabel{subsec:art-deep-clustering}{{2.4}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Materiales y métodos}{7}{}\protected@file@percent }
+\newlabel{sec:materiales}{{3}{7}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Conjunto de datos}{7}{}\protected@file@percent }
+\newlabel{subsec:dataset}{{3.1}{7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Ubicación de las imágenes agrupadas}}{8}{}\protected@file@percent }
+\newlabel{fig:dataset-location-distribution}{{2}{8}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Progreso de la toma de imágenes de grafiti}}{8}{}\protected@file@percent }
+\newlabel{fig:dataset-capture-evolution}{{3}{8}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Categorías estilísticas etiquetadas}}{9}{}\protected@file@percent }
+\newlabel{tab:estilos-definiciones}{{2}{9}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Distribución por clase de los recortes etiquetados}}{10}{}\protected@file@percent }
+\newlabel{fig:dataset-style-distribution}{{4}{10}}
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Subconjuntos etiquetados empleados}}{10}{}\protected@file@percent }
+\newlabel{tab:subconjuntos}{{3}{10}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Marco conceptual}{10}{}\protected@file@percent }
+\newlabel{subsec:conceptos}{{3.2}{10}}
+\newlabel{subsec:fundamentos}{{3.2}{10}}
+\@writefile{toc}{\contentsline {subsubsection}{Representación vectorial y métricas de distancia}{10}{}\protected@file@percent }
+\citation{arthur_k-means_2007}
+\newlabel{subsubsec:tools-similarity-search}{{3.2}{11}}
+\@writefile{toc}{\contentsline {subsubsection}{Búsqueda por similitud}{11}{}\protected@file@percent }
+\citation{ester_density-based_1996}
+\citation{ankerst_optics_1999}
+\citation{campello_density-based_2013}
+\citation{frey_clustering_2007}
+\citation{dempster_maximum_1977}
+\citation{ng_spectral_2001}
+\citation{mullner_modern_2011}
+\citation{aggarwal_surprising_2001}
+\citation{jolliffe_principal_2002}
+\citation{scholkopf_nonlinear_1998}
+\newlabel{subsubsec:agrupamiento}{{3.2}{12}}
+\@writefile{toc}{\contentsline {subsubsection}{Agrupamiento no supervisado}{12}{}\protected@file@percent }
+\newlabel{subsubsec:reduccion}{{3.2}{12}}
+\@writefile{toc}{\contentsline {subsubsection}{Reducción de dimensionalidad}{12}{}\protected@file@percent }
+\citation{tenenbaum_global_2000}
+\citation{mcinnes_umap_2020}
+\citation{rousseeuw_silhouettes_1987}
+\citation{calinski_dendrite_1974}
+\citation{davies_cluster_1979}
+\newlabel{subsubsec:metricas}{{3.2}{13}}
+\@writefile{toc}{\contentsline {subsubsection}{Métricas de evaluación}{13}{}\protected@file@percent }
+\citation{he_deep_2015}
+\citation{simonyan_very_2015}
+\citation{szegedy_rethinking_2015}
+\citation{howard_searching_2019}
+\citation{oquab_dinov2_2024}
+\citation{dosovitskiy_image_2021}
+\citation{radford_learning_2021}
+\citation{ultralytics_ultralytics_2024}
+\gdef \LT@ii {\LT@entry 
+    {1}{94.6487pt}\LT@entry 
+    {1}{111.32053pt}\LT@entry 
+    {1}{38.20009pt}\LT@entry 
+    {1}{122.70146pt}}
+\citation{pedregosa_scikit-learn_2011}
+\citation{arthur_k-means_2007}
+\citation{ester_density-based_1996}
+\citation{campello_density-based_2013}
+\citation{ankerst_optics_1999}
+\citation{mullner_modern_2011}
+\citation{ng_spectral_2001,huang_ultra-scalable_2020}
+\citation{dempster_maximum_1977}
+\citation{frey_clustering_2007}
+\gdef \LT@iii {\LT@entry 
+    {1}{111.56999pt}\LT@entry 
+    {1}{175.03122pt}\LT@entry 
+    {1}{51.87pt}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Catálogo de componentes}{14}{}\protected@file@percent }
+\newlabel{subsec:configuraciones}{{3.3}{14}}
+\@writefile{toc}{\contentsline {subsubsection}{Modelos de extracción de características}{14}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {4}{Modelos de extracción de características integrados.}}{14}{}\protected@file@percent }
+\newlabel{tab:embedding-models}{{4}{14}}
+\newlabel{subsubsec:algoritmos-agrupamiento}{{3.3}{14}}
+\@writefile{toc}{\contentsline {subsubsection}{Algoritmos de agrupamiento}{14}{}\protected@file@percent }
+\citation{jolliffe_principal_2002}
+\citation{scholkopf_nonlinear_1998}
+\citation{tenenbaum_global_2000}
+\citation{mcinnes_umap_2020}
+\gdef \LT@iv {\LT@entry 
+    {1}{76.26999pt}\LT@entry 
+    {1}{42.37pt}\LT@entry 
+    {1}{181.50345pt}}
+\citation{malkov_efficient_2018}
+\citation{ultralytics_ultralytics_2024}
+\@writefile{lot}{\contentsline {table}{\numberline {5}{Algoritmos de agrupamiento implementados.}}{15}{}\protected@file@percent }
+\newlabel{tab:clustering-algos}{{5}{15}}
+\@writefile{toc}{\contentsline {subsubsection}{Técnicas de reducción de dimensionalidad}{15}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {6}{Técnicas de reducción de dimensionalidad implementadas.}}{15}{}\protected@file@percent }
+\newlabel{tab:reduction}{{6}{15}}
+\@writefile{toc}{\contentsline {subsubsection}{Sistemas de almacenamiento}{15}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Extensiones específicas para grafiti}{15}{}\protected@file@percent }
+\newlabel{subsec:extras}{{3.4}{15}}
+\newlabel{subsubsec:segmentador}{{3.4}{15}}
+\@writefile{toc}{\contentsline {subsubsection}{Segmentador YOLO}{15}{}\protected@file@percent }
+\citation{pan_survey_2010}
+\citation{howard_universal_2018}
+\newlabel{subsubsec:cabezas}{{3.4}{16}}
+\@writefile{toc}{\contentsline {subsubsection}{Cabezas de proyección ajustadas al dominio}{16}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Cabeza de proyección ajustada a grafiti}}{17}{}\protected@file@percent }
+\newlabel{fig:cabeza-proyeccion}{{5}{17}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5}Entorno de ejecución}{17}{}\protected@file@percent }
+\newlabel{subsec:entorno}{{3.5}{17}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Metodología}{17}{}\protected@file@percent }
+\newlabel{sec:metodologia}{{4}{17}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Visión general del flujo de trabajo}{17}{}\protected@file@percent }
+\newlabel{subsec:vision}{{4.1}{17}}
+\@writefile{lot}{\contentsline {table}{\numberline {7}{\ignorespaces Versiones de las dependencias principales}}{18}{}\protected@file@percent }
+\newlabel{tab:dependencias}{{7}{18}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Flujo de trabajo en dos fases}}{18}{}\protected@file@percent }
+\newlabel{fig:pipeline}{{6}{18}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}\textit  {Pipeline} operativo}{19}{}\protected@file@percent }
+\newlabel{subsec:pipeline}{{4.2}{19}}
+\@writefile{toc}{\contentsline {subsubsection}{Ingesta y generación de \textit  {embeddings}}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{Recuperación, reducción y agrupamiento}{19}{}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Procedimiento experimental}{19}{}\protected@file@percent }
+\newlabel{subsec:experimental}{{4.3}{19}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Etapas de la segmentación}}{20}{}\protected@file@percent }
+\newlabel{fig:segmentation-stages}{{7}{20}}
+\newlabel{subsubsec:espacio-configs}{{4.3}{20}}
+\@writefile{toc}{\contentsline {subsubsection}{Definición del espacio de configuraciones}{20}{}\protected@file@percent }
+\newlabel{subsubsec:escalabilidad}{{4.3}{20}}
+\@writefile{toc}{\contentsline {subsubsection}{Protocolo de escalabilidad}{20}{}\protected@file@percent }
+\newlabel{subsubsec:reutilizacion}{{4.3}{21}}
+\@writefile{toc}{\contentsline {subsubsection}{Reutilización de almacenamientos}{21}{}\protected@file@percent }
+\newlabel{subsubsec:cronometria}{{4.3}{21}}
+\@writefile{toc}{\contentsline {subsubsection}{Instrumentación y cronometría}{21}{}\protected@file@percent }
+\citation{sculley_web-scale_2010}
+\citation{franti_k-means_2018, ahmed_k-means_2020}
+\newlabel{subsubsec:hiperparam-auto}{{4.3}{22}}
+\@writefile{toc}{\contentsline {subsubsection}{Selección automática de hiperparámetros}{22}{}\protected@file@percent }
+\newlabel{subsubsec:similarity-search}{{4.3}{22}}
+\@writefile{toc}{\contentsline {subsubsection}{Protocolo de búsqueda por similitud}{22}{}\protected@file@percent }
+\citation{schroff_facenet_2015}
+\newlabel{subsubsec:eval-intrinseca}{{4.3}{23}}
+\@writefile{toc}{\contentsline {subsubsection}{Evaluación intrínseca de los agrupamientos}{23}{}\protected@file@percent }
+\newlabel{subsubsec:eval-extrinseca}{{4.3}{23}}
+\@writefile{toc}{\contentsline {subsubsection}{Evaluación extrínseca sobre los subconjuntos etiquetados}{23}{}\protected@file@percent }
+\newlabel{subsubsec:salida}{{4.3}{24}}
+\@writefile{toc}{\contentsline {subsubsection}{Salida y agregación de resultados}{24}{}\protected@file@percent }
+\citation{hermans_defense_2017}
+\citation{wu_sampling_2017}
+\citation{khosla_supervised_2021}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Entrenamiento de modelos auxiliares}{25}{}\protected@file@percent }
+\newlabel{subsec:entrenamiento}{{4.4}{25}}
+\newlabel{subsubsec:entrenamiento-detector}{{4.4}{25}}
+\@writefile{toc}{\contentsline {subsubsection}{Detector de grafiti}{25}{}\protected@file@percent }
+\newlabel{subsubsec:entrenamiento-cabezas}{{4.4}{25}}
+\@writefile{toc}{\contentsline {subsubsection}{Cabezas de proyección}{25}{}\protected@file@percent }
+\gdef \LT@v {\LT@entry 
+    {1}{25.87181pt}\LT@entry 
+    {1}{119.36555pt}\LT@entry 
+    {1}{110.83008pt}\LT@entry 
+    {1}{142.12785pt}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Reproducibilidad}{26}{}\protected@file@percent }
+\newlabel{subsec:reproducibilidad}{{4.5}{26}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Resultados y discusión}{26}{}\protected@file@percent }
+\newlabel{sec:results}{{5}{26}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Catálogo de experimentos}{26}{}\protected@file@percent }
+\newlabel{subsec:catalogo}{{5.1}{26}}
+\gdef \LT@vi {\LT@entry 
+    {1}{162.44469pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}}
+\@writefile{lot}{\contentsline {table}{\numberline {8}{Catálogo de barridos experimentales}}{27}{}\protected@file@percent }
+\newlabel{tab:catalogo-experimentos}{{8}{27}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Calibración del \textit  {pipeline}}{27}{}\protected@file@percent }
+\newlabel{subsec:res-calibracion}{{5.2}{27}}
+\newlabel{subsubsec:res-extractor}{{5.2}{27}}
+\@writefile{toc}{\contentsline {subsubsection}{Extractor de características}{27}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {9}{E1, calidad intrínseca a $N=6416$}}{28}{}\protected@file@percent }
+\newlabel{tab:e1-quality-6416}{{9}{28}}
+\gdef \LT@vii {\LT@entry 
+    {1}{162.44469pt}\LT@entry 
+    {1}{56.76958pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{48.23367pt}\LT@entry 
+    {1}{48.23367pt}}
+\@writefile{lot}{\contentsline {table}{\numberline {10}{E1, coste de ingesta a $N=6416$.}}{29}{}\protected@file@percent }
+\newlabel{tab:e1-cost-6416}{{10}{29}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces E1, silueta por extractor}}{29}{}\protected@file@percent }
+\newlabel{fig:e1-silhouette}{{8}{29}}
+\newlabel{subsubsec:res-reduccion}{{5.2}{29}}
+\@writefile{toc}{\contentsline {subsubsection}{Reducción de dimensionalidad}{29}{}\protected@file@percent }
+\gdef \LT@viii {\LT@entry 
+    {1}{65.70549pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{42.54321pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}}
+\@writefile{lot}{\contentsline {table}{\numberline {11}{E2, calidad intrínseca a $N=6416$}}{30}{}\protected@file@percent }
+\newlabel{tab:e2-quality-6416}{{11}{30}}
+\gdef \LT@ix {\LT@entry 
+    {1}{77.08643pt}\LT@entry 
+    {1}{34.0073pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{39.6982pt}\LT@entry 
+    {1}{31.16228pt}\LT@entry 
+    {1}{31.16228pt}\LT@entry 
+    {1}{34.0073pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces E2, calidad y coste por reducción}}{31}{}\protected@file@percent }
+\newlabel{fig:e2-reduction}{{9}{31}}
+\newlabel{subsubsec:res-agrupamiento}{{5.2}{31}}
+\@writefile{toc}{\contentsline {subsubsection}{Algoritmo de agrupamiento}{31}{}\protected@file@percent }
+\gdef \LT@x {\LT@entry 
+    {1}{48.63367pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{42.54321pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}}
+\@writefile{lot}{\contentsline {table}{\numberline {12}{E3, fila representativa por familia a $N=6416$}}{32}{}\protected@file@percent }
+\newlabel{tab:e3-summary-6416}{{12}{32}}
+\newlabel{subsubsec:res-mincluster}{{5.2}{32}}
+\@writefile{toc}{\contentsline {subsubsection}{Granularidad de HDBSCAN}{32}{}\protected@file@percent }
+\gdef \LT@xi {\LT@entry 
+    {1}{79.93187pt}\LT@entry 
+    {1}{51.07912pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{39.6982pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{48.23367pt}}
+\@writefile{lot}{\contentsline {table}{\numberline {13}{E4, barrido de \texttt  {min\_cluster\_size} a $N=6416$}}{33}{}\protected@file@percent }
+\newlabel{tab:e4-mcs-6416}{{13}{33}}
+\newlabel{subsubsec:res-segmentador}{{5.2}{33}}
+\@writefile{toc}{\contentsline {subsubsection}{Impacto del segmentador}{33}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {14}{E5, calidad y coste de ingesta a $N=6416$}}{34}{}\protected@file@percent }
+\newlabel{tab:e5-segmenter-6416}{{14}{34}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces E3, calidad frente a coste por familia}}{35}{}\protected@file@percent }
+\newlabel{fig:e3-pareto}{{10}{35}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces E3, escalado por familia con $N$}}{35}{}\protected@file@percent }
+\newlabel{fig:e3-scaling}{{11}{35}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Coste computacional}{35}{}\protected@file@percent }
+\newlabel{subsec:res-coste}{{5.3}{35}}
+\gdef \LT@xii {\LT@entry 
+    {1}{37.25273pt}\LT@entry 
+    {1}{53.92458pt}\LT@entry 
+    {1}{42.54321pt}\LT@entry 
+    {1}{65.3055pt}\LT@entry 
+    {1}{65.3055pt}\LT@entry 
+    {1}{48.23367pt}\LT@entry 
+    {1}{65.3055pt}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Ejemplos de detecciones de YOLO}}{36}{}\protected@file@percent }
+\newlabel{fig:e5-yolo-detections}{{12}{36}}
+\newlabel{subsubsec:res-escalabilidad}{{5.3}{36}}
+\@writefile{toc}{\contentsline {subsubsection}{Escalabilidad por etapa}{36}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {15}{E7, tiempo por etapa frente a $N$}}{36}{}\protected@file@percent }
+\newlabel{tab:e7-cost}{{15}{36}}
+\gdef \LT@xiii {\LT@entry 
+    {1}{79.93187pt}\LT@entry 
+    {1}{105.13918pt}\LT@entry 
+    {1}{82.37732pt}\LT@entry 
+    {1}{82.37732pt}}
+\@writefile{lot}{\contentsline {table}{\numberline {16}{E7, pendientes observadas por etapa}}{37}{}\protected@file@percent }
+\newlabel{tab:e7-slopes}{{16}{37}}
+\@writefile{lof}{\contentsline {figure}{\numberline {13}{\ignorespaces E7, tiempo de pared vs $N$ por etapa}}{38}{}\protected@file@percent }
+\newlabel{fig:e7-scaling}{{13}{38}}
+\@writefile{lof}{\contentsline {figure}{\numberline {14}{\ignorespaces E7, memoria pico por etapa}}{38}{}\protected@file@percent }
+\newlabel{fig:e7-memory}{{14}{38}}
+\newlabel{subsubsec:res-similaritysearch}{{5.3}{38}}
+\@writefile{toc}{\contentsline {subsubsection}{Búsqueda por similitud: \textit  {backend} e índice ANN}{38}{}\protected@file@percent }
+\gdef \LT@xiv {\LT@entry 
+    {1}{37.25273pt}\LT@entry 
+    {1}{82.37732pt}\LT@entry 
+    {1}{53.92458pt}\LT@entry 
+    {1}{65.3055pt}\LT@entry 
+    {1}{53.92458pt}\LT@entry 
+    {1}{59.61504pt}}
+\@writefile{lot}{\contentsline {table}{\numberline {17}{E6, latencia y \textit  {recall} por \textit  {backend}}}{39}{}\protected@file@percent }
+\newlabel{tab:e6-storage}{{17}{39}}
+\@writefile{lof}{\contentsline {figure}{\numberline {15}{\ignorespaces E6+E9, latencia y \texttt  {R@5} por configuración HNSW}}{40}{}\protected@file@percent }
+\newlabel{fig:similaritysearch-pareto}{{15}{40}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Validación supervisada}{40}{}\protected@file@percent }
+\newlabel{subsec:res-supervisada}{{5.4}{40}}
+\gdef \LT@xv {\LT@entry 
+    {1}{162.44469pt}\LT@entry 
+    {1}{42.54321pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{107.98463pt}}
+\newlabel{subsubsec:res-estilo}{{5.4}{41}}
+\@writefile{toc}{\contentsline {subsubsection}{Evaluación por estilo}{41}{}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {18}{E8a, mejor celda por extractor (estilo)}}{41}{}\protected@file@percent }
+\newlabel{tab:e8a-best}{{18}{41}}
+\gdef \LT@xvi {\LT@entry 
+    {1}{162.44469pt}\LT@entry 
+    {1}{45.38866pt}\LT@entry 
+    {1}{53.92458pt}\LT@entry 
+    {1}{45.38866pt}}
+\@writefile{lot}{\contentsline {table}{\numberline {19}{E8a, recuperación supervisada \textit  {top-5} (estilo)}}{42}{}\protected@file@percent }
+\newlabel{tab:e8a-retrieval}{{19}{42}}
+\newlabel{subsubsec:res-autor}{{5.4}{42}}
+\@writefile{toc}{\contentsline {subsubsection}{Evaluación por autor}{42}{}\protected@file@percent }
+\gdef \LT@xvii {\LT@entry 
+    {1}{162.44469pt}\LT@entry 
+    {1}{42.54321pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{36.85274pt}\LT@entry 
+    {1}{107.98463pt}}
+\@writefile{lof}{\contentsline {figure}{\numberline {16}{\ignorespaces Distribución 2D de los recortes de E8a por clúster HDBSCAN}}{43}{}\protected@file@percent }
+\newlabel{fig:e8a-hdbscan}{{16}{43}}
+\@writefile{lof}{\contentsline {figure}{\numberline {17}{\ignorespaces Ejemplo del clúster de sencillo.}}{43}{}\protected@file@percent }
+\newlabel{fig:e8a-cluster-simple}{{17}{43}}
+\gdef \LT@xviii {\LT@entry 
+    {1}{162.44469pt}\LT@entry 
+    {1}{42.54321pt}\LT@entry 
+    {1}{53.92458pt}\LT@entry 
+    {1}{42.54321pt}\LT@entry 
+    {1}{42.54321pt}}
+\@writefile{lot}{\contentsline {table}{\numberline {20}{E8b, mejor celda por extractor (autoría)}}{44}{}\protected@file@percent }
+\newlabel{tab:e8b-best}{{20}{44}}
+\@writefile{lot}{\contentsline {table}{\numberline {21}{E8b, recuperación supervisada \textit  {top-5} (autoría)}}{44}{}\protected@file@percent }
+\newlabel{tab:e8b-retrieval}{{21}{44}}
+\@writefile{lof}{\contentsline {figure}{\numberline {18}{\ignorespaces Ejemplo del clúster de elaborado.}}{45}{}\protected@file@percent }
+\newlabel{fig:e8a-cluster-elaborate}{{18}{45}}
+\@writefile{lof}{\contentsline {figure}{\numberline {19}{\ignorespaces Ejemplo del clúster de personajes.}}{45}{}\protected@file@percent }
+\newlabel{fig:e8a-cluster-character}{{19}{45}}
+\newlabel{subsubsec:res-correlacion}{{5.4}{45}}
+\@writefile{toc}{\contentsline {subsubsection}{Correlación interna-externa}{45}{}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {20}{\ignorespaces Silueta frente a ARI en E8a y E8b}}{46}{}\protected@file@percent }
+\newlabel{fig:e8-correlacion}{{20}{46}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusiones}{46}{}\protected@file@percent }
+\newlabel{sec:conclusion}{{6}{46}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Resultados principales}{47}{}\protected@file@percent }
+\newlabel{sec:main-results}{{6.1}{47}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Trabajo futuro}{47}{}\protected@file@percent }
+\newlabel{sec:future-work}{{6.2}{47}}
+\bibstyle{splncs}
+\bibdata{../doc/bib}
+\bibcite{fogaca_deep_2023}{1}
+\bibcite{taylor_twenty-first_2010}{2}
+\bibcite{tokuda_quantifying_2019}{3}
+\bibcite{garcia_garcia_graffiti_2025}{4}
+\bibcite{he_deep_2015}{5}
+\bibcite{radford_learning_2021}{6}
+\bibcite{oquab_dinov2_2024}{7}
+\bibcite{mcinnes_umap_2020}{8}
+\bibcite{ester_density-based_1996}{9}
+\bibcite{malkov_efficient_2018}{10}
+\bibcite{johnson_billion-scale_2017}{11}
+\bibcite{fiel_writer_2015}{12}
+\bibcite{schroff_facenet_2015}{13}
+\bibcite{min_survey_2018}{14}
+\bibcite{caron_deep_2019}{15}
+\bibcite{van_gansbeke_scan_2020}{16}
+\bibcite{arthur_k-means_2007}{17}
+\bibcite{ankerst_optics_1999}{18}
+\bibcite{campello_density-based_2013}{19}
+\bibcite{frey_clustering_2007}{20}
+\bibcite{dempster_maximum_1977}{21}
+\bibcite{ng_spectral_2001}{22}
+\bibcite{mullner_modern_2011}{23}
+\bibcite{aggarwal_surprising_2001}{24}
+\bibcite{jolliffe_principal_2002}{25}
+\bibcite{scholkopf_nonlinear_1998}{26}
+\bibcite{tenenbaum_global_2000}{27}
+\bibcite{rousseeuw_silhouettes_1987}{28}
+\bibcite{calinski_dendrite_1974}{29}
+\bibcite{davies_cluster_1979}{30}
+\bibcite{simonyan_very_2015}{31}
+\bibcite{szegedy_rethinking_2015}{32}
+\bibcite{howard_searching_2019}{33}
+\bibcite{dosovitskiy_image_2021}{34}
+\bibcite{ultralytics_ultralytics_2024}{35}
+\bibcite{pedregosa_scikit-learn_2011}{36}
+\bibcite{huang_ultra-scalable_2020}{37}
+\bibcite{pan_survey_2010}{38}
+\bibcite{howard_universal_2018}{39}
+\bibcite{sculley_web-scale_2010}{40}
+\bibcite{franti_k-means_2018}{41}
+\bibcite{hermans_defense_2017}{42}
+\bibcite{wu_sampling_2017}{43}
+\bibcite{khosla_supervised_2021}{44}
+\gdef \@abspage@last{51}

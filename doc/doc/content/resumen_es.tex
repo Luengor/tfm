@@ -1,0 +1,24 @@
+El seguimiento manual de grafiti no autorizado se vuelve inviable a medida que
+crecen los bancos de imágenes. Este trabajo diseña, implementa y evalúa
+experimentalmente un sistema modular para agrupar por similitud visual un
+dataset no etiquetado de fotografías de grafiti, con el objetivo de
+caracterizar tanto la calidad del agrupamiento como el coste computacional de
+sus componentes en función del tamaño del banco. La arquitectura encadena
+etapas intercambiables (segmentación, extracción de características,
+almacenamiento, reducción de dimensionalidad y agrupamiento) y un marco de
+experimentación recorre combinaciones de las mismas midiendo, por ejecución,
+tiempos por etapa, memoria y métricas de calidad. La configuración base
+resultante (cabeza estilística de DINOv2 con \textit{fine-tuning} + UMAP-10 +
+HDBSCAN + imagen completa) se valida tanto sobre el dataset de $6416$ imágenes
+de grafitis como sobre subconjuntos disjuntos etiquetados manualmente. La
+cabeza estilística separa cuatro estilos con un índice de Rand ajustado de
+0.722 (K-medias con $k{=}4$ conocido \textit{a priori}), mientras que el
+agrupamiento por autoría se queda cerca del azar, evidenciando la insuficiencia
+de datos anotados por autor en el conjunto de prueba. El estudio de
+escalabilidad muestra que la búsqueda por similitud en almacenamiento con
+SQLite y la ingesta son los cuellos de botella dominantes a esta escala y que
+otros factores como la complejidad de los algoritmos de reducción o
+agrupamiento empezarían a serlo a escalas bastante mayores. Se concluye que las
+métricas intrínsecas de evaluación del agrupamiento pueden inducir a error y
+que la elección del extractor de características debe anclarse en evidencia
+supervisada.

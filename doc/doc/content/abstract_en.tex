@@ -1,0 +1,20 @@
+Manual tracking of unauthorized graffiti becomes infeasible as image banks
+grow. This work designs, implements and experimentally evaluates a modular
+system to cluster an unlabelled dataset of graffiti photographs by visual
+similarity, aiming to characterize both clustering quality and the
+computational cost of its components as a function of bank size. The
+architecture chains swappable stages (segmentation, \textit{embedding}
+extraction, storage, dimensionality reduction and clustering), and a
+benchmarking framework sweeps combinations of them, measuring per-stage time,
+memory and quality metrics for each run. The resulting base configuration (a
+\textit{fine-tuned} DINOv2 style head + UMAP-10 + HDBSCAN + full image) is
+validated both on the dataset of $6416$ graffiti images and on disjoint
+manually labelled subsets. The style head separates four styles with an
+adjusted Rand index of 0.722 (K-Means, oracle $k{=}4$), whereas author
+clustering stays near chance, exposing the insufficient per-author annotations
+in the test set. The scaling study shows that SQLite similarity search and
+ingestion are the dominant bottlenecks at this scale, while other factors such
+as the complexity of the reduction or clustering algorithms would only start to
+dominate at much larger scales. We conclude that intrinsic
+clustering-evaluation metrics can be misleading and that the choice of feature
+extractor must be anchored in supervised evidence.

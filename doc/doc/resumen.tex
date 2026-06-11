@@ -14,34 +14,9 @@
 \vspace{6.5cm}
 \textbf{Resumen}
 
-El seguimiento manual de grafiti no autorizado se vuelve inviable a medida que
-crecen los bancos de imágenes. Este trabajo diseña, implementa y evalúa
-experimentalmente un sistema modular para agrupar por similitud visual un
-dataset no etiquetado de fotografías de grafiti, con el objetivo de
-caracterizar tanto la calidad del agrupamiento como el coste computacional de
-sus componentes en función del tamaño del banco. La arquitectura encadena
-etapas intercambiables (segmentación, extracción de características,
-almacenamiento, reducción de dimensionalidad y agrupamiento) y un marco de
-experimentación recorre combinaciones de las mismas midiendo, por ejecución,
-tiempos por etapa, memoria y métricas de calidad. La configuración base
-resultante (cabeza estilística de DINOv2 con \textit{fine-tuning} + UMAP-10 +
-HDBSCAN + imagen completa) se valida tanto sobre el dataset de $6416$ imágenes
-de grafitis como sobre subconjuntos disjuntos etiquetados manualmente. La
-cabeza estilística separa cuatro estilos con un índice de Rand ajustado de
-0.722 (K-medias con $k{=}4$ conocido \textit{a priori}), mientras que el
-agrupamiento por autoría se queda cerca del azar, evidenciando la insuficiencia
-de datos anotados por autor en el conjunto de prueba. El estudio de
-escalabilidad muestra que la búsqueda por similitud en almacenamiento con
-SQLite y la ingesta son los cuellos de botella dominantes a esta escala y que
-otros factores como la complejidad de los algoritmos de reducción o
-agrupamiento empezarían a serlo a escalas bastante mayores. Se concluye que las
-métricas intrínsecas de evaluación del agrupamiento pueden inducir a error y
-que la elección del extractor de características debe anclarse en evidencia
-supervisada.
+\input{doc/content/resumen_es.tex}
 
-\textbf{Palabras clave:} grafiti, agrupamiento de imágenes, \textit{embeddings}
-profundos, reducción de dimensionalidad, HDBSCAN, búsqueda por similitud, coste
-computacional.
+\textbf{Palabras clave:} \input{doc/content/keywords_es.tex}
 
 % \newpage
 
@@ -49,27 +24,7 @@ computacional.
 \vspace{1cm}
 \textbf{Abstract}
 
-Manual tracking of unauthorized graffiti becomes infeasible as image banks
-grow. This work designs, implements and experimentally evaluates a modular
-system to cluster an unlabelled dataset of graffiti photographs by visual
-similarity, aiming to characterize both clustering quality and the
-computational cost of its components as a function of bank size. The
-architecture chains swappable stages (segmentation, \textit{embedding}
-extraction, storage, dimensionality reduction and clustering), and a
-benchmarking framework sweeps combinations of them, measuring per-stage time,
-memory and quality metrics for each run. The resulting base configuration (a
-\textit{fine-tuned} DINOv2 style head + UMAP-10 + HDBSCAN + full image) is
-validated both on the dataset of $6416$ graffiti images and on disjoint
-manually labelled subsets. The style head separates four styles with an
-adjusted Rand index of 0.722 (K-Means, oracle $k{=}4$), whereas author
-clustering stays near chance, exposing the insufficient per-author annotations
-in the test set. The scaling study shows that SQLite similarity search and
-ingestion are the dominant bottlenecks at this scale, while other factors such
-as the complexity of the reduction or clustering algorithms would only start to
-dominate at much larger scales. We conclude that intrinsic
-clustering-evaluation metrics can be misleading and that the choice of feature
-extractor must be anchored in supervised evidence.
+\input{doc/content/abstract_en.tex}
 
-\textbf{Keywords:} graffiti, image clustering, deep \textit{embeddings},
-dimensionality reduction, HDBSCAN, similarity search, computational cost.
+\textbf{Keywords:} \input{doc/content/keywords_en.tex}
 

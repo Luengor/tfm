@@ -1,0 +1,52 @@
+\documentclass[runningheads]{llncs}
+
+% --- Content packages only (NO layout packages: llncs forbids them) ---
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{longtable}
+\usepackage{array}      % m{}/p{} column tweaks used in tables
+\usepackage{csquotes}   % \enquote
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
+
+% --- Custom macros shared with the thesis (doc/macros.tex via symlink) ---
+\input{doc/macros.tex}
+
+\begin{document}
+
+\title{Caracterizaci\'on del desempe\~no y el coste computacional en
+algoritmos de similitud en bancos de im\'agenes de grafiti}
+\titlerunning{Similitud y coste en bancos de im\'agenes de grafiti}
+
+\author{Alberto Luengo Rom\'an\inst{1}}
+\authorrunning{A. Luengo Rom\'an}
+\institute{Departamento de Inform\'atica y Autom\'atica,
+Universidad de Salamanca, Espa\~na\\
+\email{luengor@usal.es}}
+
+\maketitle
+
+\begin{abstract}
+\input{doc/content/abstract_en.tex}
+
+\keywordname{} \input{doc/content/keywords_en.tex}
+\end{abstract}
+
+\input{doc/intro.tex}
+
+\input{doc/art.tex}
+
+\input{doc/tools.tex}
+
+\input{doc/methods.tex}
+
+\input{doc/results.tex}
+
+\input{doc/conclusion.tex}
+
+\bibliographystyle{splncs}
+\bibliography{../doc/bib}
+
+\end{document}

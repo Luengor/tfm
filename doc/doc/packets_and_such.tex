@@ -103,18 +103,10 @@ p\'ags.\nobreakspace#2.}]}%
 \usepackage{setspace}
 \setlength\headheight{14.6pt}
 
-% Descripción de columnas para las tablas de calidad intrínseca
-\newcommand{\glosacalidad}{Columnas: cls=n\'umero de cl\'usteres,
-ruido=fracci\'on de ruido~$\downarrow$, sil=silueta~$\uparrow$,
-CH=Calinski--Harab\'asz~$\uparrow$, DB=Davies--Bouldin~$\downarrow$,
-csCV=coef.\ de variaci\'on del tama\~no de cl\'uster~$\downarrow$.}
+% Macros compartidas con el artículo (doc/macros.tex): \citea, \glosacalidad
+\input{doc/macros.tex}
 
 \begin{document}
 % Cambiar el nombre de cuadros a tablas (ponerlo en esta ubicación)
 \renewcommand{\tablename}{Tabla}
 \renewcommand{\listtablename}{Indice de tablas}
-
-% Cita chula
-\newcommand{\citea}[3][]{%
-    #2\ifx\\#1\\\else~\textit{et~al.}\fi~\cite{#3}%
-}

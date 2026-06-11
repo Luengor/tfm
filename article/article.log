@@ -1,0 +1,1262 @@
+**
+(article.tex
+LaTeX2e <2021-11-15> patch level 1
+L3 programming layer <2022-02-24> (llncs.cls
+Document Class: llncs 2004/08/17 v2.14 
+ LaTeX document class for Lecture Notes in Computer Science
+(article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(size10.clo
+File: size10.clo 2021/10/04 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count181
+\c@section=\count182
+\c@subsection=\count183
+\c@subsubsection=\count184
+\c@paragraph=\count185
+\c@subparagraph=\count186
+\c@figure=\count187
+\c@table=\count188
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\bibindent=\dimen138
+) (multicol.sty
+Package: multicol 2021/10/28 v1.9b multicolumn formatting (FMi)
+\c@tracingmulticols=\count189
+\mult@box=\box50
+\multicol@leftmargin=\dimen139
+\c@unbalance=\count190
+\c@collectmore=\count191
+\doublecol@number=\count192
+\multicoltolerance=\count193
+\multicolpretolerance=\count194
+\full@width=\dimen140
+\page@free=\dimen141
+\premulticols=\dimen142
+\postmulticols=\dimen143
+\multicolsep=\skip49
+\multicolbaselineskip=\skip50
+\partial@page=\box51
+\last@line=\box52
+\maxbalancingoverflow=\dimen144
+\mult@rightbox=\box53
+\mult@grightbox=\box54
+\mult@firstbox=\box55
+\mult@gfirstbox=\box56
+\@tempa=\box57
+\@tempa=\box58
+\@tempa=\box59
+\@tempa=\box60
+\@tempa=\box61
+\@tempa=\box62
+\@tempa=\box63
+\@tempa=\box64
+\@tempa=\box65
+\@tempa=\box66
+\@tempa=\box67
+\@tempa=\box68
+\@tempa=\box69
+\@tempa=\box70
+\@tempa=\box71
+\@tempa=\box72
+\@tempa=\box73
+\@tempa=\box74
+\@tempa=\box75
+\@tempa=\box76
+\@tempa=\box77
+\@tempa=\box78
+\@tempa=\box79
+\@tempa=\box80
+\@tempa=\box81
+\@tempa=\box82
+\@tempa=\box83
+\@tempa=\box84
+\@tempa=\box85
+\@tempa=\box86
+\@tempa=\box87
+\@tempa=\box88
+\@tempa=\box89
+\@tempa=\box90
+\@tempa=\box91
+\@tempa=\box92
+\c@minrows=\count195
+\c@columnbadness=\count196
+\c@finalcolumnbadness=\count197
+\last@try=\dimen145
+\multicolovershoot=\dimen146
+\multicolundershoot=\dimen147
+\mult@nat@firstbox=\box93
+\colbreak@box=\box94
+\mc@col@check@num=\count198
+)
+\c@chapter=\count199
+LaTeX Font Info:    Redeclaring math symbol \Gamma on input line 360.
+LaTeX Font Info:    Redeclaring math symbol \Delta on input line 361.
+LaTeX Font Info:    Redeclaring math symbol \Theta on input line 362.
+LaTeX Font Info:    Redeclaring math symbol \Lambda on input line 363.
+LaTeX Font Info:    Redeclaring math symbol \Xi on input line 364.
+LaTeX Font Info:    Redeclaring math symbol \Pi on input line 365.
+LaTeX Font Info:    Redeclaring math symbol \Sigma on input line 366.
+LaTeX Font Info:    Redeclaring math symbol \Upsilon on input line 367.
+LaTeX Font Info:    Redeclaring math symbol \Phi on input line 368.
+LaTeX Font Info:    Redeclaring math symbol \Psi on input line 369.
+LaTeX Font Info:    Redeclaring math symbol \Omega on input line 370.
+\tocchpnum=\dimen148
+\tocsecnum=\dimen149
+\tocsectotal=\dimen150
+\tocsubsecnum=\dimen151
+\tocsubsectotal=\dimen152
+\tocsubsubsecnum=\dimen153
+\tocsubsubsectotal=\dimen154
+\tocparanum=\dimen155
+\tocparatotal=\dimen156
+\tocsubparanum=\dimen157
+\@tempcntc=\count266
+\fnindent=\dimen158
+\c@@inst=\count267
+\c@@auth=\count268
+\c@auco=\count269
+\instindent=\dimen159
+\authrun=\box95
+\authorrunning=\toks16
+\tocauthor=\toks17
+\titrun=\box96
+\titlerunning=\toks18
+\toctitle=\toks19
+\c@theorem=\count270
+\c@case=\count271
+\c@conjecture=\count272
+\c@corollary=\count273
+\c@definition=\count274
+\c@example=\count275
+\c@exercise=\count276
+\c@lemma=\count277
+\c@note=\count278
+\c@problem=\count279
+\c@property=\count280
+\c@proposition=\count281
+\c@question=\count282
+\c@solution=\count283
+\c@remark=\count284
+\headlineindent=\dimen160
+) (babel.sty
+Package: babel 2022/02/26 3.73 The Babel package
+\babel@savecnt=\count285
+\U@D=\dimen161
+\l@unhyphenated=\language87
+ (xebabel.def (txtbabel.def))
+\bbl@readstream=\read2
+\bbl@dirlevel=\count286
+
+(spanish.ldf
+Language: spanish.ldf 2021/05/27 v5.0q Spanish support from the babel system
+\es@quottoks=\toks20
+\es@quotdepth=\count287
+Package babel Info: Making " an active character on input line 570.
+Package babel Info: Making . an active character on input line 675.
+Package babel Info: Making < an active character on input line 722.
+Package babel Info: Making > an active character on input line 722.
+)) (graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+ (keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks21
+) (graphics.sty
+Package: graphics 2021/03/04 v1.4d Standard LaTeX Graphics (DPC,SPQR)
+ (trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+)
+(graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: xetex.def on input line 107.
+ (xetex.def
+File: xetex.def 2021/03/18 v5.0k Graphics/color driver for xetex
+))
+\Gin@req@height=\dimen162
+\Gin@req@width=\dimen163
+) (amsmath.sty
+Package: amsmath 2021/10/15 v2.17l AMS math features
+\@mathmargin=\skip51
+
+For additional information on amsmath, use the `?' option.
+(amstext.sty
+Package: amstext 2021/08/26 v2.01 AMS text
+ (amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks22
+\ex@=\dimen164
+)) (amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen165
+) (amsopn.sty
+Package: amsopn 2021/08/26 v2.02 operator names
+)
+\inf@bad=\count288
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count289
+\leftroot@=\count290
+LaTeX Info: Redefining \overline on input line 399.
+\classnum@=\count291
+\DOTSCASE@=\count292
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box97
+\strutbox@=\box98
+\big@size=\dimen166
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count293
+\c@MaxMatrixCols=\count294
+\dotsspace@=\muskip16
+\c@parentequation=\count295
+\dspbrk@lvl=\count296
+\tag@help=\toks23
+\row@=\count297
+\column@=\count298
+\maxfields@=\count299
+\andhelp@=\toks24
+\eqnshift@=\dimen167
+\alignsep@=\dimen168
+\tagshift@=\dimen169
+\tagwidth@=\dimen170
+\totwidth@=\dimen171
+\lineht@=\dimen172
+\@envbody=\toks25
+\multlinegap=\skip52
+\multlinetaggap=\skip53
+\mathdisplay@stack=\toks26
+LaTeX Info: Redefining \[ on input line 2938.
+LaTeX Info: Redefining \] on input line 2939.
+) (amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Redeclaring math symbol \hbar on input line 98.
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)) (longtable.sty
+Package: longtable 2021-09-01 v4.17 Multi-page Table package (DPC)
+\LTleft=\skip54
+\LTright=\skip55
+\LTpre=\skip56
+\LTpost=\skip57
+\LTchunksize=\count300
+\LTcapwidth=\dimen173
+\LT@head=\box99
+\LT@firsthead=\box100
+\LT@foot=\box101
+\LT@lastfoot=\box102
+\LT@gbox=\box103
+\LT@cols=\count301
+\LT@rows=\count302
+\c@LT@tables=\count303
+\c@LT@chunks=\count304
+\LT@p@ftn=\toks27
+) (array.sty
+Package: array 2021/10/04 v2.5f Tabular extension package (FMi)
+\col@sep=\dimen174
+\ar@mcellbox=\box104
+\extrarowheight=\dimen175
+\NC@list=\toks28
+\extratabsurround=\skip58
+\backup@length=\skip59
+\ar@cellbox=\box105
+) (csquotes.sty
+Package: csquotes 2021-02-22 v5.2l context-sensitive quotations (JAW)
+ (etoolbox.sty
+Package: etoolbox 2020/10/05 v2.5k e-TeX tools for LaTeX (JAW)
+\etb@tempcnta=\count305
+)
+\csq@reset=\count306
+\csq@gtype=\count307
+\csq@glevel=\count308
+\csq@qlevel=\count309
+\csq@maxlvl=\count310
+\csq@tshold=\count311
+\csq@ltx@everypar=\toks29
+
+(csquotes.def
+File: csquotes.def 2021-02-22 v5.2l csquotes generic definitions (JAW)
+)
+Package csquotes Info: Trying to load configuration file 'csquotes.cfg'...
+Package csquotes Info: ... configuration file loaded successfully.
+ (csquotes.cfg
+File: csquotes.cfg 
+)) (tikz.sty (pgf.sty (pgfrcs.sty
+(pgfutil-common.tex
+\pgfutil@everybye=\toks30
+\pgfutil@tempdima=\dimen176
+\pgfutil@tempdimb=\dimen177
+ (pgfutil-common-lists.tex)) (pgfutil-latex.def
+\pgfutil@abb=\box106
+)
+(pgfrcs.code.tex (pgf.revision.tex)
+Package: pgfrcs 2021/05/15 v3.1.9a (3.1.9a)
+))
+Package: pgf 2021/05/15 v3.1.9a (3.1.9a)
+ (pgfcore.sty (pgfsys.sty (pgfsys.code.tex
+Package: pgfsys 2021/05/15 v3.1.9a (3.1.9a)
+(pgfkeys.code.tex
+\pgfkeys@pathtoks=\toks31
+\pgfkeys@temptoks=\toks32
+ (pgfkeysfiltered.code.tex
+\pgfkeys@tmptoks=\toks33
+))
+\pgf@x=\dimen178
+\pgf@y=\dimen179
+\pgf@xa=\dimen180
+\pgf@ya=\dimen181
+\pgf@xb=\dimen182
+\pgf@yb=\dimen183
+\pgf@xc=\dimen184
+\pgf@yc=\dimen185
+\pgf@xd=\dimen186
+\pgf@yd=\dimen187
+\w@pgf@writea=\write3
+\r@pgf@reada=\read3
+\c@pgf@counta=\count312
+\c@pgf@countb=\count313
+\c@pgf@countc=\count314
+\c@pgf@countd=\count315
+\t@pgf@toka=\toks34
+\t@pgf@tokb=\toks35
+\t@pgf@tokc=\toks36
+\pgf@sys@id@count=\count316
+ (pgf.cfg
+File: pgf.cfg 2021/05/15 v3.1.9a (3.1.9a)
+)
+Driver file for pgf: pgfsys-xetex.def
+ (pgfsys-xetex.def
+File: pgfsys-xetex.def 2021/05/15 v3.1.9a (3.1.9a)
+
+(pgfsys-dvipdfmx.def
+File: pgfsys-dvipdfmx.def 2021/05/15 v3.1.9a (3.1.9a)
+ (pgfsys-common-pdf.def
+File: pgfsys-common-pdf.def 2021/05/15 v3.1.9a (3.1.9a)
+)
+\pgfsys@objnum=\count317
+))) (pgfsyssoftpath.code.tex
+File: pgfsyssoftpath.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfsyssoftpath@smallbuffer@items=\count318
+\pgfsyssoftpath@bigbuffer@items=\count319
+)
+(pgfsysprotocol.code.tex
+File: pgfsysprotocol.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)) (xcolor.sty
+Package: xcolor 2021/10/31 v2.13 LaTeX color extensions (UK)
+ (color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: xetex.def on input line 227.
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1352.
+Package xcolor Info: Model `RGB' extended on input line 1368.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1370.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1371.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1372.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1373.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1374.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1375.
+) (pgfcore.code.tex
+Package: pgfcore 2021/05/15 v3.1.9a (3.1.9a)
+
+(pgfmath.code.tex (pgfmathcalc.code.tex (pgfmathutil.code.tex)
+(pgfmathparser.code.tex
+\pgfmath@dimen=\dimen188
+\pgfmath@count=\count320
+\pgfmath@box=\box107
+\pgfmath@toks=\toks37
+\pgfmath@stack@operand=\toks38
+\pgfmath@stack@operation=\toks39
+) (pgfmathfunctions.code.tex
+(pgfmathfunctions.basic.code.tex) (pgfmathfunctions.trigonometric.code.tex)
+(pgfmathfunctions.random.code.tex) (pgfmathfunctions.comparison.code.tex)
+(pgfmathfunctions.base.code.tex) (pgfmathfunctions.round.code.tex)
+(pgfmathfunctions.misc.code.tex) (pgfmathfunctions.integerarithmetics.code.tex)
+)) (pgfmathfloat.code.tex
+\c@pgfmathroundto@lastzeros=\count321
+)) (pgfint.code.tex) (pgfcorepoints.code.tex
+File: pgfcorepoints.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@picminx=\dimen189
+\pgf@picmaxx=\dimen190
+\pgf@picminy=\dimen191
+\pgf@picmaxy=\dimen192
+\pgf@pathminx=\dimen193
+\pgf@pathmaxx=\dimen194
+\pgf@pathminy=\dimen195
+\pgf@pathmaxy=\dimen196
+\pgf@xx=\dimen197
+\pgf@xy=\dimen198
+\pgf@yx=\dimen199
+\pgf@yy=\dimen256
+\pgf@zx=\dimen257
+\pgf@zy=\dimen258
+)
+(pgfcorepathconstruct.code.tex
+File: pgfcorepathconstruct.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@path@lastx=\dimen259
+\pgf@path@lasty=\dimen260
+) (pgfcorepathusage.code.tex
+File: pgfcorepathusage.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@shorten@end@additional=\dimen261
+\pgf@shorten@start@additional=\dimen262
+)
+(pgfcorescopes.code.tex
+File: pgfcorescopes.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfpic=\box108
+\pgf@hbox=\box109
+\pgf@layerbox@main=\box110
+\pgf@picture@serial@count=\count322
+) (pgfcoregraphicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgflinewidth=\dimen263
+)
+(pgfcoretransformations.code.tex
+File: pgfcoretransformations.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@pt@x=\dimen264
+\pgf@pt@y=\dimen265
+\pgf@pt@temp=\dimen266
+) (pgfcorequick.code.tex
+File: pgfcorequick.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(pgfcoreobjects.code.tex
+File: pgfcoreobjects.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+) (pgfcorepathprocessing.code.tex
+File: pgfcorepathprocessing.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(pgfcorearrows.code.tex
+File: pgfcorearrows.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfarrowsep=\dimen267
+) (pgfcoreshade.code.tex
+File: pgfcoreshade.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@max=\dimen268
+\pgf@sys@shading@range@num=\count323
+\pgf@shadingcount=\count324
+) (pgfcoreimage.code.tex
+File: pgfcoreimage.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+
+(pgfcoreexternal.code.tex
+File: pgfcoreexternal.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfexternal@startupbox=\box111
+)) (pgfcorelayers.code.tex
+File: pgfcorelayers.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(pgfcoretransparency.code.tex
+File: pgfcoretransparency.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+) (pgfcorepatterns.code.tex
+File: pgfcorepatterns.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+) (pgfcorerdf.code.tex
+File: pgfcorerdf.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+))) (pgfmoduleshapes.code.tex
+File: pgfmoduleshapes.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfnodeparttextbox=\box112
+) (pgfmoduleplot.code.tex
+File: pgfmoduleplot.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(pgfcomp-version-0-65.sty
+Package: pgfcomp-version-0-65 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@nodesepstart=\dimen269
+\pgf@nodesepend=\dimen270
+) (pgfcomp-version-1-18.sty
+Package: pgfcomp-version-1-18 2021/05/15 v3.1.9a (3.1.9a)
+)) (pgffor.sty (pgfkeys.sty (pgfkeys.code.tex)) (pgfmath.sty (pgfmath.code.tex)
+) (pgffor.code.tex
+Package: pgffor 2021/05/15 v3.1.9a (3.1.9a)
+
+(pgfmath.code.tex)
+\pgffor@iter=\dimen271
+\pgffor@skip=\dimen272
+\pgffor@stack=\toks40
+\pgffor@toks=\toks41
+)) (tikz.code.tex
+Package: tikz 2021/05/15 v3.1.9a (3.1.9a)
+ (pgflibraryplothandlers.code.tex
+File: pgflibraryplothandlers.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgf@plot@mark@count=\count325
+\pgfplotmarksize=\dimen273
+)
+\tikz@lastx=\dimen274
+\tikz@lasty=\dimen275
+\tikz@lastxsaved=\dimen276
+\tikz@lastysaved=\dimen277
+\tikz@lastmovetox=\dimen278
+\tikz@lastmovetoy=\dimen279
+\tikzleveldistance=\dimen280
+\tikzsiblingdistance=\dimen281
+\tikz@figbox=\box113
+\tikz@figbox@bg=\box114
+\tikz@tempbox=\box115
+\tikz@tempbox@bg=\box116
+\tikztreelevel=\count326
+\tikznumberofchildren=\count327
+\tikznumberofcurrentchild=\count328
+\tikz@fig@count=\count329
+
+(pgfmodulematrix.code.tex
+File: pgfmodulematrix.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfmatrixcurrentrow=\count330
+\pgfmatrixcurrentcolumn=\count331
+\pgf@matrix@numberofcolumns=\count332
+)
+\tikz@expandcount=\count333
+ (tikzlibrarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)))
+(pgflibraryarrows.meta.code.tex
+File: pgflibraryarrows.meta.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+\pgfarrowinset=\dimen282
+\pgfarrowlength=\dimen283
+\pgfarrowwidth=\dimen284
+\pgfarrowlinewidth=\dimen285
+) (tikzlibrarypositioning.code.tex
+File: tikzlibrarypositioning.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+)
+(tikzlibraryfit.code.tex
+File: tikzlibraryfit.code.tex 2021/05/15 v3.1.9a (3.1.9a)
+) (doc/macros.tex)
+Package csquotes Info: Checking for multilingual support...
+Package csquotes Info: ... found 'babel' package.
+Package csquotes Info: Adjusting default style.
+Package csquotes Info: Redefining alias 'default' -> 'spanish'.
+ (l3backend-xetex.def
+File: l3backend-xetex.def 2022-02-07 L3 backend support: XeTeX
+\c__kernel_sys_dvipdfmx_version_int=\count334
+\l__color_backend_stack_int=\count335
+\g__color_backend_stack_int=\count336
+\g__graphics_track_int=\count337
+\l__pdf_internal_box=\box117
+\g__pdf_backend_object_int=\count338
+\g__pdf_backend_annotation_int=\count339
+\g__pdf_backend_link_int=\count340
+) (article.aux
+LaTeX Info: Redefining \. on input line 10.
+LaTeX Info: Redefining \% on input line 10.
+)
+\openout1 = `article.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 17.
+LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 1
+7.
+
+(ts1cmr.fd
+File: ts1cmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 17.
+LaTeX Font Info:    ... okay on input line 17.
+LaTeX Info: Redefining \. on input line 17.
+LaTeX Info: Redefining \% on input line 17.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 29.
+
+ (umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 29.
+
+ (umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) (doc/content/abstract_en.tex)
+(doc/content/keywords_en.tex) (doc/intro.tex
+File: figures/graffiti_mosaic.jpg Graphic file (type bmp)
+<figures/graffiti_mosaic.jpg>
+ [1
+
+]
+LaTeX Info: Redefining \. on input line 64.
+LaTeX Info: Redefining \% on input line 64.
+ [2]
+LaTeX Info: Redefining \. on input line 111.
+LaTeX Info: Redefining \% on input line 111.
+ [3]) (doc/art.tex
+Overfull \hbox (4.54318pt too wide) in paragraph at lines 8--21
+\TU/lmr/m/n/10 escasa, reciente y de alcance acotado. Un trabajo relevante es e
+l de Fogaça \TU/lmr/m/it/10 et al. \TU/lmr/m/n/10 [[]],
+ []
+
+LaTeX Info: Redefining \. on input line 26.
+LaTeX Info: Redefining \% on input line 26.
+[4]
+Overfull \hbox (41.64491pt too wide) in alignment at lines 48--50
+ [] [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
+[]|\TU/lmr/m/n/7 Clasificación y
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
+\TU/lmr/m/n/7 detección de
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
+[]|\TU/lmr/m/n/7 Clasificación
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
+\TU/lmr/m/n/7 supervisada +
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
+[]|\TU/lmr/m/n/7 Exactitud /
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
+\TU/lmr/m/n/7 mAP (pre-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
+\TU/lmr/m/n/7 cisión media
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 51--51
+\TU/lmr/m/n/7 promedio, su-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 52--52
+[]|\TU/lmr/m/n/7 Google Street
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 53--53
+[]|\TU/lmr/m/n/7 Categorización
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 53--53
+[]|\TU/lmr/m/n/7 Fotografías de
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 53--53
+[]|\TU/lmr/m/n/7 Categorización
+ []
+
+
+Underfull \hbox (badness 5667) in paragraph at lines 54--54
+[]|\TU/lmr/m/n/7 García García
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 54--54
+[]|\TU/lmr/m/n/7 Imágenes de
+ []
+
+
+Underfull \hbox (badness 1515) in paragraph at lines 55--55
+[]|\TU/lmr/m/n/7 Agrupamiento y
+ []
+
+
+Underfull \hbox (badness 2221) in paragraph at lines 55--55
+[]|\TU/lmr/m/it/7 Embeddings \TU/lmr/m/n/7 pro-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 55--55
+[]|\TU/lmr/m/n/7 Reducción +
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 55--55
+[]|\TU/lmr/m/n/7 Interna, ex-
+ []
+
+
+Underfull \hbox (badness 3568) in paragraph at lines 55--55
+\TU/lmr/m/n/7 terna y coste
+ []
+
+
+Overfull \hbox (41.64491pt too wide) in alignment at lines 50--59
+ [] [] [] [] [] [] 
+ []
+
+
+LaTeX Warning: Citation ` campello_density-based_2013' on page 5 undefined on i
+nput line 85.
+
+
+LaTeX Warning: Citation ` arthur_k-means_2007' on page 5 undefined on input lin
+e 85.
+
+LaTeX Info: Redefining \. on input line 88.
+LaTeX Info: Redefining \% on input line 88.
+[5]
+LaTeX Info: Redefining \. on input line 136.
+LaTeX Info: Redefining \% on input line 136.
+ [6]) (doc/tools.tex
+File: figures/map_with_photos.pdf Graphic file (type pdf)
+<use figures/map_with_photos.pdf>
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+File: figures/dataset-evolution.pdf Graphic file (type pdf)
+<use figures/dataset-evolution.pdf>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+LaTeX Info: Redefining \. on input line 60.
+LaTeX Info: Redefining \% on input line 60.
+[7]
+Underfull \vbox (badness 2277) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 60.
+LaTeX Info: Redefining \% on input line 60.
+ [8]
+File: figures/style_tag.jpg Graphic file (type bmp)
+<figures/style_tag.jpg>
+File: figures/style_throwup.jpg Graphic file (type bmp)
+<figures/style_throwup.jpg>
+File: figures/style_piece.jpg Graphic file (type bmp)
+<figures/style_piece.jpg>
+File: figures/style_character.jpg Graphic file (type bmp)
+<figures/style_character.jpg>
+File: figures/dataset_style_distribution.pdf Graphic file (type pdf)
+<use figures/dataset_style_distribution.pdf>
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+LaTeX Info: Redefining \. on input line 115.
+LaTeX Info: Redefining \% on input line 115.
+[9]
+LaTeX Info: Redefining \. on input line 153.
+LaTeX Info: Redefining \% on input line 153.
+ [10]
+Underfull \vbox (badness 7203) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 206.
+LaTeX Info: Redefining \% on input line 206.
+ [11]
+LaTeX Info: Redefining \. on input line 254.
+LaTeX Info: Redefining \% on input line 254.
+
+[12]
+Underfull \vbox (badness 4819) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 312.
+LaTeX Info: Redefining \% on input line 312.
+ [13]
+Underfull \hbox (badness 10000) in paragraph at lines 328--328
+[]|\TU/lmr/m/n/10 DINOv2 ViT-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 328--328
+[]|\TU/lmr/m/n/10 Autosupervisado (LVD-
+ []
+
+
+Overfull \hbox (19.74724pt too wide) in alignment at lines 322--333
+ [] [] [] [] 
+ []
+
+LaTeX Info: Redefining \. on input line 363.
+LaTeX Info: Redefining \% on input line 363.
+[14]
+LaTeX Info: Redefining \. on input line 419.
+LaTeX Info: Redefining \% on input line 419.
+ [15]
+LaTeX Info: Redefining \. on input line 468.
+LaTeX Info: Redefining \% on input line 468.
+ [16]
+Overfull \hbox (47.0903pt too wide) in paragraph at lines 493--497
+ [][] 
+ []
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+) (doc/methods.tex
+LaTeX Info: Redefining \. on input line 17.
+LaTeX Info: Redefining \% on input line 17.
+ [17]
+Overfull \hbox (55.41573pt too wide) in paragraph at lines 55--58
+ [][] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 75.
+LaTeX Info: Redefining \% on input line 75.
+ [18]
+File: figures/segmentation_stages.pdf Graphic file (type pdf)
+<use figures/segmentation_stages.pdf>
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+LaTeX Info: Redefining \. on input line 139.
+LaTeX Info: Redefining \% on input line 139.
+[19]
+LaTeX Info: Redefining \. on input line 166.
+LaTeX Info: Redefining \% on input line 166.
+ [20]
+Overfull \hbox (9.20744pt too wide) in paragraph at lines 202--211
+\TU/lmr/m/n/10 pamiento se repiten $\OML/cmm/m/it/10 K$ \TU/lmr/m/n/10 veces de
+ntro del mismo proceso, con las semillas $\OT1/cmr/m/n/10 0\OML/cmm/m/it/10 ; \
+OT1/cmr/m/n/10 1\OML/cmm/m/it/10 ; [] ; K \OMS/cmsy/m/n/10 ^^@
+ []
+
+LaTeX Info: Redefining \. on input line 220.
+LaTeX Info: Redefining \% on input line 220.
+[21]
+
+LaTeX Warning: Citation ` ahmed_k-means_2020' on page 22 undefined on input lin
+e 243.
+
+LaTeX Info: Redefining \. on input line 279.
+LaTeX Info: Redefining \% on input line 279.
+[22]
+LaTeX Info: Redefining \. on input line 335.
+LaTeX Info: Redefining \% on input line 335.
+ [23]
+LaTeX Info: Redefining \. on input line 383.
+LaTeX Info: Redefining \% on input line 383.
+ [24]
+LaTeX Info: Redefining \. on input line 443.
+LaTeX Info: Redefining \% on input line 443.
+ [25]) (doc/results.tex
+Overfull \hbox (51.07176pt too wide) in alignment at lines 19--21
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 22--22
+[]|\TU/lmr/m/n/9 UMAP-10, HDBSCAN
+ []
+
+
+Underfull \hbox (badness 2012) in paragraph at lines 23--23
+[]|\TU/lmr/m/n/9 Extractor base, HDBS-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 25--25
+[]|\TU/lmr/m/n/9 HDBSCAN
+ []
+
+
+Underfull \hbox (badness 6364) in paragraph at lines 27--27
+[]|$\OML/cmm/m/it/9 N \OMS/cmsy/m/n/9 2 f\OT1/cmr/m/n/9 500\OML/cmm/m/it/9 ; \O
+T1/cmr/m/n/9 1000\OML/cmm/m/it/9 ; \OT1/cmr/m/n/9 2500\OML/cmm/m/it/9 ; \OT1/cm
+r/m/n/9 6416\OMS/cmsy/m/n/9 g$\TU/lmr/m/n/9 ,
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 28--28
+[]|$\OML/cmm/m/it/9 N \OMS/cmsy/m/n/9 2 f\OT1/cmr/m/n/9 250\OML/cmm/m/it/9 ; \O
+T1/cmr/m/n/9 500\OML/cmm/m/it/9 ; \OT1/cmr/m/n/9 1000\OML/cmm/m/it/9 ; \OT1/cmr
+/m/n/9 2000\OML/cmm/m/it/9 ;$
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 31--31
+[]|\TU/lmr/m/it/9 Pipeline \TU/lmr/m/n/9 base, Post-
+ []
+
+
+Overfull \hbox (51.07176pt too wide) in alignment at lines 21--35
+ [] [] [] [] 
+ []
+
+LaTeX Info: Redefining \. on input line 35.
+LaTeX Info: Redefining \% on input line 35.
+[26]
+Overfull \hbox (36.43758pt too wide) in alignment at lines 72--74
+ [] [] [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 1783) in paragraph at lines 90--90
+[]\TU/lmr/m/n/9 Cuadro 9: E1, calidad intrínseca a $\OML/cmm/m/it/9 N \OT1/cmr/
+m/n/9 = 6416$\TU/lmr/m/n/9 . Las CNN en-
+ []
+
+
+Underfull \hbox (badness 4254) in paragraph at lines 90--90
+\TU/lmr/m/n/9 trenadas en ImageNet encabezan la silueta; el extractor base
+ []
+
+
+Overfull \hbox (36.43758pt too wide) in alignment at lines 74--92
+ [] [] [] [] [] [] [] 
+ []
+
+LaTeX Info: Redefining \. on input line 92.
+LaTeX Info: Redefining \% on input line 92.
+[27]
+Underfull \hbox (badness 1062) in paragraph at lines 109--120
+[]\TU/lmr/m/n/10 Las CNN entrenadas en ImageNet lideran la silueta (a $\OML/cmm
+/m/it/10 N \OT1/cmr/m/n/10 = 6416$\TU/lmr/m/n/10 :
+ []
+
+
+Underfull \hbox (badness 1199) in paragraph at lines 130--130
+[]|\TU/lmr/bx/n/9 RSS pi-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 130--130
+[]|\TU/lmr/bx/n/9 VRAM
+ []
+
+
+Overfull \hbox (5.41081pt too wide) in alignment at lines 129--131
+ [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (5.41081pt too wide) in alignment at lines 131--149
+ [] [] [] [] [] 
+ []
+
+LaTeX Info: Redefining \. on input line 149.
+LaTeX Info: Redefining \% on input line 149.
+[28]
+File: figures/e1_silhouette_by_embedding.pdf Graphic file (type pdf)
+<use figures/e1_silhouette_by_embedding.pdf>
+LaTeX Info: Redefining \. on input line 170.
+LaTeX Info: Redefining \% on input line 170.
+ [29]
+File: figures/e2_reduction_quality_cost.pdf Graphic file (type pdf)
+<use figures/e2_reduction_quality_cost.pdf>
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+LaTeX Info: Redefining \. on input line 239.
+LaTeX Info: Redefining \% on input line 239.
+[30]
+Underfull \hbox (badness 10000) in paragraph at lines 242--242
+[]|\TU/lmr/bx/n/9 clu
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 242--242
+[]|\TU/lmr/bx/n/9 mem
+ []
+
+
+Overfull \hbox (10.55844pt too wide) in alignment at lines 241--243
+ [] [] [] [] [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 244--244
+[]|\TU/lmr/m/n/9 HDBSCAN
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 246--246
+[]|\TU/lmr/m/n/9 GMM·300
+ []
+
+
+Overfull \hbox (10.55844pt too wide) in alignment at lines 243--257
+ [] [] [] [] [] [] [] [] [] 
+ []
+
+LaTeX Info: Redefining \. on input line 257.
+LaTeX Info: Redefining \% on input line 257.
+[31]
+File: figures/e3_pareto_quality_cost.pdf Graphic file (type pdf)
+<use figures/e3_pareto_quality_cost.pdf>
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+File: figures/e3_scaling_with_n.pdf Graphic file (type pdf)
+<use figures/e3_scaling_with_n.pdf>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+LaTeX Info: Redefining \. on input line 332.
+LaTeX Info: Redefining \% on input line 332.
+[32]
+Underfull \hbox (badness 10000) in paragraph at lines 369--369
+[]|\TU/lmr/bx/n/9 ingesta
+ []
+
+
+Overfull \hbox (19.23027pt too wide) in alignment at lines 368--370
+ [] [] [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (19.23027pt too wide) in alignment at lines 370--382
+ [] [] [] [] [] [] [] [] 
+ []
+
+LaTeX Info: Redefining \. on input line 382.
+LaTeX Info: Redefining \% on input line 382.
+[33]
+File: figures/val_batch2_pred.jpg Graphic file (type bmp)
+<figures/val_batch2_pred.jpg>
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 441.
+LaTeX Info: Redefining \% on input line 441.
+ [34]
+LaTeX Info: Redefining \. on input line 441.
+LaTeX Info: Redefining \% on input line 441.
+
+[35]
+Underfull \hbox (badness 10000) in paragraph at lines 453--453
+[]|\TU/lmr/bx/n/9 ingesta
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 453--453
+[]|\TU/lmr/bx/n/9 HDBSCAN
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 453--453
+[]|\TU/lmr/bx/n/9 K-medias
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 453--453
+[]|\TU/lmr/bx/n/9 búsqueda
+ []
+
+
+Overfull \hbox (30.74715pt too wide) in alignment at lines 452--454
+ [] [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (30.74715pt too wide) in alignment at lines 454--465
+ [] [] [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 470--470
+[]|\TU/lmr/bx/n/9 Pendiente
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 470--470
+[]|\TU/lmr/bx/n/9 Pendiente
+ []
+
+
+Overfull \hbox (2.70215pt too wide) in alignment at lines 469--471
+ [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 472--472
+[]|\TU/lmr/m/n/9 Ingesta (DI-
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 473--473
+[]|\TU/lmr/m/n/9 Reducción
+ []
+
+
+Overfull \hbox (2.70215pt too wide) in alignment at lines 471--484
+ [] [] [] [] 
+ []
+
+LaTeX Info: Redefining \. on input line 484.
+LaTeX Info: Redefining \% on input line 484.
+[36]
+File: figures/e7_scalability_loglog.pdf Graphic file (type pdf)
+<use figures/e7_scalability_loglog.pdf>
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+File: figures/e7_memory.pdf Graphic file (type pdf)
+<use figures/e7_memory.pdf>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+LaTeX Info: Redefining \. on input line 546.
+LaTeX Info: Redefining \% on input line 546.
+[37]
+Overfull \hbox (5.2762pt too wide) in alignment at lines 548--550
+ [] [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 553--553
+[]|\TU/lmr/m/n/9 PostgreSQL +
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 556--556
+[]|\TU/lmr/m/n/9 PostgreSQL +
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 559--559
+[]|\TU/lmr/m/n/9 PostgreSQL +
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 562--562
+[]|\TU/lmr/m/n/9 PostgreSQL +
+ []
+
+
+Overfull \hbox (5.2762pt too wide) in alignment at lines 550--569
+ [] [] [] [] [] [] 
+ []
+
+
+Underfull \vbox (badness 5260) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 569.
+LaTeX Info: Redefining \% on input line 569.
+ [38]
+LaTeX Info: Redefining \. on input line 604.
+LaTeX Info: Redefining \% on input line 604.
+
+[39]
+File: figures/e6_e9_pareto.pdf Graphic file (type pdf)
+<use figures/e6_e9_pareto.pdf>
+LaTeX Info: Redefining \. on input line 634.
+LaTeX Info: Redefining \% on input line 634.
+ [40]
+Overfull \hbox (76.40721pt too wide) in alignment at lines 645--647
+ [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (76.40721pt too wide) in alignment at lines 647--661
+ [] [] [] [] [] [] 
+ []
+
+LaTeX Info: Redefining \. on input line 691.
+LaTeX Info: Redefining \% on input line 691.
+[41]
+File: figures/e8a_hdbscan_3clusters.pdf Graphic file (type pdf)
+<use figures/e8a_hdbscan_3clusters.pdf>
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+File: figures/cluster_simple.pdf Graphic file (type pdf)
+<use figures/cluster_simple.pdf>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+File: figures/cluster_elaborate.pdf Graphic file (type pdf)
+<use figures/cluster_elaborate.pdf>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+File: figures/cluster_characters.pdf Graphic file (type pdf)
+<use figures/cluster_characters.pdf>
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+
+Overfull \hbox (76.40721pt too wide) in alignment at lines 772--774
+ [] [] [] [] [] [] 
+ []
+
+
+Underfull \hbox (badness 1867) in paragraph at lines 786--786
+[]\TU/lmr/m/n/9 Cuadro 20: E8b, mejor celda por extractor sobre la evaluación
+ []
+
+
+Underfull \hbox (badness 2671) in paragraph at lines 786--786
+\TU/lmr/m/n/9 de autoría (185 recortes, 87 autores, evaluación entre ciudades
+ []
+
+
+Overfull \hbox (76.40721pt too wide) in alignment at lines 774--788
+ [] [] [] [] [] [] 
+ []
+
+LaTeX Info: Redefining \. on input line 788.
+LaTeX Info: Redefining \% on input line 788.
+[42]
+LaTeX Info: Redefining \. on input line 788.
+LaTeX Info: Redefining \% on input line 788.
+ [43]
+Underfull \vbox (badness 1990) has occurred while \output is active []
+
+LaTeX Info: Redefining \. on input line 842.
+LaTeX Info: Redefining \% on input line 842.
+ [44]
+File: figures/e8_correlation.pdf Graphic file (type pdf)
+<use figures/e8_correlation.pdf>
+
+
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+LaTeX Info: Redefining \. on input line 875.
+LaTeX Info: Redefining \% on input line 875.
+[45]) (doc/conclusion.tex
+LaTeX Info: Redefining \. on input line 13.
+LaTeX Info: Redefining \% on input line 13.
+ [46]
+LaTeX Info: Redefining \. on input line 70.
+LaTeX Info: Redefining \% on input line 70.
+ [47]) (article.bbl
+LaTeX Info: Redefining \. on input line 44.
+LaTeX Info: Redefining \% on input line 44.
+ [48]
+LaTeX Info: Redefining \. on input line 147.
+LaTeX Info: Redefining \% on input line 147.
+ [49]
+Underfull \hbox (badness 7415) in paragraph at lines 185--189
+[]\TU/lmr/m/n/9 Caliński, T., Harabasz, J.:  A dendrite method for cluster anal
+y-
+ []
+
+
+Underfull \hbox (badness 4001) in paragraph at lines 185--189
+\TU/lmr/m/n/9 sis.  Communications in Statistics \TU/lmr/bx/n/9 3\TU/lmr/m/n/9 
+(1) (January 1974) 1–27 _eprint:
+ []
+
+LaTeX Info: Redefining \. on input line 254.
+LaTeX Info: Redefining \% on input line 254.
+[50])
+LaTeX Info: Redefining \. on input line 52.
+LaTeX Info: Redefining \% on input line 52.
+ [51] (article.aux
+LaTeX Info: Redefining \. on input line 10.
+LaTeX Info: Redefining \% on input line 10.
+) )
+Output written on article.xdv (51 pages, 1276112 bytes).

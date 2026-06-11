@@ -1,0 +1,277 @@
+\begin{thebibliography}{10}
+
+\bibitem{fogaca_deep_2023}
+Fogaça, J., Brandão, T., Ferreira, J.C.:
+\newblock Deep {Learning}-{Based} {Graffiti} {Detection}: {A} {Study} {Using}
+  {Images} from the {Streets} of {Lisbon}.
+\newblock Applied Sciences \textbf{13}(4) (January 2023)  2249
+
+\bibitem{taylor_twenty-first_2010}
+Taylor, M.F., Cordin, R., Njiru, J.:
+\newblock A twenty-first century graffiti classification system: {A}
+  typological tool for prioritizing graffiti removal.
+\newblock Crime Prevention and Community Safety \textbf{12}(3) (July 2010)
+  137--155
+
+\bibitem{tokuda_quantifying_2019}
+Tokuda, E.K., Cesar, R.M., Silva, C.T.:
+\newblock Quantifying the presence of graffiti in urban environments.
+\newblock In: 2019 {Ieee} {International} {Conference} on {Big} {Data} and
+  {Smart} {Computing} (bigcomp), New York, IEEE (2019)  405--408 Num Pages: 4
+  Series Title: International Conference on Big Data and Smart Computing Web of
+  Science ID: WOS:000469779800067.
+
+\bibitem{garcia_garcia_graffiti_2025}
+García~García, M., Hernández, G., González-Arrieta, A.,
+  Rodríguez~González, S.:
+\newblock Graffiti {Identification} {Using} {Color} {Analysis}: {An} {Approach}
+  {Based} on {K}-{Means} {Clustering}.
+\newblock In Marreiros, G., Grande, L., Llerena, J.P., Conceição, L., Ko, H.,
+  Plaza, M., Ricca, M., eds.: Distributed {Computing} and {Artificial}
+  {Intelligence}, {Special} {Sessions} {II}, 21st {International} {Conference},
+  Cham, Springer Nature Switzerland (2025)  323--328
+
+\bibitem{he_deep_2015}
+He, K., Zhang, X., Ren, S., Sun, J.:
+\newblock Deep {Residual} {Learning} for {Image} {Recognition} (December 2015)
+  arXiv:1512.03385 [cs.CV].
+
+\bibitem{radford_learning_2021}
+Radford, A., Kim, J.W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry,
+  G., Askell, A., Mishkin, P., Clark, J., Krueger, G., Sutskever, I.:
+\newblock Learning {Transferable} {Visual} {Models} {From} {Natural} {Language}
+  {Supervision} (February 2021) arXiv:2103.00020 [cs.CV].
+
+\bibitem{oquab_dinov2_2024}
+Oquab, M., Darcet, T., Moutakanni, T., Vo, H., Szafraniec, M., Khalidov, V.,
+  Fernandez, P., Haziza, D., Massa, F., El-Nouby, A., Assran, M., Ballas, N.,
+  Galuba, W., Howes, R., Huang, P.Y., Li, S.W., Misra, I., Rabbat, M., Sharma,
+  V., Synnaeve, G., Xu, H., Jegou, H., Mairal, J., Labatut, P., Joulin, A.,
+  Bojanowski, P.:
+\newblock {DINOv2}: {Learning} {Robust} {Visual} {Features} without
+  {Supervision} (February 2024) arXiv:2304.07193 [cs.CV].
+
+\bibitem{mcinnes_umap_2020}
+McInnes, L., Healy, J., Melville, J.:
+\newblock {UMAP}: {Uniform} {Manifold} {Approximation} and {Projection} for
+  {Dimension} {Reduction} (September 2020) arXiv:1802.03426 [stat.ML].
+
+\bibitem{ester_density-based_1996}
+Ester, M., Kriegel, H.P., Sander, J., Xu, X.:
+\newblock A density-based algorithm for discovering clusters in large spatial
+  databases with noise.
+\newblock In: Proceedings of the {Second} {International} {Conference} on
+  {Knowledge} {Discovery} and {Data} {Mining}. {KDD}'96, Portland, Oregon, AAAI
+  Press (August 1996)  226--231
+
+\bibitem{malkov_efficient_2018}
+Malkov, Y.A., Yashunin, D.A.:
+\newblock Efficient and robust approximate nearest neighbor search using
+  {Hierarchical} {Navigable} {Small} {World} graphs (August 2018)
+  arXiv:1603.09320 [cs.DS].
+
+\bibitem{johnson_billion-scale_2017}
+Johnson, J., Douze, M., Jégou, H.:
+\newblock Billion-scale similarity search with {GPUs} (February 2017)
+  arXiv:1702.08734 [cs.CV].
+
+\bibitem{fiel_writer_2015}
+Fiel, S., Sablatnig, R.:
+\newblock Writer {Identification} and {Retrieval} {Using} a {Convolutional}
+  {Neural} {Network}.
+\newblock In Azzopardi, G., Petkov, N., eds.: Computer {Analysis} of {Images}
+  and {Patterns}, Cham, Springer International Publishing (2015)  26--37
+
+\bibitem{schroff_facenet_2015}
+Schroff, F., Kalenichenko, D., Philbin, J.:
+\newblock {FaceNet}: {A} {Unified} {Embedding} for {Face} {Recognition} and
+  {Clustering} (March 2015)
+
+\bibitem{min_survey_2018}
+Min, E., Guo, X., Liu, Q., Zhang, G., Cui, J., Long, J.:
+\newblock A {Survey} of {Clustering} {With} {Deep} {Learning}: {From} the
+  {Perspective} of {Network} {Architecture}.
+\newblock Ieee Access \textbf{6} (2018)  39501--39514 Num Pages: 14 Web of
+  Science ID: WOS:000441128300001.
+
+\bibitem{caron_deep_2019}
+Caron, M., Bojanowski, P., Joulin, A., Douze, M.:
+\newblock Deep {Clustering} for {Unsupervised} {Learning} of {Visual}
+  {Features} (March 2019) arXiv:1807.05520 [cs.CV].
+
+\bibitem{van_gansbeke_scan_2020}
+Van~Gansbeke, W., Vandenhende, S., Georgoulis, S., Proesmans, M., Van~Gool, L.:
+\newblock {SCAN}: {Learning} to {Classify} {Images} {Without} {Labels}.
+\newblock In Vedaldi, A., Bischof, H., Brox, T., Frahm, J.M., eds.: Computer
+  {Vision} – {ECCV} 2020, Cham, Springer International Publishing (2020)
+  268--285
+
+\bibitem{arthur_k-means_2007}
+Arthur, D., Vassilvitskii, S.:
+\newblock k-means++: the advantages of careful seeding.
+\newblock In: Proceedings of the eighteenth annual {ACM}-{SIAM} symposium on
+  {Discrete} algorithms. {SODA} '07, USA, Society for Industrial and Applied
+  Mathematics (January 2007)  1027--1035
+
+\bibitem{ankerst_optics_1999}
+Ankerst, M., Breunig, M.M., Kriegel, H.P., Sander, J.:
+\newblock {OPTICS}: ordering points to identify the clustering structure.
+\newblock SIGMOD Rec. \textbf{28}(2) (June 1999)  49--60
+
+\bibitem{campello_density-based_2013}
+Campello, R.J.G.B., Moulavi, D., Sander, J.:
+\newblock Density-{Based} {Clustering} {Based} on {Hierarchical} {Density}
+  {Estimates}.
+\newblock In Pei, J., Tseng, V.S., Cao, L., Motoda, H., Xu, G., eds.: Advances
+  in {Knowledge} {Discovery} and {Data} {Mining}, Berlin, Heidelberg, Springer
+  (2013)  160--172
+
+\bibitem{frey_clustering_2007}
+Frey, B.J., Dueck, D.:
+\newblock Clustering by {Passing} {Messages} {Between} {Data} {Points}.
+\newblock Science \textbf{315}(5814) (February 2007)  972--976
+
+\bibitem{dempster_maximum_1977}
+Dempster, A.P., Laird, N.M., Rubin, D.B.:
+\newblock Maximum {Likelihood} from {Incomplete} {Data} {Via} the \textit{{EM}}
+  {Algorithm}.
+\newblock Journal of the Royal Statistical Society Series B: Statistical
+  Methodology \textbf{39}(1) (September 1977)  1--22
+
+\bibitem{ng_spectral_2001}
+Ng, A.Y., Jordan, M.I., Weiss, Y.:
+\newblock On spectral clustering: analysis and an algorithm.
+\newblock In: Proceedings of the 15th {International} {Conference} on {Neural}
+  {Information} {Processing} {Systems}: {Natural} and {Synthetic}. {NIPS}'01,
+  Cambridge, MA, USA, MIT Press (January 2001)  849--856
+
+\bibitem{mullner_modern_2011}
+Müllner, D.:
+\newblock Modern hierarchical, agglomerative clustering algorithms (September
+  2011) arXiv:1109.2378 [stat.ML].
+
+\bibitem{aggarwal_surprising_2001}
+Aggarwal, C.C., Hinneburg, A., Keim, D.A.:
+\newblock On the {Surprising} {Behavior} of {Distance} {Metrics} in {High}
+  {Dimensional} {Space}.
+\newblock In Van~den Bussche, J., Vianu, V., eds.: Database {Theory} — {ICDT}
+  2001, Berlin, Heidelberg, Springer (2001)  420--434
+
+\bibitem{jolliffe_principal_2002}
+Jolliffe, I.:
+\newblock Principal {Component} {Analysis}.
+\newblock Springer {Series} in {Statistics}. Springer-Verlag, New York (2002)
+
+\bibitem{scholkopf_nonlinear_1998}
+Schölkopf, B., Smola, A., Müller, K.R.:
+\newblock Nonlinear {Component} {Analysis} as a {Kernel} {Eigenvalue}
+  {Problem}.
+\newblock Neural Computation \textbf{10}(5) (July 1998)  1299--1319
+
+\bibitem{tenenbaum_global_2000}
+Tenenbaum, J.B., Silva, V.d., Langford, J.C.:
+\newblock A {Global} {Geometric} {Framework} for {Nonlinear} {Dimensionality}
+  {Reduction}.
+\newblock Science \textbf{290}(5500) (December 2000)  2319--2323
+
+\bibitem{rousseeuw_silhouettes_1987}
+Rousseeuw, P.J.:
+\newblock Silhouettes: {A} graphical aid to the interpretation and validation
+  of cluster analysis.
+\newblock Journal of Computational and Applied Mathematics \textbf{20}
+  (November 1987)  53--65
+
+\bibitem{calinski_dendrite_1974}
+Caliński, T., Harabasz, J.:
+\newblock A dendrite method for cluster analysis.
+\newblock Communications in Statistics \textbf{3}(1) (January 1974)  1--27
+  \_eprint: https://doi.org/10.1080/03610927408827101.
+
+\bibitem{davies_cluster_1979}
+Davies, D., Bouldin, D.:
+\newblock A {Cluster} {Separation} {Measure}.
+\newblock Pattern Analysis and Machine Intelligence, IEEE Transactions on
+  \textbf{PAMI-1} (May 1979)  224--227
+
+\bibitem{simonyan_very_2015}
+Simonyan, K., Zisserman, A.:
+\newblock Very {Deep} {Convolutional} {Networks} for {Large}-{Scale} {Image}
+  {Recognition} (April 2015) arXiv:1409.1556 [cs.CV].
+
+\bibitem{szegedy_rethinking_2015}
+Szegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., Wojna, Z.:
+\newblock Rethinking the {Inception} {Architecture} for {Computer} {Vision}
+  (December 2015) arXiv:1512.00567 [cs.CV].
+
+\bibitem{howard_searching_2019}
+Howard, A., Sandler, M., Chu, G., Chen, L.C., Chen, B., Tan, M., Wang, W., Zhu,
+  Y., Pang, R., Vasudevan, V., Le, Q.V., Adam, H.:
+\newblock Searching for {MobileNetV3} (November 2019) arXiv:1905.02244 [cs.CV].
+
+\bibitem{dosovitskiy_image_2021}
+Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X.,
+  Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S.,
+  Uszkoreit, J., Houlsby, N.:
+\newblock An {Image} is {Worth} 16x16 {Words}: {Transformers} for {Image}
+  {Recognition} at {Scale} (June 2021) arXiv:2010.11929 [cs.CV].
+
+\bibitem{ultralytics_ultralytics_2024}
+{Ultralytics}:
+\newblock Ultralytics {YOLO11} (September 2024)
+
+\bibitem{pedregosa_scikit-learn_2011}
+Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel,
+  O., Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J.,
+  Passos, A., Cournapeau, D., Brucher, M., Perrot, M., Duchesnay, {\'E}.:
+\newblock Scikit-learn: {Machine} {Learning} in {Python}.
+\newblock Journal of Machine Learning Research \textbf{12}(85) (2011)
+  2825--2830
+
+\bibitem{huang_ultra-scalable_2020}
+Huang, D., Wang, C.D., Wu, J.S., Lai, J.H., Kwoh, C.K.:
+\newblock Ultra-{Scalable} {Spectral} {Clustering} and {Ensemble} {Clustering}.
+\newblock Ieee Transactions on Knowledge and Data Engineering \textbf{32}(6)
+  (June 2020)  1212--1226 Num Pages: 15 Web of Science ID: WOS:000531422700013.
+
+\bibitem{pan_survey_2010}
+Pan, S.J., Yang, Q.:
+\newblock A {Survey} on {Transfer} {Learning}.
+\newblock IEEE Transactions on Knowledge and Data Engineering \textbf{22}(10)
+  (October 2010)  1345--1359
+
+\bibitem{howard_universal_2018}
+Howard, J., Ruder, S.:
+\newblock Universal {Language} {Model} {Fine}-tuning for {Text}
+  {Classification} (May 2018) arXiv:1801.06146 [cs.CL].
+
+\bibitem{sculley_web-scale_2010}
+Sculley, D.:
+\newblock Web-scale k-means clustering.
+\newblock In: Proceedings of the 19th international conference on {World} wide
+  web. {WWW} '10, New York, NY, USA, Association for Computing Machinery (April
+  2010)  1177--1178
+
+\bibitem{franti_k-means_2018}
+Fränti, P., Sieranoja, S.:
+\newblock K-means properties on six clustering benchmark datasets.
+\newblock Applied Intelligence \textbf{48}(12) (December 2018)  4743--4759
+
+\bibitem{hermans_defense_2017}
+Hermans, A., Beyer, L., Leibe, B.:
+\newblock In {Defense} of the {Triplet} {Loss} for {Person}
+  {Re}-{Identification}.
+\newblock ArXiv (March 2017)
+
+\bibitem{wu_sampling_2017}
+Wu, C.Y., Manmatha, R., Smola, A.J., Krähenbühl, P.:
+\newblock Sampling {Matters} in {Deep} {Embedding} {Learning}.
+\newblock In: 2017 {IEEE} {International} {Conference} on {Computer} {Vision}
+  ({ICCV}). (October 2017)  2859--2867 ISSN: 2380-7504.
+
+\bibitem{khosla_supervised_2021}
+Khosla, P., Teterwak, P., Wang, C., Sarna, A., Tian, Y., Isola, P., Maschinot,
+  A., Liu, C., Krishnan, D.:
+\newblock Supervised {Contrastive} {Learning} (March 2021) arXiv:2004.11362
+  [cs.LG].
+
+\end{thebibliography}
