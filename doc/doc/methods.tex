@@ -344,20 +344,20 @@ que deberá tenerse en cuenta al interpretar los resultados de la evaluación po
 autor (\ref{sec:results}). La asimetría entre entrenamiento y evaluación es,
 por tanto, intrínseca al problema de aprendizaje de métricas.
 
-Las métricas ARI, NMI y F1 por pares se calculan directamente sobre los
-vectores de etiquetas de clúster y de verdad fundamental, sin resolver
-explícitamente el problema de asignación clúster-clase: las tres son
+Las métricas ARI, NMI y F1 por pares se aplican directamente sobre los
+\textit{clusters} obtenidos y las etiquetas de estilo y autoría, sin resolver
+explícitamente el problema de asignación clúster-clase: Las tres son
 invariantes ante permutaciones de etiquetas y comparan las relaciones de
 coagrupamiento entre pares de puntos. Para los algoritmos que pueden etiquetar
 puntos como ruido ($-1$) se reportan dos lecturas de cada métrica. En la
 lectura por defecto los puntos de ruido se tratan como un único clúster
 adicional, de modo que influyen en la métrica en lugar de ignorarse
 silenciosamente. En la lectura complementaria (\texttt{*\_no\_noise}) esas
-instancias se descartan antes de puntuar, de forma que los algoritmos de densidad y
-los particionales se comparan sobre el subconjunto que cada uno realmente
-agrupa. Esta doble lectura es asimétrica respecto al tratamiento del ruido en
-las métricas intrínsecas, donde el ruido siempre se excluye y se complementan
-con valores como el porcentaje de ruido.
+instancias se descartan antes de puntuar, de forma que los algoritmos de
+densidad y los particionales se comparan sobre el subconjunto que cada uno
+realmente agrupa. Esta doble lectura es asimétrica respecto al tratamiento del
+ruido en las métricas intrínsecas, donde el ruido siempre se excluye y se
+complementan con valores como el porcentaje de ruido.
 
 Para evaluar la calidad de la búsqueda por similitud se emplean también las
 etiquetas disponibles según la evaluación: las métricas P@$k$, MAP@$k$, MRR y
