@@ -163,7 +163,7 @@ en los pipelines de agrupamiento. Sobre los vectores de 128 dimensiones de
 configuraciones y revela a UMAP como la única familia que produce
 simultáneamente un número de clústeres no trivial, ruido moderado y tamaños
 balanceados. La tabla~\ref{tab:e2-quality-6416} resume el resultado al tamaño
-de corpus completo.
+de dataset completo.
 
 {\footnotesize
 \begin{longtable}{|p{2.0cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|} \hline
@@ -198,7 +198,7 @@ mientras que PCA-50 explota a $k=238$ con un 69.8\% de ruido y un coeficiente de
 variación de 2.29. Ambas son lecturas degeneradas que las métricas individuales
 premian engañosamente: tanto la identidad (silueta $0.307$, DB $1.16$) como
 PCA-50 (silueta $0.238$) encabezan la tabla en silueta pese a descartar dos
-tercios del corpus.
+tercios del dataset.
 
 Las métricas de coste refuerzan la posición de la identidad como opción
 inferior. Esta reducción no es gratuita como podría parecer, sino que empuja el
@@ -258,9 +258,9 @@ métricas intrínsecas  en conjunto con el número de clústeres, el ruido y el
 csCV; nunca de manera aislada. Esto es especialmente importante aquí puesto que
 los algoritmos basados en densidad (HDBSCAN, DBSCAN, OPTICS) son juzgados solo
 sobre el subconjunto que agrupan, mientras que los particionales (KMeans, GMM,
-aglomerativo, espectral) lo son sobre el corpus completo. La silueta penaliza
-menos a un método que se abstiene de los puntos difíciles y CH premia la
-compactación, sin importar la estructura.
+aglomerativo, espectral) lo son sobre el conjunto de datos completo. La silueta
+penaliza menos a un método que se abstiene de los puntos difíciles y CH premia
+la compactación, sin importar la estructura.
 
 Bajo este criterio, HDBSCAN parece ser el único algoritmo que produce
 resultados defendibles en el rango de escalas evaluado: obtiene un ruido
@@ -492,7 +492,7 @@ lo haga.
 
 La pendiente observada de la búsqueda por similitud SQLite es prácticamente la
 esperada: $\approx 2.10$ sobre el rango completo y 2.13 en la ventana limpia. A
-$N=6416$ una sola pasada de 6416 consultas sobre el corpus tarda 54.4 minutos,
+$N=6416$ una sola pasada de 6416 consultas sobre el dataset tarda 54.4 minutos,
 más que la propia ingesta (21.6 min) y unas $9000$ veces más que el
 agrupamiento ($3266.6 / 0.358$~s). El \textit{throughput} cae de 68 consultas
 por segundo a $N=250$ a 2 consultas por segundo a $N=6416$: una caída de
@@ -577,21 +577,21 @@ consulta frente a SQLite y en varias docenas frente al exacto.
 Por debajo de $N\approx2500$ las tres opciones sobre PostgreSQL son
 indistinguibles en latencia y HNSW solo añade complejidad sin ganancia; por
 encima, HNSW pasa al frente mientras el exacto sigue creciendo linealmente. El
-corpus objetivo del trabajo está por encima de ese cruce, por lo que HNSW es la
+dataset del trabajo está por encima de ese cruce, por lo que HNSW es la
 elección por defecto recomendada para la búsqueda; SQLite queda como
 \textit{backend} de desarrollo de muy pequeña escala.
 
 Para validar que la configuración por defecto del índice no es una decisión
 arbitraria, un barrido complementario E9 recorre once configuraciones en torno
 a la utilizada en el barrido E6 $(\texttt{m}=16, \texttt{ef\_construction}=64,
-\texttt{ef\_search}=40)$ sobre el corpus completo. Los resultados se pueden ver 
-en la figura~\ref{fig:similaritysearch-pareto}. Ninguna cae por debajo de
-\textit{recall} 0.990, y el ancla proporciona 0.321~s por consulta a
+\texttt{ef\_search}=40)$ sobre el conjunto de datos completo. Los resultados se
+pueden ver en la figura~\ref{fig:similaritysearch-pareto}. Ninguna cae por
+debajo de \textit{recall} 0.990, y el ancla proporciona 0.321~s por consulta a
 \textit{recall} 0.995, 3.4 veces más rápida que el método exacto. Alcanzar
 \textit{recall} 1.000 sin penalizar la latencia es posible subiendo \texttt{m}
 a 32 o \texttt{ef\_construction} a 256; ambos son parámetros para la
-construcción, preferibles a \texttt{ef\_search} en un flujo de \enquote{ingesta única,
-muchas consultas} porque su sobrecoste se amortiza una sola vez. A esta
+construcción, preferibles a \texttt{ef\_search} en un flujo de \enquote{ingesta
+única, muchas consultas} porque su sobrecoste se amortiza una sola vez. A esta
 escala, parece que el uso de HNSW proporciona una mejora de latencia muy
 considerable sin una pérdida apreciable de calidad, eliminando el cuello de
 botella $O(n^2)$ de SQLite.
@@ -786,12 +786,12 @@ E8b es un resultado negativo, pero esperado. La tarea de clasificación por
 estilo es considerablemente más sencilla que la de agrupamiento por autoría,
 que además se ve afectada por un desplazamiento de dominio más severo y un
 conjunto de datos de peor calidad. Sería necesario anotar muchos más recortes y
-de más autores (probablemente más de los que hay en el corpus completo) para
+de más autores (probablemente más de los que hay en el dataset completo) para
 obtener resultados de agrupamiento por autoría aceptables. Otra posibilidad
-sería pre-entrenar los modelos de autoría sobre un corpus de grafiti de manera
-no supervisada, y luego hacer el \textit{fine-tuning} supervisado sobre el
-conjunto de autoría anotado. Esto último requeriría una gran cantidad de
-imágenes de grafiti y el uso del corpus completo podría ser un buen punto de
+sería pre-entrenar los modelos de autoría sobre un conjunto de datos de grafiti
+de manera no supervisada, y luego hacer el \textit{fine-tuning} supervisado
+sobre el conjunto de autoría anotado. Esto último requeriría una gran cantidad
+de imágenes de grafiti y el uso del dataset completo podría ser un buen punto de
 partida, pero su uso provocaría un sesgo de selección importante al evaluar
 sobre el mismo conjunto utilizado para pre-entrenar la red.
 
