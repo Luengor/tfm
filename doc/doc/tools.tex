@@ -428,6 +428,24 @@ detecciones dispersas de baja calidad. Por último, cuando el detector no emite
 ninguna detección, se puede optar por emitir la imagen completa como caja única
 o descartar la imagen del análisis.
 
+Para evaluar la calidad de este segmentador se hace uso de las métricas de
+detección estándar: precisión, \textit{recall} y la precisión media promedio
+(mAP) a distintos umbrales de intersección sobre unión (IoU). La IoU mide el
+solapamiento entre la caja predicha y la caja correcta como el cociente entre
+el área de su intersección y el área de su unión, de modo que vale $1$ cuando
+coinciden por completo y $0$ cuando son disjuntas. Las dos primeras funcionan
+de la misma manera que la búsqueda por similitud, cuantificando el porcentaje
+de detecciones relevantes recuperadas respecto al total de detecciones emitidas
+(precisión) o al total de elementos relevantes (recall). La mAP agrega ambas en
+una sola cifra: para un umbral de IoU fijo se calcula la precisión media
+(\textit{average precision}, AP), que corresponde al área bajo la curva
+precisión-\textit{recall}, y la mAP es la media de ese AP sobre todas las
+clases. Una caja de detección se considera correcta cuando su IoU con la caja
+correcta supera el umbral fijado; mAP@$0.5$, por ejemplo, emplea un umbral del
+50\%. La variante mAP@$0.5$-$0.95$ promedia además la mAP sobre umbrales de IoU
+entre el 50\% y el 95\% en pasos del 5\%, lo que proporciona una evaluación más
+completa de la calidad de las detecciones.
+
 El detector se ajusta sobre el subconjunto anotado de ambos bancos descrito en
 \ref{subsec:dataset}, disjunto del banco de evaluación, lo que evita que las
 métricas reportadas sobre las configuraciones con segmentador queden sesgadas
