@@ -76,7 +76,7 @@ La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
     \item El segmentador consume la imagen y devuelve una lista con cajas
         delimitadoras de los grafitis presentes en la imagen. En el caso de que
         no se utilice segmentador, se devuelve una única caja que abarca toda
-        la imagen, de modo que el sistema se comporta como un agrupamiento de
+        la imagen, de modo que el sistema se comporta como un agrupador de
         imágenes completas. Este comportamiento de respaldo también se puede
         habilitar o deshabilitar para los modelos de detección de grafitis,
         de modo que las imágenes sin detección se emitan como recortes de
@@ -132,10 +132,10 @@ rendimiento computacional, cuantificado mediante los tiempos absolutos de cada
 etapa del \textit{pipeline} (preparación, ingesta, reducción, agrupamiento y
 búsqueda por similitud), el \textit{throughput} de ingesta en imágenes por
 segundo, la latencia de búsqueda por consulta y la escalabilidad de estas
-magnitudes con el tamaño del banco; son métricas objetivas e independientes de
-la existencia de etiquetas. El segundo eje, secundario, es la calidad de los
-clústeres resultantes, evaluada con las métricas internas y extrínsecas
-definidas en \ref{subsubsec:metricas}.
+magnitudes con el tamaño del banco; todas ellas son métricas objetivas e
+independientes de la existencia de etiquetas. El segundo eje, secundario, es la
+calidad de los clústeres resultantes, evaluada con las métricas internas y
+extrínsecas definidas en \ref{subsubsec:metricas}.
 
 \subsubsection{Definición del espacio de configuraciones}
 \label{subsubsec:espacio-configs}
@@ -343,8 +343,8 @@ coagrupamiento entre pares de puntos. Para los algoritmos que pueden etiquetar
 puntos como ruido ($-1$) se reportan dos lecturas de cada métrica. En la
 lectura por defecto los puntos de ruido se tratan como un único clúster
 adicional, de modo que influyen en la métrica en lugar de ignorarse
-silenciosamente. En la lectura complementaria (\texttt{*\_no\_noise}) esos
-puntos se descartan antes de puntuar, de forma que los algoritmos de densidad y
+silenciosamente. En la lectura complementaria (\texttt{*\_no\_noise}) esas
+instancias se descartan antes de puntuar, de forma que los algoritmos de densidad y
 los particionales se comparan sobre el subconjunto que cada uno realmente
 agrupa. Esta doble lectura es asimétrica respecto al tratamiento del ruido en
 las métricas intrínsecas, donde el ruido siempre se excluye y se complementan
