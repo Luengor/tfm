@@ -273,6 +273,102 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
   elaborado y \textit{characters}).}
   \label{fig:e8a-clusters}
 \end{figure}
+
+% --- movido del cuerpo (Batch 5): detecciones YOLO E5, memoria E7, almacenamiento E6, recuperación E8a/E8b, HDBSCAN 3 clústeres E8a ---
+
+{\footnotesize
+\begin{longtable}{|p{1.0cm}|p{2.6cm}|p{1.6cm}|p{2.0cm}|p{1.6cm}|p{1.8cm}|} \hline
+  \textbf{$N$} & \textbf{Backend} & \textbf{ss (s)} & \textbf{ips} & \textbf{idx (s)} & \textbf{R@5} \\ \hline
+  \endhead
+   500 & SQLite             & 3.05  &    164 & --     & --    \\ \hline
+   500 & PostgreSQL exacto  & 0.162 &  3 096 & 0.0    & --    \\ \hline
+   500 & PostgreSQL + HNSW  & 0.164 &  3 042 & 0.066  & 1.000 \\ \hline
+  1000 & SQLite             & 6.41  &    156 & --     & --    \\ \hline
+  1000 & PostgreSQL exacto  & 0.190 &  5 257 & 0.0    & --    \\ \hline
+  1000 & PostgreSQL + HNSW  & 0.187 &  5 353 & 0.136  & 1.000 \\ \hline
+  2500 & SQLite             & 16.89 &    148 & --     & --    \\ \hline
+  2500 & PostgreSQL exacto  & 0.234 & 10 678 & 0.0    & --    \\ \hline
+  2500 & PostgreSQL + HNSW  & 0.166 & 15 092 & 0.372  & 1.000 \\ \hline
+  6416 & SQLite             & 43.10 &    149 & --     & --    \\ \hline
+  6416 & PostgreSQL exacto  & 0.578 & 11 109 & 0.0    & --    \\ \hline
+  6416 & PostgreSQL + HNSW  & 0.179 & 35 936 & 0.465  & 1.000 \\ \hline
+  \caption[E6, latencia y \textit{recall} por \textit{backend}]{E6, latencia, \textit{throughput} y \textit{recall} de la búsqueda
+  por similitud por \textit{backend} y tamaño de banco. SQLite escala
+  linealmente en tiempo por consulta; pgvector exacto está dominado por la
+  latencia de \textit{round-trip} en los tamaños pequeños; HNSW solo se
+  separa visiblemente por encima de $N\approx 2500$.}
+  \label{tab:e6-storage}
+\end{longtable}
+}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{figures/val_batch2_pred.jpg}
+  \caption[Ejemplos de detecciones de YOLO]{Ejemplos de detecciones del
+  detector de YOLO durante el entrenamiento. Este es uno de los <<mejores>>
+  casos, en los que la gran mayoría de los grafitis son identificados. }
+  \label{fig:e5-yolo-detections}
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{figures/e7_memory.pdf}
+  \caption[E7, memoria pico por etapa]{E7: memoria pico por etapa. El aglomerativo materializa la matriz
+  $O(n^2)$ de distancias y crece cuadráticamente con $N$; HDBSCAN, DBSCAN y
+  OPTICS se mantienen sublineales.}
+  \label{fig:e7-memory}
+\end{figure}
+
+{\footnotesize
+\begin{longtable}{|p{5.4cm}|p{1.3cm}|p{1.6cm}|p{1.3cm}|} \hline
+  \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} \\ \hline
+  \endhead
+  \texttt{dinov2\_graffiti\_style\_head}     & \textbf{0.851} & \textbf{0.909} & \textbf{0.922} \\ \hline
+  \texttt{mob.\_graffiti\_style\_head}       & 0.760 & 0.818 & 0.835 \\ \hline
+  \texttt{dinov2\_vits14}                    & 0.699 & 0.805 & 0.837 \\ \hline
+  \texttt{mobilenet\_v3}                     & 0.687 & 0.806 & 0.830 \\ \hline
+  \texttt{dinov2\_graffiti\_author\_head}    & 0.674 & 0.804 & 0.832 \\ \hline
+  \texttt{clip\_vit\_b32}                    & 0.669 & 0.792 & 0.825 \\ \hline
+  \texttt{resnet50}                          & 0.654 & 0.789 & 0.829 \\ \hline
+  \texttt{mob.\_graffiti\_author\_head}      & 0.639 & 0.775 & 0.799 \\ \hline
+  \caption[E8a, recuperación supervisada \textit{top-5} (estilo)]{E8a, recuperación supervisada \textit{top-5} por extractor sobre
+  la evaluación de estilo. Reproduce el mismo ordenamiento que el ARI de la
+  tabla~\ref{tab:e8a-best}, lo que descarta que el liderazgo de la cabeza
+  estilística esté inducido por la elección de agrupador.}
+  \label{tab:e8a-retrieval}
+\end{longtable}
+}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/e8a_hdbscan_3clusters.pdf}
+  \caption[Distribución 2D de los recortes de E8a por clúster HDBSCAN]{Representación bidimensional de la distribución de los recortes de E8a
+    en el espacio de características de la cabeza estilística de DINOv2, coloreados
+    por los tres clústeres generados por HDBSCAN.}
+  \label{fig:e8a-hdbscan}
+\end{figure}
+
+{\footnotesize
+\begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.6cm}|p{1.2cm}|p{1.2cm}|} \hline
+  \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} & \textbf{R@5} \\ \hline
+  \endhead
+  \texttt{clip\_vit\_b32}                    & \textbf{0.091} & \textbf{0.252} & \textbf{0.262} & \textbf{0.268} \\ \hline
+  \texttt{resnet50}                          & 0.085 & 0.246 & 0.256 & 0.236 \\ \hline
+  \texttt{mobilenet\_v3}                     & 0.083 & 0.240 & 0.245 & 0.251 \\ \hline
+  \texttt{dinov2\_vits14}                    & 0.081 & 0.248 & 0.251 & \textbf{0.268} \\ \hline
+  \texttt{mob.\_graffiti\_author\_head}      & 0.078 & 0.217 & 0.222 & 0.233 \\ \hline
+  \texttt{dinov2\_graffiti\_author\_head}    & 0.077 & 0.228 & 0.232 & 0.254 \\ \hline
+  \texttt{mob.\_graffiti\_style\_head}       & 0.071 & 0.196 & 0.200 & 0.176 \\ \hline
+  \texttt{dinov2\_graffiti\_style\_head}     & 0.065 & 0.226 & 0.229 & 0.192 \\ \hline
+  \caption[E8b, recuperación supervisada \textit{top-5} (autoría)]{E8b, recuperación supervisada \textit{top-5} por extractor sobre
+  la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
+  campo cabe en una banda estrecha; las cabezas de autoría quedan en la
+  zona media en ambos ejes (ARI y $P@5$), coherentemente con un soporte
+  parcial a piso aleatorio.}
+  \label{tab:e8b-retrieval}
+\end{longtable}
+}
+
 \subsection{Correlación interna--externa: detalle estadístico}
 \label{anexo:correlacion}
 Detalle numérico de la correlación de Pearson silueta--ARI resumida en

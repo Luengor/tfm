@@ -56,16 +56,12 @@ continuación. La excepción es la elección del extractor, que se basa en un
 criterio de calidad supervisada (E8a) que se discute en la sección de
 resultados supervisados (\ref{subsec:res-supervisada}).
 
-A lo largo de toda la subsección las métricas intrínsecas, que denominaremos
-simplemente \textit{calidad intrínseca} (silueta~$\uparrow$, CH~$\uparrow$,
-DB~$\downarrow$; definidas en \ref{subsubsec:eval-intrinseca}) se leen siempre de
-forma conjunta con el número de clústeres, la fracción de ruido y el
-coeficiente de variación de los tamaños de clúster. Tal y como se mencionó en
-la sección anterior, leer la silueta o el CH de forma aislada lleva a
-inversiones consistentes del ranking, porque ambos premian configuraciones
-degeneradas: pocos clústeres grandes y bien separados (CH alto) o particiones
-binarias triviales (silueta alta). El juicio final se emite siempre sobre el
-criterio conjunto, no sobre la métrica.
+La \textit{calidad intrínseca} (silueta~$\uparrow$, CH~$\uparrow$,
+DB~$\downarrow$; definidas en \ref{subsubsec:eval-intrinseca}) se lee siempre
+de forma conjunta con el número de clústeres, el ruido y el coeficiente de
+variación de tamaños. Leer la silueta o el CH de forma aislada premia
+configuraciones degeneradas (pocos clústeres grandes y separados, o particiones
+binarias triviales) y produce inversiones consistentes del ranking.
 
 \subsubsection{Extractor de características}
 \label{subsubsec:res-extractor}
@@ -102,41 +98,28 @@ $N=6416$.
 \end{longtable}
 }
 
-Probablemente, el resultado más llamativo del barrido es la inversión entre
-silueta y Calinski--Harabasz sobre ambas cabezas estilísticas. La silueta cae
-con respecto a su \textit{backbone} (DINOv2: 0.185 \(\to\) 0.155; MobileNetV3:
-0.260 \(\to\) 0.164) mientras que el CH sube en los dos casos (DINOv2: 19.2
-\(\to\) 27.9, solo superado por los \textit{backbones} YOLO; MobileNetV3: 13.1
-\(\to\) 19.7). Este fenómeno, aunque contraintuitivo a primera vista, puede
-explicarse por la naturaleza del entrenamiento contrastivo y los datos
-utilizados: el \textit{contrastive loss} optimiza la relación entre la
-compactación de los \textit{clusters} y su separación (CH), pero no la cohesión
-local de cada punto dentro de su clúster (silueta). En el caso de las cabezas
-estilísticas, entrenadas con recortes y no con imágenes completas como aquí se
-evalúan, este cambio de dominio  junto con la función de pérdida explicaría la
-caída de la silueta.
+El resultado más llamativo del barrido es la inversión entre silueta y
+Calinski--Harabasz sobre ambas cabezas estilísticas: la silueta cae respecto a
+su \textit{backbone} (DINOv2: $0.185\to0.155$; MobileNetV3: $0.260\to0.164$)
+mientras que el CH sube (DINOv2: $19.2\to27.9$; MobileNetV3: $13.1\to19.7$). Es
+coherente con el entrenamiento contrastivo, que optimiza la separación entre
+clústeres (CH) pero no la cohesión local de cada punto (silueta), además de ser
+agravado por un cambio de dominio: las cabezas se entrenaron con recortes, no
+con las imágenes completas evaluadas aquí.
 
 Las CNN entrenadas en ImageNet lideran la silueta (a $N=6416$:
-\texttt{mobilenet\_v3}=0.260, \texttt{resnet50}=0.257), con ruido bajo
-(0.078--0.118) y los clústeres más balanceados (csCV~$\approx$~0.5--0.7). Sin
-embargo, esto no significa que sean los mejores extractores para el
-agrupamiento de grafiti: es muy probable que estos modelos estén realizando un
-buen agrupamiento de apariencia (textura, color, composición) sin que este
-agrupamiento codifique información relevante para el ámbito del grafiti. YOLO,
-por el contrario, pierde en todas las categorías a la vez (a excepción del
-índice CH, que presenta dos de los más altos), confirmando que sus
-características de detección no transfieren a un agrupamiento basado en
-apariencia.
+\texttt{mobilenet\_v3}=0.260, \texttt{resnet50}=0.257), con ruido bajo y
+clústeres balanceados, pero esto no implica que sean mejores agrupando grafiti:
+es probable que estén atrupando por apariencia genérica (textura, color,
+composición) sin codificar información del dominio. Los modelos de YOLO, en
+cambio, pierden en todos los ejes salvo el CH, confirmando que sus
+características de detección no transfieren al agrupamiento por apariencia.
 
-Por otro lado, las métricas que describen el coste del barrido figuran en la
-tabla~\ref{tab:e1-cost-6416} (anexo~\ref{anexo:detalle}).
-\texttt{mobilenet\_v3} es el extractor más barato
-tanto en velocidad como en memoria gráfica (7.93~ips, 32~MB de VRAM) y la
-cabeza añade un sobrecoste pequeño ($\sim$8\,\%, 7.30~ips). Los
-\textit{backbones} YOLO son los más caros (4.5--4.9~ips y $\sim$825~MB de RSS),
-y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
-
-
+En coste (tabla~\ref{tab:e1-cost-6416}, anexo~\ref{anexo:detalle}),
+\texttt{mobilenet\_v3} es el más barato en velocidad y VRAM (7.93~ips, 32~MB) y
+la cabeza añade un sobrecoste pequeño ($\sim$8\,\%); los \textit{backbones}
+YOLO son los más caros ($\sim$825~MB de RSS) y VGG16/CLIP los más exigentes en
+VRAM (552 y 592~MB).
 
 \subsubsection{Reducción y agrupamiento base}
 \label{subsubsec:res-reduccion-resumen}
@@ -218,18 +201,9 @@ recortes de calidad muy variable, muchas veces llegando a no recortar la imagen
 y devolviéndola completa o dejando atrás varios grafitis. Esta variabilidad en
 los datos de entrada, junto con el hecho de que el extractor base no fue
 entrenado con recortes de este tipo, podría ser la causa de la caída de calidad
-y el aumento de coste a medida que el tamaño del banco crece. En la
-figura~\ref{fig:e5-yolo-detections} se muestran ejemplos de detecciones del
-modelo obtenidas durante el proceso de entrenamiento. 
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\linewidth]{figures/val_batch2_pred.jpg}
-  \caption[Ejemplos de detecciones de YOLO]{Ejemplos de detecciones del
-  detector de YOLO durante el entrenamiento. Este es uno de los <<mejores>>
-  casos, en los que la gran mayoría de los grafitis son identificados. }
-  \label{fig:e5-yolo-detections}
-\end{figure}
+y el aumento de coste a medida que el tamaño del banco crece. El
+anexo~\ref{anexo:detalle} (figura~\ref{fig:e5-yolo-detections}) recoge ejemplos
+de detecciones del modelo obtenidas durante el entrenamiento.
 
 Esta conclusión cierra la configuración base del trabajo y la fija como:
 \texttt{dinov2\_graffiti\_style\_head}~+~UMAP-10~+~HDBSCAN
@@ -316,15 +290,6 @@ La caída de UMAP a $N=6416$ refleja el cambio interno a \texttt{pynndescent}.}
   \label{fig:e7-scaling}
 \end{figure}
 
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\linewidth]{figures/e7_memory.pdf}
-  \caption[E7, memoria pico por etapa]{E7: memoria pico por etapa. El aglomerativo materializa la matriz
-  $O(n^2)$ de distancias y crece cuadráticamente con $N$; HDBSCAN, DBSCAN y
-  OPTICS se mantienen sublineales.}
-  \label{fig:e7-memory}
-\end{figure}
-
 \subsubsection{Búsqueda por similitud: \textit{backend} e índice ANN}
 \label{subsubsec:res-similaritysearch}
 El cuello $O(n^2)$ de la búsqueda SQLite identificado en E7 motiva el barrido
@@ -333,32 +298,9 @@ pgvector exacto (escaneo secuencial dentro del SGBD con el \textit{kernel} de
 coseno en C) y pgvector con índice HNSW (\texttt{m}=16,
 \texttt{ef\_construction}=64). La construcción del índice HNSW se cronometra
 una sola vez entre la ingesta y el bucle de búsqueda, así que su coste no se
-acumula sobre el tiempo de consulta.
-
-{\footnotesize
-\begin{longtable}{|p{1.0cm}|p{2.6cm}|p{1.6cm}|p{2.0cm}|p{1.6cm}|p{1.8cm}|} \hline
-  \textbf{$N$} & \textbf{Backend} & \textbf{ss (s)} & \textbf{ips} & \textbf{idx (s)} & \textbf{R@5} \\ \hline
-  \endhead
-   500 & SQLite             & 3.05  &    164 & --     & --    \\ \hline
-   500 & PostgreSQL exacto  & 0.162 &  3 096 & 0.0    & --    \\ \hline
-   500 & PostgreSQL + HNSW  & 0.164 &  3 042 & 0.066  & 1.000 \\ \hline
-  1000 & SQLite             & 6.41  &    156 & --     & --    \\ \hline
-  1000 & PostgreSQL exacto  & 0.190 &  5 257 & 0.0    & --    \\ \hline
-  1000 & PostgreSQL + HNSW  & 0.187 &  5 353 & 0.136  & 1.000 \\ \hline
-  2500 & SQLite             & 16.89 &    148 & --     & --    \\ \hline
-  2500 & PostgreSQL exacto  & 0.234 & 10 678 & 0.0    & --    \\ \hline
-  2500 & PostgreSQL + HNSW  & 0.166 & 15 092 & 0.372  & 1.000 \\ \hline
-  6416 & SQLite             & 43.10 &    149 & --     & --    \\ \hline
-  6416 & PostgreSQL exacto  & 0.578 & 11 109 & 0.0    & --    \\ \hline
-  6416 & PostgreSQL + HNSW  & 0.179 & 35 936 & 0.465  & 1.000 \\ \hline
-  \caption[E6, latencia y \textit{recall} por \textit{backend}]{E6, latencia, \textit{throughput} y \textit{recall} de la búsqueda
-  por similitud por \textit{backend} y tamaño de banco. SQLite escala
-  linealmente en tiempo por consulta; pgvector exacto está dominado por la
-  latencia de \textit{round-trip} en los tamaños pequeños; HNSW solo se
-  separa visiblemente por encima de $N\approx 2500$.}
-  \label{tab:e6-storage}
-\end{longtable}
-}
+acumula sobre el tiempo de consulta. La tabla~\ref{tab:e6-storage}
+(anexo~\ref{anexo:detalle}) recoge la latencia, el \textit{throughput} y el
+\textit{recall} por \textit{backend} y tamaño de banco.
 
 SQLite mantiene un \textit{throughput} aproximadamente plano ($\sim$150~ips)
 con tiempo de ejecución lineal en $N$. PostgreSQL exacto eleva el
@@ -471,57 +413,23 @@ distinta.
 
 La señal secundaria de recuperación supervisada (búsqueda por similitud con
 $k=5$, evaluada frente a la etiqueta de la consulta) confirma el ordenamiento
-y prescinde de la elección de agrupador. La tabla~\ref{tab:e8a-retrieval}
-muestra que la cabeza estilística de DINOv2 ocupa la primera posición en los
-tres índices (P@5~$=0.851$, MAP@5~$=0.909$, MRR~$=0.922$) y que el orden por
-P@5 reproduce, en grandes trazos, el ranking por ARI: cabezas de estilo
-arriba, \textit{backbones} sin entrenar en el bloque intermedio y cabezas de
-autoría en la parte baja. La cabeza de autor de MobileNetV3 es el peor
-recuperador del panel ($0.639$), consistente con su caída de ARI por debajo
-del propio \textit{backbone}.
+y prescinde de la elección de agrupador: la cabeza estilística de DINOv2 ocupa
+la primera posición en los tres índices (P@5~$=0.851$, MAP@5~$=0.909$,
+MRR~$=0.922$) y el orden por P@5 reproduce, en grandes trazos, el ranking por
+ARI (cabezas de estilo arriba, \textit{backbones} sin entrenar en el bloque
+intermedio y cabezas de autoría en la parte baja), lo que descarta que el
+liderazgo de la cabeza esté inducido por la elección de agrupador. El detalle
+por extractor figura en el anexo~\ref{anexo:detalle}
+(tabla~\ref{tab:e8a-retrieval}).
 
-{\footnotesize
-\begin{longtable}{|p{5.4cm}|p{1.3cm}|p{1.6cm}|p{1.3cm}|} \hline
-  \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} \\ \hline
-  \endhead
-  \texttt{dinov2\_graffiti\_style\_head}     & \textbf{0.851} & \textbf{0.909} & \textbf{0.922} \\ \hline
-  \texttt{mob.\_graffiti\_style\_head}       & 0.760 & 0.818 & 0.835 \\ \hline
-  \texttt{dinov2\_vits14}                    & 0.699 & 0.805 & 0.837 \\ \hline
-  \texttt{mobilenet\_v3}                     & 0.687 & 0.806 & 0.830 \\ \hline
-  \texttt{dinov2\_graffiti\_author\_head}    & 0.674 & 0.804 & 0.832 \\ \hline
-  \texttt{clip\_vit\_b32}                    & 0.669 & 0.792 & 0.825 \\ \hline
-  \texttt{resnet50}                          & 0.654 & 0.789 & 0.829 \\ \hline
-  \texttt{mob.\_graffiti\_author\_head}      & 0.639 & 0.775 & 0.799 \\ \hline
-  \caption[E8a, recuperación supervisada \textit{top-5} (estilo)]{E8a, recuperación supervisada \textit{top-5} por extractor sobre
-  la evaluación de estilo. Reproduce el mismo ordenamiento que el ARI de la
-  tabla~\ref{tab:e8a-best}, lo que descarta que el liderazgo de la cabeza
-  estilística esté inducido por la elección de agrupador.}
-  \label{tab:e8a-retrieval}
-\end{longtable}
-}
-
-HDBSCAN no parece llegar a distinguir las cuatro categorías de estilo posibles
-como clústeres separados, sino que las agrupa en tres grupos. Tras una revisión
-manual de los clústeres generados, parece que HDBSCAN agrupa los grafitis en
-\enquote{sencillos}, \enquote{elaborados} y \enquote{characters} (color
-naranja, verde y azul en la figura~\ref{fig:e8a-hdbscan}). El primero de estos
-grupos, con unos 150 recortes, está principalmente formado por \textit{tags} y
-algunos \textit{throw-ups} más simples. El segundo, con aproximadamente 120
-recortes, está formado por \textit{throw-ups} más elaborados y la gran mayoría
-de los \textit{pieces}. El tercero y el más pequeño con diferencia, con solo 17
-recortes, está formado por los \textit{characters} de estilo cómic, manga o
-grafiti de personajes. La figura~\ref{fig:e8a-clusters}
-(anexo~\ref{anexo:detalle}) muestra recortes de ejemplo de cada clúster.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.9\linewidth]{figures/e8a_hdbscan_3clusters.pdf}
-  \caption[Distribución 2D de los recortes de E8a por clúster HDBSCAN]{Representación bidimensional de la distribución de los recortes de E8a
-    en el espacio de características de la cabeza estilística de DINOv2, coloreados
-    por los tres clústeres generados por HDBSCAN.}
-  \label{fig:e8a-hdbscan}
-\end{figure}
-
+HDBSCAN no distingue las cuatro categorías de estilo como clústeres separados,
+sino que las funde en tres grupos. Una revisión manual los identifica como
+\enquote{sencillos} ($\sim$150 recortes: \textit{tags} y \textit{throw-ups}
+simples), \enquote{elaborados} ($\sim$120: \textit{throw-ups} elaborados y la
+mayoría de \textit{pieces}) y \enquote{characters} (solo 17: personajes de
+estilo cómic o manga). El anexo~\ref{anexo:detalle} muestra su distribución 2D
+(figura~\ref{fig:e8a-hdbscan}) y recortes de ejemplo
+(figura~\ref{fig:e8a-clusters}).
 
 \subsubsection{Evaluación por autor}
 \label{subsubsec:res-autor}
@@ -558,18 +466,11 @@ y supera a la cabeza de estilo (0.041).
 \end{longtable}
 }
 
-E8b es un resultado negativo, pero esperado. La tarea de clasificación por
-estilo es considerablemente más sencilla que la de agrupamiento por autoría,
-que además se ve afectada por un desplazamiento de dominio más severo y un
-conjunto de datos de peor calidad. Sería necesario anotar muchos más recortes y
-de más autores (probablemente más de los que hay en el dataset completo) para
-obtener resultados de agrupamiento por autoría aceptables. Otra posibilidad
-sería pre-entrenar los modelos de autoría sobre un conjunto de datos de grafiti
-de manera no supervisada, y luego hacer el \textit{fine-tuning} supervisado
-sobre el conjunto de autoría anotado. Esto último requeriría una gran cantidad
-de imágenes de grafiti y el uso del dataset completo podría ser un buen punto de
-partida, pero su uso provocaría un sesgo de selección importante al evaluar
-sobre el mismo conjunto utilizado para pre-entrenar la red.
+E8b es un resultado negativo, pero esperado. La clasificación por estilo es
+mucho más sencilla que el agrupamiento por autoría, que además sufre un
+desplazamiento de dominio más severo y utiliza un conjunto de peor calidad.
+Obtener resultados de autoría aceptables exigiría anotar muchos más recortes y
+autores (probablemente más de los que contiene el dataset completo).
 
 El problema de recuperación sigue la misma tendencia que el anterior,
 empeorando aún más la posición de las cabezas de autoría. CLIP sigue siendo el
@@ -579,28 +480,9 @@ MobileNetV3 (0.083), DINOv2 base (0.081) y las dos cabezas de autoría
 caso, las cabezas entrenadas para esta tarea específica se sitúan por debajo de
 los extractores sin entrenar, lo que es consistente con la caída de ARI y con
 la hipótesis de que el \textit{fine-tuning} para autoría no consigue una
-representación útil para esta tarea.
-
-{\footnotesize
-\begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.6cm}|p{1.2cm}|p{1.2cm}|} \hline
-  \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} & \textbf{R@5} \\ \hline
-  \endhead
-  \texttt{clip\_vit\_b32}                    & \textbf{0.091} & \textbf{0.252} & \textbf{0.262} & \textbf{0.268} \\ \hline
-  \texttt{resnet50}                          & 0.085 & 0.246 & 0.256 & 0.236 \\ \hline
-  \texttt{mobilenet\_v3}                     & 0.083 & 0.240 & 0.245 & 0.251 \\ \hline
-  \texttt{dinov2\_vits14}                    & 0.081 & 0.248 & 0.251 & \textbf{0.268} \\ \hline
-  \texttt{mob.\_graffiti\_author\_head}      & 0.078 & 0.217 & 0.222 & 0.233 \\ \hline
-  \texttt{dinov2\_graffiti\_author\_head}    & 0.077 & 0.228 & 0.232 & 0.254 \\ \hline
-  \texttt{mob.\_graffiti\_style\_head}       & 0.071 & 0.196 & 0.200 & 0.176 \\ \hline
-  \texttt{dinov2\_graffiti\_style\_head}     & 0.065 & 0.226 & 0.229 & 0.192 \\ \hline
-  \caption[E8b, recuperación supervisada \textit{top-5} (autoría)]{E8b, recuperación supervisada \textit{top-5} por extractor sobre
-  la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
-  campo cabe en una banda estrecha; las cabezas de autoría quedan en la
-  zona media en ambos ejes (ARI y $P@5$), coherentemente con un soporte
-  parcial a piso aleatorio.}
-  \label{tab:e8b-retrieval}
-\end{longtable}
-}
+representación útil para esta tarea. El detalle por extractor (línea base
+aleatoria $P@5 \approx 0.024$) figura en el anexo~\ref{anexo:detalle}
+(tabla~\ref{tab:e8b-retrieval}).
 
 \subsubsection{Correlación interna-externa}
 \label{subsubsec:res-correlacion}
@@ -610,24 +492,13 @@ $n=48$, $p<10^{-7}$ sobre agrupadores de $k$ fijo) pero se desvanece en autoría
 (E8b), donde todo el rango de ARI vive en una banda cercana al azar y el signo
 del coeficiente carece de peso práctico.
 
-El factor común en ambas métricas es la granularidad de la verdad de
-referencia. La silueta recompensa pocos clústeres grandes y cohesivos. Con
-verdad de grano grueso (4 estilos) eso coincide con lo que el ARI reconoce como
-correcto, y el valor de la silueta suele ser defendible cuando $k$ está fijado.
-Con verdad de grano fino (87 autores) ocurre lo contrario: las celdas de mayor
-ARI son agrupamientos con $k=87$, que por fuerza obtienen una silueta casi nula
-(87 clústeres diminutos no pueden ser cohesivos), mientras que las de mayor
-silueta son las particiones degeneradas de HDBSCAN ($k=2$ o $k=3$) con un ARI
-nulo.
-
-En resumen, la silueta es una métrica intrínseca adecuada para ordenar
-configuraciones a granularidad de estilo, pero no de autoría. La interpretación
-es la ya anticipada en calibración: las CNN entrenadas en ImageNet agrupan por
-apariencia genérica (textura, color, composición), y esa estructura es lo que la
-silueta detecta como conjuntos bien definidos, sin codificar la información
-estilística del dominio. Por eso su liderazgo intrínseco en E1 a $N=6416$ no se
-traduce en ventaja supervisada en E8a: la silueta mide cohesión de apariencia,
-no identidad estilística.
+El factor decisivo es la granularidad de la verdad de referencia. La silueta
+recompensa pocos clústeres grandes y cohesivos: con grano grueso (4 estilos)
+eso coincide con lo que el ARI premia, pero con grano fino (87 autores) ocurre
+lo contrario, pues las celdas de mayor ARI tienen $k=87$ —y por fuerza una
+silueta casi nula— mientras que las de mayor silueta son las particiones
+degeneradas de HDBSCAN ($k=2$ o $3$) con ARI nulo. La silueta sirve, pues, para
+ordenar configuraciones a granularidad de estilo, pero no de autoría.
 
 La consecuencia práctica es la elección del extractor base: la cabeza
 estilística de DINOv2, uno de los peores modelos por métricas intrínsecas en el
