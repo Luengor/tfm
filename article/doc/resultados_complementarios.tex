@@ -1,15 +1,16 @@
 %\! TeX root: ../article.tex
-% Anexo de calibración: contenido trasladado del cuerpo al recortar a ~20pp.
-% Hallazgos de calibración E2/E3/E4 y detalle de correlación interna-externa.
+% Anexo de resultados complementarios: contenido trasladado del cuerpo al
+% recortar a ~20pp. Calibración E2/E3/E4, tablas/figuras de detalle y el
+% detalle estadístico de la correlación interna-externa.
 
-\section{Calibración complementaria del \textit{pipeline}}
-\label{anexo:calibracion}
-Este anexo desarrolla los barridos E2 (reducción), E3 (agrupamiento) y E4
-(granularidad de HDBSCAN) que fijan las etapas intermedias del \textit{pipeline}
-base. El cuerpo del artículo (\ref{subsec:res-calibracion}) resume sus
-conclusiones; aquí se recogen las tablas, figuras y la discusión completa.
+\section{Resultados complementarios}
+\label{anexo:resultados}
+Este anexo recoge material de resultados trasladado del cuerpo: el desarrollo
+completo de los barridos de calibración E2/E3/E4, tablas y figuras de detalle
+cuyo contenido se resume en el cuerpo, y el detalle estadístico de la
+correlación interna--externa.
 
-\subsection{Reducción de dimensionalidad}
+\subsection{Calibración: reducción de dimensionalidad}
 \label{subsubsec:res-reduccion}
 Reducir la dimensionalidad de los vectores de características es un paso común
 en los \textit{pipelines} de agrupamiento. Sobre los vectores de 128
@@ -77,7 +78,7 @@ general.
   \label{fig:e2-reduction}
 \end{figure}
 
-\subsection{Algoritmo de agrupamiento}
+\subsection{Calibración: algoritmo de agrupamiento}
 \label{subsubsec:res-agrupamiento}
 HDBSCAN es el único agrupador del panel que combina una silueta competitiva,
 escalado sensato del número de clústeres con $N$, ruido moderado, tamaños
@@ -156,7 +157,7 @@ la de HDBSCAN.}
   \label{fig:e3-scaling}
 \end{figure}
 
-\subsection{Granularidad de HDBSCAN}
+\subsection{Calibración: granularidad de HDBSCAN}
 \label{subsubsec:res-mincluster}
 Una vez escogido HDBSCAN como algoritmo de agrupamiento, el siguiente paso es
 calibrar su hiperparámetro de granularidad \texttt{min\_cluster\_size} (mcs).
@@ -204,7 +205,13 @@ demasiado grueso. Esta decisión se ve reforzada en el experimento E8a, donde
 las métricas supervisadas favorecen a la configuración escogida frente a la
 otra.
 
-\section{Correlación interna--externa: detalle estadístico}
+\subsection{Tablas y figuras de detalle}
+\label{anexo:detalle}
+Material de detalle cuyo resumen se presenta en el cuerpo (sección
+\ref{sec:results}): tablas de coste y figuras redundantes con su representación
+preferida en el cuerpo, conservadas aquí por completitud y reproducibilidad.
+
+\subsection{Correlación interna--externa: detalle estadístico}
 \label{anexo:correlacion}
 Detalle numérico de la correlación de Pearson silueta--ARI resumida en
 \ref{subsubsec:res-correlacion}.
