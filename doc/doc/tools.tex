@@ -80,6 +80,8 @@ y las $6416$ restantes constituyen el conjunto de evaluación sin supervisión
 del sistema completo, del que nunca se extraen recortes de entrenamiento.
 
 \begin{table}[h!]
+  \caption[Categorías estilísticas etiquetadas]{Categorías estilísticas etiquetadas, con un recorte de ejemplo y su definición.}
+  \label{tab:estilos-definiciones}
   \centering
   \renewcommand{\arraystretch}{1.4}%
   \begin{tabular}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}m{1.8cm}|m{0.55\linewidth}|} \hline
@@ -89,8 +91,6 @@ del sistema completo, del que nunca se extraen recortes de entrenamiento.
     \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_piece.jpg} & \textit{piece} & Obra elaborada, multicolor y con letras complejas, sombreados y mayor inversión de tiempo. \\ \hline
     \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_character.jpg} & \textit{character} & Figura o personaje ilustrado en lugar de letras, a menudo acompañando a otras categorías. \\ \hline
   \end{tabular}
-  \caption[Categorías estilísticas etiquetadas]{Categorías estilísticas etiquetadas, con un recorte de ejemplo y su definición.}
-  \label{tab:estilos-definiciones}
 \end{table}
 
 La figura~\ref{fig:dataset-style-distribution} muestra la distribución por
@@ -116,6 +116,10 @@ La tabla~\ref{tab:subconjuntos} resume los subconjuntos etiquetados empleados,
 su propósito, procedencia y tamaño.
 
 \begin{table}[h!]
+  \caption[Subconjuntos etiquetados empleados]{Subconjuntos empleados (en recortes, salvo detección y no
+  supervisión, en imágenes). Los recortes de entrenamiento nunca se solapan con
+  los de evaluación.}
+  \label{tab:subconjuntos}
   \centering
   \begin{tabular}{|l|l|l|r|} \hline
     \textbf{Subconjunto} & \textbf{Propósito} & \textbf{Procedencia} & \textbf{Tamaño} \\ \hline
@@ -126,10 +130,6 @@ su propósito, procedencia y tamaño.
     Detección & Ajuste del detector & Ambos bancos & $447$ \\ \hline
     No superv. & Agrupamiento & Salamanca (disjunto) & $6416$ \\ \hline
   \end{tabular}
-  \caption[Subconjuntos etiquetados empleados]{Subconjuntos empleados (en recortes, salvo detección y no
-  supervisión, en imágenes). Los recortes de entrenamiento nunca se solapan con
-  los de evaluación.}
-  \label{tab:subconjuntos}
 \end{table}
 
 \subsection{Marco conceptual}
@@ -534,6 +534,10 @@ tabla~\ref{tab:dependencias} recoge las versiones de las dependencias
 principales.
 
 \begin{table}[h!]
+  \caption[Versiones de las dependencias principales]{Versiones de las
+  dependencias principales del proyecto. Salvo PyTorch (fijado de forma
+  exacta), corresponden al requisito mínimo declarado.}
+  \label{tab:dependencias}
   \centering
   \begin{tabular}{|l|l||l|l|} \hline
     \textbf{Dependencia} & \textbf{Versión} & \textbf{Dependencia} & \textbf{Versión} \\ \hline
@@ -546,9 +550,5 @@ principales.
     \textit{seaborn} & 0.13.0  & \textit{psutil}       & 6.1.1  \\ \hline
     \textit{tqdm}    & 4.67.3  & \textit{psycopg2}     & 2.9.11 \\ \hline
   \end{tabular}
-  \caption[Versiones de las dependencias principales]{Versiones de las
-  dependencias principales del proyecto. Salvo PyTorch (fijado de forma
-  exacta), corresponden al requisito mínimo declarado.}
-  \label{tab:dependencias}
 \end{table}
 
