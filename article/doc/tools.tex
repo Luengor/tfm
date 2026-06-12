@@ -4,50 +4,12 @@
 
 \subsection{Conjunto de datos}
 \label{subsec:dataset}
-El banco de imágenes de grafiti utilizado en este trabajo se compone de $6681$
-fotografías capturadas en condiciones reales en la ciudad de Salamanca. En la
-figura~\ref{fig:dataset-location-distribution} se puede ver un mapa con la
-ubicación de las imágenes capturadas en la ciudad que contenían información de
-GPS. Las imágenes presentan una alta variabilidad cromática y de escenas
-urbanas, con condiciones de iluminación diversas. Tampoco existe un lienzo por
-defecto para los grafitis, sino que aparecen en muros, puertas, vallas y
-mobiliario urbano en general. En muchas ocasiones, y debido a la alta densidad
-de grafitis en ciertas zonas, una misma imagen puede contener varios grafitis
-distintos, lo que añade complejidad a cualquier labor de clasificación o
-agrupamiento.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\linewidth]{figures/map_with_photos.pdf}
-  \caption[Ubicación de las imágenes agrupadas]{Ubicación de las imágenes con
-  información de GPS en la ciudad de Salamanca.}
-  \label{fig:dataset-location-distribution}
-\end{figure}
-
-Las fotografías comenzaron a tomarse a mediados de $2022$, aunque no fue hasta
-el otoño de ese mismo año que se intensificó la toma de imágenes, capturando
-prácticamente el datset completo en el mes de octubre de ese año. Durante el
-primer trimestre de $2023$ se tomaron las últimas 500 fotografías de manera más
-dispersa (evolución temporal en la
-figura~\ref{fig:dataset-capture-evolution}, anexo~\ref{anexo:materiales}).
-
-Todas las imágenes se tomaron con un teléfono móvil, en específico con un
-Samsung Galaxy S7 Edge. La resolución de las imágenes suele ser de $4032 \times
-3024$ o $4032 \times 2268$ píxeles, con una definición media de $10.6$~MP. No
-se ha aplicado ningún tipo de filtrado ni postprocesado sobre las imágenes
-originales más que el realizado por defecto por el dispositivo, de modo que la
-evaluación opera directamente sobre el material en bruto.
-
-De manera adicional a este banco de datos, se dispone de otro conjunto de
-$1106$ imágenes de la ciudad de Cuenca cedidas por la iniciativa
-StopGrafiti\footnote{\url{https://stopgrafiti.com/}}. Estas imágenes, aunque no
-se incluyen en el banco principal, se utilizan para el ajuste fino del detector
-de grafitis, así como de las cabezas de proyección ajustadas al dominio. El
-conjunto de StopGrafiti fue especialmente útil para esto, puesto que se trata
-de un banco de grafiti con autores, estilos y entornos distintos a los de
-Salamanca, lo que permite evitar el sesgo de solapamiento entre entrenamiento y
-evaluación que se produciría si se empleara el banco principal para ajustar
-todos los modelos.
+El banco de imágenes de grafiti proporcionado para este trabajo se compone de
+$6681$ fotografías capturadas en condiciones reales en la ciudad de Salamanca,
+tomadas entre $2022$ y $2023$. De manera adicional, se dispone de un conjunto
+de datos adicional de $1106$ imágenes de la ciudad de Cuenca, cedidas por la
+iniciativa StopGrafiti\footnote{\url{https://stopgrafiti.com/}}, que se emplea
+para el ajuste fino de algunos componentes del sistema.
 
 Ninguno de los dos bancos de datos cuenta con anotaciones de ningún tipo, lo
 que impide la evaluación supervisada directa de los modelos. Además, la
@@ -58,46 +20,26 @@ de modo que la evaluación supervisada se realice sobre estos recortes
 etiquetados.
 
 Se etiquetan manualmente recortes por estilo, asignándoles una de las cuatro
-categorías estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
-\textit{character}) definidas e ilustradas en la tabla~\ref{tab:estilos-definiciones}, y otros
-recortes por autoría. La procedencia de cada subconjunto difiere: el
-entrenamiento de estilo contiene recortes del banco principal, mientras que el
-de autoría se restringe a StopGrafiti; el reparto y su justificación se
-detallan al describir la evaluación extrínseca
-(\ref{subsubsec:eval-extrinseca}). De cualquier manera, de las $6681$ imágenes
-de Salamanca, $265$ se reservan para entrenamiento (ajuste fino del detector y
-de las cabezas, así como los recortes de autoría), y las $6416$ ($5880+536$)
-restantes constituyen el conjunto de evaluación sin supervisión del sistema
-completo, del que nunca se extraen recortes de entrenamiento.
+categorías estilísticas (firmas rápidas, \textit{tags}; letras redondeadas con
+no más de dos colores, \textit{throw-ups}; texto mucho más elaborado,
+\textit{pieces}; y personajes animados u otros elementos que no sean texto,
+\textit{characters}), y otros recortes por autoría. La procedencia de cada
+subconjunto difiere: el entrenamiento de estilo contiene recortes del banco
+principal, mientras que el de autoría se restringe a StopGrafiti; el reparto y
+su justificación se detallan al describir la evaluación extrínseca
+(\ref{subsubsec:eval-extrinseca}). El reparto por clase de los recortes
+etiquetados por estilo es desigual: las categorías \textit{tag}, \textit{piece}
+y \textit{throw-up} concentran la mayor parte de los recortes, mientras que
+\textit{character} resulta claramente minoritaria, lo que condiciona la
+interpretación posterior de las métricas extrínsecas por estilo. Por último, se
+utilizan imágenes de ambos grupos para el ajuste fino del detector de grafitis.
 
-\begin{table}[h!]
-  \centering
-  \renewcommand{\arraystretch}{1.4}%
-  \begin{tabular}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}m{1.8cm}|m{0.55\linewidth}|} \hline
-    \textbf{Ejemplo} & \textbf{Categoría} & \textbf{Definición} \\ \hline
-    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_tag.jpg} & \textit{tag} & Firma estilizada del autor, monocroma y de trazo rápido en una sola línea; es la forma más simple y frecuente. \\ \hline
-    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_throwup.jpg} & \textit{throw-up} & Nombre escrito en letras redondeadas, normalmente con no más de dos colores (contorno y relleno) y ejecución veloz. \\ \hline
-    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_piece.jpg} & \textit{piece} & Obra elaborada, multicolor y con letras complejas, sombreados y mayor inversión de tiempo. \\ \hline
-    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_character.jpg} & \textit{character} & Figura o personaje ilustrado en lugar de letras, a menudo acompañando a otras categorías. \\ \hline
-  \end{tabular}
-  \caption[Categorías estilísticas etiquetadas]{Categorías estilísticas etiquetadas, con un recorte de ejemplo y su definición.}
-  \label{tab:estilos-definiciones}
-\end{table}
-
-El reparto por clase de los recortes etiquetados por estilo es desigual: las
-categorías \textit{tag}, \textit{piece} y \textit{throw-up} concentran la mayor
-parte de los recortes, mientras que \textit{character} resulta claramente
-minoritaria (distribución detallada en la
-figura~\ref{fig:dataset-style-distribution}, anexo~\ref{anexo:materiales}), lo
-que condiciona la interpretación posterior de las métricas extrínsecas por
-estilo.
-
-Por último, se utilizan imágenes de ambos grupos para el ajuste fino del
-detector de grafitis, con un total de $447$ imágenes completamente anotadas con
-las cajas de los grafitis.
-
-La tabla~\ref{tab:subconjuntos} resume los subconjuntos etiquetados empleados,
-su propósito, procedencia y tamaño.
+De las $6681$ imágenes de Salamanca, $265$ se reservan para entrenamiento
+(ajuste fino del detector y de las cabezas, así como los recortes de autoría),
+y las $6416$ restantes constituyen el conjunto de evaluación sin supervisión
+del sistema completo, del que nunca se extraen recortes de entrenamiento. La
+tabla~\ref{tab:subconjuntos} resume los subconjuntos etiquetados empleados, su
+propósito, procedencia y tamaño.
 
 \begin{table}[h!]
   \centering
