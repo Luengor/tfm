@@ -211,6 +211,68 @@ Material de detalle cuyo resumen se presenta en el cuerpo (sección
 \ref{sec:results}): tablas de coste y figuras redundantes con su representación
 preferida en el cuerpo, conservadas aquí por completitud y reproducibilidad.
 
+% --- movido del cuerpo (Batch 4): coste E1, silueta E1, coste E7, ejemplos de clúster E8a ---
+
+{\footnotesize
+\begin{longtable}{|p{5.4cm}|p{1.7cm}|p{1.0cm}|p{1.4cm}|p{1.4cm}|} \hline
+  \textbf{Extractor} & \textbf{ingesta (s)} & \textbf{ips} & \textbf{RSS pico (MB)} & \textbf{VRAM (MB)} \\ \hline
+  \endhead
+  \texttt{mobilenet\_v3}                  & \textbf{808.8}  & \textbf{7.93} & 366.0 & \textbf{31.8}  \\ \hline
+  \texttt{mob.\_graffiti\_author\_head}   & 879.1  & 7.30 & 406.4 & 34.5  \\ \hline
+  \texttt{inception\_v3}                  & 973.7  & 6.59 & 337.2 & 116.1 \\ \hline
+  \texttt{vgg16}                          & 980.8  & 6.54 & 315.0 & 551.7 \\ \hline
+  \texttt{resnet50}                       & 1080.0 & 5.94 & 336.0 & 117.8 \\ \hline
+  \texttt{dinov2\_vits14}                 & 1215.7 & 5.28 & 209.6 & 98.0  \\ \hline
+  \texttt{dinov2\_graffiti\_style\_head}  & 1245.0 & 5.15 & 286.2 & 99.7  \\ \hline
+  \texttt{clip\_vit\_b32}                 & 1247.0 & 5.15 & \textbf{193.1} & 591.9 \\ \hline
+  \texttt{yolon}                          & 1301.0 & 4.93 & 853.8 & 65.4  \\ \hline
+  \texttt{yolom}                          & 1407.4 & 4.56 & 824.9 & 192.9 \\ \hline
+  \caption[E1, coste de ingesta a $N=6416$.]{E1, coste de ingesta a $N=6416$. La cabeza añade un sobrecoste
+  despreciable sobre el \textit{backbone}; los \textit{backbones} YOLO son los
+  más caros simultáneamente en tiempo y RSS. Se muestran 10 de los 12
+  extractores (las cabezas \texttt{mob.\_graffiti\_style\_head} y
+  \texttt{dinov2\_graffiti\_author\_head} se omiten por brevedad; su coste cae
+  dentro del rango de la cabeza correspondiente ya presente.)}
+  \label{tab:e1-cost-6416}
+\end{longtable}
+}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=\linewidth]{figures/e1_silhouette_by_embedding.pdf}
+  \caption[E1, silueta por extractor]{E1: silueta por extractor a tres tamaños
+      de banco. Las CNN entrenadas en ImageNet encabezan la columna, pero la
+  cabeza estilística de DINOv2 invierte silueta/CH (ver texto).}
+  \label{fig:e1-silhouette}
+\end{figure}
+
+{\footnotesize
+\begin{longtable}{|p{1.0cm}|p{1.6cm}|p{1.2cm}|p{2.0cm}|p{2.0cm}|p{1.4cm}|p{2.0cm}|} \hline
+  \textbf{$N$} & \textbf{ingesta (s)} & \textbf{red (s)} & \textbf{HDBSCAN (s)} & \textbf{K-medias (s)} & \textbf{aglo (s)} & \textbf{búsqueda (s)} \\ \hline
+  \endhead
+   250 &   58.7 &  0.253 & 0.0038 & 0.0025 & 0.0019 &   3.66 \\ \hline
+   500 &  115.7 &  0.603 & 0.0069 & 0.0027 & 0.0046 &  16.32 \\ \hline
+  1000 &  231.6 &  1.514 & 0.0144 & 0.0033 & 0.0117 &  63.28 \\ \hline
+  2000 &  455.9 &  4.542 & 0.1106 & 0.0047 & 0.0427 & 306.81 \\ \hline
+  3500 &  776.0 & 11.870 & 0.1863 & 0.0066 & 0.1405 & 995.52 \\ \hline
+  6416 & 1294.9 &  6.237 & 0.3580 & 0.0098 & 0.5988 & 3266.60 \\ \hline
+  \caption[E7, tiempo por etapa frente a $N$]{E7, tiempo por etapa frente a $N$ (extracto). A $N=6416$ la búsqueda
+  por similitud SQLite domina absolutamente, con la ingesta como segundo coste.
+La caída de UMAP a $N=6416$ se discute en el texto.}
+  \label{tab:e7-cost}
+\end{longtable}
+}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.85\linewidth]{figures/cluster_simple.pdf}\\[2pt]
+  \includegraphics[width=0.85\linewidth]{figures/cluster_elaborate.pdf}\\[2pt]
+  \includegraphics[width=0.85\linewidth]{figures/cluster_characters.pdf}
+  \caption[Ejemplos de recortes por clúster HDBSCAN en E8a]{Ejemplos de recortes
+  de cada uno de los tres clústeres de E8a (de arriba a abajo: sencillo,
+  elaborado y \textit{characters}).}
+  \label{fig:e8a-clusters}
+\end{figure}
 \subsection{Correlación interna--externa: detalle estadístico}
 \label{anexo:correlacion}
 Detalle numérico de la correlación de Pearson silueta--ARI resumida en
