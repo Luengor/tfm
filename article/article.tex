@@ -2,12 +2,15 @@
 
 \usepackage{babel}
 \babelprovide[import, main]{spanish}
+% Spanish babel usa "Cuadro" por defecto; forzar "Tabla".
+\AtBeginDocument{\renewcommand{\tablename}{Tabla}}
 
 \usepackage[T1]{fontenc}
 \usepackage{graphicx}
 \graphicspath{{figures/}}
 \usepackage{amsmath, amssymb}
 
+\usepackage{longtable}
 \usepackage{array}
 % Comillas localizadas al idioma (\enquote).
 \usepackage{csquotes}
