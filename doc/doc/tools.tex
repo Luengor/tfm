@@ -4,116 +4,42 @@
 
 \subsection{Conjunto de datos}
 \label{subsec:dataset}
-El banco de imágenes de grafiti utilizado en este trabajo se compone de $6681$
-fotografías capturadas en condiciones reales en la ciudad de Salamanca. En la
-figura~\ref{fig:dataset-location-distribution} se puede ver un mapa con la
-ubicación de las imágenes capturadas en la ciudad que contenían información de
-GPS. Las imágenes presentan una alta variabilidad cromática y de escenas
-urbanas, con condiciones de iluminación diversas. Tampoco existe un lienzo por
-defecto para los grafitis, sino que aparecen en muros, puertas, vallas y
-mobiliario urbano en general. En muchas ocasiones, y debido a la alta densidad
-de grafitis en ciertas zonas, una misma imagen puede contener varios grafitis
-distintos, lo que añade complejidad a cualquier labor de clasificación o
-agrupamiento.
+El banco principal se compone de $6681$ fotografías de grafiti capturadas en
+condiciones reales en la ciudad de Salamanca, con un teléfono móvil (Samsung
+Galaxy S7 Edge, $\sim$10.6~MP), sin filtrado ni postprocesado más allá del
+realizado por el dispositivo. Presentan alta variabilidad cromática y de escena
+(muros, puertas, vallas y mobiliario urbano), iluminación diversa y, con
+frecuencia, varios grafitis por imagen, lo que añade complejidad a cualquier
+agrupamiento. De forma adicional se dispone de $1106$ imágenes de Cuenca cedidas
+por la iniciativa StopGrafiti\footnote{\url{https://stopgrafiti.com/}}, con
+autores, estilos y entornos distintos a los de Salamanca; se emplean para el
+ajuste fino del detector y de las cabezas, evitando el sesgo de solapamiento
+entre entrenamiento y evaluación.
 
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\linewidth]{figures/map_with_photos.pdf}
-  \caption[Ubicación de las imágenes agrupadas]{Ubicación de las imágenes con
-  información de GPS en la ciudad de Salamanca.}
-  \label{fig:dataset-location-distribution}
-\end{figure}
-
-Las fotografías comenzaron a tomarse a mediados de $2022$, aunque no fue hasta
-el otoño de ese mismo año que se intensificó la toma de imágenes, capturando
-prácticamente el datset completo en el mes de octubre de ese año. Durante el
-primer trimestre de $2023$ se tomaron las últimas 500 fotografías de manera más
-dispersa, como se puede ver en la figura~\ref{fig:dataset-capture-evolution}.
-
-Todas las imágenes se tomaron con un teléfono móvil, en específico con un
-Samsung Galaxy S7 Edge. La resolución de las imágenes suele ser de $4032 \times
-3024$ o $4032 \times 2268$ píxeles, con una definición media de $10.6$~MP. No
-se ha aplicado ningún tipo de filtrado ni postprocesado sobre las imágenes
-originales más que el realizado por defecto por el dispositivo, de modo que la
-evaluación opera directamente sobre el material en bruto.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\linewidth]{figures/dataset-evolution.pdf}
-  \caption[Progreso de la toma de imágenes de grafiti]{Progreso de toma de imágenes
-  de grafiti a lo largo del tiempo. La gran mayoría de las imágenes se
-capturaron en el otoño de 2022. Durante el primer trimestre de 2023 se
-añadieron las últimas 500 imágenes al conjunto de datos.}
-  \label{fig:dataset-capture-evolution}
-\end{figure}
-
-De manera adicional a este banco de datos, se dispone de otro conjunto de
-$1106$ imágenes de la ciudad de Cuenca cedidas por la iniciativa
-StopGrafiti\footnote{\url{https://stopgrafiti.com/}}. Estas imágenes, aunque no
-se incluyen en el banco principal, se utilizan para el ajuste fino del detector
-de grafitis, así como de las cabezas de proyección ajustadas al dominio. El
-conjunto de StopGrafiti fue especialmente útil para esto, puesto que se trata
-de un banco de grafiti con autores, estilos y entornos distintos a los de
-Salamanca, lo que permite evitar el sesgo de solapamiento entre entrenamiento y
-evaluación que se produciría si se empleara el banco principal para ajustar
-todos los modelos.
-
-Ninguno de los dos bancos de datos cuenta con anotaciones de ningún tipo, lo
-que impide la evaluación supervisada directa de los modelos. Además, la
-existencia de varios grafitis por imagen hace que la anotación a nivel de
-imagen no sea suficiente para evaluar la calidad de los clústeres. Por tanto,
-se opta por recortar y etiquetar manualmente varios subconjuntos de grafitis,
-de modo que la evaluación supervisada se realice sobre estos recortes
-etiquetados.
-
-Se etiquetan manualmente recortes por estilo, asignándoles una de las cuatro
-categorías estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
-\textit{character}) definidas e ilustradas en la tabla~\ref{tab:estilos-definiciones}, y otros
-recortes por autoría. La procedencia de cada subconjunto difiere: el
-entrenamiento de estilo contiene recortes del banco principal, mientras que el
-de autoría se restringe a StopGrafiti; el reparto y su justificación se
-detallan al describir la evaluación extrínseca
-(\ref{subsubsec:eval-extrinseca}). De cualquier manera, de las $6681$ imágenes
-de Salamanca, $265$ se reservan para entrenamiento (ajuste fino del detector y
-de las cabezas, así como los recortes de autoría), y las $6416$ ($5880+536$)
-restantes constituyen el conjunto de evaluación sin supervisión del sistema
-completo, del que nunca se extraen recortes de entrenamiento.
+Ninguno de los dos bancos cuenta con anotaciones, y la existencia de varios
+grafitis por imagen hace insuficiente la anotación a nivel de imagen. Por ello
+se recortan y etiquetan manualmente subconjuntos de grafitis: por estilo,
+asignando una de las cuatro categorías de la
+tabla~\ref{tab:estilos-definiciones} (\textit{tag}, \textit{throw-up},
+\textit{piece} y \textit{character}), y por autoría. De las $6681$ imágenes de
+Salamanca, $265$ se reservan para entrenamiento y las $6416$ restantes
+constituyen el conjunto de evaluación sin supervisión, del que nunca se extraen
+recortes de entrenamiento. La tabla~\ref{tab:subconjuntos} resume los
+subconjuntos etiquetados, su propósito, procedencia y tamaño.
 
 \begin{table}[h!]
   \centering
   \renewcommand{\arraystretch}{1.4}%
   \begin{tabular}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}m{1.8cm}|m{0.55\linewidth}|} \hline
     \textbf{Ejemplo} & \textbf{Categoría} & \textbf{Definición} \\ \hline
-    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_tag.jpg} & \textit{tag} & Firma estilizada del autor, monocroma y de trazo rápido en una sola línea; es la forma más simple y frecuente. \\ \hline
-    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_throwup.jpg} & \textit{throw-up} & Nombre escrito en letras redondeadas, normalmente con no más de dos colores (contorno y relleno) y ejecución veloz. \\ \hline
+    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_tag.jpg} & \textit{tag} & Firma estilizada del autor, monocroma y de trazo rápido en una sola línea; la más simple y frecuente. \\ \hline
+    \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_throwup.jpg} & \textit{throw-up} & Nombre en letras redondeadas, normalmente con dos colores (contorno y relleno) y ejecución veloz. \\ \hline
     \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_piece.jpg} & \textit{piece} & Obra elaborada, multicolor y con letras complejas, sombreados y mayor inversión de tiempo. \\ \hline
     \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_character.jpg} & \textit{character} & Figura o personaje ilustrado en lugar de letras, a menudo acompañando a otras categorías. \\ \hline
   \end{tabular}
   \caption[Categorías estilísticas etiquetadas]{Categorías estilísticas etiquetadas, con un recorte de ejemplo y su definición.}
   \label{tab:estilos-definiciones}
 \end{table}
-
-La figura~\ref{fig:dataset-style-distribution} muestra la distribución por
-clase de los recortes etiquetados por estilo. El reparto es desigual: las
-categorías \textit{tag}, \textit{piece} y \textit{throw-up} concentran la mayor
-parte de los recortes, mientras que \textit{character} resulta claramente
-minoritaria, lo que condiciona la interpretación posterior de las métricas
-extrínsecas por estilo.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\linewidth]{figures/dataset_style_distribution.pdf}
-  \caption[Distribución por clase de los recortes etiquetados]{Distribución por clase de los recortes etiquetados por estilo,
-  separando los subconjuntos de entrenamiento y evaluación.}
-  \label{fig:dataset-style-distribution}
-\end{figure}
-
-Por último, se utilizan imágenes de ambos grupos para el ajuste fino del
-detector de grafitis, con un total de $447$ imágenes completamente anotadas con
-las cajas de los grafitis.
-
-La tabla~\ref{tab:subconjuntos} resume los subconjuntos etiquetados empleados,
-su propósito, procedencia y tamaño.
 
 \begin{table}[h!]
   \centering
@@ -134,190 +60,73 @@ su propósito, procedencia y tamaño.
 
 \subsection{Marco conceptual}
 \label{subsec:conceptos}
+Cada grafiti se representa mediante un \textit{embedding}, un vector de
+características obtenido con modelos preentrenados sobre tareas de visión
+generalistas; para las CNN de clasificación (ResNet, VGG) se accede a la
+representación latente eliminando las capas finales, mientras que DINOv2 o CLIP
+ya devuelven el vector directamente. La similitud se mide con distancia
+euclidiana o coseno; ambas coinciden cuando los vectores están normalizados a
+norma unitaria ($L_2$), por lo que CLIP, MobileNetV3 y las cabezas de dominio
+(que normalizan su salida) usan coseno y el resto, euclidiana.
 
-\subsubsection{Representación vectorial y métricas de distancia}
-\label{subsec:fundamentos}
-
-Como se mencionó en el estado de la cuestión, el sistema se apoya en la
-representación vectorial de los grafitis. Estas representaciones, conocidas
-como \textit{embeddings}, se obtienen a través de modelos de extracción de
-características preentrenados sobre tareas de visión generalistas, que se
-aplican directamente sobre las imágenes de grafiti o sobre recortes de las
-mismas. Para las redes de clasificación como pueden ser ResNet o VGG, se accede
-a esta representación eliminando las últimas capas de los modelos, que suelen
-corresponder a la tarea de clasificación, y tomando solamente con la
-representación latente previa. Otros modelos como DINOv2 o CLIP están
-entrenados específicamente para devolver una representación vectorial de la
-imagen, por lo que no es necesario modificar su arquitectura para acceder a los
-\textit{embeddings}.
-
-Teniendo una representación numérica de cada imagen, la similitud entre estas
-se mide mediante métricas de distancia sobre sus vectores en el espacio
-utilizado. Las dos más habituales son la distancia euclidiana y la distancia
-del coseno. Esta última depende solo de la dirección de los vectores y equivale
-a la euclidiana cuando los \textit{embeddings} están normalizados a norma
-unitaria (normalización $L_2$), práctica frecuente para que la magnitud del
-vector no domine la comparación. Algunos modelos de este trabajo (CLIP,
-MobileNetV3 y las cabezas ajustadas al dominio) ya producen \textit{embeddings}
-normalizados, por lo que la distancia coseno es su métrica natural; el resto
-usan la euclidiana. El modelo que hace uso de MobileNetV3 explícitamente
-normaliza sus vectores a norma unitaria para que las cabezas entrenadas en
-estilo y autoría (que sí que normalizan sus vectores) puedan compararse con los
-\textit{backbones} de los que proceden.
-
-\subsubsection{Búsqueda por similitud}
+\subsubsection{Búsqueda por similitud.}
 \label{subsubsec:tools-similarity-search}
-Para la búsqueda por similitud la propuesta considera dos enfoques. El primero
-y más simple de ellos consiste en una búsqueda exacta sobre SQLite, que se
-resuelve por fuerza bruta recuperando todos los vectores almacenados y
-calculando la distancia a cada uno de ellos. Este método es ineficiente en
-cuanto a velocidad y memoria, pero garantiza la recuperación del vecino más
-cercano real. Por otro lado, el segundo enfoque hace uso de un índice HNSW
-sobre PostgreSQL, que organiza la información en una estructura de grafo
-jerárquico de vecinos más cercanos. Al recibir una consulta, el índice recorre
-la lista de vecinos más cercanos a la consulta, y a su vez los vecinos de
-estos, hasta encontrar el mínimo local. Este método es mucho más eficiente,
-aunque no garantiza la recuperación del vecino más cercano real, sino de un
-vecino cercano, lo que puede afectar a la calidad de los resultados.
+Se consideran dos enfoques: una búsqueda exacta por fuerza bruta sobre SQLite,
+que garantiza el vecino más cercano real a costa de un coste lineal por
+consulta, y un índice aproximado HNSW~\cite{malkov_efficient_2018} sobre
+PostgreSQL (\textit{pgvector}), mucho más eficiente pero sin garantía de
+exactitud. Cuando hay etiquetas se evalúa la calidad de recuperación con P@$k$,
+R@$k$, el rango recíproco medio (MRR) y la precisión media promedio (MAP@$k$).
 
-Para evaluar esto último, al utilizar el índice HNSW también se realiza una
-búsqueda por fuerza bruta y se comparan los resultados obtenidos por ambos
-métodos, cuantificando el porcentaje de vecinos más cercanos reales recuperados
-por el índice. Además, cuando el dataset utilizado dispone de etiquetas se
-evalúa también la calidad de la búsqueda por similitud. En estos casos se
-calculan métricas como la precisión y \textit{recall} a $k$, que cuantifican el
-porcentaje de elementos relevantes recuperados respecto a los $k$ buscados
-(P@$k$) o al total de elementos relevantes (R@$k$). También se calculan el
-rango recíproco medio (MRR) que mide la posición del primer vecino relevante
-recuperado, y la precisión media promedio (MAP@$k$) que promedia la precisión a
-$k$ sobre las posiciones relevantes.
-
-\subsubsection{Agrupamiento no supervisado}
+\subsubsection{Agrupamiento y reducción de dimensionalidad.}
 \label{subsubsec:agrupamiento}
-Los principales algoritmos de agrupamiento se diferencian por la manera en la
-que agrupan los datos. Los métodos basados en centroides, como
-K-medias~\cite{arthur_k-means_2007},
-modelan cada clúster por su media y buscan minimizar la varianza intracluster.
-Esto los hace bastante eficientes, pero también sensibles a la forma y al
-solapamiento de los grupos. Por esto, estos algoritmos no suelen proporcionar
-los mejores resultados cuando los datos no se agrupan en formas esféricas bien
-separadas o cuando los distintos grupos tienen una cantidad de puntos muy
-desigual (como es el caso de este trabajo).
+Se cubren los principales paradigmas de agrupamiento: centroides
+(K-medias~\cite{arthur_k-means_2007}), densidad
+(DBSCAN~\cite{ester_density-based_1996},
+OPTICS~\cite{ankerst_optics_1999},
+HDBSCAN~\cite{campello_density-based_2013}), jerárquicos, espectrales,
+probabilísticos (GMM~\cite{dempster_maximum_1977}) y \textit{affinity
+propagation}~\cite{frey_clustering_2007}. Los métodos de densidad toleran formas
+arbitrarias y ruido pero se degradan en alta dimensión, lo que motiva una etapa
+previa de reducción ante la maldición de la
+dimensionalidad~\cite{aggarwal_surprising_2001}: lineal
+(PCA~\cite{jolliffe_principal_2002}) o no lineal
+(Kernel PCA, Isomap~\cite{tenenbaum_global_2000},
+UMAP~\cite{mcinnes_umap_2020}). La selección del número de clústeres sin
+etiquetas se resuelve con heurísticas (método del codo, BIC) en K-medias, DBSCAN
+y GMM.
 
-Los algoritmos basados en densidad, como
-DBSCAN~\cite{ester_density-based_1996}, OPTICS~\cite{ankerst_optics_1999} y
-HDBSCAN~\cite{campello_density-based_2013}, definen un clúster como una región
-conectada de alta densidad y permiten descartar puntos como ruido. Los tres
-algoritmos son muy similares; siendo OPTICS y HDBSCAN extensiones de DBSCAN que
-resuelven algunas de sus limitaciones como pueden ser el manejo de clústeres de
-distintas densidades o la dificultad de ajustar el umbral de densidad. Estos
-métodos son especialmente adecuados para datos con formas arbitrarias y con
-ruido, aunque su rendimiento puede degradarse en espacios de alta
-dimensionalidad, lo que motiva la reducción previa.
-
-También se utilizan otros métodos menos comunes como \textit{affinity
-propagation}~\cite{frey_clustering_2007}, que crea \textit{clusters} a partir del envío de mensajes de
-responsabilidad entre los puntos; los métodos probabilísticos, como los modelos
-de mezcla gaussiana~\cite{dempster_maximum_1977}, que modelan los datos como una superposición de
-distribuciones gaussianas; los métodos espectrales~\cite{ng_spectral_2001}, que utilizan la
-descomposición espectral de una matriz de similitud para reducir la
-dimensionalidad antes de aplicar un método de agrupamiento tradicional; y los
-métodos jerárquicos~\cite{mullner_modern_2011}, que construyen un dendrograma de fusiones o divisiones
-sucesivas del que pueden extraerse particiones a distintos niveles de
-granularidad. Estos algoritmos resultan ser útiles para tratar con datos con
-estructuras más complejas, aunque su coste computacional suele ser mayor que el
-de los métodos más simples (especialmente \textit{affinity propagation} y los
-métodos basados en modelos probabilísticos).
-
-La principal dificultad en un escenario sin etiquetas es la selección del
-número de clústeres. K-medias y los modelos de mezcla requieren fijarlo
-\textit{a priori}, y se recurre a heurísticas como el método del codo sobre la
-inercia o el criterio bayesiano de información (BIC). Los algoritmos basados en
-densidad y los jerárquicos lo evitan en su formulación, pero a cambio
-introducen otros hiperparámetros (umbrales de densidad, criterios de corte)
-cuyo ajuste también carece de un óptimo evidente sin verdad fundamental.
-
-\subsubsection{Reducción de dimensionalidad}
-\label{subsubsec:reduccion}
-Los \textit{embeddings} producidos por las redes utilizadas en este trabajo
-contienen entre $128$ y $4096$ dimensiones. A medida que la dimensionalidad
-crece, las distancias entre puntos tienden a igualarse y perder poder
-discriminativo, fenómeno conocido como la maldición de la
-dimensionalidad~\cite{aggarwal_surprising_2001}. Esto degrada especialmente los
-algoritmos basados en densidad y motiva aplicar una etapa previa de reducción.
-Las técnicas lineales, como PCA~\cite{jolliffe_principal_2002}, proyectan los
-datos sobre los ejes que generan la máxima varianza. Esto los hace eficientes,
-pero los limita a capturar relaciones lineales entre las características.
-Kernel PCA~\cite{scholkopf_nonlinear_1998} resuelve este problema calculando
-esta varianza en un espacio de características no lineal, permitiendo capturar
-relaciones más complejas a costa de un mayor coste computacional.
-
-Otras técnicas no lineales, como Isomap~\cite{tenenbaum_global_2000} o
-UMAP~\cite{mcinnes_umap_2020} buscan preservar relaciones de vecindad en el
-espacio original. Isomap construye un grafo de vecinos más cercanos sobre el
-espacio original y posteriormente busca una representación de menor
-dimensionalidad que preserve estas relaciones de vecindad, lo que lo convierte
-en un algoritmo especialmente costoso a medida que el tamaño del conjunto
-crece. UMAP, por su parte, asigna a cada enlace entre puntos una probabilidad
-de conexión basada en la distancia entre estos, y luego busca una
-representación de menor dimensionalidad que respete estas probabilidades a
-través de una serie de operaciones de atracción--repulsión entre los puntos.
-
-\subsubsection{Métricas de evaluación}
+\subsubsection{Métricas de evaluación.}
 \label{subsubsec:metricas}
-La calidad de los clústeres resultantes se valora con dos familias de métricas.
-Sobre el banco principal sin etiquetar se recurre a métricas internas, que
-cuantifican la cohesión intracluster y la separación intercluster directamente
-sobre los \textit{embeddings}. Se emplean el coeficiente de
-silueta~\cite{rousseeuw_silhouettes_1987}, el índice de
-Calinski--Harabász~\cite{calinski_dendrite_1974} y el índice de
-Davies--Bouldin~\cite{davies_cluster_1979}. El primero de estos mide, para cada
-punto, la diferencia entre la distancia media a los puntos del \textit{cluster}
-más cercano y la distancia media a los puntos de su propio \textit{cluster},
-normalizada por la mayor de las dos. Este favorece a los agrupamientos con
-clústeres compactos y bien separados. El índice de Calinski--Harabász fomenta
-clústeres muy compactos y separados entre sí al medir la razón entre la
-varianza intercluster y la varianza intracluster, penalizando los agrupamientos
-con clústeres dispersos o con solapamiento. Por último, el índice de
-Davies--Bouldin realiza la evaluación opuesta: para cada \textit{cluster}
-calcula la razón entre la suma de la dispersión intracluster y la distancia
-intercluster a su vecino más cercano, y devuelve la media de estas razones.
-Esto penaliza el peor caso de cada agrupamiento, favoreciendo aquellos con
-clústeres bien separados y con baja dispersión intracluster.
-
-Puesto que algunos de los algoritmos admiten la clasificación de puntos como
-ruido, estas métricas se complementan con tres indicadores estructurales: el
-número de \textit{clusters}, la proporción de puntos clasificados como ruido y
-el coeficiente de variación del tamaño de los clústeres. Haciendo uso de estas
-métricas, se puede identificar si un valor anormalmente alto en las métricas de
-calidad se debe a un muy buen agrupamiento o a un agrupamiento en el que los
-puntos más difíciles de clasificar se han descartado como ruido o se han
-agrupado en un único clúster muy grande.
-
-% TODO: a lo mejor extender esto un poco tb 
-Adicionalmente, sobre los recortes de evaluación etiquetados por estilo o
-autoría se calculan métricas extrínsecas que sí utilizan la verdad fundamental
-disponible: el índice de Rand ajustado (ARI), la información mutua normalizada
-(NMI) y la F1 por pares, que constituyen el complemento más sólido a las
-métricas internas en el plano de calidad. 
+La calidad se valora con dos familias de métricas. Sobre el banco sin etiquetar
+se emplean métricas \emph{intrínsecas}, calculadas directamente sobre los
+\textit{embeddings}: el coeficiente de
+silueta~\cite{rousseeuw_silhouettes_1987} (cohesión vs.\ separación, $\uparrow$),
+el índice de Calinski--Harabász~\cite{calinski_dendrite_1974} (razón de
+varianzas inter/intracluster, $\uparrow$) y el de
+Davies--Bouldin~\cite{davies_cluster_1979} (peor caso de
+dispersión/separación, $\downarrow$). Como algunos algoritmos etiquetan puntos
+como ruido, estas se complementan con tres indicadores estructurales: número de
+clústeres, fracción de ruido y coeficiente de variación del tamaño de los
+clústeres, que permiten distinguir un buen agrupamiento de uno que descarta los
+puntos difíciles. Sobre los recortes etiquetados por estilo o autoría se calculan
+métricas \emph{extrínsecas} que usan la verdad de referencia: el índice de Rand
+ajustado (ARI), la información mutua normalizada (NMI) y la F1 por pares.
 
 \subsection{Catálogo de componentes}
 \label{subsec:configuraciones}
-
-Esta subsección cataloga los componentes concretos integrados en el sistema,
-que constituyen los materiales sobre los que opera la evaluación. Su
-combinación parametrizada para definir cada experimento se describe en
-\ref{subsubsec:espacio-configs}.
-
-\subsubsection{Modelos de extracción de características}
-Todos los modelos se utilizan congelados, sin reentrenar sus pesos. En algunos
-casos se retiran las últimas capas que corresponden a la tarea de clasificación
-para acceder a la representación latente previa (ResNet50, VGG16 e InceptionV3,
-por ejemplo). Para el resto de modelos se utiliza la propia API de extracción
-de características, que ya devuelve la representación latente sin necesidad de
-modificar la arquitectura (DINOv2, CLIP y YOLO). La
-tabla~\ref{tab:embedding-models} resume las opciones disponibles, indicando
-arquitectura, dimensionalidad de salida y preentrenamiento.
+Todos los modelos de extracción se usan congelados. La
+tabla~\ref{tab:embedding-models} resume los extractores integrados (arquitectura,
+dimensión de salida y preentrenamiento), la
+tabla~\ref{tab:clustering-algos} los agrupadores y sus hiperparámetros clave (la
+columna «Auto.\ $k$» indica cuáles estiman su hiperparámetro principal cuando no
+se declara, según \ref{subsubsec:hiperparam-auto}) y la
+tabla~\ref{tab:reduction} las técnicas de reducción. La persistencia de los
+\textit{embeddings} se abstrae tras una interfaz común con dos \textit{backends}:
+SQLite (sin servicios externos, búsqueda lineal exacta) y PostgreSQL con
+\textit{pgvector} (búsqueda en el SGBD, con índice HNSW opcional). El índice HNSW
+de \textit{pgvector} impone un límite de 2000 dimensiones, no aplicable a
+ResNet50 e InceptionV3 (2048) ni a VGG16 (4096).
 
 \begin{longtable}{|p{3.2cm}|p{3.8cm}|c|p{4.2cm}|} \hline
   \textbf{Modelo} & \textbf{Arquitectura} & \textbf{Dim.} & \textbf{Preentrenamiento} \\ \hline
@@ -332,41 +141,19 @@ arquitectura, dimensionalidad de salida y preentrenamiento.
   \label{tab:embedding-models}
 \end{longtable}
 
-\subsubsection{Algoritmos de agrupamiento}
-\label{subsubsec:algoritmos-agrupamiento}
-El sistema cubre los principales paradigmas de agrupamiento descritos en la
-sección~\ref{subsubsec:agrupamiento}. Todas las implementaciones exponen una
-interfaz común y se configuran por hiperparámetros declarados en la
-configuración del \textit{benchmark}. Estas implementaciones no se han
-implementado desde cero, sino que se hace uso de las implementaciones
-disponibles en scikit-learn~\cite{pedregosa_scikit-learn_2011}. La
-tabla~\ref{tab:clustering-algos} recoge las opciones implementadas con sus
-hiperparámetros clave.
-
-La columna «Auto. $k$» indica qué algoritmos pueden estimar su hiperparámetro
-principal cuando este no se declara en la configuración; el procedimiento
-empleado en cada caso y su papel en el protocolo comparativo se detallan en
-\ref{subsubsec:hiperparam-auto}.
-
 \begin{longtable}{|l|l|c|} \hline
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
   K-medias~\cite{arthur_k-means_2007} & $n\_clusters$ & sí \\ \hline
   DBSCAN~\cite{ester_density-based_1996} & $\epsilon$, $min\_samples$ & sí ($\epsilon$) \\ \hline
-  HDBSCAN~\cite{campello_density-based_2013} & $min\_cluster\_size$, $max\_cluster\_size$ & no requiere \\ \hline
-  OPTICS~\cite{ankerst_optics_1999} & $min\_samples$, $max\_eps$, $metric$ & no requiere \\ \hline
+  HDBSCAN~\cite{campello_density-based_2013} & $min\_cluster\_size$ & no requiere \\ \hline
+  OPTICS~\cite{ankerst_optics_1999} & $min\_samples$, $max\_eps$ & no requiere \\ \hline
   Aglomerativo~\cite{mullner_modern_2011} & $n\_clusters$, $linkage$ & no \\ \hline
-  Espectral~\cite{ng_spectral_2001,huang_ultra-scalable_2020} & $n\_clusters$, afinidad & no \\ \hline
+  Espectral~\cite{ng_spectral_2001} & $n\_clusters$, afinidad & no \\ \hline
   GMM~\cite{dempster_maximum_1977} & $n\_components$, covarianza & sí \\ \hline
   \textit{Affinity Propagation}~\cite{frey_clustering_2007} & $damping$, $preference$ & no requiere \\ \hline
   \caption{Algoritmos de agrupamiento implementados.}
   \label{tab:clustering-algos}
 \end{longtable}
-
-\subsubsection{Técnicas de reducción de dimensionalidad}
-La etapa de reducción es opcional, siendo la implementación por defecto una
-identidad que no aplica ninguna transformación, permitiendo comparar el efecto
-de añadir esta etapa. La tabla~\ref{tab:reduction} resume las opciones
-disponibles.
 
 \begin{longtable}{|l|l|l|} \hline
   \textbf{Técnica} & \textbf{Tipo} & \textbf{Parámetros principales} \\ \hline
@@ -379,167 +166,38 @@ disponibles.
   \label{tab:reduction}
 \end{longtable}
 
-\subsubsection{Sistemas de almacenamiento}
-La persistencia de los \textit{embeddings} y los metadatos asociados se abstrae
-tras una interfaz común, de la que se han implementado dos \textit{backends}
-con características operativas distintas. El primero, basado en SQLite, no
-requiere servicios externos, almacena los vectores como \textit{blobs} y
-realiza la búsqueda por similitud mediante un recorrido lineal; resulta
-apropiado para despliegues ligeros y como referencia de cálculo exacto frente a
-alternativas aproximadas. El segundo se apoya en la extensión \textit{pgvector}
-de PostgreSQL y delega la búsqueda al motor de la base de datos. Por defecto la
-consulta es un recorrido exacto; opcionalmente puede habilitarse un índice
-aproximado HNSW~\cite{malkov_efficient_2018} sobre los vectores, lo que permite
-contrastar el coste de la búsqueda exacta frente a la aproximada. El índice
-HNSW de \textit{pgvector} impone un límite de 2000 dimensiones sobre el tipo
-\texttt{vector}, por lo que no es aplicable a los modelos cuya salida lo supera
-(ResNet50 e InceptionV3, con 2048, y VGG16, con 4096); para estos casos debe
-recurrirse a una reducción de dimensionalidad previa al almacenamiento o al
-\textit{backend} SQLite con búsqueda exacta. Ambos \textit{backends} comparten
-el esquema lógico y la persistencia de metadatos, lo que permite cambiar de uno
-a otro sin modificar el resto del \textit{pipeline}.
-
 \subsection{Extensiones específicas para grafiti}
 \label{subsec:extras}
 
-\subsubsection{Segmentador YOLO}
+\subsubsection{Segmentador YOLO.}
 \label{subsubsec:segmentador}
-La etapa de segmentación localiza los grafitis dentro de la fotografía para que
-el extractor de características opere sobre los recortes correspondientes en
-lugar de la escena completa. Se han implementado dos variantes. La primera
-de ellas no aplica ningún tipo de segmentación, de modo que el extractor de
-características se aplica sobre la fotografía completa. La segunda, utiliza
-un modelo de YOLO~\cite{ultralytics_ultralytics_2024} en su versión oficial o
-ajustado sobre el conjunto de grafiti para detectar las cajas que encierran
-cada grafiti, y recorta la imagen en consecuencia. Además, este proceso de
-recorte fusiona las cajas de detección solapadas para evitar duplicados y
-aplica un margen configurable alrededor de cada caja antes del recorte. El
-resultado es un conjunto de sub-imágenes que se procesan de forma independiente
-y que pueden producir varios vectores por fotografía original.
+La segmentación localiza los grafitis dentro de la fotografía para que el
+extractor opere sobre los recortes en lugar de la escena completa. Se implementan
+dos variantes: una identidad (imagen completa) y un detector
+YOLO~\cite{ultralytics_ultralytics_2024}, oficial o ajustado sobre grafiti, que
+detecta las cajas, fusiona las solapadas y adyacentes (con una salvaguarda que
+rechaza fusiones que cubran una fracción excesiva de la imagen), aplica un margen
+configurable y, opcionalmente, trunca a las $K$ detecciones de mayor confianza.
+El detector se evalúa con precisión, \textit{recall} y mAP a distintos umbrales
+de IoU, y se ajusta sobre el subconjunto anotado disjunto del de evaluación.
 
-Además de la fusión por solapamiento estándar, el segmentador incorpora un
-criterio de proximidad que une cajas adyacentes cuya separación no supera un
-umbral, consolidando grafitis contiguos en una misma pared. Una salvaguarda
-rechaza fusiones cuya caja unión supere una fracción del área de la imagen,
-evitando que cadenas de fusiones por contacto generen un recorte que cubra la
-escena completa. Tras la fusión, la lista de detecciones puede truncarse a las
-$K$ de mayor confianza, mitigando la fragmentación en imágenes con muchas
-detecciones dispersas de baja calidad. Por último, cuando el detector no emite
-ninguna detección, se puede optar por emitir la imagen completa como caja única
-o descartar la imagen del análisis.
-
-Para evaluar la calidad de este segmentador se hace uso de las métricas de
-detección estándar: precisión, \textit{recall} y la precisión media promedio
-(mAP) a distintos umbrales de intersección sobre unión (IoU). La IoU mide el
-solapamiento entre la caja predicha y la caja correcta como el cociente entre
-el área de su intersección y el área de su unión, de modo que vale $1$ cuando
-coinciden por completo y $0$ cuando son disjuntas. Las dos primeras funcionan
-de la misma manera que la búsqueda por similitud, cuantificando el porcentaje
-de detecciones relevantes recuperadas respecto al total de detecciones emitidas
-(precisión) o al total de elementos relevantes (recall). La mAP agrega ambas en
-una sola cifra: para un umbral de IoU fijo se calcula la precisión media
-(\textit{average precision}, AP), que corresponde al área bajo la curva
-precisión-\textit{recall}, y la mAP es la media de ese AP sobre todas las
-clases. Una caja de detección se considera correcta cuando su IoU con la caja
-correcta supera el umbral fijado; mAP@$0.5$, por ejemplo, emplea un umbral del
-50\%. La variante mAP@$0.5$-$0.95$ promedia además la mAP sobre umbrales de IoU
-entre el 50\% y el 95\% en pasos del 5\%, lo que proporciona una evaluación más
-completa de la calidad de las detecciones.
-
-El detector se ajusta sobre el subconjunto anotado de ambos bancos descrito en
-\ref{subsec:dataset}, disjunto del banco de evaluación, lo que evita que las
-métricas reportadas sobre las configuraciones con segmentador queden sesgadas
-por el solapamiento entre entrenamiento y evaluación. El procedimiento de ajuste
-fino se detalla en \ref{subsubsec:entrenamiento-detector}.
-
-\subsubsection{Cabezas de proyección ajustadas al dominio}
+\subsubsection{Cabezas de proyección ajustadas al dominio.}
 \label{subsubsec:cabezas}
-Los modelos de fundación generalistas producen representaciones transferibles,
-pero no necesariamente óptimas para el dominio del grafiti. Para acortar esa
-distancia se ha optado por un esquema de \textit{transfer
-learning}~\cite{pan_survey_2010} en el que la representación base se mantiene
-congelada y solo se entrena una cabeza ligera, siguiendo la metodología de
-\textit{fine-tuning} de ULMFiT~\cite{howard_universal_2018}. La cabeza consiste
-en una secuencia Lineal $\rightarrow$ ReLU $\rightarrow$ Lineal que proyecta
-los \textit{embeddings} base a un espacio adaptado al dominio. Además, su
-salida se normaliza a norma unitaria ($L_2$), de modo que el \textit{embedding}
-producido sea directamente comparable mediante distancia coseno
-(Figura~\ref{fig:cabeza-proyeccion}).
-
-\begin{figure}[h!]
-  \centering
-  \shorthandoff{<>}%
-  \begin{tikzpicture}[
-    >=Stealth, node distance=6mm and 6mm,
-    block/.style={draw, rounded corners, minimum height=9mm, minimum width=14mm, inner sep=3pt, align=center, font=\small},
-    frozen/.style={block, fill=gray!20, dashed},
-    trained/.style={block, fill=blue!12},
-    vec/.style={font=\footnotesize, align=center},
-  ]
-    \node[font=\small] (img) {imagen};
-    \node[frozen, right=of img] (bb) {Backbone\\congelado};
-    \node[trained, right=of bb] (l1) {Lineal};
-    \node[trained, right=of l1] (relu) {ReLU};
-    \node[trained, right=of relu] (l2) {Lineal};
-    \node[block, fill=green!12, right=of l2] (norm) {$L_2$};
-    \node[vec, right=of norm] (e) {embedding};
-
-    \draw[->] (img)--(bb); \draw[->] (bb)--(l1);
-    \draw[->] (l1)--(relu); \draw[->] (relu)--(l2); \draw[->] (l2)--(norm);
-    \draw[->] (norm)--(e);
-
-    \node[draw, dotted, fit=(l1)(relu)(l2), inner sep=2mm,
-          label=below:{\scriptsize Cabeza entrenada}] {};
-  \end{tikzpicture}%
-  \shorthandon{<>}%
-  \caption[Cabeza de proyección ajustada a grafiti]{Cabeza de proyección ajustada a grafiti. El \textit{backbone} permanece
-    congelado y solo se entrena una secuencia ligera de capas para luego normalizar
-    la salida a norma unitaria.}
-  \label{fig:cabeza-proyeccion}
-\end{figure}
-
-Se han entrenado dos tipos de cabezas (de autoría y de estilo) sobre dos
-arquitecturas base (MobileNetV3 y DINOv2). Las cabezas de autoría buscan
-acercar en el espacio latente los grafitis de un mismo autor y separar los de
-autores distintos; las de estilo organizan el espacio según las cuatro
-categorías estilísticas (\textit{tag}, \textit{throw-up}, \textit{piece} y
-\textit{character}). Las cuatro cabezas resultantes se entrenan exclusivamente
-sobre los subconjuntos anotados descritos en \ref{subsec:dataset} (detalles
-sobre el entrenamiento en  \ref{subsubsec:entrenamiento-cabezas}) y se añaden
-al catálogo de modelos de \textit{embedding}, proyectando los
-\textit{embeddings} base a un espacio de $128$ dimensiones (DINOv2 $384\to128$,
-MobileNetV3 $1280\to128$).
+Para acortar la distancia entre las representaciones generalistas y el dominio
+del grafiti se sigue un esquema de \textit{transfer
+learning}~\cite{pan_survey_2010,howard_universal_2018}: el \textit{backbone} se
+mantiene congelado y solo se entrena una cabeza ligera
+(Lineal~$\rightarrow$~ReLU~$\rightarrow$~Lineal) cuya salida se normaliza a norma
+unitaria ($L_2$), de modo que sea comparable por distancia coseno. Se entrenan
+cuatro cabezas (autoría y estilo $\times$ MobileNetV3 y DINOv2) que proyectan a
+$128$ dimensiones (DINOv2 $384\to128$, MobileNetV3 $1280\to128$) y se añaden al
+catálogo de extractores.
 
 \subsection{Entorno de ejecución}
 \label{subsec:entorno}
-Los experimentos se realizaron en el ordenador personal del autor: un portátil
-con CPU AMD Ryzen 7 5800H, GPU NVIDIA GeForce GTX 1650 y 16 GB de RAM DDR4. El
-entorno de ejecución se basa en Python 3.14 gestionado con \texttt{uv},
-empleando como dependencias nucleares PyTorch (2.10.0),
-\textit{open-clip-torch}, \textit{ultralytics}, \textit{scikit-learn},
-\textit{umap-learn}, \textit{SQLAlchemy} con \textit{pgvector}, \textit{numpy},
-\textit{pandas}, \textit{matplotlib}, \textit{seaborn}, \textit{psutil} y
-\textit{tqdm}. Salvo PyTorch, fijado de forma exacta, las versiones
-corresponden al requisito mínimo declarado en el gestor de dependencias. La
-tabla~\ref{tab:dependencias} recoge las versiones de las dependencias
-principales.
-
-\begin{table}[h!]
-  \centering
-  \begin{tabular}{|l|l||l|l|} \hline
-    \textbf{Dependencia} & \textbf{Versión} & \textbf{Dependencia} & \textbf{Versión} \\ \hline
-    Python           & 3.14    & \textit{scikit-learn} & 1.8.0   \\ \hline
-    PyTorch          & 2.10.0  & \textit{umap-learn}   & 0.5.12  \\ \hline
-    \textit{open-clip-torch} & 3.3.0 & \textit{SQLAlchemy} & 2.0.49 \\ \hline
-    \textit{transformers}    & 5.7.0 & \textit{pgvector}   & 0.4.2  \\ \hline
-    \textit{ultralytics}     & 8.4.26 & \textit{numpy}     & 2.4.3  \\ \hline
-    \textit{pandas}  & 3.0.1   & \textit{matplotlib}   & 3.10.8 \\ \hline
-    \textit{seaborn} & 0.13.0  & \textit{psutil}       & 6.1.1  \\ \hline
-    \textit{tqdm}    & 4.67.3  & \textit{psycopg2}     & 2.9.11 \\ \hline
-  \end{tabular}
-  \caption[Versiones de las dependencias principales]{Versiones de las
-  dependencias principales del proyecto. Salvo PyTorch (fijado de forma
-  exacta), corresponden al requisito mínimo declarado.}
-  \label{tab:dependencias}
-\end{table}
-
+Los experimentos se realizaron en un portátil con CPU AMD Ryzen 7 5800H, GPU
+NVIDIA GeForce GTX 1650 y 16~GB de RAM. El entorno se basa en Python 3.14
+gestionado con \texttt{uv}, con PyTorch 2.10.0 (fijado de forma exacta) como
+dependencia nuclear, junto a \textit{open-clip-torch}, \textit{ultralytics},
+\textit{scikit-learn}, \textit{umap-learn} y \textit{SQLAlchemy} con
+\textit{pgvector}, entre otras.

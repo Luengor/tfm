@@ -5,141 +5,73 @@
 \subsection{Análisis automático de grafiti}
 \label{subsec:art-grafiti}
 
-La literatura específica sobre la aplicación tanto de técnicas de visión por
-computador como de agrupamiento no supervisado al análisis de grafiti es muy
-escasa, reciente y de alcance acotado. Un trabajo relevante es el de
-\citea[etali]{Fogaça}{fogaca_deep_2023}, en el que se presenta un sistema
-encargado por el Ayuntamiento de Lisboa para clasificar imágenes de calle en
-grafiti ilegal, arte urbano o ausencia de grafiti y, a continuación, localizar
-el grafiti en la escena mediante un detector \textit{fine-tuned} por ellos
-mismos. En esta misma línea, \citea[etali]{Tokuda}{tokuda_quantifying_2019}
-desarrollan un sistema para cuantificar la densidad de grafitis en la ciudad de
-São Paulo, Brasil. Las imágenes se obtienen a través de la plataforma de Street
-View de Google, y el modelo de detección utilizado (Mask-RCNN, un modelo capaz
-de segmentar instancias de objetos en una imagen) se entrena a partir de un
-conjunto de datos anotado manualmente por los autores.
-
-Estos trabajos, aunque no están alineados del todo con el planteamiento de
-este, establecen que el uso de aprendizaje profundo es viable sobre imágenes de
-grafiti captadas en condiciones no controladas.
-
-En el ámbito del agrupamiento no supervisado, aunque varios trabajos han
-abordado la categorización de grafiti por tipo o estilo (como puede ser el
-trabajo de \citea[etali]{Taylor}{taylor_twenty-first_2010}, en el que se
-buscaba una rúbrica consistente para la clasificación manual de grafiti según
-su estilo y contenido), la gran mayoría de estos trabajos realizan esta
-categorización de forma manual, sin aplicar técnicas de agrupamiento
-automático. En esta dirección,
-\citea[etali]{Garcia~Garcia}{garcia_garcia_graffiti_2025} proponen un método de
-identificación y agrupamiento basado en el análisis de los colores dominantes
-de cada pieza haciendo uso de K-medias sobre los espacios RGB y Lab. La
-aportación es relevante porque introduce el agrupamiento en el dominio, pero
-utiliza exclusivamente estadísticas cromáticas de la imagen y prescinde de la
-estructura espacial, la textura y el contenido semántico del grafiti.
-
-La tabla~\ref{tab:art-comparativa} resume estos trabajos previos y los sitúa
-frente al planteamiento del presente, haciendo visible la carencia que este
-trabajo pretende cubrir: ninguno combina descriptores visuales profundos con
-técnicas estándar de agrupamiento ni acompaña la evaluación de una
-caracterización del coste.
+La literatura sobre la aplicación de visión por computador y agrupamiento no
+supervisado al análisis de grafiti es escasa, reciente y de alcance acotado.
+\citea[etali]{Fogaça}{fogaca_deep_2023} presentan un sistema encargado por el
+Ayuntamiento de Lisboa para clasificar imágenes de calle en grafiti ilegal, arte
+urbano o ausencia de grafiti, y localizarlo mediante un detector
+\textit{fine-tuned}. \citea[etali]{Tokuda}{tokuda_quantifying_2019} cuantifican
+la densidad de grafitis en São Paulo a partir de Google Street View con un
+modelo Mask-RCNN entrenado sobre anotaciones propias. Ambos establecen la
+viabilidad del aprendizaje profundo sobre imágenes captadas en condiciones no
+controladas. En el ámbito del agrupamiento, aunque varios trabajos categorizan
+grafiti por tipo o estilo, la mayoría lo hacen de forma
+manual~\cite{taylor_twenty-first_2010};
+\citea[etali]{Garcia~Garcia}{garcia_garcia_graffiti_2025} proponen un
+agrupamiento basado en los colores dominantes de cada pieza (K-medias sobre RGB
+y Lab), pero prescinden de la estructura espacial, la textura y el contenido
+semántico. La tabla~\ref{tab:art-comparativa} sitúa estos trabajos frente al
+presente: ninguno combina descriptores visuales profundos con técnicas estándar
+de agrupamiento ni acompaña la evaluación de una caracterización del coste, que
+es la carencia que este trabajo pretende cubrir.
 
 {\scriptsize
 \setlength{\tabcolsep}{3pt}
 \begin{longtable}{|p{1.9cm}|p{2.1cm}|p{2.0cm}|p{2.2cm}|p{2.2cm}|p{1.9cm}|} \hline
   \textbf{Trabajo} & \textbf{Tarea} & \textbf{Datos} & \textbf{Características} & \textbf{Técnica} & \textbf{Métrica} \\ \hline
   \endhead
-  Fogaça (2023) & Clasificación y detección de grafiti & Imágenes de calle (Lisboa) & CNN \textit{fine-tuned} & Clasificación supervisada + detector & Exactitud / mAP (precisión media promedio, supervisada) \\ \hline
-  Tokuda (2019) & Cuantificación de densidad de grafitis & Google Street View (São Paulo) & Mask-RCNN & Segmentación supervisada & Precisión / \textit{recall} \\ \hline
-  Taylor (2010) & Categorización por contenido & Fotografías de grafiti & Inspección visual & Categorización manual & --- (cualitativa) \\ \hline
-  García~García (2025) & Agrupamiento de grafitis & Imágenes de grafiti & Colores dominantes (RGB / Lab) & K-medias & Interna (no supervisada) \\ \hline
-  \textbf{Este trabajo} & Agrupamiento y recuperación por similitud & Banco de grafiti & \textit{Embeddings} profundos & Reducción + \textit{clustering} clásico (comparativo) & Interna, externa y coste computacional \\ \hline
-  \caption[Comparativa de trabajos previos sobre análisis de grafiti]{Comparativa de trabajos previos sobre análisis de grafiti frente al
-  planteamiento de este trabajo.}
+  Fogaça (2023) & Clasificación y detección & Imágenes de calle (Lisboa) & CNN \textit{fine-tuned} & Clasificación + detector & Exactitud / mAP \\ \hline
+  Tokuda (2019) & Cuantificación de densidad & Street View (São Paulo) & Mask-RCNN & Segmentación supervisada & Precisión / \textit{recall} \\ \hline
+  Taylor (2010) & Categorización por contenido & Fotografías de grafiti & Inspección visual & Categorización manual & --- \\ \hline
+  García~García (2025) & Agrupamiento de grafitis & Imágenes de grafiti & Colores dominantes (RGB / Lab) & K-medias & Interna \\ \hline
+  \textbf{Este trabajo} & Agrupamiento y recuperación & Banco de grafiti & \textit{Embeddings} profundos & Reducción + \textit{clustering} clásico & Interna, externa y coste \\ \hline
+  \caption[Comparativa de trabajos previos sobre análisis de grafiti]{Comparativa de trabajos previos frente al planteamiento de este trabajo.}
   \label{tab:art-comparativa}
 \end{longtable}
 }
 
-No se han localizado trabajos previos que combinen descriptores visuales
-profundos con técnicas estándar de agrupamiento para esta aplicación, ni que
-evalúen sistemáticamente qué componentes funcionan mejor sobre fotografías de
-grafitis. Esta carencia en la literatura es la que delimita el espacio en el
-que se sitúa el presente trabajo y motiva su planteamiento combinatorio.
-
-\subsection{Análisis de similitud y agrupamiento de imágenes}
+\subsection{Similitud, agrupamiento e identificación de autoría}
 \label{subsec:art-emb-red-clus}
 
-El agrupamiento de imágenes se aborda habitualmente encadenando tres etapas:
-extracción de una representación vectorial, reducción de dimensionalidad y
-agrupamiento. Los modelos de clasificación preentrenados como
-ResNet~\cite{he_deep_2015} se usan ampliamente como extractores de
-características, y modelos más recientes como CLIP~\cite{radford_learning_2021}
-o DINOv2~\cite{oquab_dinov2_2024}, entrenados por supervisión lingüística o
-auto-supervisión, ofrecen representaciones transferibles sin ajuste específico
-de dominio. La reducción de dimensionalidad previa al agrupamiento (PCA,
-UMAP~\cite{mcinnes_umap_2020}) es práctica estándar para mitigar la
-inestabilidad de las distancias en espacios de alta dimensión. Las familias
-clásicas de agrupamiento (por centroides, como K-medias; por densidad, como
-DBSCAN y HDBSCAN; jerárquicos o utilizando modelos probabilísticos) cubren
-distintos supuestos estructurales sobre los
-datos~\cite{ester_density-based_1996,campello_density-based_2013,arthur_k-means_2007}. Para la recuperación por similitud, los índices ANN como
+El agrupamiento de imágenes encadena habitualmente tres etapas: extracción de
+una representación vectorial, reducción de dimensionalidad y agrupamiento. Los
+modelos de clasificación preentrenados como ResNet~\cite{he_deep_2015} se usan
+ampliamente como extractores, y modelos más recientes como
+CLIP~\cite{radford_learning_2021} o DINOv2~\cite{oquab_dinov2_2024} ofrecen
+representaciones transferibles sin ajuste de dominio. La reducción previa (PCA,
+UMAP~\cite{mcinnes_umap_2020}) mitiga la inestabilidad de las distancias en alta
+dimensión, y las familias clásicas de agrupamiento (centroides, densidad,
+jerárquicos, probabilísticos) cubren distintos supuestos
+estructurales~\cite{ester_density-based_1996,campello_density-based_2013,arthur_k-means_2007}.
+Para la recuperación por similitud, los índices ANN como
 HNSW~\cite{malkov_efficient_2018} o FAISS~\cite{johnson_billion-scale_2017} son
-el estándar \textit{de facto} en bases de datos vectoriales modernas.
+el estándar \textit{de facto}. Estos componentes están bien caracterizados de
+forma individual, pero no se han localizado trabajos que los evalúen de forma
+combinada sobre imágenes de grafiti ni que caractericen el coste por etapa en
+función del tamaño del banco.
 
-Estos componentes están bien caracterizados de forma individual, pero no se han
-localizado trabajos que los evalúen de forma combinada sobre imágenes de
-grafiti ni que caractericen el coste computacional de cada etapa en función del
-tamaño del banco. Esta carencia es la que motiva el enfoque comparativo y
-empírico de este trabajo.
-
-\subsection{Identificación de autoría a partir de firmas y escritura}
-\label{subsec:art-author-id}
-
-La identificación de los grafiteros a partir de las fotografías de sus firmas
-es un problema muy análogo a otros ya estudiados, como pueden ser la
-verificación de firmas manuscritas o el reconocimiento facial. Para el caso de
-la identificación de autoría, Fiel y Sablatnig~\cite{fiel_writer_2015} hacen
-uso de las activaciones de una red convolucional entrenada para la
-clasificación de escritores para recuperar la identidad de un productor a
-partir de una muestra de su escritura. Estos vectores de características se
-almacenan y la consulta se resuelve por vecindad más cercana sobre los vectores
-guardados. Este patrón de \enquote{codificar una vez y recuperar por similitud}
-es precisamente el que aplica este trabajo, trasladando los descriptores
-profundos descritos en la \chaptername anterior al dominio específico de la autoría.
-
-El área del reconocimiento facial, por su parte, ha experimentado un auge en
-los últimos años gracias a la disponibilidad de grandes conjuntos de datos
-etiquetados y a la mejora de las arquitecturas de redes neuronales.
-FaceNet~\cite{schroff_facenet_2015} es un modelo que aprende a mapear imágenes
-de rostros a un espacio de características donde las distancias corresponden a
-la similitud facial. Este enfoque se basa en el aprendizaje métrico, utilizando
-una función de pérdida \enquote{por tripletes}, que fomenta que una imagen de
-un individuo quede más próxima a otras imágenes del mismo individuo que a las
-de individuos diferentes. La identificación de autoría en grafiti puede
-beneficiarse de este enfoque, ya que también se trata de un problema de
-aprendizaje métrico en el que el número de identidades no se conoce \textit{a
-priori} y las muestras por clase son escasas.
-
-\subsection{Aprendizaje profundo de clústeres y posicionamiento de
-este trabajo}
-\label{subsec:art-deep-clustering}
-
-Una línea más reciente integra la representación y el agrupamiento en un mismo
-proceso de entrenamiento. \citea[etali]{Min}{min_survey_2018} ofrecen una
-revisión exhaustiva de estas propuestas de \textit{deep clustering}. Entre las
-más relevantes se encuentran DeepCluster~\cite{caron_deep_2019}, que reagrupa
-iterativamente las características de la red con K-medias y emplea las
-asignaciones resultantes como pseudo-etiquetas para reentrenarla, o
-SCAN~\cite{van_gansbeke_scan_2020}, que disocia el aprendizaje de
-características auto-supervisadas de la asignación de clústeres con resultados
-muy superiores en conjuntos de evaluación estándar.
-
-Estas aproximaciones, sin embargo, presuponen un volumen de datos y acceso a
-cómputo de los que no se dispone en el escenario de este trabajo, y resultan
-más difíciles de interpretar y de operar. Por ese motivo, el presente trabajo
-se sitúa deliberadamente en el enfoque desacoplado: aprovechar las
-representaciones ya disponibles en modelos preentrenados, posiblemente
-ajustadas con una cabeza ligera específica de dominio, y combinarlas con
-algoritmos de \textit{clustering} maduros y bien comprendidos. La contribución
-reside en evaluar de forma sistemática qué combinaciones de extractor,
-reducción y agrupamiento se comportan mejor sobre imágenes de grafiti.
-
+La identificación de autoría a partir de firmas es análoga a otros problemas ya
+estudiados. Fiel y Sablatnig~\cite{fiel_writer_2015} recuperan la identidad de
+un escritor a partir de las activaciones de una CNN, resolviendo la consulta por
+vecindad más cercana: el patrón de \enquote{codificar una vez y recuperar por
+similitud} es precisamente el que aplica este trabajo. En reconocimiento facial,
+FaceNet~\cite{schroff_facenet_2015} aprende un espacio métrico mediante una
+pérdida por tripletes; la autoría en grafiti puede beneficiarse de este enfoque,
+al ser también un problema de aprendizaje métrico con número de identidades
+desconocido \textit{a priori} y pocas muestras por clase. Una línea más reciente
+integra representación y agrupamiento en un mismo entrenamiento
+(\textit{deep clustering})~\cite{min_survey_2018,caron_deep_2019,van_gansbeke_scan_2020},
+pero presupone un volumen de datos y de cómputo del que no se dispone aquí. Por
+ello este trabajo se sitúa deliberadamente en el enfoque desacoplado:
+aprovechar representaciones preentrenadas, posiblemente ajustadas con una cabeza
+ligera de dominio, y combinarlas con algoritmos de \textit{clustering} maduros.

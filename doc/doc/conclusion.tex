@@ -2,87 +2,44 @@
 \section{Conclusiones}
 \label{sec:conclusion}
 
-Este trabajo planteaba como objetivo general diseñar y evaluar un sistema
-modular para el agrupamiento de imágenes de grafiti, con un enfoque específico
-en la evaluación del coste computacional y la calidad del agrupamiento en
-función del tamaño del conjunto de datos. Los resultados obtenidos permiten
-extraer conclusiones concretas sobre la escalabilidad y calidad de diferentes
-combinaciones de componentes, así como identificar áreas clave para trabajo
-futuro.
+Este trabajo planteaba diseñar y evaluar un sistema modular para el agrupamiento
+de imágenes de grafiti, con énfasis en el coste computacional y la calidad del
+agrupamiento en función del tamaño del conjunto. Los resultados permiten extraer
+conclusiones concretas sobre la escalabilidad y la calidad de distintas
+combinaciones de componentes.
 
-\subsection{Resultados principales}
-\label{sec:main-results}
+En cuanto al \textbf{coste}, el barrido de escalabilidad (E7) confirma que, a
+esta escala, la ingesta es el proceso inevitable más costoso, aun con escalado
+lineal. La búsqueda por similitud sobre SQLite es aún más costosa, con escalado
+cuadrático, y se convertiría en el cuello de botella de no ser por alternativas
+como PostgreSQL con índices HNSW, que obtienen la misma calidad a una fracción
+del coste. La reducción con UMAP presenta dos regímenes según se active
+\texttt{pynndescent}, y el agrupamiento con HDBSCAN es despreciable a esta escala,
+mientras que el aglomerativo y OPTICS encuentran límites de memoria y tiempo.
 
-En cuanto al coste computacional, el barrido de escalabilidad (E7) confirma
-que, a esta escala, la ingesta de imágenes es el proceso inevitable más
-costoso, aun con un escalado lineal. La búsqueda por similitud en el
-almacenamiento con SQLite se convierte en un proceso aun más costoso, con un
-escalado cuadrático, lo que lo convertiría en el cuello de botella de la
-arquitectura de no ser por la existencia de alternativas como PostgreSQL con
-índices HNSW, que obtienen los mismos resultados de calidad a una fracción del
-coste.
-
-La etapa de reducción de dimensionalidad con UMAP muestra un comportamiento 
-complejo, puesto que presenta dos regímenes de ejecución distintos dependiendo
-del tamaño de la muestra y de la activación de \texttt{pynndescent}. El
-agrupamiento con HDBSCAN es despreciable en coste a esta escala, mientras que
-otros agrupadores como el aglomerativo u OPTICS empiezan a encontrarse con
-limitaciones de memoria o tiempo respectivamente.
-
-En cuanto a la calidad del agrupamiento, los barridos iniciales (de E1 a E5) se
-centraron en identificar combinaciones de componentes que ofrecieran un buen
-rendimiento en métricas intrínsecas de calidad de clústeres. La cabeza de
-estilo de DINOv2 obtuvo una silueta inferior a las CNN preentrenadas en
-ImageNet, pero su desempeño en la evaluación supervisada de estilo (E8a) fue
-significativamente superior, lo que valida su elección a pesar de las mediocres
-métricas intrínsecas. La reducción de dimensionalidad probó ser un elemento
-indispensable para obtener agrupamientos de mejor calidad y para reducir el
-coste de ejecución posterior. Finalmente, el agrupamiento con HDBSCAN mostró un
-comportamiento robusto y consistente, con una configuración de \texttt{mcs}=5
-que ofrecía un buen compromiso entre calidad y número de clústeres obtenidos.
-
-Por último, la evaluación supervisada (E8a--E8b) revela una fuerte asimetría
-entre los dos ejes de similitud evaluados. Sobre estilo (4 clases, 294
-recortes), la cabeza específica de DINOv2 alcanza ARI~=~0.722 y F1~=~0.806,
-mientras que los mejores extractores sin entrenar no superan ARI~=~0.368. Sobre
-autoría (87 autores, 185 recortes), todos los extractores caen en una banda
-ARI~=~0.041--0.076, cercana al azar. La causa más probable de la falta de éxito
-en E8b es la combinación de un cambio de dominio Cuenca$\to$Salamanca, un
-número insuficiente de recortes por autor y la escasa variabilidad intraautor
-en el subconjunto disponible. No es un resultado que invalide las cabezas de
-autoría, sino que indica que el conjunto de datos anotado es insuficiente para
-entrenar representaciones útiles para esta tarea.
+En cuanto a la \textbf{calidad}, los barridos E1--E5 fijaron la configuración
+base: la cabeza de estilo de DINOv2, pese a una silueta inferior a las CNN de
+ImageNet, fue muy superior en la evaluación supervisada de estilo (E8a), lo que
+valida su elección frente a las métricas intrínsecas; la reducción de
+dimensionalidad probó ser indispensable; y HDBSCAN con \texttt{mcs}=5 ofreció el
+mejor compromiso. La validación supervisada (E8a--E8b) revela una fuerte
+asimetría: sobre estilo (4 clases) la cabeza específica de DINOv2 alcanza
+ARI~=~0.722 y F1~=~0.806, frente a un máximo de 0.368 en los extractores sin
+entrenar; sobre autoría (87 autores) todos caen en una banda ARI~=~0.041--0.076,
+cercana al azar, por la combinación del cambio de dominio Cuenca$\to$Salamanca,
+un número insuficiente de recortes por autor y la escasa variabilidad intraautor.
 
 \subsection{Trabajo futuro}
 \label{sec:future-work}
-
-Aunque el trabajo ha permitido obtener las conclusiones antes destacadas, queda
-abierta la vía para la extensión del trabajo a partir de la superación de
-algunas limitaciones presentes. La más evidente es el estrecho rango de $N$
-evaluado en el barrido de escalabilidad. Con solo 6416 imágenes reales, el
-barrido abarca $\approx 1.4$ décadas en escala logarítmica, insuficiente para
-distinguir con seguridad $O(n \log n)$ de $O(n^2)$ en las etapas intermedias.
-Esto sería relativamente sencillo de solucionar remuestreando con reemplazo los
-vectores DINOv2 ya calculados para aumentar el rango de $N$ lo que fuese
-necesario, pero afectaría a los resultados de calidad obtenidos, puesto que los
-valores remuestreados no tienen significado real. Esta solución sería
-exclusivamente de coste y se etiquetaría como proyección, no como medición.
-
-Tanto esta limitación como a la siguiente, la escasez de datos anotados por
-autoría, también podrían ser abordadas mediante una gran extensión del conjunto
-de datos. Este aumento no solo extendería el rango de $N$ para el barrido de
-escalabilidad, sino que también permitiría obtener un conjunto más apropiado
-para entrenar las cabezas de autoría. Además, un conjunto de datos más grande
-también permitiría distintos enfoques para el \textit{fine-tuning} de ambas
-cabezas, como por ejemplo el pre-entrenamiento no supervisado sobre el dataset 
-completo y el uso de la supervisión de estilo y autoría solo en la fase final,
-lo que reduciría la dependencia de un conjunto anotado pequeño.
-
-Por último, el sistema actual opera en modo \enquote{\textit{batch}}: la ingesta es
-completa antes de que el agrupamiento comience. En escenarios reales las bases
-de datos de grafiti crecen de forma continua, y tanto HDBSCAN como UMAP carecen
-de una implementación incremental estable. Extender el sistema para soportar
-actualizaciones incrementales del índice y del espacio reducido puede ser una
-mejora importante para aplicar algunos de los resultados obtenidos a un sistema
-real.
-
+La limitación más evidente es el estrecho rango de $N$ evaluado: con 6416
+imágenes el barrido abarca $\approx1.4$ décadas, insuficiente para distinguir con
+seguridad $O(n\log n)$ de $O(n^2)$ en las etapas intermedias. Remuestrear con
+reemplazo los vectores DINOv2 ya calculados extendería el rango de coste (aunque
+solo como proyección, no como medición de calidad). Tanto esta limitación como la
+escasez de datos de autoría podrían abordarse con una gran extensión del conjunto,
+que además habilitaría enfoques como el pre-entrenamiento no supervisado seguido
+de supervisión de estilo y autoría solo en la fase final. Por último, el sistema
+opera en modo \textit{batch}; extenderlo para soportar actualizaciones
+incrementales del índice y del espacio reducido —que HDBSCAN y UMAP no ofrecen de
+forma estable— sería una mejora importante para aplicarlo a bancos que crecen de
+forma continua.
