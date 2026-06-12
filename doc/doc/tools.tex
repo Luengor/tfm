@@ -80,8 +80,6 @@ y las $6416$ restantes constituyen el conjunto de evaluación sin supervisión
 del sistema completo, del que nunca se extraen recortes de entrenamiento.
 
 \begin{table}[h!]
-  \caption[Categorías estilísticas etiquetadas]{Categorías estilísticas etiquetadas, con un recorte de ejemplo y su definición.}
-  \label{tab:estilos-definiciones}
   \centering
   \renewcommand{\arraystretch}{1.4}%
   \begin{tabular}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}m{1.8cm}|m{0.55\linewidth}|} \hline
@@ -91,6 +89,8 @@ del sistema completo, del que nunca se extraen recortes de entrenamiento.
     \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_piece.jpg} & \textit{piece} & Obra elaborada, multicolor y con letras complejas, sombreados y mayor inversión de tiempo. \\ \hline
     \includegraphics[height=1.3cm,width=2.4cm,keepaspectratio]{figures/style_character.jpg} & \textit{character} & Figura o personaje ilustrado en lugar de letras, a menudo acompañando a otras categorías. \\ \hline
   \end{tabular}
+  \caption[Categorías estilísticas etiquetadas]{Categorías estilísticas etiquetadas, con un recorte de ejemplo y su definición.}
+  \label{tab:estilos-definiciones}
 \end{table}
 
 La figura~\ref{fig:dataset-style-distribution} muestra la distribución por
@@ -116,10 +116,6 @@ La tabla~\ref{tab:subconjuntos} resume los subconjuntos etiquetados empleados,
 su propósito, procedencia y tamaño.
 
 \begin{table}[h!]
-  \caption[Subconjuntos etiquetados empleados]{Subconjuntos empleados (en recortes, salvo detección y no
-  supervisión, en imágenes). Los recortes de entrenamiento nunca se solapan con
-  los de evaluación.}
-  \label{tab:subconjuntos}
   \centering
   \begin{tabular}{|l|l|l|r|} \hline
     \textbf{Subconjunto} & \textbf{Propósito} & \textbf{Procedencia} & \textbf{Tamaño} \\ \hline
@@ -130,6 +126,10 @@ su propósito, procedencia y tamaño.
     Detección & Ajuste del detector & Ambos bancos & $447$ \\ \hline
     No superv. & Agrupamiento & Salamanca (disjunto) & $6416$ \\ \hline
   \end{tabular}
+  \caption[Subconjuntos etiquetados empleados]{Subconjuntos empleados (en recortes, salvo detección y no
+  supervisión, en imágenes). Los recortes de entrenamiento nunca se solapan con
+  los de evaluación.}
+  \label{tab:subconjuntos}
 \end{table}
 
 \subsection{Marco conceptual}
@@ -320,8 +320,6 @@ tabla~\ref{tab:embedding-models} resume las opciones disponibles, indicando
 arquitectura, dimensionalidad de salida y preentrenamiento.
 
 \begin{table}[h]
-  \caption{Modelos de extracción de características integrados.}
-  \label{tab:embedding-models}
   \centering
 \begin{tabular}{|p{3.2cm}|p{3.8cm}|c|p{4.2cm}|} \hline
   \textbf{Modelo} & \textbf{Arquitectura} & \textbf{Dim.} & \textbf{Preentrenamiento} \\ \hline
@@ -333,6 +331,8 @@ arquitectura, dimensionalidad de salida y preentrenamiento.
   CLIP ViT-B/32~\cite{radford_learning_2021} & \textit{Transformer} & $512$ & Imagen-texto (WIT) \\ \hline
   YOLO11 (n/m)~\cite{ultralytics_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO \\ \hline
 \end{tabular}
+  \caption{Modelos de extracción de características integrados.}
+  \label{tab:embedding-models}
 \end{table}
 
 \subsubsection{Algoritmos de agrupamiento}
@@ -352,8 +352,6 @@ empleado en cada caso y su papel en el protocolo comparativo se detallan en
 \ref{subsubsec:hiperparam-auto}.
 
 \begin{table}[h]
-  \caption{Algoritmos de agrupamiento implementados.}
-  \label{tab:clustering-algos}
   \centering
 \begin{tabular}{|l|l|c|} \hline
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
@@ -366,6 +364,8 @@ empleado en cada caso y su papel en el protocolo comparativo se detallan en
   GMM~\cite{dempster_maximum_1977} & $n\_components$, covarianza & sí \\ \hline
   \textit{Affinity Propagation}~\cite{frey_clustering_2007} & $damping$, $preference$ & no requiere \\ \hline
 \end{tabular}
+  \caption{Algoritmos de agrupamiento implementados.}
+  \label{tab:clustering-algos}
 \end{table}
 
 \subsubsection{Técnicas de reducción de dimensionalidad}
@@ -375,8 +375,6 @@ de añadir esta etapa. La tabla~\ref{tab:reduction} resume las opciones
 disponibles.
 
 \begin{table}[h]
-  \caption{Técnicas de reducción de dimensionalidad implementadas.}
-  \label{tab:reduction}
 \centering
 \begin{tabular}{|l|l|l|} \hline
   \textbf{Técnica} & \textbf{Tipo} & \textbf{Parámetros principales} \\ \hline
@@ -386,6 +384,8 @@ disponibles.
   Isomap~\cite{tenenbaum_global_2000} & No lineal & $n\_components$, $n\_neighbors$ \\ \hline
   UMAP~\cite{mcinnes_umap_2020} & No lineal & $n\_components$, $n\_neighbors$, $min\_dist$ \\ \hline
 \end{tabular}
+  \caption{Técnicas de reducción de dimensionalidad implementadas.}
+  \label{tab:reduction}
 \end{table}
 
 \subsubsection{Sistemas de almacenamiento}
@@ -534,10 +534,6 @@ tabla~\ref{tab:dependencias} recoge las versiones de las dependencias
 principales.
 
 \begin{table}[h!]
-  \caption[Versiones de las dependencias principales]{Versiones de las
-  dependencias principales del proyecto. Salvo PyTorch (fijado de forma
-  exacta), corresponden al requisito mínimo declarado.}
-  \label{tab:dependencias}
   \centering
   \begin{tabular}{|l|l||l|l|} \hline
     \textbf{Dependencia} & \textbf{Versión} & \textbf{Dependencia} & \textbf{Versión} \\ \hline
@@ -550,5 +546,9 @@ principales.
     \textit{seaborn} & 0.13.0  & \textit{psutil}       & 6.1.1  \\ \hline
     \textit{tqdm}    & 4.67.3  & \textit{psycopg2}     & 2.9.11 \\ \hline
   \end{tabular}
+  \caption[Versiones de las dependencias principales]{Versiones de las
+  dependencias principales del proyecto. Salvo PyTorch (fijado de forma
+  exacta), corresponden al requisito mínimo declarado.}
+  \label{tab:dependencias}
 \end{table}
 

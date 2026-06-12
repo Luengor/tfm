@@ -16,9 +16,6 @@ en la tabla. Las subsecciones siguientes se refieren a cada barrido por su
 identificador.
 
 \begin{table}[h]
-  \caption[Catálogo de barridos experimentales]{Catálogo de barridos experimentales. El detalle metodológico común
-  (métricas, cronometría, repeticiones) se describe en \ref{sec:metodologia}.}
-  \label{tab:catalogo-experimentos}
   \centering
 {\footnotesize
 \begin{tabular}{|p{0.6cm}|p{3.9cm}|p{3.6cm}|p{4.7cm}|} \hline
@@ -35,6 +32,9 @@ identificador.
   E9 & Parámetros HNSW & \textit{Pipeline} base, PostgreSQL & $N{=}6416$, $K{=}5$ \\ \hline
 \end{tabular}
 }
+  \caption[Catálogo de barridos experimentales]{Catálogo de barridos experimentales. El detalle metodológico común
+  (métricas, cronometría, repeticiones) se describe en \ref{sec:metodologia}.}
+  \label{tab:catalogo-experimentos}
 \end{table}
 
 \subsection{Calibración del \textit{pipeline}}
@@ -71,11 +71,6 @@ MobileNetV3); la tabla~\ref{tab:e1-quality-6416} recoge la calidad intrínseca a
 $N=6416$.
 
 \begin{table}[h]
-  \caption[E1, calidad intrínseca a $N=6416$]{E1, calidad intrínseca a $N=6416$. Las CNN entrenadas en ImageNet encabezan la silueta; el extractor base
-  (\texttt{dinov2\_graffiti\_style\_head}) presenta un CH (27.9) solo superado
-  por los \textit{backbones} YOLO, pese a una silueta inferior a la de su
-  \textit{backbone} DINOv2. \glosacalidad}
-  \label{tab:e1-quality-6416}
   \centering
 {\footnotesize
 \begin{tabular}{|p{5.4cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|} \hline
@@ -94,6 +89,11 @@ $N=6416$.
   \texttt{yolon}                          & 348 & 0.341 & 0.085 & \textbf{51.2} & 1.91 & 0.81 \\ \hline
 \end{tabular}
 }
+  \caption[E1, calidad intrínseca a $N=6416$]{E1, calidad intrínseca a $N=6416$. Las CNN entrenadas en ImageNet encabezan la silueta; el extractor base
+  (\texttt{dinov2\_graffiti\_style\_head}) presenta un CH (27.9) solo superado
+  por los \textit{backbones} YOLO, pese a una silueta inferior a la de su
+  \textit{backbone} DINOv2. \glosacalidad}
+  \label{tab:e1-quality-6416}
 \end{table}
 
 Probablemente, el resultado más llamativo del barrido es la inversión entre
@@ -130,13 +130,6 @@ cabeza añade un sobrecoste pequeño ($\sim$8\,\%, 7.30~ips). Los
 y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
 
 \begin{table}[h]
-  \caption[E1, coste de ingesta a $N=6416$.]{E1, coste de ingesta a $N=6416$. La cabeza añade un sobrecoste
-  despreciable sobre el \textit{backbone}; los \textit{backbones} YOLO son los
-  más caros simultáneamente en tiempo y RSS. Se muestran 10 de los 12
-  extractores (las cabezas \texttt{mob.\_graffiti\_style\_head} y
-  \texttt{dinov2\_graffiti\_author\_head} se omiten por brevedad; su coste cae
-  dentro del rango de la cabeza correspondiente ya presente.)}
-  \label{tab:e1-cost-6416}
   \centering
 {\footnotesize
 \begin{tabular}{|p{5.4cm}|p{1.7cm}|p{1.0cm}|p{1.4cm}|p{1.4cm}|} \hline
@@ -153,6 +146,13 @@ y VGG16/CLIP los más exigentes en VRAM (552 y 592~MB).
   \texttt{yolom}                          & 1407.4 & 4.56 & 824.9 & 192.9 \\ \hline
 \end{tabular}
 }
+  \caption[E1, coste de ingesta a $N=6416$.]{E1, coste de ingesta a $N=6416$. La cabeza añade un sobrecoste
+  despreciable sobre el \textit{backbone}; los \textit{backbones} YOLO son los
+  más caros simultáneamente en tiempo y RSS. Se muestran 10 de los 12
+  extractores (las cabezas \texttt{mob.\_graffiti\_style\_head} y
+  \texttt{dinov2\_graffiti\_author\_head} se omiten por brevedad; su coste cae
+  dentro del rango de la cabeza correspondiente ya presente.)}
+  \label{tab:e1-cost-6416}
 \end{table}
 
 \begin{figure}[h!]
@@ -175,10 +175,6 @@ balanceados. La tabla~\ref{tab:e2-quality-6416} resume el resultado al tamaño
 de dataset completo.
 
 \begin{table}[h]
-  \caption[E2, calidad intrínseca a $N=6416$]{E2, calidad intrínseca a $N=6416$. UMAP es la única reducción que
-  produce simultáneamente un número de clústeres no trivial, ruido moderado y
-  tamaños balanceados. \glosacalidad}
-  \label{tab:e2-quality-6416}
   \centering
 {\footnotesize
 \begin{tabular}{|p{2.0cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|} \hline
@@ -191,6 +187,10 @@ de dataset completo.
   Isomap-10   & 125 & 0.624 &  0.044 & \textbf{38.4} & 1.80 & 3.40 \\ \hline
 \end{tabular}
 }
+  \caption[E2, calidad intrínseca a $N=6416$]{E2, calidad intrínseca a $N=6416$. UMAP es la única reducción que
+  produce simultáneamente un número de clústeres no trivial, ruido moderado y
+  tamaños balanceados. \glosacalidad}
+  \label{tab:e2-quality-6416}
 \end{table}
 
 La fila \emph{identidad} responde directamente a la pregunta de cuánto aporta
@@ -246,12 +246,6 @@ cubre 14 configuraciones sobre el extractor base y UMAP-10: HDBSCAN, K-medias
 tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
 
 \begin{table}[h]
-  \caption[E3, fila representativa por familia a $N=6416$]{E3, fila representativa de cada familia a $N=6416$. La columna
-  \textbf{mem} reporta el pico de RSS delta de la etapa de agrupamiento. Sólo
-  HDBSCAN combina un número no trivial de clústeres, ruido moderado, tamaños
-  balanceados, coste despreciable y huella de memoria mínima. \glosacalidad{}
-  \textit{clu}=tiempo de agrupamiento, \textit{mem}=pico de RSS delta.}
-  \label{tab:e3-summary-6416}
   \centering
 {\footnotesize
 \begin{tabular}{|p{2.4cm}|p{0.9cm}|p{1.0cm}|p{1.1cm}|p{0.8cm}|p{0.8cm}|p{0.9cm}|p{1.0cm}|p{1.0cm}|} \hline
@@ -265,6 +259,12 @@ tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
   Espectral $k=10$       &  10 & \textbf{0.000} & -0.117 & 264 & 3.33 & 1.56 & 2.073 & 1.1 \\ \hline
 \end{tabular}
 }
+  \caption[E3, fila representativa por familia a $N=6416$]{E3, fila representativa de cada familia a $N=6416$. La columna
+  \textbf{mem} reporta el pico de RSS delta de la etapa de agrupamiento. Sólo
+  HDBSCAN combina un número no trivial de clústeres, ruido moderado, tamaños
+  balanceados, coste despreciable y huella de memoria mínima. \glosacalidad{}
+  \textit{clu}=tiempo de agrupamiento, \textit{mem}=pico de RSS delta.}
+  \label{tab:e3-summary-6416}
 \end{table}
 
 Como se anticipó en \ref{subsec:res-calibracion}, es necesario leer las
@@ -326,10 +326,6 @@ seis valores de \texttt{mcs} entre 5 y 200, como se puede ver en la
 tabla~\ref{tab:e4-mcs-6416} a $N=6416$.
 
 \begin{table}[h]
-  \caption[E4, barrido de \texttt{min\_cluster\_size} a $N=6416$]{E4, barrido de \texttt{min\_cluster\_size} a $N=6416$. La silueta y
-  el CH alcanzan su máximo en los valores degenerados ($k{=}2$); el criterio
-  conjunto sitúa el óptimo en \texttt{mcs}=5. \glosacalidad}
-  \label{tab:e4-mcs-6416}
   \centering
 {\footnotesize
 \begin{tabular}{|p{1.4cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|} \hline
@@ -342,6 +338,10 @@ tabla~\ref{tab:e4-mcs-6416} a $N=6416$.
   200 &   2 & 0.011 & 0.270 & 2776 & 1.27 & 0.40 \\ \hline
 \end{tabular}
 }
+  \caption[E4, barrido de \texttt{min\_cluster\_size} a $N=6416$]{E4, barrido de \texttt{min\_cluster\_size} a $N=6416$. La silueta y
+  el CH alcanzan su máximo en los valores degenerados ($k{=}2$); el criterio
+  conjunto sitúa el óptimo en \texttt{mcs}=5. \glosacalidad}
+  \label{tab:e4-mcs-6416}
 \end{table}
 
 Los valores más altos de \texttt{mcs} (100 y 200), aunque presentan las
@@ -377,13 +377,6 @@ YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}) manteniendo fijo el resto del
 \textit{pipeline}.
 
 \begin{table}[h]
-  \caption[E5, calidad y coste de ingesta a $N=6416$]{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
-  \enquote{recortes} son los puntos efectivamente agrupados, no las imágenes leídas).
-  Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.
-  Columnas: r/img=recortes por imagen, cls=número de clústeres,
-  ruido=fracción de ruido~$\downarrow$, sil=silueta~$\uparrow$,
-  CH=Calinski--Harabász~$\uparrow$, ingesta=tiempo de ingesta.}
-  \label{tab:e5-segmenter-6416}
   \centering
 {\footnotesize
 \begin{tabular}{|p{2.5cm}|p{1.5cm}|p{1.0cm}|p{1.0cm}|p{1.1cm}|p{1.0cm}|p{1.0cm}|p{1.4cm}|} \hline
@@ -394,6 +387,13 @@ YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}) manteniendo fijo el resto del
   YOLO11m \textit{ft} & 15362 & 2.39 & 1049 & 0.298 & 0.122 & \textbf{36.2} & 2152.3 \\ \hline
 \end{tabular}
 }
+  \caption[E5, calidad y coste de ingesta a $N=6416$]{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
+  \enquote{recortes} son los puntos efectivamente agrupados, no las imágenes leídas).
+  Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.
+  Columnas: r/img=recortes por imagen, cls=número de clústeres,
+  ruido=fracción de ruido~$\downarrow$, sil=silueta~$\uparrow$,
+  CH=Calinski--Harabász~$\uparrow$, ingesta=tiempo de ingesta.}
+  \label{tab:e5-segmenter-6416}
 \end{table}
 
 A escala completa, la identidad gana en todos los ejes que importan: silueta
@@ -463,10 +463,6 @@ tabla~\ref{tab:e7-slopes} contrasta las pendientes log-log observadas con la
 complejidad teórica de referencia.
 
 \begin{table}[h]
-  \caption[E7, tiempo por etapa frente a $N$]{E7, tiempo por etapa frente a $N$ (extracto). A $N=6416$ la búsqueda
-  por similitud SQLite domina absolutamente, con la ingesta como segundo coste.
-La caída de UMAP a $N=6416$ se discute en el texto.}
-  \label{tab:e7-cost}
   \centering
 {\footnotesize
 \begin{tabular}{|p{1.0cm}|p{1.6cm}|p{1.2cm}|p{2.0cm}|p{2.0cm}|p{1.4cm}|p{2.0cm}|} \hline
@@ -479,13 +475,13 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
   6416 & 1294.9 &  6.237 & 0.3580 & 0.0098 & 0.5988 & 3266.60 \\ \hline
 \end{tabular}
 }
+  \caption[E7, tiempo por etapa frente a $N$]{E7, tiempo por etapa frente a $N$ (extracto). A $N=6416$ la búsqueda
+  por similitud SQLite domina absolutamente, con la ingesta como segundo coste.
+La caída de UMAP a $N=6416$ se discute en el texto.}
+  \label{tab:e7-cost}
 \end{table}
 
 \begin{table}[h]
-  \caption[E7, pendientes observadas por etapa]{E7, pendientes observadas (regresión log-log) por etapa, comparadas
-  con la complejidad teórica de referencia. La ventana $500\ldots3500$ excluye
-el punto $N=6416$ de reducción (anomalía \texttt{pynndescent}, ver texto).}
-  \label{tab:e7-slopes}
   \centering
 {\footnotesize
 \begin{tabular}{|p{2.5cm}|p{3.4cm}|p{2.6cm}|p{2.6cm}|} \hline
@@ -500,6 +496,10 @@ el punto $N=6416$ de reducción (anomalía \texttt{pynndescent}, ver texto).}
   Búsqueda (SQLite)      & $O(n^2)$ por pasada & \textbf{2.10} & 2.13 \\ \hline
 \end{tabular}
 }
+  \caption[E7, pendientes observadas por etapa]{E7, pendientes observadas (regresión log-log) por etapa, comparadas
+  con la complejidad teórica de referencia. La ventana $500\ldots3500$ excluye
+el punto $N=6416$ de reducción (anomalía \texttt{pynndescent}, ver texto).}
+  \label{tab:e7-slopes}
 \end{table}
 
 Como se puede ver en la segunda tabla, el rango reducido de $N$ provoca que
@@ -563,12 +563,6 @@ una sola vez entre la ingesta y el bucle de búsqueda, así que su coste no se
 acumula sobre el tiempo de consulta.
 
 \begin{table}[h]
-  \caption[E6, latencia y \textit{recall} por \textit{backend}]{E6, latencia, \textit{throughput} y \textit{recall} de la búsqueda
-  por similitud por \textit{backend} y tamaño de banco. SQLite escala
-  linealmente en tiempo por consulta; pgvector exacto está dominado por la
-  latencia de \textit{round-trip} en los tamaños pequeños; HNSW solo se
-  separa visiblemente por encima de $N\approx 2500$.}
-  \label{tab:e6-storage}
   \centering
 {\footnotesize
 \begin{tabular}{|p{1.0cm}|p{2.6cm}|p{1.6cm}|p{2.0cm}|p{1.6cm}|p{1.8cm}|} \hline
@@ -587,6 +581,12 @@ acumula sobre el tiempo de consulta.
   6416 & PostgreSQL + HNSW  & 0.179 & 35 936 & 0.465  & 1.000 \\ \hline
 \end{tabular}
 }
+  \caption[E6, latencia y \textit{recall} por \textit{backend}]{E6, latencia, \textit{throughput} y \textit{recall} de la búsqueda
+  por similitud por \textit{backend} y tamaño de banco. SQLite escala
+  linealmente en tiempo por consulta; pgvector exacto está dominado por la
+  latencia de \textit{round-trip} en los tamaños pequeños; HNSW solo se
+  separa visiblemente por encima de $N\approx 2500$.}
+  \label{tab:e6-storage}
 \end{table}
 
 SQLite mantiene un \textit{throughput} aproximadamente plano ($\sim$150~ips)
@@ -662,11 +662,6 @@ ruido), \emph{chance-corrected} y, por tanto, comparable entre configuraciones
 con distinto número de clústeres.
 
 \begin{table}[h]
-  \caption[E8a, mejor celda por extractor (estilo)]{E8a, mejor celda por extractor sobre la evaluación de estilo (294
-  recortes, 4 clases). El ranking sitúa las cabezas de autoría por debajo del
-  \textit{backbone} en ambas familias, aunque con un margen modesto
-  ($-0.054$ DINOv2, $-0.038$ MobileNetV3).}
-  \label{tab:e8a-best}
   \centering
 {\footnotesize
 \begin{tabular}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
@@ -681,6 +676,11 @@ con distinto número de clústeres.
   \texttt{dinov2\_graffiti\_author\_head}     & 0.302 & 0.273 & 0.519 & 0.094 & UMAP + aglomerativo    \\ \hline
 \end{tabular}
 }
+  \caption[E8a, mejor celda por extractor (estilo)]{E8a, mejor celda por extractor sobre la evaluación de estilo (294
+  recortes, 4 clases). El ranking sitúa las cabezas de autoría por debajo del
+  \textit{backbone} en ambas familias, aunque con un margen modesto
+  ($-0.054$ DINOv2, $-0.038$ MobileNetV3).}
+  \label{tab:e8a-best}
 \end{table}
 
 El resultado es inequívoco: la cabeza estilística de DINOv2 + identidad +
@@ -712,11 +712,6 @@ recuperador del panel ($0.639$), consistente con su caída de ARI por debajo
 del propio \textit{backbone}.
 
 \begin{table}[h]
-  \caption[E8a, recuperación supervisada \textit{top-5} (estilo)]{E8a, recuperación supervisada \textit{top-5} por extractor sobre
-  la evaluación de estilo. Reproduce el mismo ordenamiento que el ARI de la
-  tabla~\ref{tab:e8a-best}, lo que descarta que el liderazgo de la cabeza
-  estilística esté inducido por la elección de agrupador.}
-  \label{tab:e8a-retrieval}
   \centering
 {\footnotesize
 \begin{tabular}{|p{5.4cm}|p{1.3cm}|p{1.6cm}|p{1.3cm}|} \hline
@@ -731,6 +726,11 @@ del propio \textit{backbone}.
   \texttt{mob.\_graffiti\_author\_head}      & 0.639 & 0.775 & 0.799 \\ \hline
 \end{tabular}
 }
+  \caption[E8a, recuperación supervisada \textit{top-5} (estilo)]{E8a, recuperación supervisada \textit{top-5} por extractor sobre
+  la evaluación de estilo. Reproduce el mismo ordenamiento que el ARI de la
+  tabla~\ref{tab:e8a-best}, lo que descarta que el liderazgo de la cabeza
+  estilística esté inducido por la elección de agrupador.}
+  \label{tab:e8a-retrieval}
 \end{table}
 
 HDBSCAN no parece llegar a distinguir las cuatro categorías de estilo posibles
@@ -793,11 +793,6 @@ la cabeza apenas iguala a su \textit{backbone} (0.048 vs.\ 0.046, +0.002 ARI)
 y supera a la cabeza de estilo (0.041).
 
 \begin{table}[h]
-  \caption[E8b, mejor celda por extractor (autoría)]{E8b, mejor celda por extractor sobre la evaluación de autoría
-  (185 recortes, 87 autores, evaluación entre ciudades Cuenca$\to$Salamanca).
-  Todos los ARI caen en una banda estrecha cercana al suelo; la simetría
-  esperada con E8a no se materializa.}
-  \label{tab:e8b-best}
   \centering
 {\footnotesize
 \begin{tabular}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
@@ -812,6 +807,11 @@ y supera a la cabeza de estilo (0.041).
   \texttt{mob.\_graffiti\_style\_head}        & 0.041 & 0.629 & 0.070 & 0.020 & UMAP + aglo-30 \\ \hline
 \end{tabular}
 }
+  \caption[E8b, mejor celda por extractor (autoría)]{E8b, mejor celda por extractor sobre la evaluación de autoría
+  (185 recortes, 87 autores, evaluación entre ciudades Cuenca$\to$Salamanca).
+  Todos los ARI caen en una banda estrecha cercana al suelo; la simetría
+  esperada con E8a no se materializa.}
+  \label{tab:e8b-best}
 \end{table}
 
 E8b es un resultado negativo, pero esperado. La tarea de clasificación por
@@ -838,12 +838,6 @@ la hipótesis de que el \textit{fine-tuning} para autoría no consigue una
 representación útil para esta tarea.
 
 \begin{table}[h]
-  \caption[E8b, recuperación supervisada \textit{top-5} (autoría)]{E8b, recuperación supervisada \textit{top-5} por extractor sobre
-  la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
-  campo cabe en una banda estrecha; las cabezas de autoría quedan en la
-  zona media en ambos ejes (ARI y $P@5$), coherentemente con un soporte
-  parcial a piso aleatorio.}
-  \label{tab:e8b-retrieval}
   \centering
 {\footnotesize
 \begin{tabular}{|p{5.4cm}|p{1.2cm}|p{1.6cm}|p{1.2cm}|p{1.2cm}|} \hline
@@ -858,6 +852,12 @@ representación útil para esta tarea.
   \texttt{dinov2\_graffiti\_style\_head}     & 0.065 & 0.226 & 0.229 & 0.192 \\ \hline
 \end{tabular}
 }
+  \caption[E8b, recuperación supervisada \textit{top-5} (autoría)]{E8b, recuperación supervisada \textit{top-5} por extractor sobre
+  la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
+  campo cabe en una banda estrecha; las cabezas de autoría quedan en la
+  zona media en ambos ejes (ARI y $P@5$), coherentemente con un soporte
+  parcial a piso aleatorio.}
+  \label{tab:e8b-retrieval}
 \end{table}
 
 \subsubsection{Correlación interna-externa}
