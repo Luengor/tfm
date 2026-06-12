@@ -1,0 +1,40 @@
+\documentclass{llncs}
+
+% --- Spanish (portable across pdflatex / tectonic) ---
+% System TeXLive (babel v26) has no spanish.ldf, so [spanish]{babel} fails.
+% Use babelprovide instead; works on both engines.
+\usepackage{babel}
+\babelprovide[import, main]{spanish}
+
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\graphicspath{{figures/}}
+\usepackage{amsmath, amssymb}
+
+\begin{document}
+
+\title{Caracterización del desempeño y el coste computacional en algoritmos
+de similitud en bancos de imágenes de grafiti}
+\titlerunning{Similitud en bancos de imágenes de grafiti}
+
+\author{Alberto Luengo Román}
+\authorrunning{A. Luengo Román}
+\institute{Departamento de Informática y Automática,\\
+Universidad de Salamanca, Salamanca, España\\
+\email{luengor@usal.es}}
+
+\maketitle
+
+\begin{abstract}
+Resumen pendiente.
+
+\keywordname{} Grafiti $\cdot$ Similitud de imágenes $\cdot$ Agrupamiento
+$\cdot$ Aprendizaje profundo
+\end{abstract}
+
+% Secciones pendientes de enlazar.
+
+\bibliographystyle{splncs}
+\bibliography{bib}
+
+\end{document}
