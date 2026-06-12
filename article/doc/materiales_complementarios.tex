@@ -28,14 +28,28 @@ añadieron las últimas 500 imágenes al conjunto de datos.}
 
 \subsection{Catálogo de componentes}
 \label{anexo:catalogo}
-Las tablas siguientes detallan los componentes resumidos en
-\ref{subsec:configuraciones}: los modelos de extracción de características
-(tabla~\ref{tab:embedding-models}), los algoritmos de agrupamiento
-(tabla~\ref{tab:clustering-algos}) y las técnicas de reducción de
-dimensionalidad (tabla~\ref{tab:reduction}). La columna «Auto. $k$» de la
-tabla~\ref{tab:clustering-algos} indica qué algoritmos estiman su
-hiperparámetro principal cuando este no se declara, según el procedimiento de
-\ref{subsubsec:hiperparam-auto}.
+\label{subsec:configuraciones}
+Esta sección cataloga los componentes concretos integrados en el sistema, que
+constituyen los materiales sobre los que opera la evaluación. Su combinación
+parametrizada para definir cada experimento se describe en
+\ref{subsubsec:espacio-configs}.
+
+El sistema integra siete modelos de extracción de características, todos
+empleados congelados: las CNN preentrenadas sobre ImageNet ResNet50, VGG16,
+InceptionV3 y MobileNetV3, los \textit{transformers}
+DINOv2~\cite{oquab_dinov2_2024} y CLIP~\cite{radford_learning_2021}, y la red de
+detección YOLO~\cite{ultralytics_ultralytics_2024}. En el agrupamiento se
+cubren los principales paradigmas (centroides, densidad, jerárquicos,
+probabilísticos y espectrales) con ocho algoritmos, y en la reducción de
+dimensionalidad cinco técnicas (PCA, Kernel PCA, Isomap, UMAP y la identidad,
+que no transforma y permite medir el efecto de añadir la etapa). Las
+tablas~\ref{tab:embedding-models}, \ref{tab:clustering-algos}
+y~\ref{tab:reduction} detallan cada opción con su arquitectura, dimensionalidad,
+hiperparámetros y referencias. Las implementaciones de agrupamiento y reducción
+provienen de scikit-learn~\cite{pedregosa_scikit-learn_2011}; algunos algoritmos
+(K-medias, DBSCAN, GMM) estiman su hiperparámetro principal cuando no se
+declara, según el procedimiento de \ref{subsubsec:hiperparam-auto} (columna
+«Auto. $k$» de la tabla~\ref{tab:clustering-algos}).
 
 \begin{longtable}{|p{3.2cm}|p{3.8cm}|c|p{4.2cm}|} \hline
   \textbf{Modelo} & \textbf{Arquitectura} & \textbf{Dim.} & \textbf{Preentrenamiento} \\ \hline
@@ -74,3 +88,23 @@ hiperparámetro principal cuando este no se declara, según el procedimiento de
   \caption{Técnicas de reducción de dimensionalidad implementadas.}
   \label{tab:reduction}
 \end{longtable}
+
+\subsubsection{Sistemas de almacenamiento}
+La persistencia de los \textit{embeddings} y los metadatos asociados se abstrae
+tras una interfaz común, de la que se han implementado dos \textit{backends}
+con características operativas distintas. El primero, basado en SQLite, no
+requiere servicios externos, almacena los vectores como \textit{blobs} y
+realiza la búsqueda por similitud mediante un recorrido lineal; resulta
+apropiado para despliegues ligeros y como referencia de cálculo exacto frente a
+alternativas aproximadas. El segundo se apoya en la extensión \textit{pgvector}
+de PostgreSQL y delega la búsqueda al motor de la base de datos. Por defecto la
+consulta es un recorrido exacto; opcionalmente puede habilitarse un índice
+aproximado HNSW~\cite{malkov_efficient_2018} sobre los vectores, lo que permite
+contrastar el coste de la búsqueda exacta frente a la aproximada. El índice
+HNSW de \textit{pgvector} impone un límite de 2000 dimensiones sobre el tipo
+\texttt{vector}, por lo que no es aplicable a los modelos cuya salida lo supera
+(ResNet50 e InceptionV3, con 2048, y VGG16, con 4096); para estos casos debe
+recurrirse a una reducción de dimensionalidad previa al almacenamiento o al
+\textit{backend} SQLite con búsqueda exacta. Ambos \textit{backends} comparten
+el esquema lógico y la persistencia de metadatos, lo que permite cambiar de uno
+a otro sin modificar el resto del \textit{pipeline}.
