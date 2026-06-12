@@ -1,0 +1,130 @@
+%! TeX root: ../informe.tex
+%\documentclass[12pt,graphicx,caption,rotating]{article}
+\documentclass[12pt,a4paper,spanish,twoside]{article}
+\usepackage[paper=a4paper,top=3cm,bottom=3cm,left=3cm,right=3cm]{geometry}
+
+% Separación de los párrafos
+\setlength{\parskip}{0.6cm}
+
+% Configuración de fuentes según el motor: pdflatex usa inputenc/fontenc,
+% xelatex/lualatex (tectonic) usan fontspec.
+\usepackage{iftex}
+\ifpdftex
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+\else
+  \usepackage{fontspec}
+\fi
+\usepackage[spanish]{babel}
+% Localiza la bibliografía al español (meses, "y", "páginas", "ed.", etc.).
+% plain.bst codifica los meses en inglés ("August"); babelbib + babplain.bst
+% los traduce ("Agosto") según el idioma fijado con \selectbiblanguage.
+\usepackage[fixlanguage]{babelbib}
+\selectbiblanguage{spanish}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{wrapfig} % Para permitir un gráfico al lado de texto
+\usepackage{url}
+\usepackage{epsfig}
+\usepackage{csquotes}
+
+\usepackage{titlesec}
+
+% Diagramas vectoriales
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
+
+% Graficos en párrafos
+\usepackage{picins}
+
+% Tablas muy largas que ocupan más de una página (se parten)
+\usepackage{longtable}
+\usepackage{array} % columnas m{} con centrado vertical
+
+%Paquete para subrayado, tachado, etc
+\usepackage{ulem}
+\normalem
+
+% Incluir paragraph
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{4}{\z@}%
+                                     {-3.25ex\@plus -1ex \@minus -.2ex}%
+                                     {1.5ex \@plus .2ex}%
+                                     {\normalfont\normalsize\bfseries}}
+\makeatother
+
+% Cambiar margenes en medio del texto
+%\usepackage{chngpage}
+%\usepackage{anysize}
+
+\usepackage{listings}
+\usepackage{color}
+\definecolor{listinggray}{gray}{0.9}
+\lstset{language=Matlab}
+\lstset{keywordstyle=\color{red}\bfseries\underbar}
+
+% Control de apendices
+%\usepackage{appendix}
+%\usepackage[toc,page]{appendix}
+
+% Usar encabezados y pie de página
+\usepackage{fancyhdr}
+
+% Para cambiar el tipo de letra del ambiente verbatim
+\usepackage{fancyvrb}
+%\fvset{fontshape=it, fontfamily=courier}
+%\DefineShortVerb{\|}
+
+% Incluir los índices y la bibliografia en el índice general
+%\usepackage{tocbibind}
+\usepackage[nottoc]{tocbibind} % Saca todos los índices y la bibliografia al índice general y no pone este
+
+\makeatother
+\usepackage[pageref]{backref}
+\renewcommand{\backreftwosep}{ y~}
+\renewcommand{\backreflastsep}{ y~}
+
+% Copy&paste de la doc de backref
+% Mejorado con código "by Jelby"
+\renewcommand*{\backref}[1]{}   % No usamos este hook, sino backrefalt
+%
+\renewcommand{\backrefalt}[4]{%
+\ifcase #1 %
+{\unskip\nobreak\hfil\penalty50\null\hfil%
+\mbox{\nobreakspace\small[\textsl{No citado: usado como
+referencia}]}%
+\parfillskip=0pt\finalhyphendemerits=0\par}
+\or
+{\unskip\nobreak\hfil\penalty50\null\hfil%
+\mbox{\nobreakspace\small[\textsl{Citado en
+p\'ag.\nobreakspace#2.}]}%
+\parfillskip=0pt\finalhyphendemerits=0\par}
+\else
+{\unskip\nobreak\hfil\penalty50\null\hfil%
+\mbox{\nobreakspace\small[\textsl{Citado en
+p\'ags.\nobreakspace#2.}]}%
+\parfillskip=0pt\finalhyphendemerits=0\par}
+\fi
+}
+
+% Para cambiar el espaciado en el índice
+\usepackage{setspace}
+\setlength\headheight{14.6pt}
+
+% Descripción de columnas para las tablas de calidad intrínseca
+\newcommand{\glosacalidad}{Columnas: cls=n\'umero de cl\'usteres,
+ruido=fracci\'on de ruido~$\downarrow$, sil=silueta~$\uparrow$,
+CH=Calinski--Harab\'asz~$\uparrow$, DB=Davies--Bouldin~$\downarrow$,
+csCV=coef.\ de variaci\'on del tama\~no de cl\'uster~$\downarrow$.}
+
+\begin{document}
+% Cambiar el nombre de cuadros a tablas (ponerlo en esta ubicación)
+\renewcommand{\tablename}{Tabla}
+\renewcommand{\listtablename}{Indice de tablas}
+
+% Cita chula
+\newcommand{\citea}[3][]{%
+    #2\ifx\\#1\\\else~\textit{et~al.}\fi~\cite{#3}%
+}
