@@ -35,6 +35,14 @@ identificador.
 \end{longtable}
 }
 
+Los experimentos se ejecutaron en un portátil con CPU AMD Ryzen 7 5800H, GPU
+NVIDIA GeForce GTX 1650 y 16 GB de RAM, sobre Python 3.14 gestionado con
+\texttt{uv} y, como dependencias nucleares, PyTorch (fijado a 2.10.0),
+\textit{open-clip-torch}, \textit{ultralytics}, \textit{scikit-learn},
+\textit{umap-learn} y \textit{SQLAlchemy} con \textit{pgvector}. Las versiones
+completas de las dependencias se recogen en el anexo~\ref{anexo:repro}
+(tabla~\ref{tab:dependencias}).
+
 \subsection{Calibración del \textit{pipeline}}
 \label{subsec:res-calibracion}
 En esta sección se recorren las decisiones tomadas para el diseño de lo que se

@@ -2,18 +2,69 @@
 \section{Metodología}
 \label{sec:metodologia}
 
+\subsection{Conjunto de datos}
+\label{subsec:dataset}
+El banco de imágenes de grafiti proporcionado para este trabajo se compone de
+$6681$ fotografías capturadas en condiciones reales en la ciudad de Salamanca,
+tomadas entre $2022$ y $2023$. De manera adicional, se dispone de un conjunto
+de datos adicional de $1106$ imágenes de la ciudad de Cuenca, cedidas por la
+iniciativa StopGrafiti\footnote{\url{https://stopgrafiti.com/}}, que se emplea
+para el ajuste fino de algunos componentes del sistema.
+
+Ninguno de los dos bancos de datos cuenta con anotaciones de ningún tipo, lo
+que impide la evaluación supervisada directa de los modelos. Además, la
+existencia de varios grafitis por imagen hace que la anotación a nivel de
+imagen no sea suficiente para evaluar la calidad de los clústeres. Por tanto,
+se opta por recortar y etiquetar manualmente varios subconjuntos de grafitis,
+de modo que la evaluación supervisada se realice sobre estos recortes
+etiquetados.
+
+Se etiquetan manualmente recortes por estilo, asignándoles una de las cuatro
+categorías estilísticas (firmas rápidas, \textit{tags}; letras redondeadas con
+no más de dos colores, \textit{throw-ups}; texto mucho más elaborado,
+\textit{pieces}; y personajes animados u otros elementos que no sean texto,
+\textit{characters}), y otros recortes por autoría. La procedencia de cada
+subconjunto difiere: el entrenamiento de estilo contiene recortes del banco
+principal, mientras que el de autoría se restringe a StopGrafiti; el reparto y
+su justificación se detallan al describir la evaluación extrínseca
+(\ref{subsubsec:eval-extrinseca}). El reparto por clase de los recortes
+etiquetados por estilo es desigual: las categorías \textit{tag}, \textit{piece}
+y \textit{throw-up} concentran la mayor parte de los recortes, mientras que
+\textit{character} resulta claramente minoritaria, lo que condiciona la
+interpretación posterior de las métricas extrínsecas por estilo. Por último, se
+utilizan imágenes de ambos grupos para el ajuste fino del detector de grafitis.
+
+De las $6681$ imágenes de Salamanca, $265$ se reservan para entrenamiento
+(ajuste fino del detector y de las cabezas, así como los recortes de autoría),
+y las $6416$ restantes constituyen el conjunto de evaluación sin supervisión
+del sistema completo, del que nunca se extraen recortes de entrenamiento. La
+tabla~\ref{tab:subconjuntos} resume los subconjuntos etiquetados empleados, su
+propósito, procedencia y tamaño.
+
+\begin{table}[h!]
+  \centering
+  \begin{tabular}{|l|l|l|r|} \hline
+    \textbf{Subconjunto} & \textbf{Propósito} & \textbf{Procedencia} & \textbf{Tamaño} \\ \hline
+    Estilo (entr.) & Cabezas de estilo & StopGrafiti + Salamanca & $385$ \\ \hline
+    Estilo (eval.) & M. Extrínsecas & Banco completo & $294$ \\ \hline
+    Autoría (entr.) & Cabezas de autoría & StopGrafiti & $321$ \\ \hline
+    Autoría (eval.) & M. Extrínsecas & Salamanca & $185$ \\ \hline
+    Detección & Ajuste del detector & Ambos bancos & $447$ \\ \hline
+    No superv. & Agrupamiento & Salamanca (disjunto) & $6416$ \\ \hline
+  \end{tabular}
+  \caption[Subconjuntos etiquetados empleados]{Subconjuntos empleados (en recortes, salvo detección y no
+  supervisión, en imágenes). Los recortes de entrenamiento nunca se solapan con
+  los de evaluación.}
+  \label{tab:subconjuntos}
+\end{table}
+
 \subsection{Visión general del flujo de trabajo}
 \label{subsec:vision}
 El sistema implementado procesa cada fotografía en cuatro etapas operativas:
 segmentación de los grafitis contenidos en la imagen, extracción de un vector
 de características por recorte, persistencia del vector junto a sus metadatos
 en un almacenamiento estructurado y, en un segundo tiempo, recuperación masiva
-del conjunto almacenado para reducirlo y agruparlo. La separación explícita
-entre la fase de ingesta y la fase de agrupamiento es intencionada. Por un
-lado, refleja el escenario de uso previsto (un banco que crece de forma
-incremental sobre el que se ejecutan sesiones de análisis puntuales), y por
-otro permite aislar el coste computacional de cada etapa al medir
-(figura~\ref{fig:pipeline}).
+del conjunto almacenado para reducirlo y agruparlo (figura~\ref{fig:pipeline}).
 
 \begin{figure}[h!]
   \centering
@@ -64,54 +115,31 @@ Cada una de las cinco etapas es un componente intercambiable tras una interfaz
 común; el catálogo completo de opciones disponibles para cada una (modelos de
 extracción, algoritmos de agrupamiento, técnicas de reducción y
 \textit{backends} de almacenamiento) se recoge en el
-anexo~\ref{subsec:configuraciones}. Este desacoplamiento es el
-que habilita la evaluación combinatoria que forma el trabajo: cada combinación
-define una configuración independiente y reproducible cuyo coste y calidad
-pueden compararse con cualquier otra.
+anexo~\ref{subsec:configuraciones}. Este desacoplamiento es el que habilita la
+evaluación combinatoria que forma el trabajo: cada combinación define una
+configuración independiente y reproducible cuyo coste y calidad pueden
+compararse con cualquier otra.
 
 \subsection{\textit{Pipeline} operativo}
 \label{subsec:pipeline}
 
 \subsubsection{Ingesta y generación de \textit{embeddings}}
-La ingesta de cada fotografía sigue la siguiente secuencia de pasos:
-\begin{enumerate}
-    \item La imagen se carga desde disco y se proporciona al segmentador.
-    \item El segmentador consume la imagen y devuelve una lista con cajas
-        delimitadoras de los grafitis presentes en la imagen. En el caso de que
-        no se utilice segmentador, se devuelve una única caja que abarca toda
-        la imagen, de modo que el sistema se comporta como un agrupador de
-        imágenes completas. Este comportamiento de respaldo también se puede
-        habilitar o deshabilitar para los modelos de detección de grafitis,
-        de modo que las imágenes sin detección se emitan como recortes de
-        escena completa o se descarten, respectivamente.
-    \item Las cajas detectadas se fusionan según criterios de solapamiento y
-        proximidad configurables, con salvaguardas para evitar mega-cajas;
-        opcionalmente se trunca la lista a las $K$ de mayor confianza. Si se
-        configura un margen no nulo, las cajas supervivientes se expanden para
-        incluir contexto visual alrededor del grafiti. Los parámetros que
-        gobiernan este proceso se describen en \ref{subsubsec:segmentador}.
-    \item Cada grafiti se recorta sobre la imagen original y el recorte se
-        entrega al modelo de extracción de características, que produce un
-        vector de características de dimensión fija.
-    \item El vector resultante, junto con la referencia a la fotografía original
-        y las coordenadas del recorte se almacenan en el sistema elegido.
-\end{enumerate}
+La extracción de características de cada fotorgraía comienza con la ingesta de
+esta imagen por el segmentador escogido. Que devuelve una lista con las cajas
+delimitadoras de los grafitis presentes en la imagen. Estas cajas se fusionan
+según criterios de solapamiento, proximidad y confianza, y se recortan sobre la
+imagen original para obtener los grafitis individuales. Cada recorte se entrega
+al modelo de extracción de características, que produce un vector de
+características de dimensión fija que representa el grafiti. Finalmente, el
+vector resultante, junto con la referencia a la fotografía original y las
+coordenadas del recorte se almacenan en el sistema elegido para su posterior
+recuperación masiva.
 
-La figura~\ref{fig:segmentation-stages} ilustra el recorrido completo sobre una
-fotografía real: las cajas que emite el detector, su fusión por solapamiento, la
-expansión por el margen configurado y los recortes finales que se entregan al
-extractor.
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=\linewidth]{figures/segmentation_stages.pdf}
-  \caption[Etapas de la segmentación]{Etapas de la segmentación sobre una fotografía del banco, siguiendo
-  el flujo de las flechas: la fotografía original; las detecciones del modelo
-  YOLO ajustado; las cajas resultantes tras fusionar las solapadas; las cajas
-  expandidas con el margen de contexto; y los recortes finales que se entregan
-  al extractor.}
-  \label{fig:segmentation-stages}
-\end{figure}
+En el caso de que no se utilice segmentador se devuelve una única caja que
+abarca toda la imagen, de modo que el sistema se comporta como un agrupador de
+imágenes completas. Este comportamiento también se puede habilitar o
+deshabilitar para los modelos de detección de caso que no detecten ningún
+grafiti.
 
 \subsubsection{Recuperación, reducción y agrupamiento}
 Una vez completada la ingesta, la fase de agrupamiento opera sobre el contenido
@@ -390,3 +418,95 @@ las desviaciones típicas y el número de muestras agregadas en cada caso, de
 manera que el análisis posterior pueda distinguir diferencias dentro del ruido
 de medición.
 
+\subsection{Componentes específicos para grafiti}
+\label{subsec:entrenamiento}
+Más allá del catálogo genérico, el sistema incorpora dos componentes ajustados
+al dominio del grafiti: un detector que segmenta los grafitis dentro de cada
+fotografía y unas cabezas de proyección que adaptan las representaciones. Ambos
+se entrenan sobre los subconjuntos anotados descritos en \ref{subsec:dataset},
+disjuntos del banco de evaluación, lo que evita sesgar las métricas por
+solapamiento entre entrenamiento y evaluación.
+
+\subsubsection{Detector de grafiti}
+\label{subsubsec:segmentador}
+\label{subsubsec:entrenamiento-detector}
+La etapa de segmentación localiza los grafitis para que el extractor opere sobre
+los recortes y no sobre la escena completa. Se implementan dos variantes: una
+sin segmentación, que entrega la fotografía completa, y otra basada en un modelo
+de YOLO~\cite{ultralytics_ultralytics_2024} (oficial o ajustado sobre grafiti)
+que detecta las cajas de cada grafiti. Las detecciones se fusionan por
+solapamiento y por un criterio de proximidad que une cajas adyacentes
+(consolidando grafitis contiguos en una misma pared), con una salvaguarda que
+rechaza uniones que superen una fracción del área de la imagen, truncado
+opcional a las $K$ cajas de mayor confianza y un margen configurable alrededor
+de cada recorte. Cuando no hay ninguna detección, la imagen se emite completa
+como caja única o se descarta. La calidad del detector se mide con las métricas
+de detección estándar (precisión, \textit{recall} y mAP a distintos umbrales de
+intersección sobre unión, IoU).
+
+El detector se entrena sobre las $447$ fotografías anotadas de ambos bancos
+(unas $650$ cajas), partiendo de los pesos preentrenados sobre COCO y ajustando
+una única clase, \enquote{grafiti}. Dado el reducido número de ejemplos se
+aplica una aumentación agresiva. Se conservan los hiperparámetros por defecto de
+la implementación de referencia salvo el número de épocas, el tamaño de
+\textit{batch} y la resolución, fijados para encajar en la memoria de la GPU
+(\ref{subsec:entorno}), con parada temprana sobre la mAP@$0.5$ de validación.
+
+\subsubsection{Cabezas de proyección ajustadas al dominio}
+\label{subsubsec:cabezas}
+\label{subsubsec:entrenamiento-cabezas}
+Los modelos de fundación generalistas producen representaciones transferibles
+pero no óptimas para el grafiti. Para acortar esa distancia se sigue un esquema
+de \textit{transfer learning}~\cite{pan_survey_2010,howard_universal_2018} en el
+que el \textit{backbone} permanece congelado y solo se entrena una cabeza ligera
+(secuencia Lineal $\rightarrow$ ReLU $\rightarrow$ Lineal) que proyecta los
+\textit{embeddings} base a un espacio de $128$ dimensiones (DINOv2 $384\to128$,
+MobileNetV3 $1280\to128$), normalizado a norma unitaria ($L_2$) para que sean
+directamente comparables mediante distancia coseno
+(figura~\ref{fig:cabeza-proyeccion}). Se entrenan cuatro cabezas, de autoría y
+de estilo sobre MobileNetV3 y DINOv2: las de autoría acercan en el espacio
+latente los grafitis de un mismo autor, mientras que las de estilo organizan el
+espacio según las cuatro categorías estilísticas.
+
+\begin{figure}[h!]
+  \centering
+  \shorthandoff{<>}%
+  \begin{tikzpicture}[
+    >=Stealth, node distance=6mm and 6mm,
+    block/.style={draw, rounded corners, minimum height=9mm, minimum width=14mm, inner sep=3pt, align=center, font=\small},
+    frozen/.style={block, fill=gray!20, dashed},
+    trained/.style={block, fill=blue!12},
+    vec/.style={font=\footnotesize, align=center},
+  ]
+    \node[font=\small] (img) {imagen};
+    \node[frozen, right=of img] (bb) {Backbone\\congelado};
+    \node[trained, right=of bb] (l1) {Lineal};
+    \node[trained, right=of l1] (relu) {ReLU};
+    \node[trained, right=of relu] (l2) {Lineal};
+    \node[block, fill=green!12, right=of l2] (norm) {$L_2$};
+    \node[vec, right=of norm] (e) {embedding};
+
+    \draw[->] (img)--(bb); \draw[->] (bb)--(l1);
+    \draw[->] (l1)--(relu); \draw[->] (relu)--(l2); \draw[->] (l2)--(norm);
+    \draw[->] (norm)--(e);
+
+    \node[draw, dotted, fit=(l1)(relu)(l2), inner sep=2mm,
+          label=below:{\scriptsize Cabeza entrenada}] {};
+  \end{tikzpicture}%
+  \shorthandon{<>}%
+  \caption[Cabeza de proyección ajustada a grafiti]{Cabeza de proyección ajustada a grafiti. El \textit{backbone} permanece
+    congelado y solo se entrena una secuencia ligera de capas para luego normalizar
+    la salida a norma unitaria.}
+  \label{fig:cabeza-proyeccion}
+\end{figure}
+
+Las cuatro cabezas se entrenan sobre la totalidad del subconjunto anotado, sin
+partición de validación y con los \textit{backbones} congelados. Las de autoría
+emplean la pérdida de tripletes \textit{batch-hard}~\cite{hermans_defense_2017}
+(margen $0.3$, Adam con \textit{learning rate} $10^{-4}$, $20$ épocas) y un
+muestreador PK de $8$ autores y $4$ recortes por autor, que concentra la pérdida
+en los tripletes más informativos de cada \textit{batch}. Las de estilo emplean
+la pérdida \textit{Supervised Contrastive}~\cite{khosla_supervised_2021}
+($T=0.07$, Adam $10^{-4}$, \textit{scheduler} cosenoidal y $60$ épocas) con un
+muestreador balanceado y parada temprana (paciencia de $15$ épocas), conservando
+la cabeza que minimiza la pérdida.
