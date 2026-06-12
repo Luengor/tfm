@@ -15,10 +15,14 @@ variado, los componentes fijos y los tamaños de banco $N$ evaluados se recogen
 en la tabla. Las subsecciones siguientes se refieren a cada barrido por su
 identificador.
 
+\begin{table}[h]
+\caption[Catálogo de barridos experimentales]{Catálogo de barridos experimentales. El detalle metodológico común
+(métricas, cronometría, repeticiones) se describe en \ref{sec:metodologia}.}
+\label{tab:catalogo-experimentos}
+\centering
 {\footnotesize
-\begin{longtable}{|p{0.6cm}|p{3.5cm}|p{3.2cm}|p{3.4cm}|} \hline
+\begin{tabular}{|p{0.6cm}|p{3.5cm}|p{3.2cm}|p{3.4cm}|} \hline
   \textbf{Id} & \textbf{Elementos variados} & \textbf{Fijo} & \textbf{$N$ / repeticiones} \\ \hline
-  \endhead
   E1 & Extractor & UMAP-10, HDBSCAN \texttt{mcs}=5, identidad, SQLite & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
   E2 & Reducción & Extractor base, HDBSCAN \texttt{mcs}=5 & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
   E3 & Agrupamiento & Extractor base, UMAP-10 & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
@@ -29,11 +33,9 @@ identificador.
   E8a & Extractor $\times$ reducción $\times$ agrupamiento sobre etiquetas de estilo & SQLite, identidad, sin límite & 294 recortes, 4 clases, $K{=}3$ \\ \hline
   E8b & Extractor $\times$ reducción $\times$ agrupamiento sobre etiquetas de autoría & SQLite, identidad, sin límite & 185 recortes, 87 autores, $K{=}3$ \\ \hline
   E9 & Parámetros HNSW & \textit{Pipeline} base, PostgreSQL & $N{=}6416$, $K{=}5$ \\ \hline
-  \caption[Catálogo de barridos experimentales]{Catálogo de barridos experimentales. El detalle metodológico común
-  (métricas, cronometría, repeticiones) se describe en \ref{sec:metodologia}.}
-  \label{tab:catalogo-experimentos}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 Los experimentos se ejecutaron en un portátil con CPU AMD Ryzen 7 5800H, GPU
 NVIDIA GeForce GTX 1650 y 16 GB de RAM, sobre Python 3.14 gestionado con
@@ -72,10 +74,16 @@ prueban doce extractores: cuatro CNN preentrenadas en ImageNet
 MobileNetV3); la tabla~\ref{tab:e1-quality-6416} recoge la calidad intrínseca a
 $N=6416$.
 
+\begin{table}[h]
+\caption[E1, calidad intrínseca a $N=6416$]{E1, calidad intrínseca a $N=6416$. Las CNN entrenadas en ImageNet encabezan la silueta; el extractor base
+(\texttt{dinov2\_graffiti\_style\_head}) presenta un CH (27.9) solo superado
+por los \textit{backbones} YOLO, pese a una silueta inferior a la de su
+\textit{backbone} DINOv2. \glosacalidad}
+\label{tab:e1-quality-6416}
+\centering
 {\footnotesize
-\begin{longtable}{|p{4.5cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|} \hline
+\begin{tabular}{|p{4.5cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|} \hline
   \textbf{Extractor} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} \\ \hline
-  \endhead
   \texttt{mobilenet\_v3}                  & 820 & \textbf{0.078} & \textbf{0.260} & 13.1 & 1.48 & \textbf{0.52} \\ \hline
   \texttt{resnet50}                       & 794 & 0.086 & 0.257 & 15.6 & \textbf{1.46} & 0.71 \\ \hline
   \texttt{vgg16}                          & 773 & 0.095 & 0.228 & 13.4 & 1.55 & 0.54 \\ \hline
@@ -88,13 +96,9 @@ $N=6416$.
   \texttt{dinov2\_graffiti\_style\_head}  & 562 & 0.202 & 0.155 & 27.9 & 1.70 & 0.74 \\ \hline
   \texttt{yolom}                          & 480 & 0.253 & 0.131 & 32.2 & 1.75 & 0.74 \\ \hline
   \texttt{yolon}                          & 348 & 0.341 & 0.085 & \textbf{51.2} & 1.91 & 0.81 \\ \hline
-  \caption[E1, calidad intrínseca a $N=6416$]{E1, calidad intrínseca a $N=6416$. Las CNN entrenadas en ImageNet encabezan la silueta; el extractor base
-  (\texttt{dinov2\_graffiti\_style\_head}) presenta un CH (27.9) solo superado
-  por los \textit{backbones} YOLO, pese a una silueta inferior a la de su
-  \textit{backbone} DINOv2. \glosacalidad}
-  \label{tab:e1-quality-6416}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 El resultado más llamativo del barrido es la inversión entre silueta y
 Calinski--Harabasz sobre ambas cabezas estilísticas: la silueta cae respecto a
@@ -151,23 +155,25 @@ El barrido E5 compara cuatro opciones de segmentación (imagen completa,
 YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}) manteniendo fijo el resto del
 \textit{pipeline}.
 
+\begin{table}[h]
+\caption[E5, calidad y coste de ingesta a $N=6416$]{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
+\enquote{recortes} son los puntos efectivamente agrupados, no las imágenes leídas).
+Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.
+Columnas: r/img=recortes por imagen, cls=número de clústeres,
+ruido=fracción de ruido~$\downarrow$, sil=silueta~$\uparrow$,
+CH=Calinski--Harabász~$\uparrow$, ingesta=tiempo de ingesta.}
+\label{tab:e5-segmenter-6416}
+\centering
 {\footnotesize
-\begin{longtable}{|p{2.3cm}|p{1.2cm}|p{0.8cm}|p{0.8cm}|p{0.9cm}|p{0.8cm}|p{0.8cm}|p{1.2cm}|} \hline
+\begin{tabular}{|p{2.3cm}|p{1.2cm}|p{0.8cm}|p{0.8cm}|p{0.9cm}|p{0.8cm}|p{0.8cm}|p{1.2cm}|} \hline
   \textbf{Segmentador} & \textbf{recortes} & \textbf{r/img} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{ingesta (s)} \\ \hline
-  \endhead
   identidad           & 6416  & 1.00 &  563 & \textbf{0.199} & \textbf{0.151} & 33.1 & \textbf{1235.5} \\ \hline
   YOLO11s             & 6590  & 1.03 &  502 & 0.225 & 0.127 & 30.4 & 1777.0 \\ \hline
   YOLO11m             & 6603  & 1.03 &  506 & 0.230 & 0.131 & 29.5 & 1811.6 \\ \hline
   YOLO11m \textit{ft} & 15362 & 2.39 & 1049 & 0.298 & 0.122 & \textbf{36.2} & 2152.3 \\ \hline
-  \caption[E5, calidad y coste de ingesta a $N=6416$]{E5, calidad intrínseca y coste de ingesta a $N=6416$ (la columna
-  \enquote{recortes} son los puntos efectivamente agrupados, no las imágenes leídas).
-  Cada segmentador alimenta a HDBSCAN un conjunto distinto de puntos.
-  Columnas: r/img=recortes por imagen, cls=número de clústeres,
-  ruido=fracción de ruido~$\downarrow$, sil=silueta~$\uparrow$,
-  CH=Calinski--Harabász~$\uparrow$, ingesta=tiempo de ingesta.}
-  \label{tab:e5-segmenter-6416}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 A escala completa, la identidad gana en todos los ejes que importan: silueta
 más alta (0.151), ruido más bajo (0.199) y mejor coste de ingesta (1235~s vs
@@ -228,10 +234,15 @@ complejidad teórica de referencia. La figura~\ref{fig:e7-scaling} representa
 estos tiempos frente a $N$ en escala log-log.
 
 
+\begin{table}[h]
+\caption[E7, pendientes observadas por etapa]{E7, pendientes observadas (regresión log-log) por etapa, comparadas
+con la complejidad teórica de referencia. La ventana $500\ldots3500$ excluye
+el punto $N=6416$ de reducción (anomalía \texttt{pynndescent}, ver texto).}
+\label{tab:e7-slopes}
+\centering
 {\footnotesize
-\begin{longtable}{|p{2.3cm}|p{3.1cm}|p{2.5cm}|p{2.5cm}|} \hline
+\begin{tabular}{|p{2.3cm}|p{3.1cm}|p{2.5cm}|p{2.5cm}|} \hline
   \textbf{Etapa / Algoritmo} & \textbf{Escala teórica} & \textbf{Pendiente $N{=}250\ldots6416$} & \textbf{Pendiente $N{=}500\ldots3500$} \\ \hline
-  \endhead
   Ingesta (DINOv2)       & $O(n)$            & 0.95 & --   \\ \hline
   Reducción (UMAP)       & $\sim O(n^{1.14})$ & 1.15 & 1.53 \\ \hline
   K-medias ($k$ fijo)      & $\approx O(n)$    & 0.43 & 0.46 \\ \hline
@@ -240,12 +251,9 @@ estos tiempos frente a $N$ en escala log-log.
   HDBSCAN                & $O(n\log n)$ amort. & 1.53 & 1.84 \\ \hline
   Aglomerativo           & $O(n^2 \log n)$   & 1.77 & 1.76 \\ \hline
   Búsqueda (SQLite)      & $O(n^2)$ por pasada & \textbf{2.10} & 2.13 \\ \hline
-  \caption[E7, pendientes observadas por etapa]{E7, pendientes observadas (regresión log-log) por etapa, comparadas
-  con la complejidad teórica de referencia. La ventana $500\ldots3500$ excluye
-el punto $N=6416$ de reducción (anomalía \texttt{pynndescent}, ver texto).}
-  \label{tab:e7-slopes}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 Como se puede ver en la segunda tabla, el rango reducido de $N$ provoca que
 varias de las etapas tengan pendientes observadas menores que la complejidad
@@ -372,10 +380,16 @@ agrupadores, seleccionada por el ARI por defecto (sin descartar puntos de
 ruido), \emph{chance-corrected} y, por tanto, comparable entre configuraciones
 con distinto número de clústeres.
 
+\begin{table}[h]
+\caption[E8a, mejor celda por extractor (estilo)]{E8a, mejor celda por extractor sobre la evaluación de estilo (294
+recortes, 4 clases). El ranking sitúa las cabezas de autoría por debajo del
+\textit{backbone} en ambas familias, aunque con un margen modesto
+($-0.054$ DINOv2, $-0.038$ MobileNetV3).}
+\label{tab:e8a-best}
+\centering
 {\footnotesize
-\begin{longtable}{|p{4.4cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{3.0cm}|} \hline
+\begin{tabular}{|p{4.4cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{3.0cm}|} \hline
   \textbf{Extractor} & \textbf{ARI} & \textbf{NMI} & \textbf{F1} & \textbf{sil} & \textbf{Celda} \\ \hline
-  \endhead
   \texttt{dinov2\_graffiti\_style\_head}      & \textbf{0.722} & \textbf{0.678} & \textbf{0.806} & \textbf{0.284} & identidad + K-medias-4   \\ \hline
   \texttt{mob.\_graffiti\_style\_head}        & 0.627 & 0.539 & 0.740 & 0.272 & identidad + K-medias-4   \\ \hline
   \texttt{clip\_vit\_b32}                     & 0.368 & 0.392 & 0.556 & 0.047 & UMAP + aglomerativo    \\ \hline
@@ -384,13 +398,9 @@ con distinto número de clústeres.
   \texttt{resnet50}                           & 0.334 & 0.277 & 0.548 & 0.058 & identidad + espectral  \\ \hline
   \texttt{mob.\_graffiti\_author\_head}       & 0.318 & 0.295 & 0.517 & 0.046 & UMAP + aglomerativo    \\ \hline
   \texttt{dinov2\_graffiti\_author\_head}     & 0.302 & 0.273 & 0.519 & 0.094 & UMAP + aglomerativo    \\ \hline
-  \caption[E8a, mejor celda por extractor (estilo)]{E8a, mejor celda por extractor sobre la evaluación de estilo (294
-  recortes, 4 clases). El ranking sitúa las cabezas de autoría por debajo del
-  \textit{backbone} en ambas familias, aunque con un margen modesto
-  ($-0.054$ DINOv2, $-0.038$ MobileNetV3).}
-  \label{tab:e8a-best}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 El resultado es inequívoco: la cabeza estilística de DINOv2 + identidad +
 K-medias-4 obtiene ARI = 0.722 y F1 = 0.806, presenta más del doble del ARI del
@@ -444,10 +454,16 @@ estilo (0.054), aunque a escala dominada por ruido; en la familia MobileNetV3
 la cabeza apenas iguala a su \textit{backbone} (0.048 vs.\ 0.046, +0.002 ARI)
 y supera a la cabeza de estilo (0.041).
 
+\begin{table}[h]
+\caption[E8b, mejor celda por extractor (autoría)]{E8b, mejor celda por extractor sobre la evaluación de autoría
+(185 recortes, 87 autores, evaluación entre ciudades Cuenca$\to$Salamanca).
+Todos los ARI caen en una banda estrecha cercana al suelo; la simetría
+esperada con E8a no se materializa.}
+\label{tab:e8b-best}
+\centering
 {\footnotesize
-\begin{longtable}{|p{4.4cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{3.0cm}|} \hline
+\begin{tabular}{|p{4.4cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{3.0cm}|} \hline
   \textbf{Extractor} & \textbf{ARI} & \textbf{NMI} & \textbf{F1} & \textbf{sil} & \textbf{Celda} \\ \hline
-  \endhead
   \texttt{clip\_vit\_b32}                     & \textbf{0.076} & \textbf{0.789} & 0.090 & 0.003 & UMAP + aglo-87 \\ \hline
   \texttt{dinov2\_graffiti\_author\_head}     & 0.065 & 0.647 & \textbf{0.093} & 0.052 & UMAP + aglo-30 \\ \hline
   \texttt{dinov2\_vits14}                     & 0.055 & 0.754 & 0.079 & \textbf{0.096} & identidad + aglo-87 \\ \hline
@@ -456,13 +472,9 @@ y supera a la cabeza de estilo (0.041).
   \texttt{mob.\_graffiti\_author\_head}       & 0.048 & 0.627 & 0.077 & 0.021 & UMAP + aglo-30 \\ \hline
   \texttt{mobilenet\_v3}                      & 0.046 & 0.780 & 0.060 & 0.023 & UMAP + aglo-87 \\ \hline
   \texttt{mob.\_graffiti\_style\_head}        & 0.041 & 0.629 & 0.070 & 0.020 & UMAP + aglo-30 \\ \hline
-  \caption[E8b, mejor celda por extractor (autoría)]{E8b, mejor celda por extractor sobre la evaluación de autoría
-  (185 recortes, 87 autores, evaluación entre ciudades Cuenca$\to$Salamanca).
-  Todos los ARI caen en una banda estrecha cercana al suelo; la simetría
-  esperada con E8a no se materializa.}
-  \label{tab:e8b-best}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 E8b es un resultado negativo, pero esperado. La clasificación por estilo es
 mucho más sencilla que el agrupamiento por autoría, que además sufre un

@@ -42,6 +42,10 @@ tabla~\ref{tab:subconjuntos} resume los subconjuntos etiquetados empleados, su
 propósito, procedencia y tamaño.
 
 \begin{table}[h!]
+  \caption[Subconjuntos etiquetados empleados]{Subconjuntos empleados (en recortes, salvo detección y no
+  supervisión, en imágenes). Los recortes de entrenamiento nunca se solapan con
+  los de evaluación.}
+  \label{tab:subconjuntos}
   \centering
   \begin{tabular}{|l|l|l|r|} \hline
     \textbf{Subconjunto} & \textbf{Propósito} & \textbf{Procedencia} & \textbf{Tamaño} \\ \hline
@@ -52,10 +56,6 @@ propósito, procedencia y tamaño.
     Detección & Ajuste del detector & Ambos bancos & $447$ \\ \hline
     No superv. & Agrupamiento & Salamanca (disjunto) & $6416$ \\ \hline
   \end{tabular}
-  \caption[Subconjuntos etiquetados empleados]{Subconjuntos empleados (en recortes, salvo detección y no
-  supervisión, en imágenes). Los recortes de entrenamiento nunca se solapan con
-  los de evaluación.}
-  \label{tab:subconjuntos}
 \end{table}
 
 \subsection{Visión general del flujo de trabajo}

@@ -20,22 +20,24 @@ simultáneamente un número de clústeres no trivial, ruido moderado y tamaños
 balanceados. La tabla~\ref{tab:e2-quality-6416} resume el resultado al tamaño
 de dataset completo.
 
+\begin{table}[b]
+\caption[E2, calidad intrínseca a $N=6416$]{E2, calidad intrínseca a $N=6416$. UMAP es la única reducción que
+produce simultáneamente un número de clústeres no trivial, ruido moderado y
+tamaños balanceados. \glosacalidad}
+\label{tab:e2-quality-6416}
+\centering
 {\footnotesize
-\begin{longtable}{|p{2.0cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|} \hline
+\begin{tabular}{|p{2.0cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|} \hline
   \textbf{Reducción} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} \\ \hline
-  \endhead
   identidad   & 301 & 0.684 &  \textbf{0.307} & 37.5 & \textbf{1.16} & \textbf{0.55} \\ \hline
   PCA-10      & 2   & 0.010 &  0.000 &  4.2 & 1.39 & 1.00 \\ \hline
   PCA-50      & 238 & 0.698 &  0.238 & 36.6 & 1.29 & 2.29 \\ \hline
   UMAP-10     & 562 & 0.202 &  0.155 & 27.9 & 1.70 & 0.74 \\ \hline
   UMAP-50     & 558 & \textbf{0.195} &  0.154 & 27.8 & 1.71 & 0.70 \\ \hline
   Isomap-10   & 125 & 0.624 &  0.044 & \textbf{38.4} & 1.80 & 3.40 \\ \hline
-  \caption[E2, calidad intrínseca a $N=6416$]{E2, calidad intrínseca a $N=6416$. UMAP es la única reducción que
-  produce simultáneamente un número de clústeres no trivial, ruido moderado y
-  tamaños balanceados. \glosacalidad}
-  \label{tab:e2-quality-6416}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 La fila \emph{identidad} responde directamente a la pregunta de cuánto aporta
 la reduccion de dimensionalidad: agrupando los 128-d crudos, HDBSCAN produce
@@ -89,10 +91,17 @@ cubre 14 configuraciones sobre el extractor base y UMAP-10: HDBSCAN, K-medias
 (\textit{average linkage}, $k\in\{10, 20\}$) y espectral ($k\in\{10, 20\}$); la
 tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
 
+\begin{table}[h]
+\caption[E3, fila representativa por familia a $N=6416$]{E3, fila representativa de cada familia a $N=6416$. La columna
+\textbf{mem} reporta el pico de RSS delta de la etapa de agrupamiento. Sólo
+HDBSCAN combina un número no trivial de clústeres, ruido moderado, tamaños
+balanceados, coste despreciable y huella de memoria mínima. \glosacalidad{}
+\textit{clu}=tiempo de agrupamiento, \textit{mem}=pico de RSS delta.}
+\label{tab:e3-summary-6416}
+\centering
 {\footnotesize
-\begin{longtable}{|p{2.4cm}|p{0.9cm}|p{1.0cm}|p{1.1cm}|p{0.8cm}|p{0.8cm}|p{0.9cm}|p{1.0cm}|p{1.0cm}|} \hline
+\begin{tabular}{|p{2.4cm}|p{0.9cm}|p{1.0cm}|p{1.1cm}|p{0.8cm}|p{0.8cm}|p{0.9cm}|p{1.0cm}|p{1.0cm}|} \hline
   \textbf{Algoritmo} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} & \textbf{clu (s)} & \textbf{mem (MB)} \\ \hline
-  \endhead
   HDBSCAN (mcs=5)        & 563 & 0.199 &  0.151 &  33 & 1.70 & 0.75 & 0.348 & 0.3 \\ \hline
   OPTICS (cos)           & 648 & 0.247 &  \textbf{0.177} &  30 & \textbf{1.64} & 0.45 & 8.578 & 763.3 \\ \hline
   GMM·300 (BIC)          & 297 & \textbf{0.000} &  0.054 &  50 & 2.52 & 0.58 & 1.839 & 49.7 \\ \hline
@@ -100,14 +109,9 @@ tabla~\ref{tab:e3-summary-6416} extrae la fila representativa de cada familia.
   DBSCAN auto-$\varepsilon$ & 239 & 0.059 & -0.015 & 46 & 1.97 & 2.47 & 0.080 & \textbf{0.2} \\ \hline
   Aglom. \textit{avg} $k=10$ &  10 & \textbf{0.000} & -0.015 & 506 & 3.11 & 1.36 & 0.408 & 314.2 \\ \hline
   Espectral $k=10$       &  10 & \textbf{0.000} & -0.117 & 264 & 3.33 & 1.56 & 2.073 & 1.1 \\ \hline
-  \caption[E3, fila representativa por familia a $N=6416$]{E3, fila representativa de cada familia a $N=6416$. La columna
-  \textbf{mem} reporta el pico de RSS delta de la etapa de agrupamiento. Sólo
-  HDBSCAN combina un número no trivial de clústeres, ruido moderado, tamaños
-  balanceados, coste despreciable y huella de memoria mínima. \glosacalidad{}
-  \textit{clu}=tiempo de agrupamiento, \textit{mem}=pico de RSS delta.}
-  \label{tab:e3-summary-6416}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 Como se anticipó en \ref{subsec:res-calibracion}, es necesario leer las
 métricas intrínsecas  en conjunto con el número de clústeres, el ruido y el
@@ -167,22 +171,24 @@ clústeres, la fracción de ruido y el balance de tamaños. El barrido (E4) cubr
 seis valores de \texttt{mcs} entre 5 y 200, como se puede ver en la
 tabla~\ref{tab:e4-mcs-6416} a $N=6416$.
 
+\begin{table}[h]
+\caption[E4, barrido de \texttt{min\_cluster\_size} a $N=6416$]{E4, barrido de \texttt{min\_cluster\_size} a $N=6416$. La silueta y
+el CH alcanzan su máximo en los valores degenerados ($k{=}2$); el criterio
+conjunto sitúa el óptimo en \texttt{mcs}=5. \glosacalidad}
+\label{tab:e4-mcs-6416}
+\centering
 {\footnotesize
-\begin{longtable}{|p{1.4cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|} \hline
+\begin{tabular}{|p{1.4cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|} \hline
   \textbf{mcs} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} \\ \hline
-  \endhead
     5 & 563 & 0.199 & 0.151 &   33 & \textbf{1.70} & \textbf{0.75} \\ \hline
    10 & 154 & 0.277 & 0.037 &   56 & 2.20 & 1.78 \\ \hline
    25 &  26 & 0.228 & 0.047 &  209 & 2.66 & 1.81 \\ \hline
    50 &   4 & \textbf{0.026} & \textbf{0.193} & \textbf{1404} & 2.01 & 0.86 \\ \hline
   100 &   2 & 0.008 & 0.269 & 2765 & 1.27 & 0.40 \\ \hline
   200 &   2 & 0.011 & 0.270 & 2776 & 1.27 & 0.40 \\ \hline
-  \caption[E4, barrido de \texttt{min\_cluster\_size} a $N=6416$]{E4, barrido de \texttt{min\_cluster\_size} a $N=6416$. La silueta y
-  el CH alcanzan su máximo en los valores degenerados ($k{=}2$); el criterio
-  conjunto sitúa el óptimo en \texttt{mcs}=5. \glosacalidad}
-  \label{tab:e4-mcs-6416}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 Los valores más altos de \texttt{mcs} (100 y 200), aunque presentan las
 métricas intrínsecas más altas con tasas de ruido y variación de tamaños bajas,
@@ -213,10 +219,18 @@ preferida en el cuerpo, conservadas aquí por completitud y reproducibilidad.
 
 % --- movido del cuerpo (Batch 4): coste E1, silueta E1, coste E7, ejemplos de clúster E8a ---
 
+\begin{table}[h]
+\caption[E1, coste de ingesta a $N=6416$.]{E1, coste de ingesta a $N=6416$. La cabeza añade un sobrecoste
+despreciable sobre el \textit{backbone}; los \textit{backbones} YOLO son los
+más caros simultáneamente en tiempo y RSS. Se muestran 10 de los 12
+extractores (las cabezas \texttt{mob.\_graffiti\_style\_head} y
+\texttt{dinov2\_graffiti\_author\_head} se omiten por brevedad; su coste cae
+dentro del rango de la cabeza correspondiente ya presente.)}
+\label{tab:e1-cost-6416}
+  \centering
 {\footnotesize
-\begin{longtable}{|p{5.4cm}|p{1.7cm}|p{1.0cm}|p{1.4cm}|p{1.4cm}|} \hline
+\begin{tabular}{|p{5.4cm}|p{1.7cm}|p{1.0cm}|p{1.4cm}|p{1.4cm}|} \hline
   \textbf{Extractor} & \textbf{ingesta (s)} & \textbf{ips} & \textbf{RSS pico (MB)} & \textbf{VRAM (MB)} \\ \hline
-  \endhead
   \texttt{mobilenet\_v3}                  & \textbf{808.8}  & \textbf{7.93} & 366.0 & \textbf{31.8}  \\ \hline
   \texttt{mob.\_graffiti\_author\_head}   & 879.1  & 7.30 & 406.4 & 34.5  \\ \hline
   \texttt{inception\_v3}                  & 973.7  & 6.59 & 337.2 & 116.1 \\ \hline
@@ -227,15 +241,9 @@ preferida en el cuerpo, conservadas aquí por completitud y reproducibilidad.
   \texttt{clip\_vit\_b32}                 & 1247.0 & 5.15 & \textbf{193.1} & 591.9 \\ \hline
   \texttt{yolon}                          & 1301.0 & 4.93 & 853.8 & 65.4  \\ \hline
   \texttt{yolom}                          & 1407.4 & 4.56 & 824.9 & 192.9 \\ \hline
-  \caption[E1, coste de ingesta a $N=6416$.]{E1, coste de ingesta a $N=6416$. La cabeza añade un sobrecoste
-  despreciable sobre el \textit{backbone}; los \textit{backbones} YOLO son los
-  más caros simultáneamente en tiempo y RSS. Se muestran 10 de los 12
-  extractores (las cabezas \texttt{mob.\_graffiti\_style\_head} y
-  \texttt{dinov2\_graffiti\_author\_head} se omiten por brevedad; su coste cae
-  dentro del rango de la cabeza correspondiente ya presente.)}
-  \label{tab:e1-cost-6416}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 \begin{figure}[h!]
   \centering
@@ -246,22 +254,24 @@ preferida en el cuerpo, conservadas aquí por completitud y reproducibilidad.
   \label{fig:e1-silhouette}
 \end{figure}
 
+\begin{table}[t]
+\caption[E7, tiempo por etapa frente a $N$]{E7, tiempo por etapa frente a $N$ (extracto). A $N=6416$ la búsqueda
+por similitud SQLite domina absolutamente, con la ingesta como segundo coste.
+La caída de UMAP a $N=6416$ se discute en el texto.}
+\label{tab:e7-cost}
+  \centering
 {\footnotesize
-\begin{longtable}{|p{1.0cm}|p{1.6cm}|p{1.2cm}|p{2.0cm}|p{2.0cm}|p{1.4cm}|p{2.0cm}|} \hline
+\begin{tabular}{|p{1.0cm}|p{1.6cm}|p{1.2cm}|p{2.0cm}|p{2.0cm}|p{1.4cm}|p{2.0cm}|} \hline
   \textbf{$N$} & \textbf{ingesta (s)} & \textbf{red (s)} & \textbf{HDBSCAN (s)} & \textbf{K-medias (s)} & \textbf{aglo (s)} & \textbf{búsqueda (s)} \\ \hline
-  \endhead
    250 &   58.7 &  0.253 & 0.0038 & 0.0025 & 0.0019 &   3.66 \\ \hline
    500 &  115.7 &  0.603 & 0.0069 & 0.0027 & 0.0046 &  16.32 \\ \hline
   1000 &  231.6 &  1.514 & 0.0144 & 0.0033 & 0.0117 &  63.28 \\ \hline
   2000 &  455.9 &  4.542 & 0.1106 & 0.0047 & 0.0427 & 306.81 \\ \hline
   3500 &  776.0 & 11.870 & 0.1863 & 0.0066 & 0.1405 & 995.52 \\ \hline
   6416 & 1294.9 &  6.237 & 0.3580 & 0.0098 & 0.5988 & 3266.60 \\ \hline
-  \caption[E7, tiempo por etapa frente a $N$]{E7, tiempo por etapa frente a $N$ (extracto). A $N=6416$ la búsqueda
-  por similitud SQLite domina absolutamente, con la ingesta como segundo coste.
-La caída de UMAP a $N=6416$ se discute en el texto.}
-  \label{tab:e7-cost}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 \begin{figure}[h!]
   \centering
@@ -276,10 +286,17 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
 
 % --- movido del cuerpo (Batch 5): detecciones YOLO E5, memoria E7, almacenamiento E6, recuperación E8a/E8b, HDBSCAN 3 clústeres E8a ---
 
+\begin{table}[h]
+\caption[E6, latencia y \textit{recall} por \textit{backend}]{E6, latencia, \textit{throughput} y \textit{recall} de la búsqueda
+por similitud por \textit{backend} y tamaño de banco. SQLite escala
+linealmente en tiempo por consulta; pgvector exacto está dominado por la
+latencia de \textit{round-trip} en los tamaños pequeños; HNSW solo se
+separa visiblemente por encima de $N\approx 2500$.}
+\label{tab:e6-storage}
+  \centering
 {\footnotesize
-\begin{longtable}{|p{1.0cm}|p{2.6cm}|p{1.6cm}|p{2.0cm}|p{1.6cm}|p{1.8cm}|} \hline
+\begin{tabular}{|p{1.0cm}|p{2.6cm}|p{1.6cm}|p{2.0cm}|p{1.6cm}|p{1.8cm}|} \hline
   \textbf{$N$} & \textbf{Backend} & \textbf{ss (s)} & \textbf{ips} & \textbf{idx (s)} & \textbf{R@5} \\ \hline
-  \endhead
    500 & SQLite             & 3.05  &    164 & --     & --    \\ \hline
    500 & PostgreSQL exacto  & 0.162 &  3 096 & 0.0    & --    \\ \hline
    500 & PostgreSQL + HNSW  & 0.164 &  3 042 & 0.066  & 1.000 \\ \hline
@@ -292,14 +309,9 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
   6416 & SQLite             & 43.10 &    149 & --     & --    \\ \hline
   6416 & PostgreSQL exacto  & 0.578 & 11 109 & 0.0    & --    \\ \hline
   6416 & PostgreSQL + HNSW  & 0.179 & 35 936 & 0.465  & 1.000 \\ \hline
-  \caption[E6, latencia y \textit{recall} por \textit{backend}]{E6, latencia, \textit{throughput} y \textit{recall} de la búsqueda
-  por similitud por \textit{backend} y tamaño de banco. SQLite escala
-  linealmente en tiempo por consulta; pgvector exacto está dominado por la
-  latencia de \textit{round-trip} en los tamaños pequeños; HNSW solo se
-  separa visiblemente por encima de $N\approx 2500$.}
-  \label{tab:e6-storage}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 \begin{figure}[h!]
   \centering
@@ -319,10 +331,16 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
   \label{fig:e7-memory}
 \end{figure}
 
+\begin{table}[h]
+\caption[E8a, recuperación supervisada \textit{top-5} (estilo)]{E8a, recuperación supervisada \textit{top-5} por extractor sobre
+la evaluación de estilo. Reproduce el mismo ordenamiento que el ARI de la
+tabla~\ref{tab:e8a-best}, lo que descarta que el liderazgo de la cabeza
+estilística esté inducido por la elección de agrupador.}
+\label{tab:e8a-retrieval}
+  \centering
 {\footnotesize
-\begin{longtable}{|p{5.4cm}|p{1.3cm}|p{1.6cm}|p{1.3cm}|} \hline
+\begin{tabular}{|p{5.4cm}|p{1.3cm}|p{1.6cm}|p{1.3cm}|} \hline
   \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} \\ \hline
-  \endhead
   \texttt{dinov2\_graffiti\_style\_head}     & \textbf{0.851} & \textbf{0.909} & \textbf{0.922} \\ \hline
   \texttt{mob.\_graffiti\_style\_head}       & 0.760 & 0.818 & 0.835 \\ \hline
   \texttt{dinov2\_vits14}                    & 0.699 & 0.805 & 0.837 \\ \hline
@@ -331,13 +349,9 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
   \texttt{clip\_vit\_b32}                    & 0.669 & 0.792 & 0.825 \\ \hline
   \texttt{resnet50}                          & 0.654 & 0.789 & 0.829 \\ \hline
   \texttt{mob.\_graffiti\_author\_head}      & 0.639 & 0.775 & 0.799 \\ \hline
-  \caption[E8a, recuperación supervisada \textit{top-5} (estilo)]{E8a, recuperación supervisada \textit{top-5} por extractor sobre
-  la evaluación de estilo. Reproduce el mismo ordenamiento que el ARI de la
-  tabla~\ref{tab:e8a-best}, lo que descarta que el liderazgo de la cabeza
-  estilística esté inducido por la elección de agrupador.}
-  \label{tab:e8a-retrieval}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 \begin{figure}[h!]
   \centering
@@ -348,10 +362,17 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
   \label{fig:e8a-hdbscan}
 \end{figure}
 
+\begin{table}[h]
+\caption[E8b, recuperación supervisada \textit{top-5} (autoría)]{E8b, recuperación supervisada \textit{top-5} por extractor sobre
+la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
+campo cabe en una banda estrecha; las cabezas de autoría quedan en la
+zona media en ambos ejes (ARI y $P@5$), coherentemente con un soporte
+parcial a piso aleatorio.}
+\label{tab:e8b-retrieval}
+\centering
 {\footnotesize
-\begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.6cm}|p{1.2cm}|p{1.2cm}|} \hline
+\begin{tabular}{|p{5.4cm}|p{1.2cm}|p{1.6cm}|p{1.2cm}|p{1.2cm}|} \hline
   \textbf{Extractor} & \textbf{P@5} & \textbf{MAP@5} & \textbf{MRR} & \textbf{R@5} \\ \hline
-  \endhead
   \texttt{clip\_vit\_b32}                    & \textbf{0.091} & \textbf{0.252} & \textbf{0.262} & \textbf{0.268} \\ \hline
   \texttt{resnet50}                          & 0.085 & 0.246 & 0.256 & 0.236 \\ \hline
   \texttt{mobilenet\_v3}                     & 0.083 & 0.240 & 0.245 & 0.251 \\ \hline
@@ -360,14 +381,9 @@ La caída de UMAP a $N=6416$ se discute en el texto.}
   \texttt{dinov2\_graffiti\_author\_head}    & 0.077 & 0.228 & 0.232 & 0.254 \\ \hline
   \texttt{mob.\_graffiti\_style\_head}       & 0.071 & 0.196 & 0.200 & 0.176 \\ \hline
   \texttt{dinov2\_graffiti\_style\_head}     & 0.065 & 0.226 & 0.229 & 0.192 \\ \hline
-  \caption[E8b, recuperación supervisada \textit{top-5} (autoría)]{E8b, recuperación supervisada \textit{top-5} por extractor sobre
-  la evaluación de autoría. Línea base aleatoria $P@5 \approx 0.024$. El
-  campo cabe en una banda estrecha; las cabezas de autoría quedan en la
-  zona media en ambos ejes (ARI y $P@5$), coherentemente con un soporte
-  parcial a piso aleatorio.}
-  \label{tab:e8b-retrieval}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 \subsection{Correlación interna--externa: detalle estadístico}
 \label{anexo:correlacion}

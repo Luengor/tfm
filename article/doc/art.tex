@@ -43,21 +43,23 @@ trabajo pretende cubrir: ninguno combina descriptores visuales profundos con
 técnicas estándar de agrupamiento ni acompaña la evaluación de una
 caracterización del coste.
 
+\begin{table}[h]
+\centering
+\caption[Comparativa de trabajos previos sobre análisis de grafiti]{Comparativa de trabajos previos sobre análisis de grafiti frente al
+planteamiento de este trabajo.}
+\label{tab:art-comparativa}
 {\scriptsize
 \setlength{\tabcolsep}{3pt}
-\begin{longtable}{|p{1.6cm}|p{1.9cm}|p{1.8cm}|p{2.0cm}|p{2.0cm}|p{1.5cm}|} \hline
+\begin{tabular}{|p{1.6cm}|p{1.9cm}|p{1.8cm}|p{2.0cm}|p{2.0cm}|p{1.5cm}|} \hline
   \textbf{Trabajo} & \textbf{Tarea} & \textbf{Datos} & \textbf{Características} & \textbf{Técnica} & \textbf{Métrica} \\ \hline
-  \endhead
   Fogaça (2023) & Clasificación y detección de grafiti & Imágenes de calle (Lisboa) & CNN \textit{fine-tuned} & Clasificación supervisada + detector & Exactitud / mAP (precisión media promedio, supervisada) \\ \hline
   Tokuda (2019) & Cuantificación de densidad de grafitis & Google Street View (São Paulo) & Mask-RCNN & Segmentación supervisada & Precisión / \textit{recall} \\ \hline
   Taylor (2010) & Categorización por contenido & Fotografías de grafiti & Inspección visual & Categorización manual & --- (cualitativa) \\ \hline
   García~García (2025) & Agrupamiento de grafitis & Imágenes de grafiti & Colores dominantes (RGB / Lab) & K-medias & Interna (no supervisada) \\ \hline
   \textbf{Este trabajo} & Agrupamiento y recuperación por similitud & Banco de grafiti & \textit{Embeddings} profundos & Reducción + \textit{clustering} clásico (comparativo) & Interna, externa y coste computacional \\ \hline
-  \caption[Comparativa de trabajos previos sobre análisis de grafiti]{Comparativa de trabajos previos sobre análisis de grafiti frente al
-  planteamiento de este trabajo.}
-  \label{tab:art-comparativa}
-\end{longtable}
+\end{tabular}
 }
+\end{table}
 
 \subsection{Análisis de similitud y agrupamiento de imágenes}
 \label{subsec:art-emb-red-clus}
