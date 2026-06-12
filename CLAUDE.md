@@ -149,5 +149,74 @@ Produces the custom `.pth` head weights. Contains triplet-loss trainer (`trainer
 - Extrinsic metrics are only computed for IdentitySegmenter runs (where the ground-truth filename mapping is unambiguous).
 
 ## Documentation
-The document for the Master's thesis lives in `doc/`. It's written in Latex, and built with tectonic into the `build` subfolder.
+The document for the Master's thesis lives in `doc/`. It's written in LaTeX (root: `doc/informe.tex`) and built with **pdflatex** into the `build` subfolder. Run from `doc/`:
+
+```bash
+cd doc
+mkdir -p build/doc                                   # \include writes per-file .aux into build/doc/
+pdflatex -interaction=nonstopmode -output-directory=build informe.tex
+BIBINPUTS=".:./build:" bibtex build/informe          # BIBINPUTS so bibtex finds bib.bib at the doc root
+pdflatex -interaction=nonstopmode -output-directory=build informe.tex
+pdflatex -interaction=nonstopmode -output-directory=build informe.tex
+```
+
+Notes:
+- `build/doc/` must exist first — pdflatex won't create subdirs for `\include` aux files.
+- The preamble (`doc/doc/packets_and_such.tex`) selects fonts by engine via `iftex`: `inputenc`/`fontenc[T1]` under pdflatex, `fontspec` under xelatex/lualatex. So it builds under either, but pdflatex is the default.
+- Spanish bibliography: `\usepackage[spanish]{babel}` needs the `texlive-langspanish` package (provides `spanish.ldf`); without it babel errors `Unknown option 'spanish'`. Localized month names ("Agosto" not "August") come from `babelbib` + `\bibliographystyle{babplain}` (set in `informe.tex`), not babel — `plain.bst` hardcodes English months.
+
+
+## Thesis proposal
+Caracterización del desempeño y el coste computacional en algoritmos de similitud en bancos de imágenes de grafiti
+### Descripción:
+El grafiti vandálico es una transgresión de dimensión visual, social y legal que provoca problema
+socialmente extendido que supone un gran trabajo para las fuerzas del orden por su continua
+renovación. La identificación de los grafiteros a partir de fotografías de sus firmas es una
+herramienta eficaz para combatir esta lacra, pero es un proceso complejo, cuya dificultad
+aumenta con el crecimiento de las bases de datos.
+En este trabajo se propone describir y caracterizar el comportamiento de varios métodos para el
+cálculo de similitud y la creación de agrupaciones en un conjunto de imágenes de grafitis ya
+existente, con el objeto de describir el coste computacional en función del tamaño del conjunto
+de imágenes, de forma experimental. Se realizará también un estudio con métricas de carácter
+no supervisado de las agrupaciones resultantes, así como una evaluación supervisada para un
+subconjunto en el que estén disponibles etiquetas.
+
+### Estructura
+Sobre la dualidad memoria de TFM/artículo, te recomiendo escribir la memoria y después recortar partes para convertirlo en artículo cuando ya la tengamos revisada y corregida. Una posibilidad de estructura sería:
+
+    Introducción: motivar la importancia del tema estudiado.
+    Estado de la cuestión: qué hay parecido o en la línea ahora mismo.
+    Materiales y métodos: qué tecnologías se usan en el trabajo y conceptos teóricos relevantes. Esta sección podría omitirse en el artículo.
+    Metodología: cuál es el flujo de trabajo que se ha seguido, descrito de manera que permitiera la replicación.
+    Resultados y discusión: qué métricas se han obtenido (resultados) y qué se interpreta de esto (discusión). Puede ser una o dos secciones, yo prefiero que estén juntas para facilitar contextualización.
+    Conclusiones: se recapitula el valor del trabajo hecho, y se puede dar alguna orientación sobre posible trabajo futuro. 
+
+Esta estructura es solo un modelo, puede salirte de ella según convenga a aquello que quieras contar con más énfasis.
+
+### Evaluadores
+Los evaluadores del trabajo tienen el siguiente perfil:
+ * Un doctor del area de lenguajes y sistemas informáticos, con tesis doctoral
+   "Técnicas de expansión en los sistemas de recuperación de información" en
+   2003.
+ * Un doctor del área de ciencias de la computación e inteligencia artifical,
+   con tesis doctoral "Modelo de reutilización soportado por estructuras
+   complejas de reutilización denominadas mecanos" en 2000.
+ * Una doctora del área de lógica y filosofía de la ciencia, con tesis doctoral
+   "From a necessitist point of view: themes on Timothy Williamson" en 2025.
+No se espera que ninguno de los evaluadores tenga un conocimiento profundo del
+tema específico del trabajo, por lo que es necesario que el trabajo sea, hasta
+cierto punto, accesible para un público general de informática. Esto no implica
+que el trabajo deba ser superficial o detallado de más, sino que debe ser claro
+y bien explicado, con los conceptos técnicos necesarios para entender el
+trabajo, pero sin dar por supuesto un conocimiento previo específico sobre el
+tema.
+
+### Otros aspectos a tener en cuenta
+ * El objetivo del trabajo es puramente técnico. En ningún caso se pretende dar
+   opinión sobre el grafiti, vandálico o no, ni sobre la legalidad/moralidad de
+   su práctica. Este es un fenómeno social complejo, cuya descripción y
+   análisis caen fuera del alcance de este trabajo. Se debería tratar el
+   grafiti como un fenómeno visual neutro, sin prejuicios, y centrarse en la
+   parte técnica de su análisis.
+
 
