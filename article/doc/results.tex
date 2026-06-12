@@ -112,7 +112,7 @@ con las imágenes completas evaluadas aquí.
 Las CNN entrenadas en ImageNet lideran la silueta (a $N=6416$:
 \texttt{mobilenet\_v3}=0.260, \texttt{resnet50}=0.257), con ruido bajo y
 clústeres balanceados, pero esto no implica que sean mejores agrupando grafiti:
-es probable que estén atrupando por apariencia genérica (textura, color,
+es probable que estén agrupando por apariencia genérica (textura, color,
 composición) sin codificar información del dominio. Los modelos de YOLO, en
 cambio, pierden en todos los ejes salvo el CH, confirmando que sus
 características de detección no transfieren al agrupamiento por apariencia.
@@ -355,21 +355,21 @@ botella $O(n^2)$ de SQLite.
 \subsection{Validación supervisada}
 \label{subsec:res-supervisada}
 Las métricas extrínsecas, aplicables cuando se dispone de etiquetas sobre los
-pares, las métricas extrínsecas miden directamente la concordancia entre los
-clústeres y la verdad de referencia. Esta subsección hace uso de los dos
-conjuntos etiquetados manualmente por autor y estilo para evaluar la capacidad
-de los extractores de características para separar ambos ejes y validar las
-métricas intrínsecas empleadas en el resto del trabajo. La unidad de análisis
-es el recorte (recortes pre-segmentados, segmentador identidad): 294 recortes
-sobre 4 estilos para E8a y 185 recortes sobre 87 autores para E8b. Los dos
-diseños no son simétricos en su exposición al desplazamiento de dominio. La
-cabeza estilística se entrenó sobre un conjunto \emph{mixto} de 385 recortes
-(110 Salamanca + 275 Cuenca) y se evalúa sobre 294 recortes de Salamanca
-disjuntos del entrenamiento, así que E8a es un \textit{held-out} dentro del
-propio dominio de entrenamiento. Las cabezas de autoría, en cambio, se
-entrenaron sobre 321 recortes \emph{exclusivamente} de Cuenca y se evalúan
-sobre 185 recortes de Salamanca, así que E8b mezcla generalización a autores no
-vistos con un desplazamiento de dominio Cuenca$\to$Salamanca.
+pares, miden directamente la concordancia entre los clústeres y la verdad de
+referencia. Esta subsección hace uso de los dos conjuntos etiquetados
+manualmente por autor y estilo para evaluar la capacidad de los extractores de
+características para separar ambos ejes y validar las métricas intrínsecas
+empleadas en el resto del trabajo. La unidad de análisis es el recorte
+(recortes pre-segmentados, segmentador identidad): 294 recortes sobre 4 estilos
+para E8a y 185 recortes sobre 87 autores para E8b. Los dos diseños no son
+simétricos en su exposición al desplazamiento de dominio. La cabeza estilística
+se entrenó sobre un conjunto \emph{mixto} de 385 recortes (110 Salamanca + 275
+Cuenca) y se evalúa sobre 294 recortes de Salamanca disjuntos del
+entrenamiento, así que E8a es un \textit{held-out} dentro del propio dominio de
+entrenamiento. Las cabezas de autoría, en cambio, se entrenaron sobre 321
+recortes \emph{exclusivamente} de Cuenca y se evalúan sobre 185 recortes de
+Salamanca, así que E8b mezcla generalización a autores no vistos con un
+desplazamiento de dominio Cuenca$\to$Salamanca.
 
 \subsubsection{Evaluación por estilo}
 \label{subsubsec:res-estilo}

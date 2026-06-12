@@ -122,8 +122,8 @@ reproducible cuyo coste y calidad pueden compararse con cualquier otra.
 \label{subsec:pipeline}
 
 \subsubsection{Ingesta y generación de \textit{embeddings}}
-La extracción de características de cada fotorgraía comienza con la ingesta de
-esta imagen por el segmentador escogido. Que devuelve una lista con las cajas
+La extracción de características de cada fotografía comienza con la ingesta de
+esta imagen por el segmentador escogido, que devuelve una lista con las cajas
 delimitadoras de los grafitis presentes en la imagen. Estas cajas se fusionan
 según criterios de solapamiento, proximidad y confianza, y se recortan sobre la
 imagen original para obtener los grafitis individuales. Cada recorte se entrega
@@ -136,8 +136,8 @@ recuperación masiva.
 En el caso de que no se utilice segmentador se devuelve una única caja que
 abarca toda la imagen, de modo que el sistema se comporta como un agrupador de
 imágenes completas. Este comportamiento también se puede habilitar o
-deshabilitar para los modelos de detección de caso que no detecten ningún
-grafiti.
+deshabilitar para los modelos de detección para el caso en el que no detecten
+ningún grafiti.
 
 \subsubsection{Recuperación, reducción y agrupamiento}
 Una vez completada la ingesta, la fase de agrupamiento opera sobre el contenido
