@@ -6,11 +6,21 @@
 % Separación de los párrafos
 \setlength{\parskip}{0.6cm}
 
-%\usepackage[utf8]{inputenc}
+% Configuración de fuentes según el motor: pdflatex usa inputenc/fontenc,
+% xelatex/lualatex (tectonic) usan fontspec.
+\usepackage{iftex}
+\ifpdftex
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+\else
+  \usepackage{fontspec}
+\fi
 \usepackage[spanish]{babel}
-\usepackage{fontspec}
-% This comented for tectonic
-%\usepackage [T1]{fontenc}
+% Localiza la bibliografía al español (meses, "y", "páginas", "ed.", etc.).
+% plain.bst codifica los meses en inglés ("August"); babelbib + babplain.bst
+% los traduce ("Agosto") según el idioma fijado con \selectbiblanguage.
+\usepackage[fixlanguage]{babelbib}
+\selectbiblanguage{spanish}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{wrapfig} % Para permitir un gráfico al lado de texto
