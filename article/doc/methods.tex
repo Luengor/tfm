@@ -135,7 +135,8 @@ segundo, la latencia de búsqueda por consulta y la escalabilidad de estas
 magnitudes con el tamaño del banco; todas ellas son métricas objetivas e
 independientes de la existencia de etiquetas. El segundo eje, secundario, es la
 calidad de los clústeres resultantes, evaluada con las métricas internas y
-extrínsecas definidas en \ref{subsubsec:metricas}.
+extrínsecas definidas en \ref{subsubsec:eval-intrinseca} y
+\ref{subsubsec:eval-extrinseca}.
 
 \subsubsection{Definición del espacio de configuraciones}
 \label{subsubsec:espacio-configs}
@@ -278,7 +279,11 @@ del índice aproximado y es nulo en los \textit{backends} exactos.
 
 \subsubsection{Evaluación intrínseca de los agrupamientos}
 \label{subsubsec:eval-intrinseca}
-Las métricas intrínsecas definidas en \ref{subsubsec:metricas} se calculan de
+La calidad intrínseca se cuantifica con tres métricas que miden la cohesión
+intracluster y la separación intercluster directamente sobre los
+\textit{embeddings}: el coeficiente de silueta~\cite{rousseeuw_silhouettes_1987},
+el índice de Calinski--Harabász~\cite{calinski_dendrite_1974} y el índice de
+Davies--Bouldin~\cite{davies_cluster_1979}. Se calculan de
 manera operativa sobre los \textit{embeddings} originales en su espacio de
 partida, no sobre los \textit{embeddings} reducidos utilizados por el
 agrupamiento. Esto se hace porque el objetivo de estas métricas es evaluar la
@@ -298,8 +303,8 @@ clústeres resultantes.
 
 \subsubsection{Evaluación extrínseca sobre los subconjuntos etiquetados}
 \label{subsubsec:eval-extrinseca}
-La evaluación supervisada hace uso de las métricas descritas anteriormente
-(sección \ref{subsubsec:metricas}) y opera sobre dos conjuntos de recortes
+La evaluación supervisada hace uso de métricas extrínsecas (ARI, NMI y F1 por
+pares, definidas más adelante) y opera sobre dos conjuntos de recortes
 etiquetados, uno por cada tarea supervisada del trabajo: evaluación por estilo
 y evaluación por autor. En ambos casos, se utilizan los recortes directamente
 como imágenes a evaluar en vez de aportar la imagen original y utilizar un
@@ -360,8 +365,9 @@ ruido en las métricas intrínsecas, donde el ruido siempre se excluye y se
 complementan con valores como el porcentaje de ruido.
 
 Para evaluar la calidad de la búsqueda por similitud se emplean también las
-etiquetas disponibles según la evaluación: las métricas P@$k$, MAP@$k$, MRR y
-R@$k$ definidas en \ref{subsubsec:tools-similarity-search} se calculan por
+etiquetas disponibles según la evaluación: las métricas P@$k$ (precisión en las
+$k$ primeras posiciones), MAP@$k$ (precisión media promedio), MRR (rango
+recíproco medio) y R@$k$ (\textit{recall} a $k$) se calculan por
 consulta y se promedian sobre todas las consultas realizadas para obtener una
 media global de la calidad de la búsqueda por similitud. Como R@$k$ acota su
 denominador al máximo de vecinos relevantes recuperables en $k$ posiciones
