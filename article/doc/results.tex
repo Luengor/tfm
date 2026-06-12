@@ -16,7 +16,7 @@ en la tabla. Las subsecciones siguientes se refieren a cada barrido por su
 identificador.
 
 {\footnotesize
-\begin{longtable}{|p{0.6cm}|p{3.9cm}|p{3.6cm}|p{4.7cm}|} \hline
+\begin{longtable}{|p{0.6cm}|p{3.5cm}|p{3.2cm}|p{3.4cm}|} \hline
   \textbf{Id} & \textbf{Elementos variados} & \textbf{Fijo} & \textbf{$N$ / repeticiones} \\ \hline
   \endhead
   E1 & Extractor & UMAP-10, HDBSCAN \texttt{mcs}=5, identidad, SQLite & $N\in\{250, 1000, 6416\}$, $K{=}3$ \\ \hline
@@ -73,7 +73,7 @@ MobileNetV3); la tabla~\ref{tab:e1-quality-6416} recoge la calidad intrínseca a
 $N=6416$.
 
 {\footnotesize
-\begin{longtable}{|p{5.4cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|} \hline
+\begin{longtable}{|p{4.5cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|p{0.9cm}|} \hline
   \textbf{Extractor} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{DB} & \textbf{csCV} \\ \hline
   \endhead
   \texttt{mobilenet\_v3}                  & 820 & \textbf{0.078} & \textbf{0.260} & 13.1 & 1.48 & \textbf{0.52} \\ \hline
@@ -152,7 +152,7 @@ YOLO11s, YOLO11m y YOLO11m \textit{fine-tuned}) manteniendo fijo el resto del
 \textit{pipeline}.
 
 {\footnotesize
-\begin{longtable}{|p{2.5cm}|p{1.5cm}|p{1.0cm}|p{1.0cm}|p{1.1cm}|p{1.0cm}|p{1.0cm}|p{1.4cm}|} \hline
+\begin{longtable}{|p{2.3cm}|p{1.2cm}|p{0.8cm}|p{0.8cm}|p{0.9cm}|p{0.8cm}|p{0.8cm}|p{1.2cm}|} \hline
   \textbf{Segmentador} & \textbf{recortes} & \textbf{r/img} & \textbf{cls} & \textbf{ruido} & \textbf{sil} & \textbf{CH} & \textbf{ingesta (s)} \\ \hline
   \endhead
   identidad           & 6416  & 1.00 &  563 & \textbf{0.199} & \textbf{0.151} & 33.1 & \textbf{1235.5} \\ \hline
@@ -229,7 +229,7 @@ estos tiempos frente a $N$ en escala log-log.
 
 
 {\footnotesize
-\begin{longtable}{|p{2.5cm}|p{3.4cm}|p{2.6cm}|p{2.6cm}|} \hline
+\begin{longtable}{|p{2.3cm}|p{3.1cm}|p{2.5cm}|p{2.5cm}|} \hline
   \textbf{Etapa / Algoritmo} & \textbf{Escala teórica} & \textbf{Pendiente $N{=}250\ldots6416$} & \textbf{Pendiente $N{=}500\ldots3500$} \\ \hline
   \endhead
   Ingesta (DINOv2)       & $O(n)$            & 0.95 & --   \\ \hline
@@ -373,7 +373,7 @@ ruido), \emph{chance-corrected} y, por tanto, comparable entre configuraciones
 con distinto número de clústeres.
 
 {\footnotesize
-\begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
+\begin{longtable}{|p{4.4cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{3.0cm}|} \hline
   \textbf{Extractor} & \textbf{ARI} & \textbf{NMI} & \textbf{F1} & \textbf{sil} & \textbf{Celda} \\ \hline
   \endhead
   \texttt{dinov2\_graffiti\_style\_head}      & \textbf{0.722} & \textbf{0.678} & \textbf{0.806} & \textbf{0.284} & identidad + K-medias-4   \\ \hline
@@ -445,7 +445,7 @@ la cabeza apenas iguala a su \textit{backbone} (0.048 vs.\ 0.046, +0.002 ARI)
 y supera a la cabeza de estilo (0.041).
 
 {\footnotesize
-\begin{longtable}{|p{5.4cm}|p{1.2cm}|p{1.0cm}|p{1.0cm}|p{1.0cm}|p{3.5cm}|} \hline
+\begin{longtable}{|p{4.4cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{0.7cm}|p{3.0cm}|} \hline
   \textbf{Extractor} & \textbf{ARI} & \textbf{NMI} & \textbf{F1} & \textbf{sil} & \textbf{Celda} \\ \hline
   \endhead
   \texttt{clip\_vit\_b32}                     & \textbf{0.076} & \textbf{0.789} & 0.090 & 0.003 & UMAP + aglo-87 \\ \hline

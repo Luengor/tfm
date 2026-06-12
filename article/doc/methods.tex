@@ -69,6 +69,7 @@ del conjunto almacenado para reducirlo y agruparlo (figura~\ref{fig:pipeline}).
 \begin{figure}[h!]
   \centering
   \shorthandoff{<>}%
+  \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}[
     >=Stealth, node distance=11mm and 17mm,
     block/.style={draw, rounded corners, minimum height=9mm, minimum width=22mm,
@@ -104,6 +105,7 @@ del conjunto almacenado para reducirlo y agruparlo (figura~\ref{fig:pipeline}).
     \node[draw, dotted, fit=(red)(clu)(out), inner sep=3mm,
           label=below:{\scriptsize Fase de agrupamiento (puntual)}] {};
   \end{tikzpicture}%
+  }%
   \shorthandon{<>}%
   \caption[Flujo de trabajo en dos fases]{Flujo de trabajo en dos fases. El almacenamiento es el punto de
   acoplamiento entre la ingesta incremental y la fase de agrupamiento puntual.}
@@ -306,6 +308,7 @@ espacio según las cuatro categorías estilísticas.
 \begin{figure}[h!]
   \centering
   \shorthandoff{<>}%
+  \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}[
     >=Stealth, node distance=6mm and 6mm,
     block/.style={draw, rounded corners, minimum height=9mm, minimum width=14mm, inner sep=3pt, align=center, font=\small},
@@ -328,6 +331,7 @@ espacio según las cuatro categorías estilísticas.
     \node[draw, dotted, fit=(l1)(relu)(l2), inner sep=2mm,
           label=below:{\scriptsize Cabeza entrenada}] {};
   \end{tikzpicture}%
+  }%
   \shorthandon{<>}%
   \caption[Cabeza de proyección ajustada a grafiti]{Cabeza de proyección ajustada a grafiti. El \textit{backbone} permanece
     congelado y solo se entrena una secuencia ligera de capas para luego normalizar
