@@ -319,7 +319,11 @@ modificar la arquitectura (DINOv2, CLIP y YOLO). La
 tabla~\ref{tab:embedding-models} resume las opciones disponibles, indicando
 arquitectura, dimensionalidad de salida y preentrenamiento.
 
-\begin{longtable}{|p{3.2cm}|p{3.8cm}|c|p{4.2cm}|} \hline
+\begin{table}[h]
+  \caption{Modelos de extracción de características integrados.}
+  \label{tab:embedding-models}
+  \centering
+\begin{tabular}{|p{3.2cm}|p{3.8cm}|c|p{4.2cm}|} \hline
   \textbf{Modelo} & \textbf{Arquitectura} & \textbf{Dim.} & \textbf{Preentrenamiento} \\ \hline
   ResNet50~\cite{he_deep_2015} & CNN residual & $2048$ & ImageNet \\ \hline
   VGG16~\cite{simonyan_very_2015} & CNN profunda & $4096$ & ImageNet \\ \hline
@@ -328,9 +332,8 @@ arquitectura, dimensionalidad de salida y preentrenamiento.
   DINOv2 ViT-S/14~\cite{oquab_dinov2_2024} & \textit{Transformer}~\cite{dosovitskiy_image_2021} & $384$ & Autosupervisado (LVD-142M) \\ \hline
   CLIP ViT-B/32~\cite{radford_learning_2021} & \textit{Transformer} & $512$ & Imagen-texto (WIT) \\ \hline
   YOLO11 (n/m)~\cite{ultralytics_ultralytics_2024} & Detector \textit{one-stage} & $256$--$512$ & COCO \\ \hline
-  \caption{Modelos de extracción de características integrados.}
-  \label{tab:embedding-models}
-\end{longtable}
+\end{tabular}
+\end{table}
 
 \subsubsection{Algoritmos de agrupamiento}
 \label{subsubsec:algoritmos-agrupamiento}
@@ -348,7 +351,11 @@ principal cuando este no se declara en la configuración; el procedimiento
 empleado en cada caso y su papel en el protocolo comparativo se detallan en
 \ref{subsubsec:hiperparam-auto}.
 
-\begin{longtable}{|l|l|c|} \hline
+\begin{table}[h]
+  \caption{Algoritmos de agrupamiento implementados.}
+  \label{tab:clustering-algos}
+  \centering
+\begin{tabular}{|l|l|c|} \hline
   \textbf{Algoritmo} & \textbf{Hiperparámetros principales} & \textbf{Auto. $k$} \\ \hline
   K-medias~\cite{arthur_k-means_2007} & $n\_clusters$ & sí \\ \hline
   DBSCAN~\cite{ester_density-based_1996} & $\epsilon$, $min\_samples$ & sí ($\epsilon$) \\ \hline
@@ -358,9 +365,8 @@ empleado en cada caso y su papel en el protocolo comparativo se detallan en
   Espectral~\cite{ng_spectral_2001,huang_ultra-scalable_2020} & $n\_clusters$, afinidad & no \\ \hline
   GMM~\cite{dempster_maximum_1977} & $n\_components$, covarianza & sí \\ \hline
   \textit{Affinity Propagation}~\cite{frey_clustering_2007} & $damping$, $preference$ & no requiere \\ \hline
-  \caption{Algoritmos de agrupamiento implementados.}
-  \label{tab:clustering-algos}
-\end{longtable}
+\end{tabular}
+\end{table}
 
 \subsubsection{Técnicas de reducción de dimensionalidad}
 La etapa de reducción es opcional, siendo la implementación por defecto una
@@ -368,16 +374,19 @@ identidad que no aplica ninguna transformación, permitiendo comparar el efecto
 de añadir esta etapa. La tabla~\ref{tab:reduction} resume las opciones
 disponibles.
 
-\begin{longtable}{|l|l|l|} \hline
+\begin{table}[h]
+  \caption{Técnicas de reducción de dimensionalidad implementadas.}
+  \label{tab:reduction}
+\centering
+\begin{tabular}{|l|l|l|} \hline
   \textbf{Técnica} & \textbf{Tipo} & \textbf{Parámetros principales} \\ \hline
   Identity & --- & --- \\ \hline
   PCA~\cite{jolliffe_principal_2002} & Lineal & $n\_components$ \\ \hline
   Kernel PCA~\cite{scholkopf_nonlinear_1998} & No lineal & $n\_components$, \textit{kernel} \\ \hline
   Isomap~\cite{tenenbaum_global_2000} & No lineal & $n\_components$, $n\_neighbors$ \\ \hline
   UMAP~\cite{mcinnes_umap_2020} & No lineal & $n\_components$, $n\_neighbors$, $min\_dist$ \\ \hline
-  \caption{Técnicas de reducción de dimensionalidad implementadas.}
-  \label{tab:reduction}
-\end{longtable}
+\end{tabular}
+\end{table}
 
 \subsubsection{Sistemas de almacenamiento}
 La persistencia de los \textit{embeddings} y los metadatos asociados se abstrae
