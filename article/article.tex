@@ -11,6 +11,27 @@
 \graphicspath{{figures/}}
 \usepackage{amsmath, amssymb}
 
+% Tablas largas que se parten entre páginas (tools/results) y columnas m{}/p{}.
+\usepackage{longtable}
+\usepackage{array}
+% Comillas localizadas al idioma (\enquote).
+\usepackage{csquotes}
+\usepackage{url}
+% Diagramas vectoriales (methods/tools).
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
+
+% Glosa de columnas de las tablas de calidad intrínseca (usada en results).
+\newcommand{\glosacalidad}{Columnas: cls=n\'umero de cl\'usteres,
+ruido=fracci\'on de ruido~$\downarrow$, sil=silueta~$\uparrow$,
+CH=Calinski--Harab\'asz~$\uparrow$, DB=Davies--Bouldin~$\downarrow$,
+csCV=coef.\ de variaci\'on del tama\~no de cl\'uster~$\downarrow$.}
+
+% Cita con autor + et al.
+\newcommand{\citea}[3][]{%
+    #2\ifx\\#1\\\else~\textit{et~al.}\fi~\cite{#3}%
+}
+
 \begin{document}
 
 \title{Caracterización del desempeño y el coste computacional en algoritmos
