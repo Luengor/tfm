@@ -32,6 +32,12 @@ csCV=coef.\ de variaci\'on del tama\~no de cl\'uster~$\downarrow$.}
     #2\ifx\\#1\\\else~\textit{et~al.}\fi~\cite{#3}%
 }
 
+% babel ini-spanish (v26) no registra < > como shorthands, así que los guardas
+% \shorthandoff{<>}/\shorthandon{<>} de las figuras tikz (methods/tools) darían
+% error. Se neutralizan: no hacen falta porque < > nunca son activos aquí.
+\renewcommand{\shorthandoff}[1]{}
+\renewcommand{\shorthandon}[1]{}
+
 \begin{document}
 
 \title{Caracterización del desempeño y el coste computacional en algoritmos
@@ -47,13 +53,15 @@ Universidad de Salamanca, Salamanca, España\\
 \maketitle
 
 \begin{abstract}
-Resumen pendiente.
-
-\keywordname{} Grafiti $\cdot$ Similitud de imágenes $\cdot$ Agrupamiento
-$\cdot$ Aprendizaje profundo
+\input{doc/resumen}
 \end{abstract}
 
-% Secciones pendientes de enlazar.
+\input{doc/intro}
+\input{doc/art}
+\input{doc/tools}
+\input{doc/methods}
+\input{doc/results}
+\input{doc/conclusion}
 
 \bibliographystyle{splncs}
 \bibliography{bib}
