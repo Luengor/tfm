@@ -48,8 +48,53 @@
 % ============================================================
 \section{Introducción}
 
-\begin{frame}{Introducción}
-  % TODO: motivación + objetivo + trabajos relacionados
+\begin{frame}{Contexto}
+  \begin{columns}
+    \column{0.55\textwidth}
+      \begin{itemize}
+        \item El grafiti no autorizado supone un \textbf{coste continuo} para las administraciones
+        \item Seguimiento manual: \textbf{costoso e inconsistente}
+        \item Agrupamiento automático por similitud visual $\Rightarrow$ trazabilidad de autores, priorización de retirada
+      \end{itemize}
+    \column{0.45\textwidth}
+      \imgw{1.0}{graffiti_mosaic.jpg}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Problema y objetivo}
+  \textbf{Problema:} dado un banco de fotografías de grafiti (mayoritariamente sin etiquetar), agruparlas por similitud visual de forma automática
+
+  \vspace{1em}
+
+  \textbf{Objetivo:} diseñar y evaluar un \textbf{sistema modular} que permita:
+  \begin{itemize}
+    \item Comparar combinaciones de extractores de características, técnicas de reducción y algoritmos de agrupamiento
+    \item Caracterizar el \textbf{coste computacional} por etapa en función del tamaño del banco
+    \item Evaluar la calidad del agrupamiento con métricas intrínsecas y extrínsecas
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Trabajos relacionados}
+  \begin{table}
+    \centering
+    \large
+    \begin{tabular}{lll}
+      \toprule
+      \textbf{Trabajo} & \textbf{Tarea} & \textbf{Limitación} \\
+      \midrule
+      Fogaça et al.~\cite{fogaca_deep_2023}             & Detección y clasificación  & Supervisado, sin agrupamiento \\
+      Tokuda et al.~\cite{tokuda_quantifying_2019}      & Cuantificación geográfica  & Sin similitud visual \\
+      García García et al.~\cite{garcia_garcia_graffiti_2025} & Agrupamiento por color & Sin descriptores profundos \\
+      \midrule
+      \textbf{Este trabajo} & \textbf{Agrupamiento + coste} & --- \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.5em}
+  \centering
+  \small Ningún trabajo previo combina \textbf{descriptores profundos}, agrupamiento clásico\\
+  y caracterización del \textbf{coste computacional} sobre imágenes de grafiti.
 \end{frame}
 
 % ============================================================
