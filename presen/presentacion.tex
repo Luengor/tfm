@@ -7,6 +7,8 @@
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{url}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\addbibresource{bib.bib}
 
 % ---- Theme ----
 \usetheme{Madrid}
@@ -108,6 +110,12 @@
 
 \begin{frame}{Conclusiones}
   % TODO: principales hallazgos + trabajo futuro
+\end{frame}
+
+% ============================================================
+% --- Referencias ---
+\begin{frame}[allowframebreaks]{Referencias}
+  \printbibliography[heading=none]
 \end{frame}
 
 % ============================================================
