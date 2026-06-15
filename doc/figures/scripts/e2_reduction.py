@@ -59,7 +59,7 @@ def main() -> None:
     df["reduction"] = pd.Categorical(df["reduction"], categories=order, ordered=True)
     df = df.sort_values("reduction")
 
-    fig, (axA, axB) = plt.subplots(1, 2, figsize=(9.2, 3.8))
+    fig, (axA, axB) = plt.subplots(1, 2, figsize=(9.2, 3.1))
 
     palette = sns.color_palette("colorblind", n_colors=len(order))
     color_map = {lbl: palette[i] for i, lbl in enumerate(order)}
@@ -132,7 +132,7 @@ def main() -> None:
     axB.set_xlabel("Tiempo (s)")
     axB.set_ylabel("")
     axB.set_title("B · Coste por etapa, N=6416")
-    axB.legend(loc="lower right")
+    axB.legend(loc="upper right")
 
     # Annotate totals
     totals = df.set_index("reduction").apply(lambda r: r["red_t"] + r["clu_t"], axis=1)
@@ -149,7 +149,6 @@ def main() -> None:
                 color="#333333",
             )
 
-    fig.suptitle("E2 · Reducción de dimensionalidad: calidad y coste a N=6416", y=1.02)
     save(fig, "e2_reduction_quality_cost")
 
 

@@ -12,6 +12,7 @@
 \usepackage{csquotes}
 \usepackage[backend=bibtex,style=numeric,sorting=none]{biblatex}
 \addbibresource{bib.bib}
+\renewcommand*{\bibfont}{\small}
 
 % ---- Theme ----
 \usetheme{Madrid}
@@ -334,51 +335,6 @@
   \end{columns}
 \end{frame}
 
-\subsection{Búsqueda por similitud}
-\begin{frame}{Búsqueda por similitud: recuperación basada en contenido}
-  El mismo espacio de \textit{embeddings} habilita la \textbf{recuperación de
-  imágenes basada en contenido} (\textit{content-based image
-  retrieval}): dada una firma de consulta, devolver las visualmente más
-  parecidas~\cite{van_rijsbergen_c_j_information_1979,fiel_writer_2015}.
-  \begin{columns}[c]
-    \column{0.5\textwidth}
-      \centering
-      \shorthandoff{<>}%
-      \begin{tikzpicture}[
-        >=Stealth, node distance=6mm and 12mm,
-        block/.style={draw, rounded corners, minimum height=7mm, minimum width=18mm,
-                      inner sep=3pt, align=center, font=\scriptsize},
-        idx/.style={block, fill=green!12},
-        res/.style={block, fill=blue!8, minimum width=12mm},
-        lbl/.style={font=\scriptsize, midway, fill=white, inner sep=1pt},
-      ]
-        \node[block] (q) {consulta};
-        \node[idx, right=of q] (i) {índice de\\\textit{embeddings}};
-        \node[res, right=14mm of i] (r1) {vecino 1};
-        \node[res, below=3mm of r1] (r2) {vecino 2};
-        \node[res, below=3mm of r2] (r3) {\dots};
-        \draw[->] (q)--(i) node[lbl,above]{\textit{embed.}};
-        \draw[->] (i.east)--(r1.west) node[lbl,above]{top-$k$};
-        \draw[->] (i.east)--(r2.west);
-        \draw[->] (i.east)--(r3.west);
-      \end{tikzpicture}%
-      \shorthandon{<>}
-    \column{0.5\textwidth}
-      \begin{itemize}\small
-        \item Dos \textit{backends}: barrido \textbf{exacto} (SQLite, fuerza bruta) vs.\ índice
-          aproximado \textbf{HNSW}~\cite{malkov_efficient_2018} sobre pgvector
-        \item Compromiso \textbf{velocidad / exactitud}: el ANN sacrifica
-          recuperar el vecino \emph{exacto} por escalar a bancos
-          grandes~\cite{johnson_billion-scale_2017}
-        \item Calidad con métricas clásicas de RI: \textbf{P@$k$, R@$k$,
-          MAP@$k$, MRR}~\cite{van_rijsbergen_c_j_information_1979}
-      \end{itemize}
-      \vspace{0.3em}
-      {\footnotesize Es a la vez \textbf{herramienta de consulta} y \textbf{sonda de
-      calidad} del espacio de \textit{embeddings} (sección de resultados).}
-  \end{columns}
-\end{frame}
-
 % ============================================================
 \section{Experimentos y resultados}
 
@@ -422,21 +378,37 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Resultados: calidad intrínseca y elección de componentes}
+\begin{frame}{Resultados: elección de algoritmo de agrupamiento}
   \begin{columns}[c]
-    \column{0.52\textwidth}
-      \centering
-      \includegraphics[width=\linewidth]{figures/e3_pareto_quality_cost.pdf}\\
-      {\scriptsize Calidad frente a coste por familia de agrupamiento ($N{=}6416$).}
-    \column{0.48\textwidth}
+    \column{0.40\textwidth}
       \footnotesize
       \begin{itemize}
-        \item \textbf{HDBSCAN} domina el frente de Pareto: silueta competitiva, ruido moderado, tamaños balanceados y coste despreciable
-        \item OPTICS lo iguala en calidad pero paga $\sim$25$\times$ tiempo y $\sim$2500$\times$ memoria
-        \item \textbf{UMAP-10} es la única reducción no degenerada; la identidad descarta $\sim$68\,\% de los puntos como ruido
-        \item Silueta y CH \textbf{aisladas engañan}: premian $k{=}2$ trivial $\Rightarrow$ criterio conjunto
+        \item \textbf{HDBSCAN} domina el frente de Pareto: silueta competitiva,
+            ruido moderado, tamaños balanceados y coste despreciable
+        \item OPTICS iguala en calidad pero paga $\sim$25$\times$ tiempo y
+            $\sim$2500$\times$ memoria
+        \item K-medias es el algortimo más rápido y no devuelve ruido, pero
+            obtiene un $70\%$ de la silueta de HDBSCAN.
+        \item Silueta y CH \textbf{aisladas engañan}: premian $k{=}2$ trivial
+            $\Rightarrow$ criterio conjunto
       \end{itemize}
+    \column{0.60\textwidth}
+      \centering
+      \includegraphics[width=0.8\linewidth]{figures/e3_pareto_quality_cost.pdf}\\
+      {\scriptsize Calidad frente a coste por familia de agrupamiento ($N{=}6416$).}
   \end{columns}
+\end{frame}
+
+\begin{frame}{Resultados: elección de reducción de dimensionalidad}
+  \footnotesize
+  \begin{itemize}
+    \item \textbf{UMAP-10} es la única reducción no degenerada
+    \item La identidad (sin reducción) descarta $\sim$68\,\% de los puntos como ruido: espacio de alta dimensión rompe HDBSCAN
+    \item PCA e Isomap producen particiones degeneradas ($k{=}2$ trivial)
+  \end{itemize}
+  \vfill
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/e2_reduction_quality_cost.pdf}
 \end{frame}
 
 \begin{frame}{Resultados: validación supervisada (estilo)}
@@ -526,12 +498,6 @@
 \end{frame}
 
 % ============================================================
-% --- Referencias ---
-\begin{frame}[allowframebreaks]{Referencias}
-  \printbibliography[heading=none]
-\end{frame}
-
-% ============================================================
 % --- Gracias ---
 \begin{frame}[plain]
   \centering
@@ -540,6 +506,12 @@
   {\normalsize Alberto Luengo Román}\\
   {\small \texttt{aluengor0001@gmail.com}}\\[1.5em]
   \imgw{0.25}{marca-UniversidadSalamanca-color.pdf}
+\end{frame}
+
+% ============================================================
+% --- Referencias ---
+\begin{frame}[allowframebreaks]{Referencias}
+  \printbibliography[heading=none]
 \end{frame}
 
 % ============================================================
