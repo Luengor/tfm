@@ -168,7 +168,7 @@
   \centering
   \shorthandoff{<>}%
   \begin{tikzpicture}[
-    >=Stealth, node distance=9mm and 15mm,
+    >=Stealth, node distance=9mm and 20mm,
     block/.style={draw, rounded corners, minimum height=8mm, minimum width=20mm,
                   inner sep=4pt, align=center, font=\small},
     store/.style={block, fill=green!12},
@@ -183,12 +183,12 @@
     \draw[->] (seg)--(ext) node[lbl, above]{recortes};
     \draw[->] (ext)--(sto) node[lbl, above]{\textit{embeddings}};
 
-    \node[block, below=12mm of seg] (red) {Reducción};
+    \node[block, below=18mm of seg] (red) {Reducción};
     \node[block, right=of red] (clu) {Agrupamiento};
     \node[io, right=of clu] (out) {clústeres\\y métricas};
     \draw[->] (red)--(clu);
     \draw[->] (clu)--(out);
-    \draw[->] (sto.south) -- ++(0,-6mm) -| (red.north)
+    \draw[->] (sto.south) -- ++(0,-9mm) -| (red.north)
         node[lbl, pos=0.25, above]{carga masiva};
 
     \node[draw, dotted, fit=(img)(seg)(ext), inner sep=3mm,
@@ -199,7 +199,7 @@
   \shorthandon{<>}
 
   \vspace{0.8em}
-  \small Cinco etapas \textbf{intercambiables} tras una interfaz común $\Rightarrow$ evaluación combinatoria de configuraciones.
+  \small Cinco etapas \textbf{intercambiables} tras una interfaz común
 \end{frame}
 
 \subsection{Segmentación}
@@ -207,10 +207,10 @@
   \begin{columns}
     \column{0.42\textwidth}
       \begin{itemize}
+        \item Etapa \textbf{opcional} para recortar grafitis de la escena
         \item Detector \textbf{YOLO ajustado} sobre grafiti ($447$ imágenes, $\sim$650 cajas; partida de pesos COCO)
         \item \textbf{Fusión} de cajas por solapamiento y proximidad; salvaguarda anti-mega-cajas
         \item \textbf{Margen} de contexto configurable antes de recortar
-        \item Alternativa: sin segmentar $\Rightarrow$ imagen completa
       \end{itemize}
     \column{0.58\textwidth}
       \imgw{1.0}{segmentation_stages.pdf}\\
@@ -218,10 +218,10 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Segmentación: detecciones del detector}
-  \centering
-  \imgw{0.8}{val_batch2_pred.jpg}
-\end{frame}
+% \begin{frame}{Segmentación: detecciones del detector}
+%   \centering
+%   \imgw{0.8}{val_batch2_pred.jpg}
+% \end{frame}
 
 \subsection{Extracción de características}
 \begin{frame}{Extracción de características}
@@ -232,7 +232,7 @@
       \begin{itemize}
         \item CNN: se elimina la capa de clasificación
         \item \textit{Transformers} (DINOv2, CLIP): ya devuelven un vector
-        \item Salen de $384$ a $4096$ dimensiones
+        \item Vectores de entre $384$ y $4096$ dimensiones
       \end{itemize}
     \column{0.5\textwidth}
       \centering \small
@@ -244,8 +244,8 @@
         VGG16         & CNN profunda      & $4096$ \\
         InceptionV3   & CNN multi-rama    & $2048$ \\
         MobileNetV3   & CNN ligera        & $1280$ \\
-        DINOv2 ViT-S/14 & \textit{Transf.} & $384$ \\
-        CLIP ViT-B/32 & \textit{Transf.} & $512$ \\
+        DINOv2 ViT-S/14 & \textit{Transformer} & $384$ \\
+        CLIP ViT-B/32 & \textit{Transformer} & $512$ \\
         \bottomrule
       \end{tabular}
   \end{columns}
