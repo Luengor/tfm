@@ -470,6 +470,41 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}{Resultados: búsqueda por similitud (SQLite vs PostgreSQL)}
+  \begin{columns}[c]
+    \column{0.54\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item \textbf{SQLite}: exploración lineal en Python, $\sim$150~cons./s plano $\Rightarrow$ tiempo $O(n)$ por consulta, $O(n^2)$ por pasada
+        \item \textbf{pgvector exacto}: \textit{kernel} de coseno en C, dos órdenes de magnitud más rápido; latencia limitada por el \textit{round-trip} a $N$ pequeño
+        \item \textbf{pgvector + HNSW}: único \textit{backend} cuyo \textit{throughput} \emph{crece} con $N$; a $N{=}6416$, $3.2\times$ sobre el exacto y $240\times$ sobre SQLite
+        \item \textbf{R@5 = 1.000} a todas las escalas: índice aproximado \textbf{sin} pérdida de \textit{recall}; índice cuesta $0.47$~s, se amortiza en una consulta
+        \item Por debajo de $N{\approx}2500$ las tres opciones PostgreSQL son indistinguibles; el banco está por encima del cruce $\Rightarrow$ \textbf{HNSW por defecto}
+      \end{itemize}
+    \column{0.46\textwidth}
+      \centering \scriptsize
+      \setlength{\tabcolsep}{3pt}
+      \begin{tabular}{rlrr}
+        \toprule
+        \textbf{$N$} & \textbf{\textit{Backend}} & \textbf{cons./s} & \textbf{R@5} \\
+        \midrule
+         500 & SQLite           &    164 & --    \\
+         500 & pgvector exacto  &  3\,096 & --    \\
+         500 & pgvector + HNSW  &  3\,042 & 1.000 \\
+        \midrule
+        2500 & SQLite           &    148 & --    \\
+        2500 & pgvector exacto  & 10\,678 & --    \\
+        2500 & pgvector + HNSW  & 15\,092 & 1.000 \\
+        \midrule
+        6416 & SQLite           &    149 & --    \\
+        6416 & pgvector exacto  & 11\,109 & --    \\
+        6416 & \textbf{pgvector + HNSW} & \textbf{35\,936} & \textbf{1.000} \\
+        \bottomrule
+      \end{tabular}\\[0.4em]
+      {\scriptsize E6: \textit{throughput} (consultas/s) y \textit{recall}@5 por \textit{backend}.}
+  \end{columns}
+\end{frame}
+
 % ============================================================
 \section{Conclusiones}
 
