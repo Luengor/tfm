@@ -7,7 +7,7 @@
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{url}
-\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\usepackage[backend=bibtex,style=numeric,sorting=none]{biblatex}
 \addbibresource{bib.bib}
 
 % ---- Theme ----
@@ -101,7 +101,62 @@
 \section{Conjunto de datos}
 
 \begin{frame}{Conjunto de datos}
-  % TODO: ejemplos de imágenes, escala, anotaciones manuales
+  \begin{columns}
+    \column{0.55\textwidth}
+      \begin{itemize}
+        \item \textbf{Banco principal:} $6681$ fotografías de grafiti en
+            \textbf{Salamanca}
+        \item Capturadas con dispositivo móvil ($\sim$10.6~MP), sin
+            postprocesado. Captura masiva en otoño de 2022
+        \item Alta variabilidad entre fotografías: iluminación, perspectiva,
+            oclusión, escena, etc. Muchas de las fotografías contienen
+            \textbf{múltiples grafitis}
+        \item \textbf{Banco auxiliar:} $1106$ imágenes de \textbf{Cuenca}
+            (StopGrafiti) $\Rightarrow$ solo ajuste fino, evita solapamiento
+            entrenamiento/evaluación
+      \end{itemize}
+    \column{0.45\textwidth}
+      \imgw{1.0}{map_with_photos.pdf}
+      \centering \scriptsize Ubicación de las imágenes con GPS
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Anotaciones y subconjuntos}
+  \centering
+  \textbf{Ningún banco viene etiquetado} $\Rightarrow$ recorte y anotación \textbf{a mano}\\[0.2em]
+  Cuatro categorías estilísticas: \textit{tag}, \textit{throw-up}, \textit{piece}, \textit{character}
+  \vfill
+  \begin{columns}[c]
+    \column{0.38\textwidth}
+      \centering
+      \setlength{\tabcolsep}{4pt}\renewcommand{\arraystretch}{1.1}%
+      \begin{tabular}{cc}
+        \includegraphics[width=2cm,height=1.5cm,keepaspectratio]{figures/style_tag.jpg} &
+          \includegraphics[width=2cm,height=1.5cm,keepaspectratio]{figures/style_throwup.jpg} \\
+        {\scriptsize \textit{tag}} & {\scriptsize \textit{throw-up}} \\[0.4em]
+        \includegraphics[width=2cm,height=1.5cm,keepaspectratio]{figures/style_piece.jpg} &
+          \includegraphics[width=2cm,height=1.5cm,keepaspectratio]{figures/style_character.jpg} \\
+        {\scriptsize \textit{piece}} & {\scriptsize \textit{character}} \\
+      \end{tabular}
+    \column{0.6\textwidth}
+      \centering
+      \footnotesize
+      \begin{tabular}{llr}
+        \toprule
+        \textbf{Subconjunto} & \textbf{Procedencia} & \textbf{Tamaño} \\
+        \midrule
+        Estilo (entr.)   & StopGrafiti + Salamanca & $385$ \\
+        Estilo (eval.)   & Banco completo          & $294$ \\
+        Autoría (entr.)  & StopGrafiti             & $321$ \\
+        Autoría (eval.)  & Salamanca               & $185$ \\
+        Detección        & Ambos bancos            & $447$ \\
+        No superv.       & Salamanca (disjunto)    & $6416$ \\
+        \bottomrule
+      \end{tabular}\\[0.5em]
+      {\scriptsize Tamaño en recortes, salvo detección y no superv.\ (imágenes).\\
+      Entrenamiento y evaluación nunca se solapan.}
+  \end{columns}
+  \vfill
 \end{frame}
 
 % ============================================================
