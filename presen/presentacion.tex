@@ -9,6 +9,7 @@
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{url}
+\usepackage{csquotes}
 \usepackage[backend=bibtex,style=numeric,sorting=none]{biblatex}
 \addbibresource{bib.bib}
 
@@ -210,7 +211,7 @@
     \column{0.42\textwidth}
       \begin{itemize}
         \item Etapa \textbf{opcional} para recortar grafitis de la escena
-        \item Detector \textbf{YOLO ajustado} sobre grafiti ($447$ imágenes, $\sim$650 cajas; partida de pesos COCO)
+        \item Detector \textbf{YOLO ajustado}~\cite{ultralytics_ultralytics_2024} sobre grafiti ($447$ imágenes, $\sim$650 cajas; partida de pesos COCO)
         \item \textbf{Fusión} de cajas por solapamiento y proximidad
         \item \textbf{Margen} de contexto configurable antes de recortar
       \end{itemize}
@@ -242,12 +243,12 @@
         \toprule
         \textbf{Modelo} & \textbf{Tipo} & \textbf{Dim.} \\
         \midrule
-        ResNet50      & CNN residual      & $2048$ \\
-        VGG16         & CNN profunda      & $4096$ \\
-        InceptionV3   & CNN multi-rama    & $2048$ \\
-        MobileNetV3   & CNN ligera        & $1280$ \\
-        DINOv2 ViT-S/14 & \textit{Transformer} & $384$ \\
-        CLIP ViT-B/32 & \textit{Transformer} & $512$ \\
+        ResNet50~\cite{he_deep_2015}      & CNN residual      & $2048$ \\
+        VGG16~\cite{simonyan_very_2015}         & CNN profunda      & $4096$ \\
+        InceptionV3~\cite{szegedy_rethinking_2015}   & CNN multi-rama    & $2048$ \\
+        MobileNetV3~\cite{howard_searching_2019}   & CNN ligera        & $1280$ \\
+        DINOv2 ViT-S/14~\cite{oquab_dinov2_2024} & \textit{Transf.} & $384$ \\
+        CLIP ViT-B/32~\cite{radford_learning_2021} & \textit{Transf.} & $512$ \\
         \bottomrule
       \end{tabular}
   \end{columns}
@@ -256,11 +257,11 @@
 \begin{frame}{Extracción de características: ajuste al dominio}
   \begin{columns}
     \column{0.65\textwidth}
-      \textbf{Cabezas de proyección} entrenadas sobre grafiti utilizando \textit{transfer learning}:
+      \textbf{Cabezas de proyección} entrenadas sobre grafiti utilizando \textit{transfer learning}~\cite{pan_survey_2010}:
       \begin{itemize}
         \item \textit{Backbone} \textbf{congelado}, solo se entrena una cabeza ligera (Linear→ReLU→Linear→$L_2$)
         \item Bases: \textbf{MobileNetV3} y \textbf{DINOv2}
-        \item Tareas: \textbf{autoría} (pérdida de tripletes) y \textbf{estilo} (\textit{SupCon})
+        \item Tareas: \textbf{autoría} (pérdida de tripletes~\cite{schroff_facenet_2015,hermans_defense_2017}) y \textbf{estilo} (\textit{SupCon}~\cite{khosla_supervised_2021})
         \item En total 4 cabezas
       \end{itemize}
     \column{0.35\textwidth}
@@ -297,10 +298,10 @@
   \begin{columns}
     \column{0.54\textwidth}
       \begin{itemize}\small
-        \item \textbf{PCA} (lineal): direcciones de máxima varianza
-        \item \textbf{Kernel PCA} (no lineal): PCA en un espacio de características implícito
-        \item \textbf{Isomap} (no lineal): preserva distancias geodésicas sobre el grafo de vecinos
-        \item \textbf{UMAP} (no lineal): preserva la estructura local de vecindad
+        \item \textbf{PCA}~\cite{jolliffe_principal_2002} (lineal): direcciones de máxima varianza
+        \item \textbf{Kernel PCA}~\cite{scholkopf_nonlinear_1998} (no lineal): PCA en un espacio de características implícito
+        \item \textbf{Isomap}~\cite{tenenbaum_global_2000} (no lineal): preserva distancias geodésicas sobre el grafo de vecinos
+        \item \textbf{UMAP}~\cite{mcinnes_umap_2020} (no lineal): preserva la estructura local de vecindad
       \end{itemize}
       \vspace{0.3em}
       {\footnotesize Las métricas de calidad se calculan sobre los \textit{embeddings} \textbf{originales} (sin reducir).}
@@ -320,12 +321,12 @@
       \vspace{0.5em}
       \footnotesize
       \begin{itemize}
-        \item \textbf{Particional:} K-medias
-        \item \textbf{Densidad:} DBSCAN, OPTICS, HDBSCAN
-        \item \textbf{Jerárquico:} Aglomerativo
-        \item \textbf{Grafo:} Espectral
-        \item \textbf{Probabilístico:} GMM
-        \item \textbf{Mensajes:} Affinity Propagation
+        \item \textbf{Particional:} K-medias~\cite{arthur_k-means_2007}
+        \item \textbf{Densidad:} DBSCAN~\cite{ester_density-based_1996}, OPTICS~\cite{ankerst_optics_1999}, HDBSCAN~\cite{campello_density-based_2013}
+        \item \textbf{Jerárquico:} Aglomerativo~\cite{mullner_modern_2011}
+        \item \textbf{Grafo:} Espectral~\cite{ng_spectral_2001}
+        \item \textbf{Probabilístico:} GMM~\cite{dempster_maximum_1977}
+        \item \textbf{Mensajes:} Affinity Propagation~\cite{frey_clustering_2007}
       \end{itemize}
     \column{0.54\textwidth}
       \centering
@@ -333,30 +334,195 @@
   \end{columns}
 \end{frame}
 
+\subsection{Búsqueda por similitud}
+\begin{frame}{Búsqueda por similitud: recuperación basada en contenido}
+  El mismo espacio de \textit{embeddings} habilita la \textbf{recuperación de
+  imágenes basada en contenido} (\textit{content-based image
+  retrieval}): dada una firma de consulta, devolver las visualmente más
+  parecidas~\cite{van_rijsbergen_c_j_information_1979,fiel_writer_2015}.
+  \begin{columns}[c]
+    \column{0.5\textwidth}
+      \centering
+      \shorthandoff{<>}%
+      \begin{tikzpicture}[
+        >=Stealth, node distance=6mm and 12mm,
+        block/.style={draw, rounded corners, minimum height=7mm, minimum width=18mm,
+                      inner sep=3pt, align=center, font=\scriptsize},
+        idx/.style={block, fill=green!12},
+        res/.style={block, fill=blue!8, minimum width=12mm},
+        lbl/.style={font=\scriptsize, midway, fill=white, inner sep=1pt},
+      ]
+        \node[block] (q) {consulta};
+        \node[idx, right=of q] (i) {índice de\\\textit{embeddings}};
+        \node[res, right=14mm of i] (r1) {vecino 1};
+        \node[res, below=3mm of r1] (r2) {vecino 2};
+        \node[res, below=3mm of r2] (r3) {\dots};
+        \draw[->] (q)--(i) node[lbl,above]{\textit{embed.}};
+        \draw[->] (i.east)--(r1.west) node[lbl,above]{top-$k$};
+        \draw[->] (i.east)--(r2.west);
+        \draw[->] (i.east)--(r3.west);
+      \end{tikzpicture}%
+      \shorthandon{<>}
+    \column{0.5\textwidth}
+      \begin{itemize}\small
+        \item Dos \textit{backends}: barrido \textbf{exacto} (SQLite, fuerza bruta) vs.\ índice
+          aproximado \textbf{HNSW}~\cite{malkov_efficient_2018} sobre pgvector
+        \item Compromiso \textbf{velocidad / exactitud}: el ANN sacrifica
+          recuperar el vecino \emph{exacto} por escalar a bancos
+          grandes~\cite{johnson_billion-scale_2017}
+        \item Calidad con métricas clásicas de RI: \textbf{P@$k$, R@$k$,
+          MAP@$k$, MRR}~\cite{van_rijsbergen_c_j_information_1979}
+      \end{itemize}
+      \vspace{0.3em}
+      {\footnotesize Es a la vez \textbf{herramienta de consulta} y \textbf{sonda de
+      calidad} del espacio de \textit{embeddings} (sección de resultados).}
+  \end{columns}
+\end{frame}
+
 % ============================================================
 \section{Experimentos y resultados}
 
 \begin{frame}{Diseño experimental}
-  % TODO: configuraciones evaluadas, métricas usadas
+  \begin{columns}[t]
+    \column{0.5\textwidth}
+      \footnotesize
+      \textbf{Diez barridos}; cada uno varía \textbf{un solo eje} sobre una configuración base, para comparaciones justas.
+      \vspace{0.4em}
+      \begin{tabular}{lll}
+        \toprule
+        \textbf{Objetivo} & \textbf{Exp.} & \textbf{Eje variado} \\
+        \midrule
+        Calibración & E1 & Extractor \\
+                    & E2 & Reducción \\
+                    & E3--E4 & Agrupamiento / \texttt{mcs} \\
+                    & E5 & Segmentador \\
+        \midrule
+        Coste       & E7 & Tamaño del banco $N$ \\
+                    & E6, E9 & \textit{Backend} / índice HNSW \\
+        \midrule
+        Supervisado & E8a & Estilo (4 clases) \\
+                    & E8b & Autoría (87 autores) \\
+        \bottomrule
+      \end{tabular}
+      \vspace{0.4em}\\
+      {\scriptsize $N$ hasta $6416$; $K{=}3$--$5$ repeticiones por celda.}
+    \column{0.5\textwidth}
+      \footnotesize
+      \textbf{Métricas de calidad}
+      \begin{itemize}\scriptsize
+        \item \textbf{Intrínsecas} (sin etiquetas): silueta~\cite{rousseeuw_silhouettes_1987}, Calinski--Harabasz~\cite{calinski_dendrite_1974}, Davies--Bouldin~\cite{davies_cluster_1979}, ruido, balance de tamaños
+        \item \textbf{Extrínsecas} (con etiquetas): ARI~\cite{hubert_comparing_1985}, NMI~\cite{strehl_cluster_2002}, F1 pareada
+        \item \textbf{Coste}: tiempo de pared y memoria pico por etapa
+      \end{itemize}
+      \vspace{0.3em}
+      \begin{block}{\scriptsize Configuración base resultante}
+        {\scriptsize DINOv2 cabeza-estilo $+$ UMAP-10 $+$ HDBSCAN (\texttt{mcs}=5) $+$ segmentador identidad $+$ SQLite}
+      \end{block}
+      {\scriptsize Las métricas intrínsecas se leen \textbf{en conjunto}: aisladas premian particiones degeneradas.}
+  \end{columns}
 \end{frame}
 
-\begin{frame}{Resultados: métricas intrínsecas}
-  % TODO
+\begin{frame}{Resultados: calidad intrínseca y elección de componentes}
+  \begin{columns}[c]
+    \column{0.52\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/e3_pareto_quality_cost.pdf}\\
+      {\scriptsize Calidad frente a coste por familia de agrupamiento ($N{=}6416$).}
+    \column{0.48\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item \textbf{HDBSCAN} domina el frente de Pareto: silueta competitiva, ruido moderado, tamaños balanceados y coste despreciable
+        \item OPTICS lo iguala en calidad pero paga $\sim$25$\times$ tiempo y $\sim$2500$\times$ memoria
+        \item \textbf{UMAP-10} es la única reducción no degenerada; la identidad descarta $\sim$68\,\% de los puntos como ruido
+        \item Silueta y CH \textbf{aisladas engañan}: premian $k{=}2$ trivial $\Rightarrow$ criterio conjunto
+      \end{itemize}
+  \end{columns}
 \end{frame}
 
-\begin{frame}{Resultados: métricas extrínsecas}
-  % TODO
+\begin{frame}{Resultados: validación supervisada (estilo)}
+  \begin{columns}[c]
+    \column{0.52\textwidth}
+      \centering \footnotesize
+      \setlength{\tabcolsep}{4pt}
+      \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Extractor} & \textbf{ARI} & \textbf{NMI} & \textbf{F1} \\
+        \midrule
+        \textbf{DINOv2 estilo} & \textbf{0.722} & \textbf{0.678} & \textbf{0.806} \\
+        MobileNet estilo       & 0.627 & 0.539 & 0.740 \\
+        CLIP ViT-B/32          & 0.368 & 0.392 & 0.556 \\
+        DINOv2 (base)          & 0.356 & 0.374 & 0.558 \\
+        ResNet50               & 0.334 & 0.277 & 0.548 \\
+        \bottomrule
+      \end{tabular}\\[0.4em]
+      {\scriptsize E8a: mejor celda por extractor (294 recortes, 4 estilos).}
+      \vspace{0.6em}
+      \begin{itemize}\scriptsize
+        \item La cabeza de estilo \textbf{dobla} el ARI de cualquier extractor sin ajustar
+        \item Valida elegir la cabeza pese a su silueta intrínseca más baja
+        \item \textbf{Autoría (E8b)} fracasa (ARI $\approx$0.04--0.08): pocos recortes/autor $+$ cambio de dominio, no un fallo del método
+      \end{itemize}
+    \column{0.48\textwidth}
+      \centering
+      \includegraphics[width=0.92\linewidth]{figures/e8a_hdbscan_3clusters.pdf}\\
+      {\scriptsize HDBSCAN separa \textit{sencillo} / \textit{elaborado} / \textit{character}.}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{Resultados: coste computacional}
-  % TODO
+  \begin{columns}[c]
+    \column{0.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/e7_scalability_loglog.pdf}\\
+      {\scriptsize Tiempo de pared frente a $N$ por etapa (log--log).}
+    \column{0.5\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item \textbf{Ingesta}: coste lineal inevitable y dominante a esta escala
+        \item Agrupamiento (HDBSCAN) y reducción: \textbf{despreciables} ($<5$~s)
+        \item \textbf{Cuello de botella}: búsqueda por similitud en SQLite, $\approx O(n^2)$ (pendiente $2.1$): 54~min a $N{=}6416$
+      \end{itemize}
+      \vspace{0.3em}
+      \centering \scriptsize
+      \setlength{\tabcolsep}{3pt}
+      \begin{tabular}{lrr}
+        \toprule
+        \textit{Backend} ($N{=}6416$) & \textbf{cons./s} & \textbf{R@5} \\
+        \midrule
+        SQLite (exacto)      &    149 & --    \\
+        pgvector (exacto)    & 11\,109 & --    \\
+        pgvector + \textbf{HNSW} & \textbf{35\,936} & \textbf{1.000} \\
+        \bottomrule
+      \end{tabular}\\[0.3em]
+      {\scriptsize HNSW: $240\times$ más rápido que SQLite \textbf{sin} pérdida de \textit{recall}.}
+  \end{columns}
 \end{frame}
 
 % ============================================================
 \section{Conclusiones}
 
 \begin{frame}{Conclusiones}
-  % TODO: principales hallazgos + trabajo futuro
+  \begin{columns}[t]
+    \column{0.5\textwidth}
+      \textbf{Hallazgos principales}
+      \begin{itemize}\small
+        \item Sistema \textbf{modular} que compara extractores, reducciones y agrupadores bajo una misma interfaz
+        \item \textbf{Pipeline base}: cabeza de estilo DINOv2 $+$ UMAP-10 $+$ HDBSCAN; valida la cabeza por su calidad \textbf{supervisada}, no la intrínseca
+        \item El \textbf{coste} lo dominan ingesta y, sobre todo, la búsqueda $O(n^2)$; \textbf{HNSW} la elimina sin perder \textit{recall}
+        \item La reducción de dimensionalidad es \textbf{indispensable} para calidad y coste
+      \end{itemize}
+    \column{0.5\textwidth}
+      \textbf{Limitaciones y trabajo futuro}
+      \begin{itemize}\small
+        \item Rango de $N$ estrecho ($\le 6416$): difícil separar $O(n\log n)$ de $O(n^2)$
+        \item Datos de \textbf{autoría} insuficientes $\Rightarrow$ ampliar y anotar el banco
+        \item Preentrenamiento no supervisado antes de las cabezas supervisadas
+        \item Pasar de \textit{batch} a \textbf{ingesta incremental} (índice y espacio reducido)
+      \end{itemize}
+  \end{columns}
+  \vfill
+  \centering
+  \footnotesize El trabajo \textbf{caracteriza} desempeño y coste de la similitud visual en bancos de grafiti, con una recomendación concreta y reproducible.
 \end{frame}
 
 % ============================================================
@@ -375,5 +541,9 @@
   {\small \texttt{aluengor0001@gmail.com}}\\[1.5em]
   \imgw{0.25}{marca-UniversidadSalamanca-color.pdf}
 \end{frame}
+
+% ============================================================
+% --- Diapositivas de respaldo + preguntas previsibles del tribunal ---
+\input{preguntas_jurado.tex}
 
 \end{document}

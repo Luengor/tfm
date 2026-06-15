@@ -1,0 +1,134 @@
+%! TeX root: presentacion.tex
+% =====================================================================
+% Preguntas previsibles del tribunal y diapositivas de respaldo (backup).
+%
+% Este fichero se incluye tras el cierre principal de la presentación,
+% dentro de \appendix, de modo que las diapositivas NO aparecen en el
+% índice ni en la numeración principal. Sirven como:
+%   1) Guion de preparación: lista de preguntas difíciles + respuesta breve.
+%   2) Diapositivas de respaldo a mano por si una pregunta concreta merece
+%      apoyo visual durante el turno de preguntas.
+%
+% Perfil del tribunal (ver CLAUDE.md):
+%   J1 — Recuperación de información (tesis: técnicas de expansión en RI).
+%   J2 — Ciencias de la computación e IA (reutilización software).
+%   J3 — Lógica y filosofía de la ciencia.
+% =====================================================================
+
+\appendix
+
+\section*{Respaldo: preguntas del tribunal}
+
+% ---------------------------------------------------------------------
+\begin{frame}[allowframebreaks]{Preguntas previsibles --- guion}
+  \footnotesize
+  \textbf{Recuperación de información (J1)}
+  \begin{itemize}
+    \item \textit{¿Por qué un índice HNSW y no un índice invertido / cuantización (IVF, PQ, Faiss)?}\\
+      Los descriptores son vectores densos de 128--4096~d; no hay vocabulario discreto que invertir. HNSW da \textit{recall}@5~$=1.0$ a esta escala con la menor latencia; IVF/PQ ganan en memoria a escalas de millones, fuera del rango actual (trabajo futuro).
+    \item \textit{Su búsqueda es similitud pura. ¿Cabe expansión de consulta o realimentación por relevancia?}\\
+      Sí, encaja de forma natural: la consulta es un vector, así que la expansión sería un \textbf{pseudo-relevance feedback} estilo Rocchio (mover el vector de consulta hacia el centroide de los $k$ primeros). No se evaluó, pero el espacio de \textit{embeddings} lo soporta sin cambios de arquitectura. Es una extensión directa y prometedora del sistema.
+    \item \textit{¿Por qué P@k, MAP, MRR y no solo \textit{accuracy}?}\\
+      Son las métricas de ordenación clásicas de RI; capturan la calidad del \textit{ranking}, no solo la del primer acierto. Se usan como señal de calidad independiente del agrupador.
+  \end{itemize}
+
+  \framebreak
+  \textbf{IA y reutilización (J2)}
+  \begin{itemize}
+    \item \textit{¿Por qué \textit{backbones} congelados y no \textit{fine-tuning} completo o \textit{deep clustering} extremo-a-extremo?}\\
+      Datos anotados escasos (cientos de recortes); el ajuste completo sobreajustaría. Congelar el \textit{backbone} y entrenar una cabeza ligera es la opción robusta con pocos datos. El \textit{deep clustering} (SCAN, etc.) se cita como trabajo futuro al ampliar el banco.
+    \item \textit{¿Por qué la cabeza de estilo si su silueta intrínseca es peor que la de las CNN de ImageNet?}\\
+      La silueta intrínseca mide apariencia (textura/color), no la semántica del grafiti. En la evaluación \textbf{supervisada} la cabeza dobla el ARI (0.722 vs $\le$0.37). La decisión se toma sobre la métrica que importa.
+    \item \textit{¿Por qué falla la autoría? ¿Invalida el método?}\\
+      No. Es escasez de datos (pocos recortes/autor) más cambio de dominio Cuenca$\to$Salamanca. La misma arquitectura funciona en estilo; el limitante es el conjunto, no el diseño.
+  \end{itemize}
+
+  \framebreak
+  \textbf{Metodología y filosofía de la ciencia (J3)}
+  \begin{itemize}
+    \item \textit{El \enquote{criterio conjunto} de métricas, ¿no es \textit{post-hoc} / a medida del resultado?}\\
+      Se fija \textbf{antes} de mirar rankings y se justifica teóricamente: silueta y CH aisladas premian particiones degeneradas ($k{=}2$, alta cobertura de ruido). Se muestra explícitamente que cada métrica aislada invierte el orden. El criterio es una salvaguarda contra esas patologías conocidas, no un ajuste a posteriori.
+    \item \textit{Con $N\le 6416$, ¿puede afirmar que la búsqueda es $O(n^2)$?}\\
+      No como exponente asintótico; se reporta como \textbf{pendiente observada} (2.10 log--log) en este régimen, coherente con el coste por pasada. La memoria distingue caso a caso. La limitación de rango se reconoce abiertamente.
+    \item \textit{Etiquetado manual: ¿subjetividad? ¿un solo anotador?}\\
+      Las cuatro categorías de estilo son convenciones establecidas en la literatura de grafiti; la autoría es objetiva (misma firma). Es una limitación reconocida; ampliar anotadores y medir acuerdo es trabajo futuro.
+    \item \textit{¿Posición ética ante la identificación de autores?}\\
+      El trabajo es puramente técnico y trata el grafiti como fenómeno visual neutro; no opina sobre legalidad ni moralidad (alcance explícito del TFM).
+  \end{itemize}
+\end{frame}
+
+% ---------------------------------------------------------------------
+% Diapositivas de respaldo con apoyo visual reutilizando figuras.
+% ---------------------------------------------------------------------
+\begin{frame}{Respaldo: la maldición de la dimensionalidad}
+  \begin{columns}[c]
+    \column{0.5\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item Con cosenos sobre vectores unitarios la distancia sigue siendo informativa, pero al crecer $d$ el contraste vecino cercano/lejano se desvanece~\cite{aggarwal_surprising_2001}
+        \item Por eso la reducción (UMAP-10) \textbf{mejora} el agrupamiento y abarata las etapas siguientes
+        \item Las métricas de calidad se calculan sobre los \textit{embeddings} \textbf{originales} (L2-normalizados) para comparar entre familias
+      \end{itemize}
+    \column{0.5\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/curse_dimensionality.pdf}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Respaldo: \textit{backend} de búsqueda y configuración HNSW}
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/e6_e9_pareto.pdf}
+    \column{0.45\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item Por debajo de $N\approx2500$ los tres \textit{backends} sobre PostgreSQL son indistinguibles
+        \item Por encima, HNSW se separa: a $N{=}6416$ es $3.2\times$ el exacto y $240\times$ SQLite
+        \item E9: ninguna configuración baja de \textit{recall} $0.99$; subir \texttt{m} o \texttt{ef\_construction} llega a $1.0$ sin penalizar latencia
+      \end{itemize}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Respaldo: memoria pico por etapa}
+  \begin{columns}[c]
+    \column{0.55\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/e7_memory.pdf}
+    \column{0.45\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item El agrupamiento \textbf{aglomerativo} materializa la matriz de distancias $O(n^2)$ y se descarta por memoria antes que por tiempo
+        \item HDBSCAN, DBSCAN y OPTICS se mantienen sublineales
+        \item Refuerza la elección de HDBSCAN: coste y memoria mínimos
+      \end{itemize}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Respaldo: silueta por extractor a tres escalas}
+  \centering
+  \includegraphics[width=0.85\linewidth]{figures/e1_silhouette_by_embedding.pdf}\\
+  {\footnotesize Las CNN de ImageNet lideran la silueta \emph{intrínseca}, pero
+  no la calidad \emph{supervisada} (E8a). La métrica intrínseca mide apariencia,
+  no semántica de grafiti.}
+\end{frame}
+
+\begin{frame}{Respaldo: ejemplos de clústeres de estilo (E8a)}
+  \begin{columns}[c]
+    \column{0.33\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/cluster_simple.pdf}\\
+      {\scriptsize sencillo}
+    \column{0.33\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/cluster_elaborate.pdf}\\
+      {\scriptsize elaborado}
+    \column{0.33\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/cluster_characters.pdf}\\
+      {\scriptsize \textit{characters}}
+  \end{columns}
+  \vspace{0.4em}
+  \centering {\footnotesize HDBSCAN colapsa los 4 estilos en 3 grupos coherentes:
+  une \textit{tag}/\textit{throw-up} en \enquote{sencillo}.}
+\end{frame}
