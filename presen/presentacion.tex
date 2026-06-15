@@ -4,6 +4,8 @@
 \usepackage[T1]{fontenc}
 \usepackage[spanish]{babel}
 \usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
 \usepackage{booktabs}
 \usepackage{amsmath}
 \usepackage{url}
@@ -162,28 +164,171 @@
 % ============================================================
 \section{Metodología}
 
-\begin{frame}{Sistema}
-  % TODO: diagrama del sistema completo
+\begin{frame}{Sistema: dos fases acopladas por el almacenamiento}
+  \centering
+  \shorthandoff{<>}%
+  \begin{tikzpicture}[
+    >=Stealth, node distance=9mm and 15mm,
+    block/.style={draw, rounded corners, minimum height=8mm, minimum width=20mm,
+                  inner sep=4pt, align=center, font=\small},
+    store/.style={block, fill=green!12},
+    io/.style={font=\footnotesize, align=center},
+    lbl/.style={font=\scriptsize, midway, fill=white, inner sep=2pt},
+  ]
+    \node[io] (img) {fotografía};
+    \node[block, right=of img] (seg) {Segmentador};
+    \node[block, right=of seg] (ext) {Extractor};
+    \node[store, right=of ext] (sto) {Almacenamiento};
+    \draw[->] (img)--(seg);
+    \draw[->] (seg)--(ext) node[lbl, above]{recortes};
+    \draw[->] (ext)--(sto) node[lbl, above]{\textit{embeddings}};
+
+    \node[block, below=12mm of seg] (red) {Reducción};
+    \node[block, right=of red] (clu) {Agrupamiento};
+    \node[io, right=of clu] (out) {clústeres\\y métricas};
+    \draw[->] (red)--(clu);
+    \draw[->] (clu)--(out);
+    \draw[->] (sto.south) -- ++(0,-6mm) -| (red.north)
+        node[lbl, pos=0.25, above]{carga masiva};
+
+    \node[draw, dotted, fit=(img)(seg)(ext), inner sep=3mm,
+          label=above:{\scriptsize Ingesta (incremental)}] {};
+    \node[draw, dotted, fit=(red)(clu)(out), inner sep=3mm,
+          label=below:{\scriptsize Agrupamiento (puntual)}] {};
+  \end{tikzpicture}%
+  \shorthandon{<>}
+
+  \vspace{0.8em}
+  \small Cinco etapas \textbf{intercambiables} tras una interfaz común $\Rightarrow$ evaluación combinatoria de configuraciones.
 \end{frame}
 
 \subsection{Segmentación}
 \begin{frame}{Segmentación}
-  % TODO
+  \begin{columns}
+    \column{0.42\textwidth}
+      \begin{itemize}
+        \item Detector \textbf{YOLO ajustado} sobre grafiti ($447$ imágenes, $\sim$650 cajas; partida de pesos COCO)
+        \item \textbf{Fusión} de cajas por solapamiento y proximidad; salvaguarda anti-mega-cajas
+        \item \textbf{Margen} de contexto configurable antes de recortar
+        \item Alternativa: sin segmentar $\Rightarrow$ imagen completa
+      \end{itemize}
+    \column{0.58\textwidth}
+      \imgw{1.0}{segmentation_stages.pdf}\\
+      \centering \scriptsize Original → detecciones → fusión → margen → recortes
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Segmentación: detecciones del detector}
+  \centering
+  \imgw{0.8}{val_batch2_pred.jpg}
 \end{frame}
 
 \subsection{Extracción de características}
 \begin{frame}{Extracción de características}
-  % TODO: modelos usados (CLIP, DINOv2, MobileNet, etc.)
+  \begin{columns}
+    \column{0.5\textwidth}
+      Modelos \textbf{preentrenados y congelados}: se toma su representación latente como vector de características.
+      \vspace{0.6em}
+      \begin{itemize}
+        \item CNN: se elimina la capa de clasificación
+        \item \textit{Transformers} (DINOv2, CLIP): ya devuelven un vector
+        \item Salen de $384$ a $4096$ dimensiones
+      \end{itemize}
+    \column{0.5\textwidth}
+      \centering \small
+      \begin{tabular}{llr}
+        \toprule
+        \textbf{Modelo} & \textbf{Tipo} & \textbf{Dim.} \\
+        \midrule
+        ResNet50      & CNN residual      & $2048$ \\
+        VGG16         & CNN profunda      & $4096$ \\
+        InceptionV3   & CNN multi-rama    & $2048$ \\
+        MobileNetV3   & CNN ligera        & $1280$ \\
+        DINOv2 ViT-S/14 & \textit{Transf.} & $384$ \\
+        CLIP ViT-B/32 & \textit{Transf.} & $512$ \\
+        \bottomrule
+      \end{tabular}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Extracción de características: ajuste al dominio}
+  \begin{columns}
+    \column{0.65\textwidth}
+      \textbf{Cabezas de proyección} entrenadas sobre grafiti utilizando \textit{transfer learning}:
+      \begin{itemize}
+        \item \textit{Backbone} \textbf{congelado}, solo se entrena una cabeza ligera (Linear→ReLU→Linear→$L_2$)
+        \item Bases: \textbf{MobileNetV3} y \textbf{DINOv2}
+        \item Tareas: \textbf{autoría} (pérdida de tripletes) y \textbf{estilo} (\textit{SupCon})
+        \item En total 4 cabezas
+      \end{itemize}
+    \column{0.35\textwidth}
+      \centering
+      \shorthandoff{<>}%
+      \hspace*{1.5em}%
+      \begin{tikzpicture}[
+        >=Stealth, node distance=4.5mm,
+        block/.style={draw, rounded corners, minimum height=7mm, minimum width=30mm,
+                      inner sep=3pt, align=center, font=\small},
+        frozen/.style={block, fill=gray!20, dashed},
+        trained/.style={block, fill=blue!12},
+        vec/.style={font=\footnotesize, align=center},
+      ]
+        \node[vec] (img) {recorte};
+        \node[frozen, below=of img] (bb) {\textit{Backbone} congelado};
+        \node[trained, below=of bb] (l1) {Lineal};
+        \node[trained, below=of l1] (relu) {ReLU};
+        \node[trained, below=of relu] (l2) {Lineal};
+        \node[block, fill=green!12, below=of l2] (norm) {$L_2$};
+        \node[vec, below=of norm] (e) {\textit{embedding} ($128$)};
+        \draw[->] (img)--(bb); \draw[->] (bb)--(l1); \draw[->] (l1)--(relu);
+        \draw[->] (relu)--(l2); \draw[->] (l2)--(norm); \draw[->] (norm)--(e);
+        \node[draw, dotted, fit=(l1)(relu)(l2), inner sep=1.5mm,
+              label={[align=center,font=\scriptsize]right:{cabeza\\entrenada}}] {};
+      \end{tikzpicture}%
+      \shorthandon{<>}
+  \end{columns}
 \end{frame}
 
 \subsection{Reducción de dimensionalidad}
 \begin{frame}{Reducción de dimensionalidad}
-  % TODO: PCA, UMAP, etc.
+  Paso \textbf{opcional} entre almacenamiento y agrupamiento: reduce coste y mitiga la maldición de la dimensionalidad~\cite{aggarwal_surprising_2001}.
+  \begin{columns}
+    \column{0.54\textwidth}
+      \begin{itemize}\small
+        \item \textbf{PCA} (lineal): direcciones de máxima varianza
+        \item \textbf{Kernel PCA} (no lineal): PCA en un espacio de características implícito
+        \item \textbf{Isomap} (no lineal): preserva distancias geodésicas sobre el grafo de vecinos
+        \item \textbf{UMAP} (no lineal): preserva la estructura local de vecindad
+      \end{itemize}
+      \vspace{0.3em}
+      {\footnotesize Las métricas de calidad se calculan sobre los \textit{embeddings} \textbf{originales} (sin reducir).}
+    \column{0.46\textwidth}
+      \imgw{1.0}{curse_dimensionality.pdf}\\
+      \centering \scriptsize Conforme aumenta el número de dimensiones la
+      distancia entre el vecino más cercano y más lejano se vuelven
+      equivalentes.
+  \end{columns}
 \end{frame}
 
 \subsection{Agrupamiento}
 \begin{frame}{Agrupamiento}
-  % TODO: algoritmos, métricas
+  \begin{columns}
+    \column{0.46\textwidth}
+      Ocho algoritmos de varias familias tras una interfaz común:
+      \vspace{0.5em}
+      \footnotesize
+      \begin{itemize}
+        \item \textbf{Particional:} K-medias
+        \item \textbf{Densidad:} DBSCAN, OPTICS, HDBSCAN
+        \item \textbf{Jerárquico:} Aglomerativo
+        \item \textbf{Grafo:} Espectral
+        \item \textbf{Probabilístico:} GMM
+        \item \textbf{Mensajes:} Affinity Propagation
+      \end{itemize}
+    \column{0.54\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/clustering_comparison.pdf}
+  \end{columns}
 \end{frame}
 
 % ============================================================
