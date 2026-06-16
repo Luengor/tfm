@@ -64,7 +64,8 @@ def main() -> None:
     palette = sns.color_palette("colorblind", n_colors=len(order))
     color_map = {lbl: palette[i] for i, lbl in enumerate(order)}
 
-    for _, row in df.iterrows():
+    df_scatter = df[df["reduction"] != "UMAP-50"]
+    for _, row in df_scatter.iterrows():
         lbl = row["reduction"]
         color = HIGHLIGHT if lbl == "UMAP-10" else color_map[lbl]
         axA.scatter(
@@ -83,12 +84,12 @@ def main() -> None:
             color="#333333",
         )
     # Pareto front: non-dominated on (min noise, max silhouette)
-    pareto = df[
-        df.apply(
+    pareto = df_scatter[
+        df_scatter.apply(
             lambda row: not any(
-                (df["noise"] <= row["noise"])
-                & (df["silhouette"] >= row["silhouette"])
-                & ((df["noise"] < row["noise"]) | (df["silhouette"] > row["silhouette"]))
+                (df_scatter["noise"] <= row["noise"])
+                & (df_scatter["silhouette"] >= row["silhouette"])
+                & ((df_scatter["noise"] < row["noise"]) | (df_scatter["silhouette"] > row["silhouette"]))
             ),
             axis=1,
         )
@@ -108,8 +109,8 @@ def main() -> None:
     axA.set_ylabel("Silueta")
     axA.set_title("A · Calidad: silueta vs. ruido")
     axA.set_xlim(-0.05, 1.05)
-    ymin = min(-0.05, df["silhouette"].min() - 0.05)
-    axA.set_ylim(ymin, df["silhouette"].max() + 0.07)
+    ymin = min(-0.05, df_scatter["silhouette"].min() - 0.05)
+    axA.set_ylim(ymin, df_scatter["silhouette"].max() + 0.07)
 
     # Panel B: stage cost
     long = df.melt(

@@ -64,7 +64,8 @@ def load_runs(exp: str) -> list[dict]:
         with path.open() as f:
             results = json.load(f)["results"]
         for r in results:
-            key = (r.get("embedding_type"), r.get("limit_parameter"), r.get("reduction_type"), r.get("clustering_type"))
+            rp = r.get("reduction_params")
+            key = (r.get("embedding_type"), r.get("limit_parameter"), r.get("reduction_type"), json.dumps(rp, sort_keys=True) if isinstance(rp, dict) else rp, r.get("clustering_type"))
             existing = merged.get(key)
             if existing is None or mtime > existing[0]:
                 merged[key] = (mtime, r)

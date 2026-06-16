@@ -378,45 +378,47 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Resultados: elección de algoritmo de agrupamiento}
+\begin{frame}{Resultados: extractores de características (E1)}
   \begin{columns}[c]
-    \column{0.40\textwidth}
+    \column{0.46\textwidth}
+      \centering
+      \includegraphics[width=\linewidth]{figures/e1_silhouette_by_embedding.pdf}\\
+      {\scriptsize E1: silueta por extractor a tres tamaños de banco.}
+    \column{0.54\textwidth}
+      \centering \scriptsize
+      \setlength{\tabcolsep}{3pt}
+      \begin{tabular}{lcccc}
+        \toprule
+        \textbf{Extractor} & \textbf{sil} & \textbf{cls} & \textbf{ruido} & \textbf{csCV} \\
+        \midrule
+        \texttt{mobilenet\_v3}        & \textbf{0.260} & 820 & \textbf{0.078} & \textbf{0.52} \\
+        \texttt{resnet50}             & 0.257 & 794 & 0.086 & 0.71 \\
+        \texttt{vgg16}                & 0.228 & 773 & 0.095 & 0.54 \\
+        \texttt{inception\_v3}        & 0.213 & 724 & 0.118 & 0.64 \\
+        \texttt{dinov2\_vits14}       & 0.185 & 632 & 0.123 & 0.92 \\
+        \texttt{clip\_vit\_b32}       & 0.170 & 734 & 0.150 & 0.74 \\
+        \texttt{mob. estilo}          & 0.164 & 629 & 0.214 & 0.58 \\
+        \texttt{dinov2\_graffiti\_style} & 0.155 & 562 & 0.202 & 0.74 \\
+        \texttt{yolom}                & 0.131 & 480 & 0.253 & 0.74 \\
+        \texttt{yolon}                & 0.085 & 348 & 0.341 & 0.81 \\
+        \bottomrule
+      \end{tabular}\\[0.3em]
+      {\scriptsize E1, calidad intrínseca a $N{=}6416$. Las CNN ImageNet lideran silueta; la cabeza de estilo DINOv2 queda en posición 8.}
+      \vspace{0.3em}
       \footnotesize
       \begin{itemize}
-        \item \textbf{HDBSCAN} domina el frente de Pareto: silueta competitiva,
-            ruido moderado, tamaños balanceados y coste despreciable
-        \item OPTICS iguala en calidad pero paga $\sim$25$\times$ tiempo y
-            $\sim$2500$\times$ memoria
-        \item K-medias es el algortimo más rápido y no devuelve ruido, pero
-            obtiene un $70\%$ de la silueta de HDBSCAN.
-        \item Silueta y CH \textbf{aisladas engañan}: premian $k{=}2$ trivial
-            $\Rightarrow$ criterio conjunto
+        \item Las CNN agrupan por apariencia genérica (textura, color, composición) — silueta alta no implica relevancia para grafiti
+        \item La silueta es el criterio de ordenación principal \textbf{dentro} del barrido, pero no decide el extractor final
       \end{itemize}
-    \column{0.60\textwidth}
-      \centering
-      \includegraphics[width=0.8\linewidth]{figures/e3_pareto_quality_cost.pdf}\\
-      {\scriptsize Calidad frente a coste por familia de agrupamiento ($N{=}6416$).}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Resultados: elección de reducción de dimensionalidad}
-  \footnotesize
-  \begin{itemize}
-    \item \textbf{UMAP-10} es la única reducción no degenerada
-    \item La identidad (sin reducción) descarta $\sim$68\,\% de los puntos como ruido: espacio de alta dimensión rompe HDBSCAN
-    \item PCA e Isomap producen particiones degeneradas ($k{=}2$ trivial)
-  \end{itemize}
-  \vfill
-  \centering
-  \includegraphics[width=0.92\linewidth]{figures/e2_reduction_quality_cost.pdf}
-\end{frame}
-
-\begin{frame}{Resultados: validación supervisada (estilo)}
+\begin{frame}{Resultados: validación supervisada y elección del extractor}
   \begin{columns}[c]
-    \column{0.52\textwidth}
-      \centering \footnotesize
-      \setlength{\tabcolsep}{4pt}
-      \begin{tabular}{lcccc}
+    \column{0.46\textwidth}
+      \centering \scriptsize
+      \setlength{\tabcolsep}{3pt}
+      \begin{tabular}{lccc}
         \toprule
         \textbf{Extractor} & \textbf{ARI} & \textbf{NMI} & \textbf{F1} \\
         \midrule
@@ -426,62 +428,74 @@
         DINOv2 (base)          & 0.356 & 0.374 & 0.558 \\
         ResNet50               & 0.334 & 0.277 & 0.548 \\
         \bottomrule
-      \end{tabular}\\[0.4em]
+      \end{tabular}\\[0.3em]
       {\scriptsize E8a: mejor celda por extractor (294 recortes, 4 estilos).}
-      \vspace{0.6em}
-      \begin{itemize}\scriptsize
-        \item La cabeza de estilo \textbf{dobla} el ARI de cualquier extractor sin ajustar
-        \item Valida elegir la cabeza pese a su silueta intrínseca más baja
-        \item \textbf{Autoría (E8b)} fracasa (ARI $\approx$0.04--0.08): pocos recortes/autor $+$ cambio de dominio, no un fallo del método
+      \vspace{0.4em}
+      \footnotesize
+      \begin{itemize}
+        \item Cabeza de estilo DINOv2 \textbf{dobla} el ARI de cualquier extractor sin ajustar (sil.\ intrínseca: 0.155, posición 8)
+        \item \textbf{E8b (autoría, 87 autores):} ARI $\approx 0.04$--$0.08$ — pocos recortes/autor y cambio de dominio Cuenca$\to$Salamanca
       \end{itemize}
-    \column{0.48\textwidth}
+    \column{0.54\textwidth}
       \centering
-      \includegraphics[width=0.92\linewidth]{figures/e8a_hdbscan_3clusters.pdf}\\
-      {\scriptsize HDBSCAN separa \textit{sencillo} / \textit{elaborado} / \textit{character}.}
+      \includegraphics[width=\linewidth]{figures/e8_correlation.pdf}\\
+      {\scriptsize Silueta frente a ARI por celda (E8a/E8b). En E8a: $r{=}+0.78$ para $k$ fijo — la silueta \emph{sí} ordena bien a granularidad de estilo. En E8b: todo el rango de ARI vive cerca del azar, la correlación pierde sentido.}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Resultados: coste computacional}
+\begin{frame}{Resultados: reducción de dimensionalidad (E2)}
+  \footnotesize
+  \begin{itemize}
+    \item Sin reducción: presenta la mejor silueta del experimento, pero a
+        costa de un $68\%$ de ruido. El coste de memoria y tiempo se trasladan de la etapa
+        de reducción al agrupamiento
+    \item PCA solo produce agrupamientos degenerados: dos \textit{clusters} y silueta nula 
+        en PCA-10 y un $69.8\%$ de ruido en PCA-50
+    \item \textbf{UMAP}: Mejor equilibrio entre silueta y ruido. UMAP-50 da
+        resultados prácticamente idénticos a UMAP-10, pero prácticamente
+        doblando el coste de memoria y tiempo
+  \end{itemize}
+  \vfill
+  \centering
+  \includegraphics[width=0.80\linewidth]{figures/e2_reduction_quality_cost.pdf}\\
+  {\scriptsize E2: calidad intrínseca (izquierda) y coste por etapa (derecha) por familia de reducción a $N{=}6416$.}
+\end{frame}
+
+\begin{frame}{Resultados: algoritmo de agrupamiento (E3)}
   \begin{columns}[c]
-    \column{0.5\textwidth}
+    \column{0.55\textwidth}
+      \centering
+      \includegraphics[width=0.9\linewidth]{figures/e3_pareto_quality_cost.pdf}\\
+      {\scriptsize E3: frente de Pareto calidad-coste por familia ($N{=}6416$).}
+    \column{0.45\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item \textbf{HDBSCAN}: silueta competitiva, ruido moderado, tamaños balanceados, coste despreciable ($0.35$~s)
+        \item OPTICS iguala en calidad, ${\sim}25\times$ más tiempo, ${\sim}2\,500\times$ más memoria
+        \item K-medias: más rápido, pero silueta 0.094 puntos inferior. Mejor opción sin ruido
+        \item Métricas \textbf{aisladas} engañan: silueta y CH premian $k{=}2$ trivial $\Rightarrow$ criterio conjunto
+      \end{itemize}
+      \vspace{0.4em}
+      \begin{block}{\scriptsize Pipeline base}
+        {\scriptsize DINOv2 estilo $+$ UMAP-10 $+$ HDBSCAN (\texttt{mcs}=5) $+$ identidad $+$ SQLite}
+      \end{block}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Resultados: coste del sistema completo}
+  \begin{columns}[c]
+    \column{0.50\textwidth}
       \centering
       \includegraphics[width=\linewidth]{figures/e7_scalability_loglog.pdf}\\
-      {\scriptsize Tiempo de pared frente a $N$ por etapa (log--log).}
-    \column{0.5\textwidth}
-      \footnotesize
-      \begin{itemize}
-        \item \textbf{Ingesta}: coste lineal inevitable y dominante a esta escala
-        \item Agrupamiento (HDBSCAN) y reducción: \textbf{despreciables} ($<5$~s)
-        \item \textbf{Cuello de botella}: búsqueda por similitud en SQLite, $\approx O(n^2)$ (pendiente $2.1$): 54~min a $N{=}6416$
-      \end{itemize}
+      {\scriptsize E7: tiempo de pared vs $N$ por etapa (log--log).}
       \vspace{0.3em}
-      \centering \scriptsize
-      \setlength{\tabcolsep}{3pt}
-      \begin{tabular}{lrr}
-        \toprule
-        \textit{Backend} ($N{=}6416$) & \textbf{cons./s} & \textbf{R@5} \\
-        \midrule
-        SQLite (exacto)      &    149 & --    \\
-        pgvector (exacto)    & 11\,109 & --    \\
-        pgvector + \textbf{HNSW} & \textbf{35\,936} & \textbf{1.000} \\
-        \bottomrule
-      \end{tabular}\\[0.3em]
-      {\scriptsize HNSW: $240\times$ más rápido que SQLite \textbf{sin} pérdida de \textit{recall}.}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{Resultados: búsqueda por similitud (SQLite vs PostgreSQL)}
-  \begin{columns}[c]
-    \column{0.54\textwidth}
       \footnotesize
       \begin{itemize}
-        \item \textbf{SQLite}: exploración lineal en Python, $\sim$150~cons./s plano $\Rightarrow$ tiempo $O(n)$ por consulta, $O(n^2)$ por pasada
-        \item \textbf{pgvector exacto}: \textit{kernel} de coseno en C, dos órdenes de magnitud más rápido; latencia limitada por el \textit{round-trip} a $N$ pequeño
-        \item \textbf{pgvector + HNSW}: único \textit{backend} cuyo \textit{throughput} \emph{crece} con $N$; a $N{=}6416$, $3.2\times$ sobre el exacto y $240\times$ sobre SQLite
-        \item \textbf{R@5 = 1.000} a todas las escalas: índice aproximado \textbf{sin} pérdida de \textit{recall}; índice cuesta $0.47$~s, se amortiza en una consulta
-        \item Por debajo de $N{\approx}2500$ las tres opciones PostgreSQL son indistinguibles; el banco está por encima del cruce $\Rightarrow$ \textbf{HNSW por defecto}
+        \item Ingesta: lineal $O(n)$, dominante a esta escala
+        \item Agrupamiento y reducción: \textbf{despreciables} ($<5$~s a $N{=}6416$)
+        \item \textbf{Cuello}: búsqueda SQLite $\approx O(n^2)$, pendiente 2.1; 54~min a $N{=}6416$
       \end{itemize}
-    \column{0.46\textwidth}
+    \column{0.50\textwidth}
       \centering \scriptsize
       \setlength{\tabcolsep}{3pt}
       \begin{tabular}{rlrr}
@@ -500,8 +514,14 @@
         6416 & pgvector exacto  & 11\,109 & --    \\
         6416 & \textbf{pgvector + HNSW} & \textbf{35\,936} & \textbf{1.000} \\
         \bottomrule
-      \end{tabular}\\[0.4em]
+      \end{tabular}\\[0.3em]
       {\scriptsize E6: \textit{throughput} (consultas/s) y \textit{recall}@5 por \textit{backend}.}
+      \vspace{0.3em}
+      \footnotesize
+      \begin{itemize}
+        \item pgvector exacto: ${\sim}2$ órdenes de magnitud sobre SQLite
+        \item \textbf{HNSW}: único \textit{throughput} que \emph{crece} con $N$; $240\times$ sobre SQLite \textbf{sin} pérdida de \textit{recall}
+      \end{itemize}
   \end{columns}
 \end{frame}
 
