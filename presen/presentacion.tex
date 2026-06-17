@@ -510,11 +510,19 @@ el ARI no se despega del azar.}
       {\scriptsize E7: tiempo de pared vs $N$ por etapa (log--log).}
     \column{0.50\textwidth}
       \footnotesize
+      Pendiente log--log observada (vs.\ teórica):
       \begin{itemize}
-        \item Ingesta: lineal $O(n)$, dominante a esta escala
-        \item Agrupamiento y reducción: \textbf{despreciables} ($<5$~s a $N{=}6416$)
-        \item \textbf{Cuello}: búsqueda SQLite $\approx O(n^2)$, pendiente 2.1; 54~min a $N{=}6416$
+        \item \textbf{Ingesta} (DINOv2): $0.95 \approx O(n)$; dominante a esta escala
+        \item \textbf{Reducción} (UMAP): $1.15$, \textbf{despreciable} ($<5$~s)
+        \item \textbf{Agrupamiento}: K-medias $0.43$, HDBSCAN $1.53$,
+            aglomerativo $1.77$. A esta escala es más aparente el coste de
+            memoria que el tiempo para OPTICS ($763$~MB) y
+            aglomerativo ($314$~MB, $O(n^2)$)
+        \item \textbf{Cuello}: búsqueda SQLite $2.10 \approx O(n^2)$ por
+            pasada, \textbf{54.4~min} a $N{=}6416$
       \end{itemize}
+      \medskip
+      {\scriptsize Rango de $N$ estrecho: pendientes \emph{observadas}.}
   \end{columns}
 \end{frame}
 
