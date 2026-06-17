@@ -115,14 +115,14 @@
       \begin{itemize}
         \item \textbf{Banco principal:} $6681$ fotografías de grafiti en
             \textbf{Salamanca}
-        \item Capturadas con dispositivo móvil ($\sim$10.6~MP), sin
+        \item Capturadas con un teléfono móvil ($\sim$10.6~MP), sin
             postprocesado. Captura masiva en otoño de 2022
         \item Alta variabilidad entre fotografías: iluminación, perspectiva,
             oclusión, escena, etc. Muchas de las fotografías contienen
             \textbf{múltiples grafitis}
         \item \textbf{Banco auxiliar:} $1106$ imágenes de \textbf{Cuenca}
-            (StopGrafiti) $\Rightarrow$ solo ajuste fino, evita solapamiento
-            entrenamiento/evaluación
+            cedidas por StopGrafiti. Utilizadas solo para ajuste fino, evita
+            solapamiento entrenamiento/evaluación
       \end{itemize}
     \column{0.45\textwidth}
       \imgw{1.0}{map_with_photos.pdf}
@@ -379,7 +379,7 @@
       \begin{itemize}\scriptsize
         \item \textbf{Intrínsecas} (sin etiquetas): silueta,
             Calinski--Harabasz, Davies--Bouldin, ruido, balance de tamaños
-        \item \textbf{Extrínsecas} (con etiquetas): ARI, NMI, F1 balanceada
+        \item \textbf{Extrínsecas} (con etiquetas): ARI, NMI, F1 balanceada, MAP, Recall
         \item \textbf{Coste}: tiempo de pared y memoria pico por etapa
       \end{itemize}
       \vspace{0.3em}
@@ -415,17 +415,19 @@
         \texttt{yolon}                & 0.085 & 348 & 0.341 & 0.81 \\
         \bottomrule
       \end{tabular}\\[0.3em]
-      {\scriptsize E1, calidad intrínseca a $N{=}6416$. Las CNN ImageNet lideran silueta; la cabeza de estilo DINOv2 queda en posición 8.}
+      {\scriptsize E1, calidad intrínseca a $N{=}6416$. Las CNN ImageNet lideran silueta; la cabeza de estilo DINOv2 queda en posición 10 de 12.}
       \vspace{0.3em}
       \footnotesize
       \begin{itemize}
-        \item Las CNN agrupan por apariencia genérica (textura, color, composición) — silueta alta no implica relevancia para grafiti
-        \item La silueta es el criterio de ordenación principal \textbf{dentro} del barrido, pero no decide el extractor final
+        \item Las CNN realizan la mejor agrupación, pero no hay seguridad de
+            que estas redes midan similitud entre grafitis y no entre escenas
+        \item La silueta se utiliza como criterio de ordenación principal
+            \textbf{dentro} del barrido, pero no decide el extractor final
       \end{itemize}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Resultados: validación supervisada y elección del extractor}
+\begin{frame}{Resultados: validación supervisada (E8) y elección del extractor}
   \begin{columns}[c]
     \column{0.46\textwidth}
       \centering \scriptsize
@@ -445,13 +447,19 @@
       \vspace{0.4em}
       \footnotesize
       \begin{itemize}
-        \item Cabeza de estilo DINOv2 \textbf{dobla} el ARI de cualquier extractor sin ajustar (sil.\ intrínseca: 0.155, posición 8)
-        \item \textbf{E8b (autoría, 87 autores):} ARI $\approx 0.04$--$0.08$ — pocos recortes/autor y cambio de dominio Cuenca$\to$Salamanca
+        \item Cabeza de estilo DINOv2 \textbf{dobla} el ARI de cualquier
+            extractor sin ajustar (sil.\ intrínseca: 0.155, posición 10 de 12)
+        \item \textbf{E8b (autoría, 87 autores):} ARI $\approx 0.04$--$0.08$,
+            debido a los pocos recortes por autor y un cambio de dominio
+            Cuenca$\to$Salamanca
       \end{itemize}
     \column{0.54\textwidth}
       \centering
       \includegraphics[width=\linewidth]{figures/e8_correlation.pdf}\\
-      {\scriptsize Silueta frente a ARI por celda (E8a/E8b). En E8a: $r{=}+0.78$ para $k$ fijo — la silueta \emph{sí} ordena bien a granularidad de estilo. En E8b: todo el rango de ARI vive cerca del azar, la correlación pierde sentido.}
+      {\scriptsize Silueta frente a ARI por celda (E8a/E8b). En E8a:
+      $r{=}+0.78$ para $k$ fijo, la silueta \emph{sí} ordena bien a
+  granularidad de estilo. En E8b: la correlación no es informativa: a 87 clases
+el ARI no se despega del azar.}
   \end{columns}
 \end{frame}
 
