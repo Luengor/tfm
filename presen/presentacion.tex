@@ -12,7 +12,7 @@
 \usepackage{csquotes}
 \usepackage[backend=bibtex,style=numeric,sorting=none]{biblatex}
 \addbibresource{bib.bib}
-\renewcommand*{\bibfont}{\small}
+\renewcommand*{\bibfont}{\scriptsize}
 
 % ---- Theme ----
 \usetheme{Madrid}
@@ -212,7 +212,8 @@
     \column{0.42\textwidth}
       \begin{itemize}
         \item Etapa \textbf{opcional} para recortar grafitis de la escena
-        \item Detector \textbf{YOLO ajustado}~\cite{ultralytics_ultralytics_2024} sobre grafiti ($447$ imágenes, $\sim$650 cajas; partida de pesos COCO)
+        \item Detector \textbf{YOLO ajustado} sobre grafiti ($447$ imágenes,
+            $\sim$650 cajas; partida de pesos COCO)
         \item \textbf{Fusión} de cajas por solapamiento y proximidad
         \item \textbf{Margen} de contexto configurable antes de recortar
       \end{itemize}
@@ -244,12 +245,12 @@
         \toprule
         \textbf{Modelo} & \textbf{Tipo} & \textbf{Dim.} \\
         \midrule
-        ResNet50~\cite{he_deep_2015}      & CNN residual      & $2048$ \\
-        VGG16~\cite{simonyan_very_2015}         & CNN profunda      & $4096$ \\
-        InceptionV3~\cite{szegedy_rethinking_2015}   & CNN multi-rama    & $2048$ \\
-        MobileNetV3~\cite{howard_searching_2019}   & CNN ligera        & $1280$ \\
-        DINOv2 ViT-S/14~\cite{oquab_dinov2_2024} & \textit{Transf.} & $384$ \\
-        CLIP ViT-B/32~\cite{radford_learning_2021} & \textit{Transf.} & $512$ \\
+        ResNet50      & CNN residual      & $2048$ \\
+        VGG16         & CNN profunda      & $4096$ \\
+        InceptionV3   & CNN multi-rama    & $2048$ \\
+        MobileNetV3   & CNN ligera        & $1280$ \\
+        DINOv2 ViT-S/14 & \textit{Transf.} & $384$ \\
+        CLIP ViT-B/32 & \textit{Transf.} & $512$ \\
         \bottomrule
       \end{tabular}
   \end{columns}
@@ -260,9 +261,11 @@
     \column{0.65\textwidth}
       \textbf{Cabezas de proyección} entrenadas sobre grafiti utilizando \textit{transfer learning}~\cite{pan_survey_2010}:
       \begin{itemize}
-        \item \textit{Backbone} \textbf{congelado}, solo se entrena una cabeza ligera (Linear→ReLU→Linear→$L_2$)
+        \item \textit{Backbone} \textbf{congelado}, solo se entrena una cabeza
+            ligera (Linear→ReLU→Linear→$L_2$)
         \item Bases: \textbf{MobileNetV3} y \textbf{DINOv2}
-        \item Tareas: \textbf{autoría} (pérdida de tripletes~\cite{schroff_facenet_2015,hermans_defense_2017}) y \textbf{estilo} (\textit{SupCon}~\cite{khosla_supervised_2021})
+        \item Tareas: \textbf{autoría} (pérdida de tripletes) y \textbf{estilo}
+            (\textit{SupCon})
         \item En total 4 cabezas
       \end{itemize}
     \column{0.35\textwidth}
@@ -299,10 +302,13 @@
   \begin{columns}
     \column{0.54\textwidth}
       \begin{itemize}\small
-        \item \textbf{PCA}~\cite{jolliffe_principal_2002} (lineal): direcciones de máxima varianza
-        \item \textbf{Kernel PCA}~\cite{scholkopf_nonlinear_1998} (no lineal): PCA en un espacio de características implícito
-        \item \textbf{Isomap}~\cite{tenenbaum_global_2000} (no lineal): preserva distancias geodésicas sobre el grafo de vecinos
-        \item \textbf{UMAP}~\cite{mcinnes_umap_2020} (no lineal): preserva la estructura local de vecindad
+        \item \textbf{PCA} (lineal): direcciones de máxima varianza
+        \item \textbf{Kernel PCA} (no lineal): PCA en un espacio de
+            características implícito
+        \item \textbf{Isomap} (no lineal): preserva distancias geodésicas sobre
+            el grafo de vecinos
+        \item \textbf{UMAP} (no lineal): preserva la estructura local de
+            vecindad
       \end{itemize}
       \vspace{0.3em}
       {\footnotesize Las métricas de calidad se calculan sobre los \textit{embeddings} \textbf{originales} (sin reducir).}
@@ -322,12 +328,12 @@
       \vspace{0.5em}
       \footnotesize
       \begin{itemize}
-        \item \textbf{Particional:} K-medias~\cite{arthur_k-means_2007}
-        \item \textbf{Densidad:} DBSCAN~\cite{ester_density-based_1996}, OPTICS~\cite{ankerst_optics_1999}, HDBSCAN~\cite{campello_density-based_2013}
-        \item \textbf{Jerárquico:} Aglomerativo~\cite{mullner_modern_2011}
-        \item \textbf{Grafo:} Espectral~\cite{ng_spectral_2001}
-        \item \textbf{Probabilístico:} GMM~\cite{dempster_maximum_1977}
-        \item \textbf{Mensajes:} Affinity Propagation~\cite{frey_clustering_2007}
+        \item \textbf{Particional:} K-medias
+        \item \textbf{Densidad:} DBSCAN, OPTICS, HDBSCAN
+        \item \textbf{Jerárquico:} Aglomerativo
+        \item \textbf{Grafo:} Espectral
+        \item \textbf{Probabilístico:} GMM
+        \item \textbf{Mensajes:} Affinity Propagation
       \end{itemize}
     \column{0.54\textwidth}
       \centering
@@ -366,8 +372,9 @@
       \footnotesize
       \textbf{Métricas de calidad}
       \begin{itemize}\scriptsize
-        \item \textbf{Intrínsecas} (sin etiquetas): silueta~\cite{rousseeuw_silhouettes_1987}, Calinski--Harabasz~\cite{calinski_dendrite_1974}, Davies--Bouldin~\cite{davies_cluster_1979}, ruido, balance de tamaños
-        \item \textbf{Extrínsecas} (con etiquetas): ARI~\cite{hubert_comparing_1985}, NMI~\cite{strehl_cluster_2002}, F1 pareada
+        \item \textbf{Intrínsecas} (sin etiquetas): silueta,
+            Calinski--Harabasz, Davies--Bouldin, ruido, balance de tamaños
+        \item \textbf{Extrínsecas} (con etiquetas): ARI, NMI, F1 balanceada
         \item \textbf{Coste}: tiempo de pared y memoria pico por etapa
       \end{itemize}
       \vspace{0.3em}
