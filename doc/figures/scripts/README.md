@@ -23,6 +23,7 @@ Shared style lives in `_style.py`. Output naming mirrors the
 | Script | Output PDF | Figure label |
 |---|---|---|
 | `e1_silhouette.py` | `e1_silhouette_by_embedding.pdf` | `fig:e1-silhouette` |
+| `e1_silhouette_hbar.py` | `e1_silhouette_hbar.pdf` | *(presentation slide E1, `presen/presentacion.tex`)* |
 | `e2_reduction.py`  | `e2_reduction_quality_cost.pdf` | `fig:e2-reduction` |
 | `e3_pareto.py`     | `e3_pareto_quality_cost.pdf` | `fig:e3-pareto` |
 | `e3_scaling.py`    | `e3_scaling_with_n.pdf` | `fig:e3-scaling` |
