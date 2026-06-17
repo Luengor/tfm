@@ -66,8 +66,8 @@
     \column{0.45\textwidth}
       \footnotesize
       \begin{itemize}
-        \item Por debajo de $N\approx2500$ los tres \textit{backends} sobre PostgreSQL son indistinguibles
-        \item Por encima, HNSW se separa: a $N{=}6416$ es $3.2\times$ el exacto y $240\times$ SQLite
+        \item Por debajo de $N\approx1000$, pgvector exacto y HNSW son indistinguibles
+        \item Por encima, HNSW se separa: su latencia se mantiene plana mientras la del exacto crece; a $N{=}6416$ es $3.2\times$ el exacto y $240\times$ SQLite
         \item E9: ninguna configuración baja de \textit{recall} $0.99$; subir \texttt{m} o \texttt{ef\_construction} llega a $1.0$ sin penalizar latencia
       \end{itemize}
   \end{columns}

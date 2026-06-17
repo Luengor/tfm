@@ -383,7 +383,7 @@
       \end{itemize}
       \vspace{0.3em}
       \begin{block}{\scriptsize Configuración base resultante}
-        {\scriptsize DINOv2 cabeza-estilo $+$ UMAP-10 $+$ HDBSCAN (\texttt{mcs}=5) $+$ segmentador identidad $+$ SQLite}
+        {\scriptsize DINOv2 cabeza-estilo $+$ UMAP-10 $+$ HDBSCAN (\texttt{mcs}=5) $+$ segmentador identidad}
       \end{block}
       {\scriptsize Las métricas intrínsecas se leen \textbf{en conjunto}: aisladas premian particiones degeneradas.}
   \end{columns}
@@ -468,7 +468,7 @@ el ARI no se despega del azar.}
     \item Sin reducción: presenta la mejor silueta del experimento, pero a
         costa de un $68\%$ de ruido. El coste de memoria y tiempo se trasladan de la etapa
         de reducción al agrupamiento
-    \item PCA solo produce agrupamientos degenerados: dos \textit{clusters} y silueta nula 
+    \item PCA solo produce agrupamientos degenerados: dos clústeres y silueta nula
         en PCA-10 y un $69.8\%$ de ruido en PCA-50
     \item \textbf{UMAP}: Mejor equilibrio entre silueta y ruido. UMAP-50 da
         resultados prácticamente idénticos a UMAP-10, pero prácticamente
@@ -496,7 +496,7 @@ el ARI no se despega del azar.}
       \end{itemize}
       \vspace{0.4em}
       \begin{block}{\scriptsize Pipeline base}
-        {\scriptsize DINOv2 estilo $+$ UMAP-10 $+$ HDBSCAN (\texttt{mcs}=5) $+$ identidad $+$ SQLite}
+        {\scriptsize DINOv2 estilo $+$ UMAP-10 $+$ HDBSCAN (\texttt{mcs}=5) $+$ identidad}
       \end{block}
   \end{columns}
 \end{frame}
@@ -534,26 +534,33 @@ el ARI no se despega del azar.}
         \toprule
         \textbf{$N$} & \textbf{\textit{Backend}} & \textbf{cons./s} & \textbf{R@5} \\
         \midrule
-         500 & SQLite           &    164 & --    \\
-         500 & pgvector exacto  &  3\,096 & --    \\
-         500 & pgvector + HNSW  &  3\,042 & 1.000 \\
+         500 & SQLite           &  32.8 & --    \\
+         500 & pgvector exacto  &   619 & --    \\
+         500 & pgvector + HNSW  &   608 & 1.000 \\
         \midrule
-        2500 & SQLite           &    148 & --    \\
-        2500 & pgvector exacto  & 10\,678 & --    \\
-        2500 & pgvector + HNSW  & 15\,092 & 1.000 \\
+        2500 & SQLite           &   5.9 & --    \\
+        2500 & pgvector exacto  &   427 & --    \\
+        2500 & pgvector + HNSW  &   604 & 1.000 \\
         \midrule
-        6416 & SQLite           &    149 & --    \\
-        6416 & pgvector exacto  & 11\,109 & --    \\
-        6416 & \textbf{pgvector + HNSW} & \textbf{35\,936} & \textbf{1.000} \\
+        6416 & SQLite           &   2.3 & --    \\
+        6416 & pgvector exacto  &   173 & --    \\
+        6416 & \textbf{pgvector + HNSW} & \textbf{560} & \textbf{1.000} \\
         \bottomrule
       \end{tabular}\\[0.3em]
       {\scriptsize E6: \textit{throughput} (consultas/s) y \textit{recall}@5 por \textit{backend}.}
     \column{0.50\textwidth}
       \small
       \begin{itemize}
-        \item pgvector exacto: ${\sim}2$ órdenes de magnitud sobre SQLite (elimina el \textit{round-trip} de Python)
-        \item \textbf{HNSW}: único \textit{throughput} que \emph{crece} con $N$; $3.2\times$ sobre el exacto y $240\times$ sobre SQLite a $N{=}6416$, \textbf{sin} pérdida de \textit{recall} (R@5 $=1.000$). Índice: $0.47$~s, amortizado en \textbf{una} consulta
-        \item Cruce ${\approx}N{=}2500$; el dataset está por encima $\Rightarrow$ HNSW por defecto
+        \item pgvector exacto: ${\sim}2$ órdenes de magnitud sobre SQLite
+            (elimina el \textit{round-trip} de Python)
+        \item \textbf{HNSW}: único \textit{throughput} que se mantiene
+            \emph{constante} con $N$ (${\sim}560$ cons./s) mientras el exacto y
+            SQLite se desploman; a $N{=}6416$, $3.2\times$ sobre el exacto y
+            $240\times$ sobre SQLite, \textbf{sin} pérdida de \textit{recall}
+            (R@5 $=1.000$). Índice: $0.47$~s, amortizado en \textbf{una}
+            consulta
+        \item Su \textbf{ventaja crece con $N$}; el dataset está muy por encima
+            del cruce
       \end{itemize}
   \end{columns}
 \end{frame}
