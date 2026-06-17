@@ -56,9 +56,8 @@
   \begin{columns}
     \column{0.65\textwidth}
       \begin{itemize}
-        \item El grafiti no autorizado se trata de un fenómeno urbano
-            recurrente que requiere atención continua por parte de las
-            administraciones
+        \item El grafiti no autorizado es un fenómeno urbano recurrente que
+            requiere atención continua por parte de las administraciones
         \item El seguimiento manual es \textbf{costoso e inconsistente}
         \item Un agrupamiento automático por similitud visual facilitaría
             la trazabilidad de autores o la priorización de retirada basada
@@ -121,7 +120,7 @@
             oclusión, escena, etc. Muchas de las fotografías contienen
             \textbf{múltiples grafitis}
         \item \textbf{Banco auxiliar:} $1106$ imágenes de \textbf{Cuenca}
-            cedidas por StopGrafiti. Utilizadas solo para ajuste fino, evita
+            cedidas por StopGrafiti. Utilizadas solo para ajuste fino, evitando 
             solapamiento entrenamiento/evaluación
       \end{itemize}
     \column{0.45\textwidth}
@@ -132,7 +131,7 @@
 
 \begin{frame}{Anotaciones y subconjuntos}
   \centering
-  \textbf{Ninguno de los bancos están etiquetados}. Para poder obtener métricas
+  \textbf{Ninguno de los bancos está etiquetados}. Para poder obtener métricas
   que representen la calidad real del agrupamiento, se lleva a cabo un proceso
   de recorte y anotación manual\\[0.2em]
   Cuatro categorías estilísticas: \textit{tag}, \textit{throw-up}, \textit{piece}, \textit{character}
@@ -319,8 +318,8 @@
       {\footnotesize Las métricas de calidad se calculan sobre los \textit{embeddings} \textbf{originales} (sin reducir).}
     \column{0.46\textwidth}
       \imgw{1.0}{curse_dimensionality.pdf}\\
-      \centering \scriptsize Conforme aumenta el número de dimensiones la
-      distancia entre el vecino más cercano y más lejano se vuelven
+      \centering \scriptsize Conforme aumenta el número de dimensiones las
+      distancias entre el vecino más cercano y más lejano se vuelven
       equivalentes.
   \end{columns}
 \end{frame}
@@ -401,7 +400,7 @@
       \setlength{\tabcolsep}{3pt}
       \begin{tabular}{lcccc}
         \toprule
-        \textbf{Extractor} & \textbf{sil} & \textbf{cls} & \textbf{ruido} & \textbf{csCV} \\
+        \textbf{Extractor} & \textbf{sil} & \textbf{cls} & \textbf{ruido} & \textbf{balance} \\
         \midrule
         \texttt{mobilenet\_v3}        & \textbf{0.260} & 820 & \textbf{0.078} & \textbf{0.52} \\
         \texttt{resnet50}             & 0.257 & 794 & 0.086 & 0.71 \\
@@ -526,8 +525,8 @@ el ARI no se despega del azar.}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Resultados: búsqueda por similitud (E9)}
-  \begin{columns}[c]
+\begin{frame}{Resultados: búsqueda por similitud (E6, E9)}
+  \begin{columns}[cbalance]
     \column{0.50\textwidth}
       \centering \small
       \setlength{\tabcolsep}{3pt}
