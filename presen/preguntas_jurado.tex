@@ -115,3 +115,39 @@
   \centering {\footnotesize HDBSCAN colapsa los 4 estilos en 3 grupos coherentes:
   une \textit{tag}/\textit{throw-up} en \enquote{sencillo}.}
 \end{frame}
+
+\begin{frame}{Respaldo: autoría (E8b) bajo recuperación, no partición}
+  \begin{columns}[c]
+    \column{0.5\textwidth}
+      \centering \scriptsize
+      \setlength{\tabcolsep}{4pt}
+      \begin{tabular}{lccc}
+        \toprule
+        \textbf{Extractor} & \textbf{MAP@5} & \textbf{Rec@5} & \textbf{MRR} \\
+        \midrule
+        CLIP ViT-B/32        & 0.252 & 0.268 & 0.262 \\
+        DINOv2 (base)        & 0.248 & 0.268 & 0.251 \\
+        ResNet50             & 0.246 & 0.236 & 0.256 \\
+        \midrule
+        DINOv2 autor         & 0.228 & 0.254 & 0.232 \\
+        MobileNet autor      & 0.217 & 0.233 & 0.222 \\
+        \bottomrule
+      \end{tabular}\\[0.3em]
+      {\scriptsize E8b: mejor celda por extractor (185 recortes, 87 autores).}
+    \column{0.5\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item El ARI $\approx 0$ es un \textbf{artefacto de protocolo}: con
+            $\sim$2 recortes/autor no se pueden formar 87 clústeres. Es
+            identificación \emph{abierta}, no partición
+        \item Bajo recuperación sí hay señal: MRR $\approx 0.25$, unas
+            $8\times$ el azar ($\approx 0.03$)
+        \item Pero esa señal es \textbf{similitud genérica} (misma sesión, muro,
+            color): las cabezas de autor \textbf{no superan} a los extractores
+            sin ajustar, incluso quedan algo por debajo
+        \item El ajuste fino entrenado \emph{solo en Cuenca} no transfiere a
+            Salamanca (cambio de dominio + autores no vistos). Asimetría con
+            estilo, que se entrenó mixto y se evalúa en dominio
+      \end{itemize}
+  \end{columns}
+\end{frame}
