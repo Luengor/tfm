@@ -50,7 +50,7 @@ def main() -> None:
         )
     df = pd.DataFrame(rows)
 
-    fig, (ax_stages, ax_algo) = plt.subplots(1, 2, figsize=(10.5, 4.4), sharex=False)
+    fig, (ax_stages, ax_algo) = plt.subplots(2, 1, figsize=(10.5, 10.5), sharex=False)
 
     # === Panel A: pipeline stages (use HDBSCAN run for stages + search) ===
     base = df[df.algo == "hdbscan"].sort_values("N")
@@ -96,8 +96,10 @@ def main() -> None:
     ax_stages.set_yscale("log")
     ax_stages.set_xlabel("N (imágenes)")
     ax_stages.set_ylabel("Tiempo de pared (s)")
-    ax_stages.set_title("A · Etapas del pipeline")
+    ax_stages.set_title("A · Etapas del pipeline", pad=4)
     ax_stages.legend(loc="upper left")
+    ax_stages.xaxis.set_minor_locator(plt.LogLocator(base=10, subs="auto", numticks=10))
+    ax_stages.grid(which="minor", axis="x", lw=0.3, alpha=0.4)
 
     # === Panel B: clustering algorithms ===
     algo_palette = sns.color_palette("colorblind", n_colors=len(ALGORITHMS))
@@ -127,10 +129,10 @@ def main() -> None:
     ax_algo.set_yscale("log")
     ax_algo.set_xlabel("N (imágenes)")
     ax_algo.set_ylabel("Tiempo de pared (s)")
-    ax_algo.set_title("B · Algoritmos de agrupamiento")
+    ax_algo.set_title("B · Algoritmos de agrupamiento", pad=4)
     ax_algo.legend(loc="upper left")
-
-    fig.suptitle("E7 · Escalabilidad temporal (log–log)", y=1.02)
+    ax_algo.xaxis.set_minor_locator(plt.LogLocator(base=10, subs="auto", numticks=10))
+    ax_algo.grid(which="minor", axis="x", lw=0.3, alpha=0.4)
     save(fig, "e7_scalability_loglog")
 
 

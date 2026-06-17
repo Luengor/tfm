@@ -488,14 +488,19 @@
       \centering
       \includegraphics[width=\linewidth]{figures/e7_scalability_loglog.pdf}\\
       {\scriptsize E7: tiempo de pared vs $N$ por etapa (log--log).}
-      \vspace{0.3em}
+    \column{0.50\textwidth}
       \footnotesize
       \begin{itemize}
         \item Ingesta: lineal $O(n)$, dominante a esta escala
         \item Agrupamiento y reducción: \textbf{despreciables} ($<5$~s a $N{=}6416$)
         \item \textbf{Cuello}: búsqueda SQLite $\approx O(n^2)$, pendiente 2.1; 54~min a $N{=}6416$
       \end{itemize}
-    \column{0.50\textwidth}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Resultados: búsqueda por similitud (HNSW)}
+  \begin{columns}[c]
+    \column{0.55\textwidth}
       \centering \scriptsize
       \setlength{\tabcolsep}{3pt}
       \begin{tabular}{rlrr}
@@ -516,7 +521,7 @@
         \bottomrule
       \end{tabular}\\[0.3em]
       {\scriptsize E6: \textit{throughput} (consultas/s) y \textit{recall}@5 por \textit{backend}.}
-      \vspace{0.3em}
+    \column{0.45\textwidth}
       \footnotesize
       \begin{itemize}
         \item pgvector exacto: ${\sim}2$ órdenes de magnitud sobre SQLite
