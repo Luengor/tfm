@@ -502,7 +502,7 @@ el ARI no se despega del azar.}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Resultados: coste del sistema completo}
+\begin{frame}{Resultados: coste del sistema completo (E7)}
   \begin{columns}[c]
     \column{0.50\textwidth}
       \centering
@@ -526,10 +526,10 @@ el ARI no se despega del azar.}
   \end{columns}
 \end{frame}
 
-\begin{frame}{Resultados: búsqueda por similitud (HNSW)}
+\begin{frame}{Resultados: búsqueda por similitud (E9)}
   \begin{columns}[c]
-    \column{0.55\textwidth}
-      \centering \scriptsize
+    \column{0.50\textwidth}
+      \centering \small
       \setlength{\tabcolsep}{3pt}
       \begin{tabular}{rlrr}
         \toprule
@@ -549,11 +549,12 @@ el ARI no se despega del azar.}
         \bottomrule
       \end{tabular}\\[0.3em]
       {\scriptsize E6: \textit{throughput} (consultas/s) y \textit{recall}@5 por \textit{backend}.}
-    \column{0.45\textwidth}
-      \footnotesize
+    \column{0.50\textwidth}
+      \small
       \begin{itemize}
-        \item pgvector exacto: ${\sim}2$ órdenes de magnitud sobre SQLite
-        \item \textbf{HNSW}: único \textit{throughput} que \emph{crece} con $N$; $240\times$ sobre SQLite \textbf{sin} pérdida de \textit{recall}
+        \item pgvector exacto: ${\sim}2$ órdenes de magnitud sobre SQLite (elimina el \textit{round-trip} de Python)
+        \item \textbf{HNSW}: único \textit{throughput} que \emph{crece} con $N$; $3.2\times$ sobre el exacto y $240\times$ sobre SQLite a $N{=}6416$, \textbf{sin} pérdida de \textit{recall} (R@5 $=1.000$). Índice: $0.47$~s, amortizado en \textbf{una} consulta
+        \item Cruce ${\approx}N{=}2500$; el dataset está por encima $\Rightarrow$ HNSW por defecto
       \end{itemize}
   \end{columns}
 \end{frame}
@@ -582,7 +583,6 @@ el ARI no se despega del azar.}
   \end{columns}
   \vfill
   \centering
-  \footnotesize El trabajo \textbf{caracteriza} desempeño y coste de la similitud visual en bancos de grafiti, con una recomendación concreta y reproducible.
 \end{frame}
 
 % ============================================================
