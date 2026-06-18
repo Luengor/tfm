@@ -253,8 +253,8 @@
         VGG16         & CNN profunda      & $4096$ \\
         InceptionV3   & CNN multi-rama    & $2048$ \\
         MobileNetV3   & CNN ligera        & $1280$ \\
-        DINOv2 ViT-S/14 & \textit{Transf.} & $384$ \\
-        CLIP ViT-B/32 & \textit{Transf.} & $512$ \\
+        DINOv2 ViT-S/14 & \textit{Transformer} & $384$ \\
+        CLIP ViT-B/32 & \textit{Transformer} & $512$ \\
         \bottomrule
       \end{tabular}
   \end{columns}
@@ -378,12 +378,14 @@
       \begin{itemize}\scriptsize
         \item \textbf{Intrínsecas} (sin etiquetas): silueta,
             Calinski--Harabasz, Davies--Bouldin, ruido, balance de tamaños
-        \item \textbf{Extrínsecas} (con etiquetas): ARI, NMI, F1 balanceada, MAP, Recall
+        \item \textbf{Extrínsecas} (con etiquetas): ARI, NMI, F1 balanceada,
+            MAP, Recall. Calculadas \textbf{sobre recortes, sin segmentador}.
         \item \textbf{Coste}: tiempo de pared y memoria pico por etapa
       \end{itemize}
       \vspace{0.3em}
       \begin{block}{\scriptsize Configuración base resultante}
-        {\scriptsize DINOv2 cabeza-estilo $+$ UMAP-10 $+$ HDBSCAN (\texttt{mcs}=5) $+$ segmentador identidad}
+        {\scriptsize DINOv2 cabeza-estilo $+$ UMAP-10 $+$ HDBSCAN
+         (\texttt{mcs}=5) $+$ segmentador identidad}
       \end{block}
       {\scriptsize Las métricas intrínsecas se leen \textbf{en conjunto}: aisladas premian particiones degeneradas.}
   \end{columns}
@@ -391,9 +393,10 @@
 
 \begin{frame}{Resultados: segmentador (E5)}
   \begin{columns}[c]
-    \column{0.52\textwidth}
+    \column{0.55\textwidth}
       \centering \scriptsize
       \setlength{\tabcolsep}{3pt}
+      \includegraphics[height=0.42\textheight]{figures/val_batch2_pred.jpg}\\[0.5em]
       \begin{tabular}{lrrrr}
         \toprule
         \textbf{Segmentador} & \textbf{r/img} & \textbf{ruido} & \textbf{sil} & \textbf{ingesta} \\
@@ -406,10 +409,7 @@
       \end{tabular}\\[0.3em]
       {\scriptsize E5, calidad intrínseca y coste de ingesta (s) a $N{=}6416$.
       r/img = recortes por imagen, ruido$\downarrow$, sil$\uparrow$.}
-      \begin{block}{\scriptsize Decisión}
-        {\scriptsize Segmentador \textbf{identidad} en el \textit{pipeline} base}
-      \end{block}
-    \column{0.48\textwidth}
+    \column{0.45\textwidth}
       \footnotesize
       \begin{itemize}
         \item \textbf{Identidad gana en todo}: mejor silueta, menor ruido y
