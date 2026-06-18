@@ -1,45 +1,5 @@
 \appendix
 
-% \section*{Respaldo: preguntas del tribunal}
-% 
-% % ---------------------------------------------------------------------
-% \begin{frame}[allowframebreaks]{Preguntas previsibles --- guion}
-%   \footnotesize
-%   \textbf{Recuperación de información (J1)}
-%   \begin{itemize}
-%     \item \textit{¿Por qué un índice HNSW y no un índice invertido / cuantización (IVF, PQ, Faiss)?}\\
-%       Los descriptores son vectores densos de 128--4096~d; no hay vocabulario discreto que invertir. HNSW da \textit{recall}@5~$=1.0$ a esta escala con la menor latencia; IVF/PQ ganan en memoria a escalas de millones, fuera del rango actual (trabajo futuro).
-%     \item \textit{Su búsqueda es similitud pura. ¿Cabe expansión de consulta o realimentación por relevancia?}\\
-%       Sí, encaja de forma natural: la consulta es un vector, así que la expansión sería un \textbf{pseudo-relevance feedback} estilo Rocchio (mover el vector de consulta hacia el centroide de los $k$ primeros). No se evaluó, pero el espacio de \textit{embeddings} lo soporta sin cambios de arquitectura. Es una extensión directa y prometedora del sistema.
-%     \item \textit{¿Por qué P@k, MAP, MRR y no solo \textit{accuracy}?}\\
-%       Son las métricas de ordenación clásicas de RI; capturan la calidad del \textit{ranking}, no solo la del primer acierto. Se usan como señal de calidad independiente del agrupador.
-%   \end{itemize}
-% 
-%   \framebreak
-%   \textbf{IA y reutilización (J2)}
-%   \begin{itemize}
-%     \item \textit{¿Por qué \textit{backbones} congelados y no \textit{fine-tuning} completo o \textit{deep clustering} extremo-a-extremo?}\\
-%       Datos anotados escasos (cientos de recortes); el ajuste completo sobreajustaría. Congelar el \textit{backbone} y entrenar una cabeza ligera es la opción robusta con pocos datos. El \textit{deep clustering} (SCAN, etc.) se cita como trabajo futuro al ampliar el banco.
-%     \item \textit{¿Por qué la cabeza de estilo si su silueta intrínseca es peor que la de las CNN de ImageNet?}\\
-%       La silueta intrínseca mide apariencia (textura/color), no la semántica del grafiti. En la evaluación \textbf{supervisada} la cabeza dobla el ARI (0.722 vs $\le$0.37). La decisión se toma sobre la métrica que importa.
-%     \item \textit{¿Por qué falla la autoría? ¿Invalida el método?}\\
-%       No. Es escasez de datos (pocos recortes/autor) más cambio de dominio Cuenca$\to$Salamanca. La misma arquitectura funciona en estilo; el limitante es el conjunto, no el diseño.
-%   \end{itemize}
-% 
-%   \framebreak
-%   \textbf{Metodología y filosofía de la ciencia (J3)}
-%   \begin{itemize}
-%     \item \textit{El \enquote{criterio conjunto} de métricas, ¿no es \textit{post-hoc} / a medida del resultado?}\\
-%       Se fija \textbf{antes} de mirar rankings y se justifica teóricamente: silueta y CH aisladas premian particiones degeneradas ($k{=}2$, alta cobertura de ruido). Se muestra explícitamente que cada métrica aislada invierte el orden. El criterio es una salvaguarda contra esas patologías conocidas, no un ajuste a posteriori.
-%     \item \textit{Con $N\le 6416$, ¿puede afirmar que la búsqueda es $O(n^2)$?}\\
-%       No como exponente asintótico; se reporta como \textbf{pendiente observada} (2.10 log--log) en este régimen, coherente con el coste por pasada. La memoria distingue caso a caso. La limitación de rango se reconoce abiertamente.
-%     \item \textit{Etiquetado manual: ¿subjetividad? ¿un solo anotador?}\\
-%       Las cuatro categorías de estilo son convenciones establecidas en la literatura de grafiti; la autoría es objetiva (misma firma). Es una limitación reconocida; ampliar anotadores y medir acuerdo es trabajo futuro.
-%     \item \textit{¿Posición ética ante la identificación de autores?}\\
-%       El trabajo es puramente técnico y trata el grafiti como fenómeno visual neutro; no opina sobre legalidad ni moralidad (alcance explícito del TFM).
-%   \end{itemize}
-% \end{frame}
-
 % ---------------------------------------------------------------------
 % Diapositivas de respaldo con apoyo visual reutilizando figuras.
 % ---------------------------------------------------------------------
@@ -137,14 +97,11 @@
     \column{0.5\textwidth}
       \footnotesize
       \begin{itemize}
-        \item El ARI $\approx 0$ es un \textbf{artefacto de protocolo}: con
-            $\sim$2 recortes/autor no se pueden formar 87 clústeres. Es
-            identificación \emph{abierta}, no partición
-        \item Bajo recuperación sí hay señal: MRR $\approx 0.25$, unas
-            $8\times$ el azar ($\approx 0.03$)
-        \item Pero esa señal es \textbf{similitud genérica} (misma sesión, muro,
-            color): las cabezas de autor \textbf{no superan} a los extractores
-            sin ajustar, incluso quedan algo por debajo
+        \item Bajo recuperación sí hay señal: MRR $\approx 0.25$, $8\times$ el
+            azar ($\approx 0.03$)
+        \item Pero esa señal es \textbf{similitud genérica} (misma sesión,
+            muro, color): las cabezas de autor \textbf{no superan} a los
+            extractores sin ajustar, incluso quedan algo por debajo
         \item El ajuste fino entrenado \emph{solo en Cuenca} no transfiere a
             Salamanca (cambio de dominio + autores no vistos). Asimetría con
             estilo, que se entrenó mixto y se evalúa en dominio

@@ -389,6 +389,44 @@
   \end{columns}
 \end{frame}
 
+\begin{frame}{Resultados: segmentador (E5)}
+  \begin{columns}[c]
+    \column{0.52\textwidth}
+      \centering \scriptsize
+      \setlength{\tabcolsep}{3pt}
+      \begin{tabular}{lrrrr}
+        \toprule
+        \textbf{Segmentador} & \textbf{r/img} & \textbf{ruido} & \textbf{sil} & \textbf{ingesta} \\
+        \midrule
+        \textbf{identidad}      & 1.00 & \textbf{0.199} & \textbf{0.151} & \textbf{1236} \\
+        YOLO11s                 & 1.03 & 0.225 & 0.127 & 1777 \\
+        YOLO11m                 & 1.03 & 0.230 & 0.131 & 1812 \\
+        YOLO11m \textit{ft}     & 2.39 & 0.298 & 0.122 & 2152 \\
+        \bottomrule
+      \end{tabular}\\[0.3em]
+      {\scriptsize E5, calidad intrínseca y coste de ingesta (s) a $N{=}6416$.
+      r/img = recortes por imagen, ruido$\downarrow$, sil$\uparrow$.}
+      \begin{block}{\scriptsize Decisión}
+        {\scriptsize Segmentador \textbf{identidad} en el \textit{pipeline} base}
+      \end{block}
+    \column{0.48\textwidth}
+      \footnotesize
+      \begin{itemize}
+        \item \textbf{Identidad gana en todo}: mejor silueta, menor ruido y
+            menor coste de ingesta
+        \item Detectores base (YOLO11s/m): $\sim$1 caja/imagen, reproducen el
+            banco original; calidad marginal o peor además de ser más costosos
+        \item YOLO11m \textit{ft}: lidera a $N{=}1000$, pero a escala completa
+            produce $2.4$ recortes/imagen y degenera ($30\%$ ruido, $1049$
+            clústeres)
+        \item El detector alcanza un recall $0.74$ y mAP@.5--.95 $0.60$.
+            El segmentador pierde uno de cada cuatro grafitis, y los que
+            detecta no los ajusta bien del todo. Las cabezas de estilo no 
+            toleran bien el ruido de los recortes.
+      \end{itemize}
+  \end{columns}
+\end{frame}
+
 \begin{frame}{Resultados: extractores de características (E1)}
   \begin{columns}[c]
     \column{0.46\textwidth}
@@ -498,44 +536,6 @@ el ARI no se despega del azar.}
       \begin{block}{\scriptsize Pipeline base}
         {\scriptsize DINOv2 estilo $+$ UMAP-10 $+$ HDBSCAN (\texttt{mcs}=5) $+$ identidad}
       \end{block}
-  \end{columns}
-\end{frame}
-
-\begin{frame}{Resultados: segmentador (E5)}
-  \begin{columns}[c]
-    \column{0.52\textwidth}
-      \centering \scriptsize
-      \setlength{\tabcolsep}{3pt}
-      \begin{tabular}{lrrrr}
-        \toprule
-        \textbf{Segmentador} & \textbf{r/img} & \textbf{ruido} & \textbf{sil} & \textbf{ingesta} \\
-        \midrule
-        \textbf{identidad}      & 1.00 & \textbf{0.199} & \textbf{0.151} & \textbf{1236} \\
-        YOLO11s                 & 1.03 & 0.225 & 0.127 & 1777 \\
-        YOLO11m                 & 1.03 & 0.230 & 0.131 & 1812 \\
-        YOLO11m \textit{ft}     & 2.39 & 0.298 & 0.122 & 2152 \\
-        \bottomrule
-      \end{tabular}\\[0.3em]
-      {\scriptsize E5, calidad intrínseca y coste de ingesta (s) a $N{=}6416$.
-      r/img = recortes por imagen, ruido$\downarrow$, sil$\uparrow$.}
-      \begin{block}{\scriptsize Decisión}
-        {\scriptsize Segmentador \textbf{identidad} en el \textit{pipeline} base}
-      \end{block}
-    \column{0.48\textwidth}
-      \footnotesize
-      \begin{itemize}
-        \item \textbf{Identidad gana en todo}: mejor silueta, menor ruido y
-            menor coste de ingesta
-        \item Detectores base (YOLO11s/m): $\sim$1 caja/imagen, reproducen el
-            banco original; calidad marginal o peor además de ser más costosos
-        \item YOLO11m \textit{ft}: lidera a $N{=}1000$, pero a escala completa
-            produce $2.4$ recortes/imagen y degenera ($30\%$ ruido, $1049$
-            clústeres)
-        \item El detector alcanza un recall $0.74$ y mAP@.5--.95 $0.60$.
-            El segmentador pierde uno de cada cuatro grafitis, y los que
-            detecta no los ajusta bien del todo. Las cabezas de estilo no 
-            toleran bien el ruido de los recortes.
-      \end{itemize}
   \end{columns}
 \end{frame}
 
