@@ -552,9 +552,9 @@ el ARI no se despega del azar.}
         \item \textbf{Ingesta} (DINOv2): $0.95 \approx O(n)$; dominante a esta escala
         \item \textbf{Reducción} (UMAP): $1.15$, \textbf{despreciable} ($<5$~s)
         \item \textbf{Agrupamiento}: K-medias $0.43$, HDBSCAN $1.53$,
-            aglomerativo $1.77$. A esta escala es más aparente el coste de
-            memoria que el tiempo para OPTICS ($763$~MB) y
-            aglomerativo ($314$~MB, $O(n^2)$)
+            aglomerativo $1.77$. A esta escala es más aparente el \textbf{coste
+            de memoria} que el tiempo para OPTICS ($763$~MB) y aglomerativo
+            ($314$~MB, $O(n^2)$)
         \item \textbf{Cuello}: búsqueda SQLite $2.10 \approx O(n^2)$ por
             pasada, \textbf{54.4~min} a $N{=}6416$
       \end{itemize}
@@ -611,10 +611,15 @@ el ARI no se despega del azar.}
     \column{0.5\textwidth}
       \textbf{Hallazgos principales}
       \begin{itemize}\small
-        \item Sistema \textbf{modular} que compara extractores, reducciones y agrupadores bajo una misma interfaz
-        \item \textbf{Pipeline base}: cabeza de estilo DINOv2 $+$ UMAP-10 $+$ HDBSCAN; valida la cabeza por su calidad \textbf{supervisada}, no la intrínseca
-        \item El \textbf{coste} lo dominan ingesta y, sobre todo, la búsqueda $O(n^2)$; \textbf{HNSW} la elimina sin perder \textit{recall}
-        \item La reducción de dimensionalidad es \textbf{indispensable} para calidad y coste
+        \item Sistema \textbf{modular} que compara extractores, reducciones y
+            agrupadores bajo una misma interfaz
+        \item \textbf{Pipeline base}: cabeza de estilo DINOv2 $+$ UMAP-10 $+$
+            HDBSCAN; valida la cabeza por su calidad \textbf{supervisada}, no
+            la intrínseca
+        \item El \textbf{coste} lo dominan ingesta y, sobre todo, la búsqueda
+            $O(n^2)$; \textbf{HNSW} la elimina sin perder \textit{recall}
+        \item La reducción de dimensionalidad es \textbf{indispensable} para
+            calidad y coste
       \end{itemize}
     \column{0.5\textwidth}
       \textbf{Limitaciones y trabajo futuro}
