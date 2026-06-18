@@ -11,7 +11,10 @@
         \item Con cosenos sobre vectores unitarios la distancia sigue siendo informativa, pero al crecer $d$ el contraste vecino cercano/lejano se desvanece~\cite{aggarwal_surprising_2001}
         \item Por eso la reducción (UMAP-10) \textbf{mejora} el agrupamiento y abarata las etapas siguientes
         \item Las métricas de calidad se calculan sobre los \textit{embeddings} \textbf{originales} (L2-normalizados) para comparar entre familias
-      \end{itemize}
+        \item A la derecha, la relación entre la diferencia de distancia entre
+            el vecino más cercano y más lejano y la distancia al más cercano,
+            que tiende a cero a medida que $d$ crece.
+    \end{itemize}
     \column{0.5\textwidth}
       \centering
       \includegraphics[width=\linewidth]{figures/curse_dimensionality.pdf}
@@ -46,6 +49,47 @@
         \item Refuerza la elección de HDBSCAN: coste y memoria mínimos
       \end{itemize}
   \end{columns}
+\end{frame}
+
+\begin{frame}{Respaldo: ¿por qué silueta?}
+  \footnotesize
+  \begin{itemize}
+    \item \textbf{La objeción es real}: la silueta asume clústeres compactos y
+      convexos; penaliza las formas arbitrarias que producen los métodos de
+      densidad (HDBSCAN). No se oculta.
+    \item \textbf{Ninguna métrica se lee sola}. La comparación de \emph{extractores}
+      se ancla en métricas \emph{extrínsecas} (ARI/NMI), que no asumen forma; la
+      silueta es el \emph{proxy} para cuando no hay etiquetas.
+    \item \textbf{Por qué la silueta como eje único}: es el único índice interno
+      \emph{acotado} ($[-1,1]$) y comparable entre distintos $k$ y entre familias
+      de algoritmos. Calinski--Harabasz crece con $n$ y $d$; Davies--Bouldin no
+      está acotado $\Rightarrow$ malos para comparar entre ejecuciones.
+    \item \textbf{A fortiori}: aun penalizada por la silueta, HDBSCAN llega a las
+      mejores configuraciones $\Rightarrow$ el ranking es robusto al sesgo.
+    \item El ruido ($-1$) se \textbf{excluye} de la silueta: corta en ambos
+      sentidos (puede \emph{inflar} la de densidad); se reporta \texttt{noise\_ratio}
+      aparte para que sea visible.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Respaldo: ¿por qué silueta? (¿sesga SupCon la métrica?)}
+  \footnotesize
+  \begin{itemize}
+    \item SupCon optimiza compacidad intra-clase + separación: justo lo que premia
+      la silueta. ¿No infla la métrica a su favor?
+    \item \textbf{Distinción clave}: el ARI mide \emph{directamente} el objetivo
+      (acuerdo con las etiquetas reales); la silueta es un \emph{proxy} geométrico
+      de validez condicional.
+    \item Optimizar hacia el objetivo es legítimo (es aprender). Sólo sería
+      \enquote{Goodhart} si el proxy subiera \emph{sin} subir el objetivo (ARI).
+    \item \textbf{Evidencia (E1)}: las CNN \emph{sin ajustar} lideran la silueta
+      pero \emph{no} la calidad supervisada $\Rightarrow$ la silueta no favorece a
+      los modelos ajustados; si acaso, lo contrario.
+    \item Por eso el ranking de extractores descansa en el ARI, no en márgenes de
+      silueta: no comparables entre geometrías moldeadas por objetivos distintos.
+    \item (DBCV es un índice interno apto para densidad, pero sólo puntúa
+      \emph{clusterers} de densidad $\Rightarrow$ no sirve de eje común con KMeans/GMM.)
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Respaldo: silueta por extractor a tres escalas}
