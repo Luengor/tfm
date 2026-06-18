@@ -1,4 +1,4 @@
-\documentclass[aspectratio=169]{beamer}
+\documentclass[aspectratio=1610]{beamer}
 
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -359,9 +359,10 @@
 \begin{frame}{Diseño experimental}
   \begin{columns}[t]
     \column{0.5\textwidth}
+      \small
+      \textbf{Diez barridos}; cada uno varía \textbf{un solo eje} sobre una configuración base, para comparaciones justas.\\[0.5em]
+      \vspace{0.2em}
       \footnotesize
-      \textbf{Diez barridos}; cada uno varía \textbf{un solo eje} sobre una configuración base, para comparaciones justas.
-      \vspace{0.4em}
       \begin{tabular}{lll}
         \toprule
         \textbf{Objetivo} & \textbf{Exp.} & \textbf{Eje variado} \\
@@ -381,9 +382,9 @@
       \vspace{0.4em}\\
       {\scriptsize $N$ hasta $6416$; $K{=}3$--$5$ repeticiones por celda.}
     \column{0.5\textwidth}
-      \footnotesize
+      \small
       \textbf{Métricas de calidad}
-      \begin{itemize}\scriptsize
+      \begin{itemize}\footnotesize
         \item \textbf{Intrínsecas} (sin etiquetas): silueta,
             Calinski--Harabasz, Davies--Bouldin, ruido, balance de tamaños
         \item \textbf{Extrínsecas} (con etiquetas): ARI, NMI, F1 balanceada,
@@ -391,11 +392,11 @@
         \item \textbf{Coste}: tiempo de pared y memoria pico por etapa
       \end{itemize}
       \vspace{0.3em}
-      \begin{block}{\scriptsize Configuración base resultante}
-        {\scriptsize DINOv2 cabeza-estilo $+$ UMAP-10 $+$ HDBSCAN
+      \begin{block}{\footnotesize Configuración base resultante}
+        {\footnotesize DINOv2 cabeza-estilo $+$ UMAP-10 $+$ HDBSCAN
          (\texttt{mcs}=5) $+$ segmentador identidad}
       \end{block}
-      {\scriptsize Las métricas intrínsecas se leen \textbf{en conjunto}: aisladas premian particiones degeneradas.}
+      {\footnotesize Las métricas intrínsecas se leen \textbf{en conjunto}: aisladas premian particiones degeneradas.}
   \end{columns}
 \end{frame}
 
@@ -441,7 +442,7 @@
       \includegraphics[height=0.82\textheight]{figures/e1_silhouette_hbar.pdf}\\
       {\scriptsize E1: silueta por extractor a tres tamaños de banco.}
     \column{0.54\textwidth}
-      \centering \scriptsize
+      \centering \footnotesize
       \setlength{\tabcolsep}{3pt}
       \begin{tabular}{lcccc}
         \toprule
@@ -473,7 +474,7 @@
 \begin{frame}{Resultados: validación supervisada (E8) y elección del extractor}
   \begin{columns}[c]
     \column{0.46\textwidth}
-      \centering \scriptsize
+      \centering \small
       \setlength{\tabcolsep}{3pt}
       \begin{tabular}{lccc}
         \toprule
@@ -487,7 +488,7 @@
         \bottomrule
       \end{tabular}
       \vspace{0.6em}
-      \footnotesize
+      \small
       \begin{itemize}
         \item La cabeza de estilo DINOv2 \textbf{dobla} el ARI de cualquier
             extractor sin ajustar.
@@ -497,7 +498,7 @@
       \end{itemize}
     \column{0.54\textwidth}
       \centering
-      \includegraphics[width=\linewidth]{figures/e8_correlation.pdf}
+      \includegraphics[width=0.9\linewidth]{figures/e8_correlation.pdf}
   \end{columns}
 \end{frame}
 
@@ -515,7 +516,7 @@
   \end{itemize}
   \vfill
   \centering
-  \includegraphics[width=0.80\linewidth]{figures/e2_reduction_quality_cost.pdf}
+  \includegraphics[width=0.85\linewidth]{figures/e2_reduction_quality_cost.pdf}
 \end{frame}
 
 \begin{frame}{Resultados: algoritmo de agrupamiento (E3)}
@@ -543,8 +544,7 @@
   \begin{columns}[c]
     \column{0.50\textwidth}
       \centering
-      \includegraphics[width=\linewidth]{figures/e7_scalability_loglog.pdf}\\
-      {\scriptsize E7: tiempo de pared vs $N$ por etapa (log--log).}
+      \includegraphics[width=0.9\linewidth]{figures/e7_scalability_loglog.pdf}
     \column{0.50\textwidth}
       \footnotesize
       Pendiente log--log observada (vs.\ teórica):

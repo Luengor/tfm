@@ -52,7 +52,7 @@ def main() -> None:
         zip(FAMILY_ORDER, sns.color_palette("colorblind", n_colors=len(FAMILY_ORDER)))
     )
 
-    fig, ax = plt.subplots(figsize=(9.5, 7.5))
+    fig, ax = plt.subplots(figsize=(9.5, 9.0))
 
     for fam, sub in raw.groupby("family"):
         if len(sub) > 1:
@@ -102,7 +102,7 @@ def main() -> None:
             xy=(row.cost_plot, row.silhouette),
             xytext=(8, 6),
             textcoords="offset points",
-            fontsize=9,
+            fontsize=13,
             fontweight="bold",
             color=HIGHLIGHT if row.family == "HDBSCAN" else "#222222",
             zorder=5,
@@ -110,10 +110,11 @@ def main() -> None:
 
     ax.axhline(0, color="0.6", lw=0.6, ls=":")
     ax.set_xscale("log")
-    ax.set_xlabel("Coste (s, escala log) — tiempo de agrupamiento")
-    ax.set_ylabel("Silueta (mejor variante por familia)")
+    ax.set_xlabel("Coste (s, escala log) — tiempo de agrupamiento", fontsize=14)
+    ax.set_ylabel("Silueta (mejor variante por familia)", fontsize=14)
+    ax.tick_params(labelsize=13)
     ax.grid(True, which="both", alpha=0.25)
-    ax.legend(loc="lower right")
+    ax.legend(loc="lower right", fontsize=13)
 
     save(fig, "e3_pareto_quality_cost")
 

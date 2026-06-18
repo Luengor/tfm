@@ -106,11 +106,12 @@ def _panel(ax, pts, title, annotate_fixed, draw_lines=True):
         fa = [a for _, a in fixed]
         lines.insert(0, f"$r$ ($k$ fijo, $n={len(fixed)}$) $= {_pearson(fs, fa):+.2f}$")
     ax.text(0.04, 0.96, "\n".join(lines), transform=ax.transAxes,
-            va="top", ha="left", fontsize=8,
+            va="top", ha="left", fontsize=11,
             bbox=dict(boxstyle="round,pad=0.4", fc="white", ec="#cccccc", lw=0.8))
 
-    ax.set_title(title)
-    ax.set_xlabel("Silueta")
+    ax.set_title(title, fontsize=13)
+    ax.set_xlabel("Silueta", fontsize=12)
+    ax.tick_params(labelsize=11)
 
 
 def main() -> None:
@@ -118,11 +119,12 @@ def main() -> None:
     a = _cells("exp08a", "extrinsic_ari")
     b = _cells("exp08b", "extrinsic_author_ari")
 
-    fig, (axa, axb) = plt.subplots(1, 2, figsize=(8.2, 4.0), sharey=True)
+    fig, (axa, axb) = plt.subplots(2, 1, figsize=(6.5, 7.5), sharex=True)
     _panel(axa, a, "E8a · estilo (4 clases)", annotate_fixed=True)
     _panel(axb, b, "E8b · autoría (87 clases)", annotate_fixed=False, draw_lines=False)
 
-    axa.set_ylabel("ARI")
+    axa.set_ylabel("ARI", fontsize=12)
+    axb.set_ylabel("ARI", fontsize=12)
 
     handles = [
         Line2D([], [], marker="o", ls="", color=PALETTE[0], label="$k$ fijo (KMeans/aglo/espectral)"),
@@ -130,9 +132,9 @@ def main() -> None:
         Line2D([], [], ls="-", color=PALETTE[0], label="ajuste $k$ fijo"),
         Line2D([], [], ls="--", color="#444444", label="ajuste todas las celdas"),
     ]
-    fig.legend(handles=handles, loc="lower center", ncol=4, frameon=False,
-               bbox_to_anchor=(0.5, -0.02))
-    fig.tight_layout(rect=(0, 0.06, 1, 1))
+    fig.legend(handles=handles, loc="lower center", ncol=2, frameon=False,
+               bbox_to_anchor=(0.5, -0.01), fontsize=11)
+    fig.tight_layout(rect=(0, 0.08, 1, 1))
     save(fig, "e8_correlation")
 
 

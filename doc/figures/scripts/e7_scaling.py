@@ -50,7 +50,7 @@ def main() -> None:
         )
     df = pd.DataFrame(rows)
 
-    fig, (ax_stages, ax_algo) = plt.subplots(2, 1, figsize=(10.5, 10.5), sharex=False)
+    fig, (ax_stages, ax_algo) = plt.subplots(2, 1, figsize=(10.5, 13.0), sharex=False)
 
     # === Panel A: pipeline stages (use HDBSCAN run for stages + search) ===
     base = df[df.algo == "hdbscan"].sort_values("N")
@@ -70,7 +70,7 @@ def main() -> None:
         ax_stages.annotate(
             f"  m≈{s:.2f}",
             xy=(sub["N"].iloc[-1], sub[col].iloc[-1]),
-            fontsize=7,
+            fontsize=12,
             color=color,
             va="center",
         )
@@ -87,17 +87,18 @@ def main() -> None:
             xy=(6416, anom["umap"].iloc[0]),
             xytext=(-8, -18),
             textcoords="offset points",
-            fontsize=7,
+            fontsize=12,
             color=HIGHLIGHT,
             ha="right",
         )
 
     ax_stages.set_xscale("log")
     ax_stages.set_yscale("log")
-    ax_stages.set_xlabel("N (imágenes)")
-    ax_stages.set_ylabel("Tiempo de pared (s)")
-    ax_stages.set_title("A · Etapas del pipeline", pad=4)
-    ax_stages.legend(loc="upper left")
+    ax_stages.set_xlabel("N (imágenes)", fontsize=14)
+    ax_stages.set_ylabel("Tiempo de pared (s)", fontsize=14)
+    ax_stages.set_title("A · Etapas del pipeline", pad=4, fontsize=15)
+    ax_stages.tick_params(labelsize=13)
+    ax_stages.legend(loc="upper left", fontsize=13)
     ax_stages.xaxis.set_minor_locator(plt.LogLocator(base=10, subs="auto", numticks=10))
     ax_stages.grid(which="minor", axis="x", lw=0.3, alpha=0.4)
 
@@ -120,19 +121,21 @@ def main() -> None:
         ax_algo.annotate(
             f"  m≈{s:.2f}",
             xy=(sub["N"].iloc[-1], sub["clustering"].iloc[-1]),
-            fontsize=7,
+            fontsize=12,
             color=color,
             va="center",
         )
 
     ax_algo.set_xscale("log")
     ax_algo.set_yscale("log")
-    ax_algo.set_xlabel("N (imágenes)")
-    ax_algo.set_ylabel("Tiempo de pared (s)")
-    ax_algo.set_title("B · Algoritmos de agrupamiento", pad=4)
-    ax_algo.legend(loc="upper left")
+    ax_algo.set_xlabel("N (imágenes)", fontsize=14)
+    ax_algo.set_ylabel("Tiempo de pared (s)", fontsize=14)
+    ax_algo.set_title("B · Algoritmos de agrupamiento", pad=4, fontsize=15)
+    ax_algo.tick_params(labelsize=13)
+    ax_algo.legend(loc="upper left", fontsize=13)
     ax_algo.xaxis.set_minor_locator(plt.LogLocator(base=10, subs="auto", numticks=10))
     ax_algo.grid(which="minor", axis="x", lw=0.3, alpha=0.4)
+    fig.tight_layout(h_pad=4.0)
     save(fig, "e7_scalability_loglog")
 
 
