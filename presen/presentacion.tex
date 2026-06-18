@@ -18,7 +18,9 @@
 \usetheme{Madrid}
 \usecolortheme{default}
 \setbeamertemplate{navigation symbols}{}
-\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{footline}{%
+  \hfill\insertframenumber/\insertmainframenumber\hspace{2pt}\vspace{2pt}%
+}
 
 % ---- Metadata ----
 \title[Similitud y coste en imágenes de grafiti]{%
@@ -113,7 +115,8 @@
     \column{0.55\textwidth}
       \begin{itemize}
         \item \textbf{Banco principal:} $6681$ fotografías de grafiti en
-            \textbf{Salamanca}
+            \textbf{Salamanca}. Provenientes de un proyecto de la Dra. González
+            Arrieta
         \item Capturadas con un teléfono móvil ($\sim$10.6~MP), sin
             postprocesado. Captura masiva en otoño de 2022
         \item Alta variabilidad entre fotografías: iluminación, perspectiva,
@@ -179,30 +182,32 @@
     >=Stealth, node distance=9mm and 20mm,
     block/.style={draw, rounded corners, minimum height=8mm, minimum width=20mm,
                   inner sep=4pt, align=center, font=\small},
-    store/.style={block, fill=green!12},
+    ingest/.style={block, fill=blue!10},
+    cluster/.style={block, fill=orange!15},
+    store/.style={block, fill=green!15},
     io/.style={font=\footnotesize, align=center},
     lbl/.style={font=\scriptsize, midway, fill=white, inner sep=2pt},
   ]
     \node[io] (img) {fotografía};
-    \node[block, right=of img] (seg) {Segmentador};
-    \node[block, right=of seg] (ext) {Extractor};
+    \node[ingest, right=of img] (seg) {Segmentador};
+    \node[ingest, right=of seg] (ext) {Extractor};
     \node[store, right=of ext] (sto) {Almacenamiento};
     \draw[->] (img)--(seg);
     \draw[->] (seg)--(ext) node[lbl, above]{recortes};
     \draw[->] (ext)--(sto) node[lbl, above]{\textit{embeddings}};
 
-    \node[block, below=18mm of seg] (red) {Reducción};
-    \node[block, right=of red] (clu) {Agrupamiento};
+    \node[cluster, below=18mm of seg] (red) {Reducción};
+    \node[cluster, right=of red] (clu) {Agrupamiento};
     \node[io, right=of clu] (out) {clústeres\\y métricas};
     \draw[->] (red)--(clu);
     \draw[->] (clu)--(out);
     \draw[->] (sto.south) -- ++(0,-9mm) -| (red.north)
         node[lbl, pos=0.25, above]{carga masiva};
 
-    \node[draw, dotted, fit=(img)(seg)(ext), inner sep=3mm,
-          label=above:{\scriptsize Ingesta (incremental)}] {};
-    \node[draw, dotted, fit=(red)(clu)(out), inner sep=3mm,
-          label=below:{\scriptsize Agrupamiento (puntual)}] {};
+    \node[draw, dotted, blue!50, fit=(img)(seg)(ext), inner sep=3mm,
+          label=above:{\scriptsize\color{blue!70} Ingesta (incremental)}] {};
+    \node[draw, dotted, orange!70, fit=(red)(clu)(out), inner sep=3mm,
+          label=below:{\scriptsize\color{orange!80!black} Agrupamiento (puntual)}] {};
   \end{tikzpicture}%
   \shorthandon{<>}
 
@@ -220,6 +225,9 @@
             $\sim$650 cajas; partida de pesos COCO)
         \item \textbf{Fusión} de cajas por solapamiento y proximidad
         \item \textbf{Margen} de contexto configurable antes de recortar
+        \item Se trata de una \textbf{extentsión} a lo especificado en la
+            propuesta original con el objetivo de obtener mejores resultados
+            del dataset dado
       \end{itemize}
     \column{0.58\textwidth}
       \imgw{1.0}{segmentation_stages.pdf}\\
@@ -253,8 +261,8 @@
         VGG16         & CNN profunda      & $4096$ \\
         InceptionV3   & CNN multi-rama    & $2048$ \\
         MobileNetV3   & CNN ligera        & $1280$ \\
-        DINOv2 ViT-S/14 & \textit{Transformer} & $384$ \\
-        CLIP ViT-B/32 & \textit{Transformer} & $512$ \\
+        DINOv2 ViT-S/14 & \textit{Vis. Trans.} & $384$ \\
+        CLIP ViT-B/32 & \textit{Vis. Trans.} & $512$ \\
         \bottomrule
       \end{tabular}
   \end{columns}
@@ -318,9 +326,9 @@
       {\footnotesize Las métricas de calidad se calculan sobre los \textit{embeddings} \textbf{originales} (sin reducir).}
     \column{0.46\textwidth}
       \imgw{1.0}{curse_dimensionality.pdf}\\
-      \centering \scriptsize Conforme aumenta el número de dimensiones las
-      distancias entre el vecino más cercano y más lejano se vuelven
-      equivalentes.
+      \centering \scriptsize Conforme \textbf{aumenta} el número de dimensiones
+      (hacia la derecha) la diferencia entre la distancia más cercana y la más
+      lejana tiende a 0.
   \end{columns}
 \end{frame}
 
@@ -393,13 +401,13 @@
 
 \begin{frame}{Resultados: segmentador (E5)}
   \begin{columns}[c]
-    \column{0.55\textwidth}
-      \centering \scriptsize
+    \column{0.50\textwidth}
+      \centering \footnotesize
       \setlength{\tabcolsep}{3pt}
-      \includegraphics[height=0.42\textheight]{figures/val_batch2_pred.jpg}\\[0.5em]
+      \includegraphics[height=0.45\textheight]{figures/val_batch2_pred.jpg}\\[0.75em]
       \begin{tabular}{lrrrr}
         \toprule
-        \textbf{Segmentador} & \textbf{r/img} & \textbf{ruido} & \textbf{sil} & \textbf{ingesta} \\
+        \textbf{Segmentador} & \textbf{r/img} & \textbf{ruido}$\downarrow$ & \textbf{sil}$\uparrow$ & \textbf{ingesta} \\
         \midrule
         \textbf{identidad}      & 1.00 & \textbf{0.199} & \textbf{0.151} & \textbf{1236} \\
         YOLO11s                 & 1.03 & 0.225 & 0.127 & 1777 \\
@@ -407,22 +415,21 @@
         YOLO11m \textit{ft}     & 2.39 & 0.298 & 0.122 & 2152 \\
         \bottomrule
       \end{tabular}\\[0.3em]
-      {\scriptsize E5, calidad intrínseca y coste de ingesta (s) a $N{=}6416$.
-      r/img = recortes por imagen, ruido$\downarrow$, sil$\uparrow$.}
-    \column{0.45\textwidth}
+    \column{0.50\textwidth}
       \footnotesize
       \begin{itemize}
         \item \textbf{Identidad gana en todo}: mejor silueta, menor ruido y
             menor coste de ingesta
         \item Detectores base (YOLO11s/m): $\sim$1 caja/imagen, reproducen el
-            banco original; calidad marginal o peor además de ser más costosos
+            banco original; \textbf{calidad marginal o peor} además de ser más
+            costosos
         \item YOLO11m \textit{ft}: lidera a $N{=}1000$, pero a escala completa
-            produce $2.4$ recortes/imagen y degenera ($30\%$ ruido, $1049$
+            produce $2.4$ recortes/imagen y \textbf{degenera} ($30\%$ ruido, $1049$
             clústeres)
-        \item El detector alcanza un recall $0.74$ y mAP@.5--.95 $0.60$.
-            El segmentador pierde uno de cada cuatro grafitis, y los que
-            detecta no los ajusta bien del todo. Las cabezas de estilo no 
-            toleran bien el ruido de los recortes.
+        \item El detector alcanza un recall $0.74$ y mAP@.5--.95 $0.60$. El
+            segmentador \textbf{pierde uno de cada cuatro grafitis}, y los que
+            detecta no los ajusta bien del todo. Las cabezas de estilo
+            \textbf{no toleran bien la variabilidad} de los recortes.
       \end{itemize}
   \end{columns}
 \end{frame}
@@ -451,8 +458,7 @@
         \texttt{yolom}                & 0.131 & 480 & 0.253 & 0.74 \\
         \texttt{yolon}                & 0.085 & 348 & 0.341 & 0.81 \\
         \bottomrule
-      \end{tabular}\\[0.3em]
-      {\scriptsize E1, calidad intrínseca a $N{=}6416$. Las CNN ImageNet lideran silueta; la cabeza de estilo DINOv2 queda en posición 10 de 12.}
+      \end{tabular}
       \vspace{0.3em}
       \footnotesize
       \begin{itemize}
@@ -479,24 +485,19 @@
         DINOv2 (base)          & 0.356 & 0.374 & 0.558 \\
         ResNet50               & 0.334 & 0.277 & 0.548 \\
         \bottomrule
-      \end{tabular}\\[0.3em]
-      {\scriptsize E8a: mejor celda por extractor (294 recortes, 4 estilos).}
-      \vspace{0.4em}
+      \end{tabular}
+      \vspace{0.6em}
       \footnotesize
       \begin{itemize}
-        \item Cabeza de estilo DINOv2 \textbf{dobla} el ARI de cualquier
-            extractor sin ajustar (sil.\ intrínseca: 0.155, posición 10 de 12)
+        \item La cabeza de estilo DINOv2 \textbf{dobla} el ARI de cualquier
+            extractor sin ajustar.
         \item \textbf{E8b (autoría, 87 autores):} ARI $\approx 0.04$--$0.08$.
             Con $\sim$2 recortes por autor, 87 clústeres no son detectables; es
             una tarea de \emph{recuperación abierta}, no de partición
       \end{itemize}
     \column{0.54\textwidth}
       \centering
-      \includegraphics[width=\linewidth]{figures/e8_correlation.pdf}\\
-      {\scriptsize Silueta frente a ARI por celda (E8a/E8b). En E8a:
-      $r{=}+0.78$ para $k$ fijo, la silueta \emph{sí} ordena bien a
-  granularidad de estilo. En E8b: la correlación no es informativa: a 87 clases
-el ARI no se despega del azar.}
+      \includegraphics[width=\linewidth]{figures/e8_correlation.pdf}
   \end{columns}
 \end{frame}
 
@@ -514,8 +515,7 @@ el ARI no se despega del azar.}
   \end{itemize}
   \vfill
   \centering
-  \includegraphics[width=0.80\linewidth]{figures/e2_reduction_quality_cost.pdf}\\
-  {\scriptsize E2: calidad intrínseca (izquierda) y coste por etapa (derecha) por familia de reducción a $N{=}6416$.}
+  \includegraphics[width=0.80\linewidth]{figures/e2_reduction_quality_cost.pdf}
 \end{frame}
 
 \begin{frame}{Resultados: algoritmo de agrupamiento (E3)}
@@ -528,13 +528,13 @@ el ARI no se despega del azar.}
       \footnotesize
       \begin{itemize}
         \item \textbf{HDBSCAN}: silueta competitiva, ruido moderado, tamaños balanceados, coste despreciable ($0.35$~s)
-        \item OPTICS iguala en calidad, ${\sim}25\times$ más tiempo, ${\sim}2\,500\times$ más memoria
-        \item K-medias: más rápido, pero silueta 0.094 puntos inferior. Mejor opción sin ruido
+        \item \textbf{OPTICS} iguala en calidad, ${\sim}25\times$ más tiempo, ${\sim}2\,500\times$ más memoria
+        \item \textbf{K-medias}: más rápido, pero silueta 0.094 puntos inferior. Mejor opción \textbf{sin ruido}
         \item Métricas \textbf{aisladas} engañan: silueta y CH premian $k{=}2$ trivial $\Rightarrow$ criterio conjunto
       \end{itemize}
       \vspace{0.4em}
       \begin{block}{\scriptsize Pipeline base}
-        {\scriptsize DINOv2 estilo $+$ UMAP-10 $+$ HDBSCAN (\texttt{mcs}=5) $+$ identidad}
+        {\scriptsize DINOv2 estilo $+$ UMAP-10 $+$ HDBSCAN (\texttt{mcs}=5) $+$ segmentador identidad}
       \end{block}
   \end{columns}
 \end{frame}
@@ -589,16 +589,16 @@ el ARI no se despega del azar.}
     \column{0.50\textwidth}
       \small
       \begin{itemize}
-        \item pgvector exacto: ${\sim}2$ órdenes de magnitud sobre SQLite
-            (elimina el \textit{round-trip} de Python)
-        \item \textbf{HNSW}: único \textit{throughput} que se mantiene
-            \emph{constante} con $N$ (${\sim}560$ cons./s) mientras el exacto y
-            SQLite se desploman; a $N{=}6416$, $3.2\times$ sobre el exacto y
+        \item \textbf{SQLite}: Búsqueda completa $O(n^2)$, \textbf{inviable} a
+            escala ($54.4$~min a $N{=}6416$)
+        \item \textbf{PostgreSQL $+$ pgvector}: ${\sim}2$ órdenes de magnitud
+            sobre SQLite (elimina el \textit{round-trip} de Python)
+        \item \textbf{HNSW}: único \textit{throughput} que se \textbf{mantiene
+            \emph{constante} con $N$} (${\sim}560$ cons./s) mientras el exacto
+            y SQLite se desploman; a $N{=}6416$, $3.2\times$ sobre el exacto y
             $240\times$ sobre SQLite, \textbf{sin} pérdida de \textit{recall}
-            (R@5 $=1.000$). Índice: $0.47$~s, amortizado en \textbf{una}
-            consulta
-        \item Su \textbf{ventaja crece con $N$}; el dataset está muy por encima
-            del cruce
+            (R@5 $=1.000$). La construcción del índice se amortiza en
+            \textbf{una} consulta. 
       \end{itemize}
   \end{columns}
 \end{frame}
@@ -606,32 +606,27 @@ el ARI no se despega del azar.}
 % ============================================================
 \section{Conclusiones}
 
-\begin{frame}{Conclusiones}
-  \begin{columns}[t]
-    \column{0.5\textwidth}
-      \textbf{Hallazgos principales}
-      \begin{itemize}\small
-        \item Sistema \textbf{modular} que compara extractores, reducciones y
-            agrupadores bajo una misma interfaz
-        \item \textbf{Pipeline base}: cabeza de estilo DINOv2 $+$ UMAP-10 $+$
-            HDBSCAN; valida la cabeza por su calidad \textbf{supervisada}, no
-            la intrínseca
-        \item El \textbf{coste} lo dominan ingesta y, sobre todo, la búsqueda
-            $O(n^2)$; \textbf{HNSW} la elimina sin perder \textit{recall}
-        \item La reducción de dimensionalidad es \textbf{indispensable} para
-            calidad y coste
-      \end{itemize}
-    \column{0.5\textwidth}
-      \textbf{Limitaciones y trabajo futuro}
-      \begin{itemize}\small
-        \item Rango de $N$ estrecho ($\le 6416$): difícil separar $O(n\log n)$ de $O(n^2)$
-        \item Datos de \textbf{autoría} insuficientes $\Rightarrow$ ampliar y anotar el banco
-        \item Preentrenamiento no supervisado antes de las cabezas supervisadas
-        \item Pasar de \textit{batch} a \textbf{ingesta incremental} (índice y espacio reducido)
-      \end{itemize}
-  \end{columns}
-  \vfill
-  \centering
+\begin{frame}{Conclusiones: Hallazgos principales}
+  \begin{itemize}
+    \item Se ha desarrollado un sistema \textbf{modular} que compara
+        extractores, reducciones y agrupadores bajo una misma interfaz
+    \item \textbf{Pipeline base}: cabeza de estilo DINOv2 $+$ UMAP-10 $+$
+        HDBSCAN; valida la cabeza por su calidad \textbf{supervisada}, no
+        la intrínseca
+    \item El \textbf{coste} lo dominan ingesta y, sobre todo, la búsqueda
+        $O(n^2)$; \textbf{HNSW} la elimina sin perder calidad 
+    \item La reducción de dimensionalidad es \textbf{indispensable} para
+        calidad y coste
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Conclusiones: Limitaciones y trabajo futuro}
+  \begin{itemize}
+    \item Rango de $N$ estrecho ($\le 6416$): difícil separar $O(n\log n)$ de $O(n^2)$
+    \item Datos de \textbf{autoría} insuficientes $\Rightarrow$ ampliar y anotar el banco
+    \item Preentrenamiento no supervisado antes de las cabezas supervisadas
+    \item Pasar de \textit{batch} a \textbf{ingesta incremental} (índice y espacio reducido)
+  \end{itemize}
 \end{frame}
 
 % ============================================================
@@ -641,7 +636,7 @@ el ARI no se despega del azar.}
   \vspace{2em}
   {\Large \textbf{Gracias}}\\[1em]
   {\normalsize Alberto Luengo Román}\\
-  {\small \texttt{aluengor0001@gmail.com}}\\[1.5em]
+  {\small \texttt{luengor@usal.es}}\\[1.5em]
   \imgw{0.25}{marca-UniversidadSalamanca-color.pdf}
 \end{frame}
 
@@ -653,6 +648,7 @@ el ARI no se despega del azar.}
 
 % ============================================================
 % --- Diapositivas de respaldo + preguntas previsibles del tribunal ---
+\appendix
 \input{preguntas_jurado.tex}
 
 \end{document}

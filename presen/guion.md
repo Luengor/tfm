@@ -52,11 +52,12 @@ Para el proyecto, disponemos de un banco principal de 6600 fotografías de
 grafiti en Salamanca, capturadas principalmente en 2022. Las fotografías son
 bastante distintas entre si: hay bastante variedad de perspectivas, iluminación
 y escenas, algunos grafitis son sobre muros, otros sobre papeleras o postes.
-Muchas de las fotografías contienen varios grafiti.
+Muchas de las fotografías contienen varios grafitis.
 
 Además, se cuenta con un banco auxiliar de más de 1000 fotografías de Cuenca,
-cedidas por la iniciativa StopGrafiti. Estas se utilizan solo para el ajuste
-fino para evitar el solapamiento entre datos de entrenamiento y evaluación.
+cedidas por la iniciativa StopGrafiti, que nos contactó por el interés que
+tenía en el proyecto. Estas se utilizan solo para el ajuste fino para evitar el
+solapamiento entre datos de entrenamiento y evaluación.
 
 ## Anotaciones y subconjuntos
 Ninguno de los bancos cuenta con anotaciones, por lo que ha sido necesario
@@ -90,7 +91,9 @@ A continuación se explican con más detalle cada una de las fases.
 La etapa de segmentación consiste en obtener de manera automática los recortes
 de los grafitis a partir de las fotografías. Para esto, se utiliza un modelo de
 YOLO ajustado sobre algunos de los recortes anotados para detectar
-específicamente grafitis.
+específicamente grafitis. Esto, cae fuera de lo que se esperaba del proyecto,
+se ha realizado como un trabajo extra para intentar dar lo máximo posible del
+dataset que tenemos.
 
 La fase procede como se muestra en el diagrama: los grafitis se detectan, se
 fusionan los recortes que cumplen ciertos criterios, se añade un ligero margen
@@ -108,9 +111,11 @@ transformers como DINOv2 o CLIP.
 ## Extracción de características: ajuste al dominio
 Para mejorar la calidad de las representaciones numéricas, se realiza un ajuste
 fino de algunas de las redes neuronales. Esto se hace entrenando una pequeña
-red neuronal que se situa al final de la red pre-entrenada y que se entrena
-sobre los conjuntos anotados de grafitis. Se entrenan 4 cabezas: 2 para estilo
-y 2 para autoría, una en MobileNet y otra en DINOv2.
+red neuronal que se sitúa al final de la red pre-entrenada (una cabeza). Estas
+cabezas consisten en un par de capas lineales con una función de activación
+entre ellas y una normalización final. Estas cabezas se entrenan sobre los
+conjuntos anotados de grafitis. Se entrenan 4 cabezas: 2 para estilo y 2 para
+autoría, una en MobileNet y otra en DINOv2.
 
 ## Reducción de dimensionalidad
 Los vectores de características obtenidos por la red neuronal llegan a contener
@@ -266,18 +271,14 @@ La tabla muestra el rendimiento de la búsqueda por similitud a distintos tamañ
 de banco y con tres backends distintos.
 
 SQLite hace la búsqueda en Python con un barrido lineal, lo que lo hace muy
-lento. pgvector exacto elimina el round-trip a Python y llega a unas 600
-consultas por segundo a N pequeño, pero su throughput cae con N.
+lento. PostgreSQL con una extensión específica para datos vectoriales,
+pgvector, elimina el round-trip a Python y llega a unas 600 consultas por
+segundo a N pequeño, pero su throughput cae con N.
 
-El índice HNSW, que es un índice aproximado, mantiene un throughput prácticamente
-constante en torno a 560 consultas por segundo independientemente del tamaño del
-banco. A N igual a 6416, es 3.2 veces más rápido que el exacto y 240 veces más
-rápido que SQLite, y todo esto sin ninguna pérdida de recall: R@5 es 1.000 en
-todos los casos.
-
-El índice tarda menos de medio segundo en construirse, por lo que se amortiza en
-una sola consulta. Y su ventaja sobre el exacto sigue creciendo con N, por lo
-que para bancos más grandes la diferencia sería aún más pronunciada.
+Haciendo uso de un índice HNSW, una estructura de datos que permite realizar
+búsquedas aproximadas de vecinos más cercanos, se consigue un throughput
+prácticamente constante de unas 560 consultas por segundo. Esto además se 
+consigue sin ninguna pérdida de recall: R@5 es 1.000 en todos los casos.
 
 # Conclusiones
 ## Conclusiones

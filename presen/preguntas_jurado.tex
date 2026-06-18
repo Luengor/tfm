@@ -54,9 +54,6 @@
 \begin{frame}{Respaldo: ¿por qué silueta?}
   \footnotesize
   \begin{itemize}
-    \item \textbf{La objeción es real}: la silueta asume clústeres compactos y
-      convexos; penaliza las formas arbitrarias que producen los métodos de
-      densidad (HDBSCAN). No se oculta.
     \item \textbf{Ninguna métrica se lee sola}. La comparación de \emph{extractores}
       se ancla en métricas \emph{extrínsecas} (ARI/NMI), que no asumen forma; la
       silueta es el \emph{proxy} para cuando no hay etiquetas.
@@ -64,8 +61,8 @@
       \emph{acotado} ($[-1,1]$) y comparable entre distintos $k$ y entre familias
       de algoritmos. Calinski--Harabasz crece con $n$ y $d$; Davies--Bouldin no
       está acotado $\Rightarrow$ malos para comparar entre ejecuciones.
-    \item \textbf{A fortiori}: aun penalizada por la silueta, HDBSCAN llega a las
-      mejores configuraciones $\Rightarrow$ el ranking es robusto al sesgo.
+    \item Aún penalizada por la silueta, HDBSCAN llega a las mejores
+        configuraciones $\Rightarrow$ el ranking es robusto al sesgo.
     \item El ruido ($-1$) se \textbf{excluye} de la silueta: corta en ambos
       sentidos (puede \emph{inflar} la de densidad); se reporta \texttt{noise\_ratio}
       aparte para que sea visible.
@@ -75,8 +72,6 @@
 \begin{frame}{Respaldo: ¿por qué silueta? (¿sesga SupCon la métrica?)}
   \footnotesize
   \begin{itemize}
-    \item SupCon optimiza compacidad intra-clase + separación: justo lo que premia
-      la silueta. ¿No infla la métrica a su favor?
     \item \textbf{Distinción clave}: el ARI mide \emph{directamente} el objetivo
       (acuerdo con las etiquetas reales); la silueta es un \emph{proxy} geométrico
       de validez condicional.
